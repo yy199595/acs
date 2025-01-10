@@ -10,10 +10,21 @@ namespace kcp
 {
 	Server::Server(asio::io_context& io, kcp::Server::Component* component, unsigned short port, Asio::Context& main)
 			: mContext(io), mSocket(io, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)), mComponent(component),
-			  mTimer(io), mMainContext(main)
+			  mTimer(io), mMainContext(main), mTime(KCP_UPDATE_INTERVAL)
 	{
-		this->mTimer.expires_after(std::chrono::milliseconds(KCP_UPDATE_INTERVAL));
-		this->mTimer.async_wait([this](auto&& PH1){ this->OnUpdate(std::forward<decltype(PH1)>(PH1)); });
+
+	}
+
+	void Server::Start()
+	{
+		this->StartTimer();
+		this->StartReceive();
+	}
+
+	void Server::StartTimer()
+	{
+		this->mTimer.expires_after(this->mTime);
+		this->mTimer.async_wait([this](auto&& PH1){ this->Update(); });
 	}
 
 	void Server::StartReceive()
@@ -28,7 +39,7 @@ namespace kcp
 			{
 				return;
 			}
-			this->StartReceive();
+			asio::post(this->mContext, [this] { this->StartReceive(); });
 		};
 		this->mSocket.async_receive_from(asio::buffer(this->mRecvBuffer),
 				this->mSenderPoint, callback);
@@ -78,6 +89,7 @@ namespace kcp
 			iter->second->Update(t);
 			iter++;
 		}
+		this->StartTimer();
 	}
 
 	kcp::Session* Server::GetSession(const std::string& address)
@@ -95,14 +107,6 @@ namespace kcp
 		}
 		CONSOLE_LOG_DEBUG("kcp client:{} connect server", address)
 		return kcpSession;
-	}
-
-	void Server::OnUpdate(const asio::error_code& code)
-	{
-		this->Update();
-		this->mTimer.expires_after(std::chrono::milliseconds(KCP_UPDATE_INTERVAL));
-		this->mTimer.async_wait([this](auto&& PH1)
-		{ OnUpdate(std::forward<decltype(PH1)>(PH1)); });
 	}
 
 	void Server::OnReceive(size_t size)

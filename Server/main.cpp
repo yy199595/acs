@@ -184,12 +184,6 @@ int main(int argc, char** argv)
 #ifdef __OS_WIN__
 	//system("chcp 65001 > nul");
 #endif
-
-	unsigned short num1 = 0;
-	unsigned short num = 140;
-	char buffer[sizeof(num)] = { 0};
-	tcp::Data::Write(buffer, num);
-	tcp::Data::Read(buffer, num1);
 	int id = 0;
 	RegisterAll();
 	std::string path;

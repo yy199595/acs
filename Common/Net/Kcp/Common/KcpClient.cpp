@@ -60,31 +60,32 @@ namespace kcp
 	void Client::StartReceive()
 	{
 		std::shared_ptr<Client> self = this->shared_from_this();
+		auto callback = [self](const asio::error_code& code, size_t size)
+		{
+			if (code.value() != Asio::OK)
+			{
+				CONSOLE_LOG_ERROR("code:{}", code.message())
+				return;
+			}
+			self->mReceiveBuffer.commit(size);
+			unsigned short port = self->mLocalEndpoint.port();
+			std::string ip = self->mLocalEndpoint.address().to_string();
+
+			const char* msg = asio::buffer_cast<const char*>(self->mReceiveBuffer.data());
+
+			ikcp_input(self->mKcp, msg, (int)size);
+			int messageLen = ikcp_recv(self->mKcp, self->mDecodeBuffer.data(), kcp::BUFFER_COUNT);
+			//CONSOLE_LOG_DEBUG("client receive message : {}", messageLen);
+			if (messageLen > 0)
+			{
+				const std::string address = fmt::format("{}:{}", ip, port);
+				self->OnReceive(address, self->mDecodeBuffer.data(), messageLen);
+			}
+			self->mReceiveBuffer.consume(size);
+			asio::post(self->mContext, [self] { self->StartReceive(); });
+		};
 		this->mSocket.async_receive_from(this->mReceiveBuffer.prepare(kcp::BUFFER_COUNT),
-				this->mLocalEndpoint, [self](const asio::error_code& code, size_t size)
-				{
-					if (code.value() != Asio::OK)
-					{
-						CONSOLE_LOG_ERROR("code:{}", code.message())
-						return;
-					}
-					self->mReceiveBuffer.commit(size);
-					unsigned short port = self->mLocalEndpoint.port();
-					std::string ip = self->mLocalEndpoint.address().to_string();
-
-					const char * msg = asio::buffer_cast<const char *>(self->mReceiveBuffer.data());
-
-					ikcp_input(self->mKcp, msg, (int)size);
-					int messageLen = ikcp_recv(self->mKcp, self->mDecodeBuffer.data(), kcp::BUFFER_COUNT);
-					//CONSOLE_LOG_DEBUG("client receive message : {}", messageLen);
-					if(messageLen > 0)
-					{
-						const std::string address = fmt::format("{}:{}", ip, port);
-						self->OnReceive(address, self->mDecodeBuffer.data(), messageLen);
-					}
-					self->mReceiveBuffer.consume(size);
-					asio::post(self->mContext, [self] { self->StartReceive(); });
-				});
+				this->mLocalEndpoint, callback);
 	}
 
 	void Client::OnReceive(const std::string& address, const char* buf, int size)

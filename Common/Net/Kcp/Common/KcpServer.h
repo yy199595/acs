@@ -15,14 +15,15 @@ namespace kcp
 		typedef acs::IRpc<rpc::Message, rpc::Message> Component;
 		Server(asio::io_context & io, Component * component, unsigned short port, Asio::Context & main);
 	public:
-		void StartReceive();
+		void Start();
 		void RemoveSession(const std::string & address);
 		bool Send(const std::string & addr, tcp::IProto * message);
 		inline asio::ip::udp::socket & Socket() { return this->mSocket; }
 	private:
 		void Update();
+		void StartTimer();
+		void StartReceive();
 		void OnReceive(size_t size);
-		void OnUpdate(const asio::error_code & code);
 		kcp::Session * GetSession(const std::string & address);
 	private:
 		Component * mComponent;
@@ -31,6 +32,7 @@ namespace kcp
 		asio::streambuf mSendBuffer;
 		asio::ip::udp::socket mSocket;
 		Asio::Context & mMainContext;
+		std::chrono::milliseconds mTime;
 		asio::ip::udp::endpoint mSenderPoint;
 		std::array<char, kcp::BUFFER_COUNT> mRecvBuffer;
 		std::array<char, kcp::BUFFER_COUNT> mDecodeBuffer;

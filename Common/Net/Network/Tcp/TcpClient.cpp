@@ -49,6 +49,7 @@ namespace tcp
 			CONSOLE_LOG_ERROR("[{}:{}] ", ip, port, code.message());
 			return;
 		}
+
 		this->ClearBuffer();
 		this->mSocket->MakeNewSocket();
 		Asio::EndPoint endPoint(address, port);

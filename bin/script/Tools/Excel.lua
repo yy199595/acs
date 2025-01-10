@@ -4,8 +4,9 @@ local fs = require("util.fs")
 local log = require("Console")
 local director = require("util.dir")
 local config = app:GetConfig("excel")
+local Module = require("Module")
+local Excel = Module()
 
-local Excel = { }
 Excel.Handler = { }
 Excel.Line = {
     CommentLine = 1, --注释行

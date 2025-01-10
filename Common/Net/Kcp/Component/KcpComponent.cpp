@@ -72,7 +72,7 @@ namespace acs
 				Asio::Context& io = this->mApp->GetContext();
 				this->mKcpServer = std::make_unique<kcp::Server>(context, this, port, io);
 			}
-			asio::post(context, [this]() { this->mKcpServer->StartReceive(); });
+			asio::post(context, [this] { this->mKcpServer->Start(); });
 			return true;
 		}
 		catch (std::exception& e)
