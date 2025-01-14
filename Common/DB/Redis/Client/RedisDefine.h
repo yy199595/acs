@@ -102,7 +102,7 @@ namespace redis
 	{
 	public:
 		Response();
-		~Response() final { this->Clear(); }
+		~Response()  { this->Clear(); }
 
 	public:
 		bool IsOk();

@@ -6,10 +6,7 @@
 #define APP_TCPCLIENT_H
 #include"Socket.h"
 #include"Core/Queue/Queue.h"
-
-#ifdef __SHARE_PTR_COUNTER__
 #include "Rpc/Common/Message.h"
-#endif
 namespace tcp
 {
 	enum TimeoutFlag

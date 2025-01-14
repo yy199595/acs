@@ -51,9 +51,9 @@ option(__ENABLE_OPEN_SSL__ "开启openssl" ON)
 option(__MEMOEY_CHECK__ "开启内存检查" OFF)
 option(__ENABLE_OPEN_WOLF_SSL__ "开启wolfssl" OFF)
 
-option(__ENABLE_MEMORY_CHECK__ "开启内存检查" ON)
+option(__ENABLE_MEMORY_CHECK__ "开启内存检查" OFF)
 
-option(__SHARE_PTR_COUNTER__ "开启指针计算查询" ON)
+option(__SHARE_PTR_COUNTER__ "开启指针计算查询" OFF)
 option(__MEMORY_POOL_OPERATOR__ "使用重载对象内存池" OFF)
 
 option(__MONGO_DB_AUTH_SHA256__ "mongodb使用sha256认证" ON)

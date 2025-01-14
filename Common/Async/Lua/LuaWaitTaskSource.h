@@ -22,7 +22,7 @@ namespace acs
 	public:
 		explicit LuaWaitTaskSource(lua_State* lua);
 
-		~LuaWaitTaskSource() final;
+		~LuaWaitTaskSource();
 
 	public:
 		int Await();

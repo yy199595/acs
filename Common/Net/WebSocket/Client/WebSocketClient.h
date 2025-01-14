@@ -7,6 +7,7 @@
 #include "Network/Tcp/Client.h"
 #include "Entity/Component/IComponent.h"
 #include "WebSocket/Common/WebSocketMessage.h"
+
 namespace http
 {
 	class Request;
