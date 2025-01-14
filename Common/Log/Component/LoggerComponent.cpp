@@ -111,6 +111,7 @@ namespace acs
 
 	void LoggerComponent::Flush()
 	{
+		std::lock_guard<std::mutex> lock(this->mMutex);
 		auto iter1 = this->mLoggers.begin();
 		for (; iter1 != this->mLoggers.end(); iter1++)
 		{
@@ -149,7 +150,6 @@ namespace acs
 
 	void LoggerComponent::PushLog(std::unique_ptr<custom::LogInfo> log)
 	{
-		assert(this->mApp->IsMainThread());
 		custom::Logger* logger = this->GetLogger(log->Level);
 		if (logger != nullptr)
 		{

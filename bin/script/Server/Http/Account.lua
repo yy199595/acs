@@ -32,7 +32,7 @@ function Account:Login(request)
     local gate_id =  app.Random("GateSystem")
     local address = app.GetListen(gate_id, "gate")
     if address == nil then
-        log.Error("not find gate address:%s", gate_id)
+        log.Error("not find gate address {}", gate_id)
         return XCode.AddressAllotFailure
     end
 

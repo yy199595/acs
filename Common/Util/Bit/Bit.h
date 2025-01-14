@@ -10,15 +10,13 @@ namespace help
 	namespace bit
 	{
 		template<typename T>
-		inline void Set(int pos, T & value)
+		inline std::enable_if_t<std::is_integral<T>::value, void> Set(int pos, T & value)
 		{
-			static_assert(std::is_integral<T>::value, "T must be an integral type");
 			value |= (static_cast<T>(1) << pos);
 		}
 		template<typename T>
-		inline T Get(int pos, const T & value)
+		inline std::enable_if_t<std::is_integral<T>::value, void> Get(int pos, const T & value)
 		{
-			static_assert(std::is_integral<T>::value, "T must be an integral type");
 			return (value >> pos) & static_cast<T>(1);
 		}
 	}

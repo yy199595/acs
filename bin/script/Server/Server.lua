@@ -54,43 +54,26 @@ function Main:Update()
 end
 
 function Main:OnComplete()
+    local hosts = TcpSocket.Query("baidu.com")
+    log.Debug("{}", hosts)
 
-    local bson = require("util.bson")
-    local json = require("util.json")
+    for i = 1, 10 do
+        local request = "GET / HTTP/1.1\r\n"
+        request = request .. "HOST: " .. "baidu.com\r\n"
+        request = request .. "Connection: close\r\n\r\n"
 
-    local request = {
-        func = "ChatSystem.OnChat",
-        player_id = 10000999,
-        name = "xiaoming",
-        friend_list = {
-            {
-                id = 1001,
-                name = "xiaozhang"
-            },
-            {
-                id = 1002,
-                name = "xiaohua"
-            }
-        },
-        sex = true,
-        list = { 1, 2, 3, 44, 5 }
-    }
+        local client = TcpSocket.Connect(hosts[1], 80)
 
-    local sum = 100000
-    local str1 = bson.encode(request)
-    local str2 = json.encode(request)
-    local t1 = os.clock()
-    for i = 1, sum do
-        --local str = bson.encode(request)
-       bson.decode(str1)
+        print(client:Send(request))
+        local size, message = client:Read()
+        if size == 0 then
+            log.Error("read error", message)
+        end
+        client:Close()
+        coroutine.sleep(1000)
+        client = nil
     end
-    local t2 = os.clock()
-    for i = 1, sum do
-        --local str = json.encode(request)
-        json.decode(str2)
-    end
-    local t3 = os.clock()
-    print(string.format("[%s]bson=%s  [%s]json=%s", #str1, t2- t1, #str2, t3 - t2))
+
 end
 
 return Main

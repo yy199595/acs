@@ -224,7 +224,7 @@ namespace Lua
 		explicit SharedPtrProxy(std::shared_ptr<T> t)
 			: mNativePtr(t) { }
 
-		~SharedPtrProxy() = default;
+		~SharedPtrProxy() { printf("SharedPtrProxy\n");};
 
 	 public:
 		static std::shared_ptr<T> Read(lua_State* lua, int index)
@@ -249,7 +249,7 @@ namespace Lua
 			new(lua_newuserdata(lua, sizeof(PtrProxy<T>))) PtrProxy<T>(data, false);
 		}
 
-		static void Destory(lua_State* lua, int index)
+		static void Destroy(lua_State* lua, int index)
 		{
 			if (lua_isuserdata(lua, index))
 			{

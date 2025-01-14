@@ -26,6 +26,8 @@
 #include "Kcp/Common/KcpClient.h"
 #include "Core/Lua/LuaOs.h"
 #include "Proto/Lua/Bson.h"
+#include "Lua/Lib/Lib.h"
+#include "Lua/Socket/LuaClient.h"
 #ifdef __ENABLE_OPEN_SSL__
 #include "Util/Ssl/rsa.h"
 #include "Util/Ssl/LuaRsa.h"
@@ -121,10 +123,11 @@ namespace acs
 		classProxyHelper3.PushMemberFunction("GetSheets", &lxlsx::ExcelFile::GetSheets);
 
 		Lua::ClassProxyHelper classProxyHelper4(this->mLuaEnv, "TcpSocket");
-		classProxyHelper4.BeginRegister<tcp::Socket>();
+		classProxyHelper4.BeginRegister<lua::Client>();
 		classProxyHelper4.PushExtensionFunction("Send", Lua::TcpSock::Send);
 		classProxyHelper4.PushExtensionFunction("Read", Lua::TcpSock::Read);
 		classProxyHelper4.PushExtensionFunction("Query", Lua::TcpSock::Query);
+		classProxyHelper4.PushExtensionFunction("Close", Lua::TcpSock::Close);
 		classProxyHelper4.PushExtensionFunction("Connect", Lua::TcpSock::Connect);
 
 		Lua::ClassProxyHelper classProxyHelper5(this->mLuaEnv, "UdpSocket");
@@ -197,6 +200,11 @@ namespace acs
 		moduleRegistry.AddFunction("Verify", lua::ljwt::Verify).End("util.jwt");
 
 		moduleRegistry.Start();
+		moduleRegistry.AddFunction("format", Lua::lfmt::format);
+		moduleRegistry.AddFunction("serialize", Lua::lfmt::serialize);
+		moduleRegistry.AddFunction("deserialize", Lua::lfmt::deserialize).End("util.fmt");
+
+		moduleRegistry.Start();
 		moduleRegistry.AddFunction("Make", Lua::LuaDir::Make);
 		moduleRegistry.AddFunction("IsExist", Lua::LuaDir::IsExist).End("util.dir");
 
@@ -216,12 +224,13 @@ namespace acs
 
 	Lua::LuaModule * LuaComponent::LoadModule(const std::string& name)
 	{
-		LuaModule * luaModule = nullptr;
-		if(this->mLuaModules.Get(name, luaModule))
+		auto iter = this->mLuaModules.find(name);
+		if(iter != this->mLuaModules.end())
 		{
-			return luaModule;
+			return iter->second.get();
 		}
-		if(!this->mModulePaths.Has(name))
+
+		if(this->mModulePaths.find(name) == this->mModulePaths.end())
 		{
 			return nullptr;
 		}
@@ -233,12 +242,13 @@ namespace acs
 			lua_pop(this->mLuaEnv, 1);
 			return nullptr;
 		}
-
+		LuaModule * luaModule = nullptr;
 		luaL_checktype(this->mLuaEnv, -1, LUA_TTABLE);
 		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
-		luaModule = new LuaModule(this->mLuaEnv, name, ref);
+		std::unique_ptr<LuaModule> newModule = std::make_unique<LuaModule>(this->mLuaEnv, name, ref);
 		{
-			this->mLuaModules.Add(name, luaModule);
+			luaModule = newModule.get();
+			this->mLuaModules.emplace(name, std::move(newModule));
 		}
 		return luaModule;
 	}
@@ -273,7 +283,13 @@ namespace acs
 				long long time = help::fs::GetLastWriteTime(filePath);
 				if (help::fs::GetFileName(filePath, moduleName))
 				{
-					ModuleInfo * moduleInfo = new ModuleInfo();
+					auto iter = this->mModulePaths.find(moduleName);
+					if(iter != this->mModulePaths.end())
+					{
+						LOG_ERROR("module name : {}  {}", moduleName, filePath);
+						return false;
+					}
+					std::unique_ptr<ModuleInfo> moduleInfo = std::make_unique<ModuleInfo>();
 					{
 						moduleInfo->Name = moduleName;
 						moduleInfo->FullPath = filePath;
@@ -281,11 +297,7 @@ namespace acs
 						moduleInfo->LocalPath = filePath;
 						help::Str::ReplaceString(moduleInfo->LocalPath, work, "");
 					}
-					if(!this->mModulePaths.Add(moduleName, moduleInfo))
-					{
-						LOG_ERROR("module name : {}  {}", moduleName, filePath);
-						return false;
-					}
+					this->mModulePaths.emplace(moduleName, std::move(moduleInfo));
 				}
 			}
 		}
@@ -313,8 +325,8 @@ namespace acs
 
 	bool LuaComponent::OnHotFix()
 	{
-		auto iter = this->mModulePaths.Begin();
-		for (; iter != this->mModulePaths.End(); iter++)
+		auto iter = this->mModulePaths.begin();
+		for (; iter != this->mModulePaths.end(); iter++)
 		{
 			this->CheckModuleHotfix(iter->first);
 		}
@@ -323,11 +335,12 @@ namespace acs
 
 	void LuaComponent::CheckModuleHotfix(const std::string& module)
 	{
-		ModuleInfo * moduleInfo = nullptr;
-		if (!this->mModulePaths.Get(module, moduleInfo))
+		auto iter = this->mModulePaths.find(module);
+		if(iter == this->mModulePaths.end())
 		{
 			return;
 		}
+		ModuleInfo * moduleInfo = iter->second.get();
 		const std::string& path = moduleInfo->FullPath;
 		long long time = help::fs::GetLastWriteTime(path);
 		if (moduleInfo->LastWriteTime == time)
@@ -340,10 +353,10 @@ namespace acs
 			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
 			return;
 		}
-		LuaModule * luaModule = nullptr;
-		if (this->mLuaModules.Get(module, luaModule))
+		auto iter1 = this->mLuaModules.find(module);
+		if(iter1 != this->mLuaModules.end())
 		{
-			luaModule->OnModuleHotfix();
+			iter1->second->OnModuleHotfix();
 		}
 		LOG_INFO("load lua file [{}] ok", moduleInfo->LocalPath);
 	}
@@ -404,7 +417,7 @@ namespace acs
 		std::unique_ptr<json::w::Value> jsonObject = document.AddObject("lua");
 		{
 			document.Add("lua", this->GetMemorySize());
-			document.Add("module", this->mModulePaths.Size());
+			document.Add("module", this->mModulePaths.size());
 		}
 	}
 }

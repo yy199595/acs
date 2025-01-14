@@ -5,14 +5,14 @@
 ---
 
 local Log = { }
-local pcall = xpcall
-local string_fmt = string.format
+local lfmt = require("util.fmt")
+local string_format = lfmt.format
 local console = require("Console")
 local logger = require("util.logger")
 local debug_traceback = debug.traceback
 
 function Log.Info(fmt, ...)
-    local message = string_fmt(fmt, ...)
+    local message = string_format(fmt, ...)
     logger.Output(console.LogInfo, message)
 end
 
@@ -27,7 +27,7 @@ function Log.OnError(error_msg)
 end
 
 function Log.Debug(fmt, ...)
-    local message = string_fmt(fmt, ...)
+    local message = string_format(fmt, ...)
     logger.Output(console.LogDebug, message)
 end
 
@@ -37,17 +37,17 @@ function Log.Stack(err)
 end
 
 function Log.Warning(fmt, ...)
-    local message = string_fmt(fmt, ...)
+    local message = string_format(fmt, ...)
     logger.Output(console.LogWarn, message)
 end
 
 function Log.Error(fmt, ...)
-    local message = string_fmt(fmt, ...)
+    local message = string_format(fmt, ...)
     logger.Output(console.LogError, message)
 end
 
 function Log.Fatal(fmt, ...)
-    local msg = string_fmt(fmt, ...)
+    local msg = string_format(fmt, ...)
     local message = debug_traceback() .. msg
     logger.Output(console.LogFatal, message)
 end

@@ -123,7 +123,7 @@ namespace Lua
 				lua_rawset(this->mLua, -3);
 
 				lua_pushstring(this->mLua, "__gc");
-				lua_pushcclosure(this->mLua, ClassMateProxy::OnDestory<T>, 0);
+				lua_pushcclosure(this->mLua, ClassMateProxy::OnDestroy<T>, 0);
 				lua_rawset(this->mLua, -3);
 
 				lua_pushstring(this->mLua, "__name");

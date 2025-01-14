@@ -18,6 +18,10 @@
         "IsClient": true,
         "Request": "c2s.chat.request"
     },
+    "ChatSystem.OnSleep": {
+        "Proto" : "json",
+        "Async": true
+    },
     "ChatComponent.OnChat" : {
         "SendToClient" : true,
         "Request": "c2s.chat.request"

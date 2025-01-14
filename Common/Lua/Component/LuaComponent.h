@@ -1,7 +1,7 @@
 #pragma once
 #include<set>
 #include<memory>
-#include"Core/Map/HashMap.h"
+#include<unordered_map>
 #include"Lua/Module/LuaModule.h"
 #include"Lua/Config/LuaConfig.h"
 #include"Entity/Component/Component.h"
@@ -48,7 +48,7 @@ namespace acs
 		Lua::LuaModule * mMainModule;
 		std::vector<std::string> mDoFiles;
 		std::unique_ptr<LuaConfig> mLuaConfig;
-		custom::HashMap<std::string, ModuleInfo *> mModulePaths;
-		custom::HashMap<std::string, Lua::LuaModule *> mLuaModules;
+		std::unordered_map<std::string, std::unique_ptr<ModuleInfo>> mModulePaths;
+		std::unordered_map<std::string, std::unique_ptr<Lua::LuaModule>> mLuaModules;
 	};
 }

@@ -32,13 +32,21 @@ namespace acs
 		template<typename T>
 		void SetResult(T result);
 		void SetResult(int code, std::unique_ptr<rpc::Message> response);
+
+		template<typename... Args>
+		void SetResults(Args &&... args)
+		{
+			size_t size = sizeof...(Args);
+			Lua::Parameter::WriteArgs(this->mLua, std::forward<Args>(args)...);
+			Lua::Coroutine::Resume(this->mLua, (int)size);
+		}
 	 private:
 		int mRef;
 		lua_State* mLua;
 	};
 
 	template<typename T>
-	void LuaWaitTaskSource::SetResult(T result)
+	inline void LuaWaitTaskSource::SetResult(T result)
 	{
 		Lua::Parameter::Write(this->mLua, result);
         Lua::Coroutine::Resume(this->mLua, 1);

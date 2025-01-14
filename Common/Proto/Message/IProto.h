@@ -72,6 +72,7 @@ namespace tcp
 	class TextProto final : public IProto
 	{
 	public:
+		TextProto() = default;
 		explicit TextProto(std::string  msg) : mMessage(std::move(msg)) { }
 		explicit TextProto(const char * msg, size_t size) : mMessage(msg, size) { }
 	private:
@@ -91,11 +92,17 @@ namespace tcp
 
 	inline int TextProto::OnRecvMessage(std::istream& os, size_t size)
 	{
-		this->mMessage.resize(size);
-		char * buffer = const_cast<char*>(this->mMessage.c_str());
+		size_t count = 0;
+		char buffer[128] = { 0 };
+		do
 		{
-			os.readsome(buffer, size);
+			count = os.readsome(buffer, sizeof(buffer));
+			if(count > 0)
+			{
+				this->mMessage.append(buffer, count);
+			}
 		}
+		while(count > 0);
 		return 0;
 	}
 

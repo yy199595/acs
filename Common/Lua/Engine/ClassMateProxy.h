@@ -55,7 +55,7 @@ namespace Lua
 		}
 
 		template<typename T>
-		inline int OnDestory(lua_State* lua)
+		inline int OnDestroy(lua_State* lua)
 		{
 			PtrProxy<T>::Destroy(lua, -1);
 			//printf("destory object %s\n", typeid(T).name());
