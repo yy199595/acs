@@ -30,7 +30,6 @@ namespace http
 namespace acs
 {
     class HttpMethodConfig;
-	typedef IRequest<HttpMethodConfig, http::Request, http::Response> HttpHandlerComponent;
 	class HttpWebComponent final : public HttpListenComponent, public IServerRecord
     {
     public:
@@ -55,8 +54,7 @@ namespace acs
 		http::ContentFactory mFactory;
 		std::vector<std::string> mRoots;
 		class DispatchComponent * mDispatch;
-		class CoroutineComponent * mCorComponent;
-		std::vector<HttpHandlerComponent *> mRecordComponents;
+		class CoroutineComponent * mCoroutine;
 		std::unordered_map<std::string, std::string> mDefaultHeader;
 		custom::HashMap<std::string, class HttpService *> mHttpServices;
 	};

@@ -38,6 +38,6 @@ namespace acs
 		asio_udp::endpoint mRemotePoint;
 		class DispatchComponent * mDispatch;
 		std::unique_ptr<kcp::Server> mKcpServer;
-		std::unordered_map<int, std::unique_ptr<kcp::IClient>> mClients;
+		std::unordered_map<int, std::shared_ptr<kcp::IClient>> mClients;
 	};
 }

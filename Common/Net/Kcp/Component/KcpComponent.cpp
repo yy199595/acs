@@ -187,11 +187,11 @@ namespace acs
 			kcp::Client * udpClient = nullptr;
 			Asio::Context & context = this->mApp->GetContext();
 			asio_udp::endpoint remote(asio::ip::make_address(ip), port);
-			std::unique_ptr<kcp::Client> client = std::make_unique<kcp::Client>(context, this, remote, context);
+			std::shared_ptr<kcp::Client> client = std::make_shared<kcp::Client>(context, this, remote, context);
 			{
 				client->StartReceive();
 				udpClient = client.get();
-				this->mClients.emplace(id, std::move(client));
+				this->mClients.emplace(id, client);
 			}
 			return udpClient;
 		}

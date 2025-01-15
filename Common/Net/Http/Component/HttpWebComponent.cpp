@@ -21,7 +21,7 @@ namespace acs
 		this->mConfig.Auth = true;
 		this->mConfig.RpcDebug = false;
 		this->mDispatch = nullptr;
-		this->mCorComponent = nullptr;
+		this->mCoroutine = nullptr;
 		this->mFactory.Add<http::FromContent>(http::Header::FORM);
 		this->mFactory.Add<http::JsonContent>(http::Header::JSON);
 
@@ -50,8 +50,7 @@ namespace acs
 			this->mHttpServices.Add(name, httpService);
 		}
 
-		this->mCorComponent = App::Coroutine();
-		this->mApp->GetComponents(this->mRecordComponents);
+		this->mCoroutine = App::Coroutine();
 		this->mDispatch = this->GetComponent<DispatchComponent>();
 		return this->ReadHttpConfig();
 	}
@@ -313,7 +312,7 @@ namespace acs
 			this->Invoke(httpConfig, request, response);
 			return;
 		}
-		this->mCorComponent->Start(&HttpWebComponent::Invoke, this, httpConfig, request, response);
+		this->mCoroutine->Start(&HttpWebComponent::Invoke, this, httpConfig, request, response);
 	}
 
 	HttpStatus HttpWebComponent::AuthToken(const HttpMethodConfig* config, http::Request* request) noexcept
@@ -369,15 +368,6 @@ namespace acs
 	void HttpWebComponent::Invoke(const HttpMethodConfig* config, http::Request* request, http::Response* response) noexcept
 	{
 		HttpStatus code = HttpStatus::OK;
-		for (HttpHandlerComponent* recordComponent: this->mRecordComponents)
-		{
-			int status = recordComponent->OnRequest(*config, *request);
-			if (status != (int)HttpStatus::OK && status != XCode::Ok)
-			{
-				this->SendResponse(request->GetSockId(), (HttpStatus)status);
-				return;
-			}
-		}
 		do
 		{
 			http::Head& head = request->Header();
@@ -421,10 +411,6 @@ namespace acs
 #endif
 		} while (false);
 
-		for (HttpHandlerComponent* recordComponent: this->mRecordComponents)
-		{
-			recordComponent->OnRequestDone(*config, *request, *response);
-		}
 		this->SendResponse(request->GetSockId(), code);
 	}
 
