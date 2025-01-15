@@ -11,19 +11,19 @@
 #include "Client/Component/WsClientComponent.h"
 #include "Client/Component/TcpClientComponent.h"
 
-namespace acs
+namespace lua
 {
-	int LuaTcpClient::Send(lua_State* l)
+	int Client::Send(lua_State* l)
 	{
 		std::unique_ptr<rpc::Message> message;
 		int sessionId = (int)luaL_checkinteger(l, 1);
 		const std::string func = luaL_checkstring(l, 2);
-		if(App::Inst()->MakeMessage(l, 3, func, message) != XCode::Ok)
+		if(acs::App::Inst()->MakeMessage(l, 3, func, message) != XCode::Ok)
 		{
 			lua_pushinteger(l, XCode::Failure);
 			return 1;
 		}
-		RouterComponent * router = App::Get<RouterComponent>();
+		acs::RouterComponent * router = acs::App::Get<acs::RouterComponent>();
 		if(router == nullptr)
 		{
 			lua_pushinteger(l, XCode::NetWorkError);
@@ -34,111 +34,81 @@ namespace acs
 		return 1;
 	}
 
-	int LuaTcpClient::Call(lua_State* l)
+	int Client::Call(lua_State* l)
 	{
 		std::unique_ptr<rpc::Message> message;
 		int sessionId = (int)luaL_checkinteger(l, 1);
 		const std::string func = luaL_checkstring(l, 2);
-		if(App::Inst()->MakeMessage(l, 3, func, message) != XCode::Ok)
+		if(acs::App::Inst()->MakeMessage(l, 3, func, message) != XCode::Ok)
 		{
 			lua_pushinteger(l, XCode::Failure);
 			return 1;
 		}
-		RouterComponent * router = App::Get<RouterComponent>();
+		acs::RouterComponent * router = acs::App::Get<acs::RouterComponent>();
 		if(router == nullptr)
 		{
 			lua_pushinteger(l, XCode::NetWorkError);
 			return 1;
 		}
+
 		lua_pushthread(l);
 		message->SetNet(rpc::Net::Client);
 		return router->LuaCall(l, sessionId, std::move(message));
 	}
 
-	int LuaTcpClient::Connect(lua_State* lua)
+	int Client::Connect(lua_State* lua)
 	{
 		const std::string addr = luaL_checkstring(lua, 1);
-		TcpClientComponent * clientComponent = App::Get<TcpClientComponent>();
+		acs::RouterComponent * router = acs::App::Get<acs::RouterComponent>();
+		if(router == nullptr)
 		{
-			int sessionId = clientComponent->Connect(addr);
-			lua_pushinteger(lua, sessionId);
+			lua_pushinteger(lua, XCode::NetWorkError);
+			return 1;
 		}
+		rpc::IInnerSender* clientSender = router->GetSender(rpc::Net::Client);
+		if(clientSender == nullptr)
+		{
+			luaL_error(lua, "not find client sender");
+			return 0;
+		}
+		int sessionId = clientSender->Connect(addr);
+		lua_pushinteger(lua, sessionId);
 		return 1;
 	}
 
-	int LuaTcpClient::Close(lua_State* l)
+	int Client::Close(lua_State* L)
 	{
-		int sessionId = (int)luaL_checkinteger(l, 1);
-		TcpClientComponent * clientComponent = App::Get<TcpClientComponent>();
+		int sessionId = (int)luaL_checkinteger(L, 1);
+		acs::RouterComponent * router = acs::App::Get<acs::RouterComponent>();
+		if(router == nullptr)
 		{
-			clientComponent->Remove(sessionId);
+			lua_pushinteger(L, XCode::NetWorkError);
+			return 1;
 		}
+		rpc::IInnerSender* clientSender = router->GetSender(rpc::Net::Client);
+		if(clientSender == nullptr)
+		{
+			luaL_error(L, "not find client sender");
+			return 0;
+		}
+		clientSender->Remove(sessionId);
 		return 0;
 	}
 }
 
-namespace acs
+
+namespace lua
 {
-	int LuaWsClient::Send(lua_State* l)
+	int lib::luaopen_lclient(lua_State* L)
 	{
-		std::unique_ptr<rpc::Message> message;
-		int sessionId = (int)luaL_checkinteger(l, 1);
-		const std::string func = luaL_checkstring(l, 2);
-		if(App::Inst()->MakeMessage(l, 3, func, message) != XCode::Ok)
-		{
-			lua_pushinteger(l, XCode::Failure);
-			return 1;
-		}
-		RouterComponent * router = App::Get<RouterComponent>();
-		if(router == nullptr)
-		{
-			lua_pushinteger(l, XCode::NetWorkError);
-			return 1;
-		}
-		message->SetNet(rpc::Net::Client);
-		lua_pushinteger(l, router->Send(sessionId, std::move(message)));
+		luaL_Reg l[] = {
+				{ "Send", lua::Client::Send },
+				{ "Call", lua::Client::Call },
+				{ "Close", lua::Client::Close },
+				{ "Connect", lua::Client::Connect },
+				{ nullptr,  nullptr }
+		};
+		luaL_newlib(L, l);
 		return 1;
-	}
-
-	int LuaWsClient::Call(lua_State* l)
-	{
-		std::unique_ptr<rpc::Message> message;
-		int sessionId = (int)luaL_checkinteger(l, 1);
-		const std::string func = luaL_checkstring(l, 2);
-		if(App::Inst()->MakeMessage(l, 3, func, message) != XCode::Ok)
-		{
-			lua_pushinteger(l, XCode::Failure);
-			return 1;
-		}
-		RouterComponent * router = App::Get<RouterComponent>();
-		if(router == nullptr)
-		{
-			lua_pushinteger(l, XCode::NetWorkError);
-			return 1;
-		}
-		lua_pushthread(l);
-		message->SetNet(rpc::Net::Client);
-		return router->LuaCall(l, sessionId, std::move(message));
-	}
-
-	int LuaWsClient::Connect(lua_State* lua)
-	{
-		const std::string addr = luaL_checkstring(lua, 1);
-		WsClientComponent * clientComponent = App::Get<WsClientComponent>();
-		{
-			int sessionId = clientComponent->Connect(addr);
-			lua_pushinteger(lua, sessionId);
-		}
-		return 1;
-	}
-
-	int LuaWsClient::Close(lua_State* l)
-	{
-		int sessionId = (int)luaL_checkinteger(l, 1);
-		WsClientComponent * clientComponent = App::Get<WsClientComponent>();
-		{
-			clientComponent->Remove(sessionId);
-		}
-		return 0;
 	}
 }

@@ -25,6 +25,7 @@ namespace acs
 		LOG_CHECK_RET_FALSE(this->mProto = this->GetComponent<ProtoComponent>())
 		LOG_CHECK_RET_FALSE(this->mLuaComponent = this->GetComponent<LuaComponent>())
 		LOG_CHECK_RET_FALSE(this->mDisComponent = this->GetComponent<DispatchComponent>())
+		this->mLuaComponent->AddCCModule("net.client", lua::lib::luaopen_lclient);
 		return true;
 	}
 
@@ -58,15 +59,6 @@ namespace acs
 		return iter->second->Send(message) ? XCode::Ok : XCode::SendMessageFail;
 	}
 
-	void TcpClientComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
-	{
-		luaRegister.AddFunction("Send", LuaTcpClient::Send);
-		luaRegister.AddFunction("Call", LuaTcpClient::Call);
-		luaRegister.AddFunction("Close", LuaTcpClient::Close);
-		luaRegister.AddFunction("Connect", LuaTcpClient::Connect);
-		luaRegister.End("net.client");
-	}
-
 	void TcpClientComponent::OnSendFailure(int id, rpc::Message* message)
 	{
 		if(message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
@@ -97,16 +89,15 @@ namespace acs
 		}
 	}
 
-	int TcpClientComponent::Remove(int id)
+	void TcpClientComponent::Remove(int id)
 	{
 		auto iter = this->mClientMap.find(id);
 		if(iter == this->mClientMap.end())
 		{
-			return 0;
+			return;
 		}
 		iter->second->Close();
 		this->mClientMap.erase(iter);
-		return 1;
 	}
 
 	void TcpClientComponent::OnClientError(int id, int code)

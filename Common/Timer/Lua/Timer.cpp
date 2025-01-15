@@ -9,7 +9,7 @@
 #include"Timer/Component/TimerComponent.h"
 using namespace acs;
 
-namespace Lua
+namespace lua
 {
 	std::unique_ptr<LuaTimer> MakeTimer(lua_State * lua, int index, unsigned int ms)
 	{

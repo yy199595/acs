@@ -7,7 +7,7 @@
 #include"Util/Tools/String.h"
 
 using namespace acs;
-namespace Lua
+namespace lua
 {
 
 	void Log::Error(lua_State * lua)

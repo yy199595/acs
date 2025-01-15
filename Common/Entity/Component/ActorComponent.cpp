@@ -61,14 +61,6 @@ namespace acs
 		}
 	}
 
-	void ActorComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
-	{
-		luaRegister.AddFunction("Send", LuaActor::Send);
-		luaRegister.AddFunction("Call", LuaActor::Call);
-		luaRegister.AddFunction("Publish", LuaActor::Publish);
-		luaRegister.AddFunction("AddAddr", LuaPlayer::AddAddr).End("core.router");
-	}
-
 	bool ActorComponent::AddRandomActor(const std::string& name, acs::Actor* actor)
 	{
 		if (name.empty())

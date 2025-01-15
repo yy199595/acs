@@ -5,7 +5,7 @@
 #ifndef APP_TIMER_H
 #define APP_TIMER_H
 #include"Lua/Engine/Define.h"
-namespace Lua
+namespace lua
 {
 	namespace Timer
 	{

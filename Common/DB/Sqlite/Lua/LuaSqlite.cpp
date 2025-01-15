@@ -8,7 +8,7 @@
 #include"Yyjson/Lua/ljson.h"
 #include"Sqlite/Component/SqliteComponent.h"
 using namespace acs;
-namespace Lua
+namespace lua
 {
 	int Sqlite::Exec(lua_State* lua)
 	{

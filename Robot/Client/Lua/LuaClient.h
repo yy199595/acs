@@ -5,9 +5,9 @@
 #ifndef APP_LUACLIENT_H
 #define APP_LUACLIENT_H
 struct lua_State;
-namespace acs
+namespace lua
 {
-	namespace LuaTcpClient
+	namespace Client
 	{
 		extern int Send(lua_State * l);
 		extern int Call(lua_State * l);
@@ -16,14 +16,12 @@ namespace acs
 	}
 }
 
-namespace acs
+
+namespace lua
 {
-	namespace LuaWsClient
+	namespace lib
 	{
-		extern int Send(lua_State * l);
-		extern int Call(lua_State * l);
-		extern int Close(lua_State * l);
-		extern int Connect(lua_State * l);
+		extern int luaopen_lclient(lua_State * L);
 	}
 }
 

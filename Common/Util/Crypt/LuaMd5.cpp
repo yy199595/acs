@@ -52,28 +52,3 @@ namespace lua
 		return 1;
 	}
 }
-
-
-namespace lua
-{
-	int lib::luaopen_lmd5(lua_State* L)
-	{
-		luaL_Reg l[] = {
-				{ "ToString", lua::md5::ToString },
-				{ nullptr, nullptr}
-		};
-		luaL_newlib(L, l);
-		return 1;
-	}
-
-	int lib::luaopen_lbase64(lua_State* L)
-	{
-		luaL_Reg l[] = {
-				{ "encode", lua::base64::Encode },
-				{ "decode", lua::base64::Decode },
-				{ nullptr, nullptr}
-		};
-		luaL_newlib(L, l);
-		return 1;
-	}
-}

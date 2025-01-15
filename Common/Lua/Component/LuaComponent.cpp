@@ -57,21 +57,31 @@ namespace acs
 	void LuaComponent::LoadAllLib()
 	{
 		luaL_openlibs(this->mLuaEnv);
+		this->AddCCModule("util.fs", lua::lib::luaopen_lfs);
+		this->AddCCModule("util.md5", lua::lib::luaopen_lmd5);
+		this->AddCCModule("util.oss", lua::lib::luaopen_loss);
+		this->AddCCModule("util.fmt", lua::lib::luaopen_lfmt);
+		this->AddCCModule("util.jwt", lua::lib::luaopen_ljwt);
+		this->AddCCModule("util.json", lua::lib::luaopen_ljson);
+		this->AddCCModule("util.bson", lua::lib::luaopen_lbson);
+		this->AddCCModule("util.proto", lua::lib::luaopen_lproto);
+		this->AddCCModule("util.base64", lua::lib::luaopen_lbase64);
+
+		this->AddCCModule("db.redis", lua::lib::luaopen_lredisdb);
+		this->AddCCModule("db.mongo", lua::lib::luaopen_lmonogodb);
+		this->AddCCModule("db.sqlite", lua::lib::luaopen_lsqlitedb);
+
+		this->AddCCModule("core.app", lua::lib::luaopen_lapp);
+		this->AddCCModule("core.log", lua::lib::luaopen_llog);
+		this->AddCCModule("core.timer", lua::lib::luaopen_ltimer);
+
+		this->AddCCModule("net.http", lua::lib::luaopen_lhttp);
+	}
+
+	void LuaComponent::AddCCModule(const char* module, lua_CFunction func)
+	{
 		Lua::ModuleClass moduleRegistry(this->mLuaEnv);
-		const luaL_Reg luaLibs[] = {
-				{ "util.fs", lua::lib::luaopen_lfs },
-				{ "util.md5", lua::lib::luaopen_lmd5 },
-				{ "util.fmt", lua::lib::luaopen_lfmt },
-				{ "util.jwt", lua::lib::luaopen_ljwt },
-				{ "core.app", lua::lib::luaopen_lapp },
-				{ "util.json", lua::lib::luaopen_ljson },
-				{ "util.bson", lua::lib::luaopen_lbson },
-				{ "util.base64", lua::lib::luaopen_lbase64 }
-		};
-		for (const luaL_Reg& luaLib: luaLibs)
-		{
-			moduleRegistry.Register(luaLib);
-		}
+		moduleRegistry.Register(module, func);
 	}
 
 	void LuaComponent::RegisterLuaClass()
@@ -167,14 +177,6 @@ namespace acs
 
 	bool LuaComponent::LateAwake()
 	{
-		Lua::ModuleClass moduleRegistry(this->mLuaEnv);
-
-		std::vector<ILuaRegister*> components;
-		this->mApp->GetComponents(components);
-		for (ILuaRegister* component: components)
-		{
-			component->OnLuaRegister(moduleRegistry);
-		}
 		return this->LoadAllFile();
 	}
 
@@ -190,7 +192,9 @@ namespace acs
 		{
 			return nullptr;
 		}
+		lua_settop(this->mLuaEnv, 0);
 		lua_getglobal(this->mLuaEnv, "require");
+		assert(lua_isfunction(this->mLuaEnv, -1));
 		lua_pushstring(this->mLuaEnv, name.c_str());
 		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
 		{
@@ -286,6 +290,7 @@ namespace acs
 		{
 			this->CheckModuleHotfix(iter->first);
 		}
+		this->CollectGarbage();
 		return true;
 	}
 
@@ -373,6 +378,7 @@ namespace acs
 		std::unique_ptr<json::w::Value> jsonObject = document.AddObject("lua");
 		{
 			document.Add("lua", this->GetMemorySize());
+			document.Add("free", this->CollectGarbage());
 			document.Add("module", this->mModulePaths.size());
 		}
 	}

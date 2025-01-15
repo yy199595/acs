@@ -16,6 +16,7 @@ namespace acs
 	public:
 		RouterComponent();
 	public:
+		rpc::IInnerSender * GetSender(char net);
 		int Send(int id, int code, rpc::Message * message);
 		int Send(int id, std::unique_ptr<rpc::Message> message);
 		std::unique_ptr<rpc::Message> Call(int id, std::unique_ptr<rpc::Message> message);

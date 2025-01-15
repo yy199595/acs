@@ -117,8 +117,10 @@ namespace rpc
 		IInnerSender() = default;
 		virtual ~IInnerSender() = default;
 	public:
+		virtual void Remove(int id) { }
 		virtual char GetNet() const noexcept = 0;
 		virtual int Send(int id, rpc::Message* message) noexcept = 0;
+		virtual int Connect(const std::string & address) { return 0; }
 	};
 
 	class IOuterSender //外网接口

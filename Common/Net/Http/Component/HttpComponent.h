@@ -16,7 +16,7 @@ namespace http
 namespace acs
 {
 	class HttpComponent final : public RpcComponent<http::Response>,
-	                            public ILuaRegister, public IRpc<http::Request, http::Response>
+	                             public IRpc<http::Request, http::Response>
 	{
 	 public:
 		HttpComponent();
@@ -36,7 +36,6 @@ namespace acs
 #endif
         bool LateAwake() final;
 		void OnDelTask(int key) final;
-		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		std::shared_ptr<http::RequestClient> CreateClient(http::Request * request);
 		void OnMessage(http::Request *request, http::Response *response) noexcept final;
 	private:

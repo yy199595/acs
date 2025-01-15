@@ -7,7 +7,7 @@
 namespace acs
 {
 	class SqlHelper;
-	class SqliteComponent final : public Component, public ILuaRegister, public IDestroy
+	class SqliteComponent final : public Component, public IDestroy
 	{
 	public:
 		SqliteComponent() = default;
@@ -21,7 +21,6 @@ namespace acs
 		bool Awake() final;
 		void OnDestroy() final;
 		sqlite3 * GetClient(const std::string & tab);
-		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 	private:
 		std::string mName;
 		std::string mSaveDir;

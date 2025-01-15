@@ -20,7 +20,7 @@ namespace acs
 	class ThreadComponent;
 
 	class RedisComponent final : public RpcComponent<redis::Response>,
-		public ILuaRegister, public IRpc<redis::Request, redis::Response>, public IDestroy, public IServerRecord
+		 public IRpc<redis::Request, redis::Response>, public IDestroy, public IServerRecord
 	{
 	 public:
 		RedisComponent() = default;
@@ -60,7 +60,6 @@ namespace acs
 		void OnDestroy() final;
         bool LateAwake() final;
 		void OnRecord(json::w::Document &document) final;
-		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 	private:
 		redis::Config mConfig;
 		custom::Queue<int> mFreeClients; //空闲客户端

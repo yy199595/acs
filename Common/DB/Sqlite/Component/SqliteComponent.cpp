@@ -4,7 +4,7 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Util/Tools/String.h"
 #include"Util/Sql/SqlHelper.h"
-#include"Sqlite/Lua/LuaSqlite.h"
+#include "Lua/Lib/Lib.h"
 #include"Lua/Engine/ModuleClass.h"
 namespace acs
 {
@@ -15,14 +15,6 @@ namespace acs
 			return false;
 		}
 		return help::dir::MakeDir(this->mSaveDir);
-	}
-
-	void SqliteComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
-	{
-		luaRegister.AddFunction("Exec", Lua::Sqlite::Exec);
-		luaRegister.AddFunction("Find", Lua::Sqlite::Find);
-		luaRegister.AddFunction("FindOne", Lua::Sqlite::FindOne);
-		luaRegister.End("db.sqlite");
 	}
 
 	int SqliteComponent::MakeTable(const std::string & table,

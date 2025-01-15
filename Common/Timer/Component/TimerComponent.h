@@ -6,8 +6,7 @@
 #include"Entity/Component/Component.h"
 namespace acs
 {
-    class TimerComponent final : public Component, public ISystemUpdate,
-								 public ILuaRegister, public IFrameUpdate
+    class TimerComponent final : public Component, public ISystemUpdate, public IFrameUpdate
 	{
 	 public:
 		TimerComponent();
@@ -34,7 +33,6 @@ namespace acs
 		bool InvokeTimer(long long timerId);
 		bool AddTimerToWheel(long long timerId);
 		bool AddTimerToWheel(std::unique_ptr<TimerBase> timer);
-      	void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
     private:
 		const int LayerCount = 5;
 		const int TimerPrecision = 20;

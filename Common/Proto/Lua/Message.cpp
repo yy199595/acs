@@ -8,7 +8,7 @@
 
 using namespace acs;
 
-namespace Lua
+namespace lua
 {
 	int MessageEx::New(lua_State* lua)
 	{
@@ -28,7 +28,7 @@ namespace Lua
 				return 0;
 			}
 			message.reset(data->New());
-			UserDataParameter::Write(lua,  message.release());
+			Lua::UserDataParameter::Write(lua,  message.release());
 			return 1;
 		}
 		else if (lua_isstring(lua, 2))
@@ -40,7 +40,7 @@ namespace Lua
 			{
 				return 0;
 			}
-			UserDataParameter::Write(lua, message.release());
+			Lua::UserDataParameter::Write(lua, message.release());
 			return 1;
 		}
 		std::unique_ptr<pb::Message> message;
@@ -48,7 +48,7 @@ namespace Lua
 		{
 			return 0;
 		}
-		UserDataParameter::Write(lua,  message.release());
+		Lua::UserDataParameter::Write(lua,  message.release());
 		return 1;
 	}
 

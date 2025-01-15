@@ -5,7 +5,7 @@
 #ifndef APP_COMMON_SQLITE_LUA_LUASQLITE_H
 #define APP_COMMON_SQLITE_LUA_LUASQLITE_H
 #include"Lua/Engine/Define.h"
-namespace Lua
+namespace lua
 {
 	namespace Sqlite
 	{

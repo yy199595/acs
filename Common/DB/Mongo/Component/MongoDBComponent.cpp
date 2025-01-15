@@ -240,9 +240,4 @@ namespace acs
 			data->Add("wait", this->AwaitCount() + this->mRequests.size());
 		}
 	}
-
-	void MongoDBComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
-	{
-		luaRegister.Register("db.mongodb", lua::lib::luaopen_lmonogodb);
-	}
 }

@@ -13,7 +13,7 @@ Console.LogFatal = 5
 
 local debug_module = os.debug
 local string_format = string.format
-local console = require("util.logger")
+local console = require("core.log")
 
 function Console.Show(type, fmt, ...)
     if debug_module then

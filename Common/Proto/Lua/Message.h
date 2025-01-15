@@ -50,7 +50,7 @@ namespace acs
 	};
 }
 
-namespace Lua
+namespace lua
 {
 	namespace MessageEx
 	{

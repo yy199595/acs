@@ -2,6 +2,7 @@
 #include"Redis/Lua/LuaRedis.h"
 #include"Timer/Timer/ElapsedTimer.h"
 #include"Lua/Engine/ModuleClass.h"
+#include "Lua/Lib/Lib.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Entity/Actor/App.h"
 
@@ -116,16 +117,6 @@ namespace acs
 		}
 		return nullptr;
 	}
-
-	void RedisComponent::OnLuaRegister(Lua::ModuleClass &luaRegister)
-	{
-		luaRegister.AddFunction("Sub", Lua::redis::Sub);
-		luaRegister.AddFunction("Run", Lua::redis::Run);
-		luaRegister.AddFunction("Call", Lua::redis::Call);
-        luaRegister.AddFunction("Send", Lua::redis::Send);
-		luaRegister.AddFunction("Sync", Lua::redis::SyncRun);
-		luaRegister.End("db.redis");
-    }
 
 	void RedisComponent::Send(std::unique_ptr<redis::Request> request)
 	{

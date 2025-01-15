@@ -31,7 +31,7 @@ namespace acs
         bool mHasWarning;
     };
 
-	class ProtoComponent final : public Component, public ILuaRegister, public IHotfix
+	class ProtoComponent final : public Component, public IHotfix
     {
     public:
         ProtoComponent() = default;
@@ -52,7 +52,6 @@ namespace acs
 	 private:
 		bool Awake() final;
 		bool OnHotFix() final;
-		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
         const pb::Message * FindMessage(const std::string & name);
 		void LoopMessage(const pb::Descriptor * descriptor, std::vector<std::string> & protos);
 	private:

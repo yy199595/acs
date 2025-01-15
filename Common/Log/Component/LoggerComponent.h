@@ -12,8 +12,7 @@
 
 namespace acs
 {
-	class LoggerComponent final : public Component,
-	                              public ILuaRegister, public IDestroy
+	class LoggerComponent final : public Component, public IDestroy
 	{
 	public:
 		LoggerComponent();
@@ -31,7 +30,6 @@ namespace acs
 	private:
 		bool Awake() final;
 		void OnDestroy() final;
-		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 	private:
 		std::mutex mMutex;
 		class ThreadComponent * mThread;

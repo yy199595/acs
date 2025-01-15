@@ -130,6 +130,12 @@ namespace acs
 		return this->Send(id, std::unique_ptr<rpc::Message>(message));
 	}
 
+	rpc::IInnerSender* RouterComponent::GetSender(char net)
+	{
+		auto iter = this->mSenders.find(net);
+		return iter != this->mSenders.end() ? iter->second : nullptr;
+	}
+
 	std::unique_ptr<rpc::Message> RouterComponent::Call(int id, std::unique_ptr<rpc::Message> message)
 	{
 		int timeout = message->GetTimeout();

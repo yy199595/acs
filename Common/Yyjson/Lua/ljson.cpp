@@ -285,19 +285,3 @@ namespace lua
 		}
 	}
 }
-
-namespace lua
-{
-	int lib::luaopen_ljson(lua_State* L)
-	{
-		luaL_Reg l[] = {
-				{ "read", yyjson::read_file },
-				{ "encode", yyjson::encode },
-				{ "decode", yyjson::decode },
-				{ "pretty", yyjson::pretty },
-				{ nullptr, nullptr}
-		};
-		luaL_newlib(L, l);
-		return 1;
-	}
-}

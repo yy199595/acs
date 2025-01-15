@@ -58,7 +58,6 @@ function Main:OnComplete()
     local ap = require("core.app")
     local json = require("util.json")
     local bson = require("util.bson")
-    table.print(ap)
     local userInfo = {
         _id = 1001,
         sex = true,

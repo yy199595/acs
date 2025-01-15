@@ -276,13 +276,6 @@ namespace acs
 		fromData.signature = help::Base64::Encode(str3);
 		fromData.url = fmt::format("{}/{}", this->mConfig.host, fullName);
 	}
-
-	void OssComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
-	{
-		luaRegister.AddFunction("Sign", oss::Sign);
-		luaRegister.AddFunction("Upload", oss::Upload);
-		luaRegister.End("util.oss");
-	}
 }
 
 #endif

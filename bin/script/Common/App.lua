@@ -10,7 +10,9 @@ local http = require("HttpComponent")
 
 local app = require("core.app")
 local config = app.GetConfig()
-local _, router = pcall(require, "core.router")
+local router_send = app.Send
+local router_call = app.Call
+local router_publish = app.Publish
 
 local App = Module()
 SetMember(App, "agent", { })
@@ -48,7 +50,7 @@ end
 ---@param channel string
 ---@param message table
 function App:Publish(actorId, channel, message)
-    local status, code = xpcall(router.Publish, log_err, actorId, channel, message)
+    local status, code = xpcall(router_publish, log_err, actorId, channel, message)
     if not status then
         return XCode.CallLuaFunctionFail
     end
@@ -69,7 +71,7 @@ end
 ---@param request table
 ---@return number
 function App:Send(actorId, name, request)
-    local status, code = xpcall(router.Send, log_err, actorId, name, request)
+    local status, code = xpcall(router_send, log_err, actorId, name, request)
     if not status then
         return XCode.CallLuaFunctionFail
     end
@@ -81,7 +83,7 @@ end
 ---@param request table
 ---@return number table
 function App:Call(actorId, name, request)
-    local status, code, response = xpcall(router.Call, log_err, actorId, name, request)
+    local status, code, response = xpcall(router_call, log_err, actorId, name, request)
     if not status then
         return XCode.CallLuaFunctionFail
     end

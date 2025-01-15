@@ -16,7 +16,7 @@
 #include"Http/Component/HttpWebComponent.h"
 
 using namespace acs;
-namespace Lua
+namespace lua
 {
 	int HttpHead::Get(lua_State* L)
 	{

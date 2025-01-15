@@ -56,8 +56,7 @@ namespace acs
 namespace acs
 {
     class MongoDBComponent final : public RpcComponent<mongo::Response>,
-			public IRpc<mongo::Request, mongo::Response>,
-			public IDestroy, public IServerRecord, public ILuaRegister
+			public IRpc<mongo::Request, mongo::Response>, public IDestroy, public IServerRecord
 	{
 	public:
 		MongoDBComponent() = default;
@@ -71,7 +70,6 @@ namespace acs
 		bool LateAwake() final;
 		void OnDestroy() final;
 		void OnRecord(json::w::Document &document) final;
-		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		void OnMessage(int id, mongo::Request * request, mongo::Response * message) noexcept final;
 	private:
 		void Send(std::unique_ptr<mongo::Request> request);

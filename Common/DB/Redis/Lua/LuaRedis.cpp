@@ -10,7 +10,7 @@
 #include"Redis/Component/RedisComponent.h"
 #include "Redis/Component/RedisSubComponent.h"
 using namespace acs;
-namespace Lua
+namespace lua
 {
 	inline void ReadFromIndex(lua_State * lua, int index, ::redis::Request * request)
 	{

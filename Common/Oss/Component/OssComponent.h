@@ -51,7 +51,7 @@ namespace oss
 
 namespace acs
 {
-	class OssComponent final : public Component, public IComplete, public ILuaRegister
+	class OssComponent final : public Component, public IComplete
 	{
 	public:
 		OssComponent();
@@ -66,8 +66,6 @@ namespace acs
 	public:
 		void Sign(const oss::Policy& policy, oss::FromData & fromData);
 		void Sign(const oss::Policy & policy, json::w::Value & document);
-	private:
-		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 	private:
 		oss::Config mConfig;
 		class HttpComponent* mHttp;

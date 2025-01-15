@@ -112,17 +112,6 @@ namespace acs
 		return response;
 	}
 
-	void HttpComponent::OnLuaRegister(Lua::ModuleClass &luaRegister)
-	{
-		luaRegister.AddFunction("Do", Lua::HttpClient::Do);
-		luaRegister.AddFunction("Get", Lua::HttpClient::Get);
-		luaRegister.AddFunction("Post", Lua::HttpClient::Post);
-		luaRegister.AddFunction("Upload", Lua::HttpClient::Upload);
-		luaRegister.AddFunction("Download", Lua::HttpClient::Download);
-
-		luaRegister.End("net.http");
-	}
-
 	void HttpComponent::OnDelTask(int key)
 	{
 		std::shared_ptr<http::RequestClient> httpClient;

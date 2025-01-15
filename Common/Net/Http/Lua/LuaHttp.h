@@ -5,7 +5,7 @@
 #ifndef APP_LUAHTTP_H
 #define APP_LUAHTTP_H
 #include"Lua/Engine/Define.h"
-namespace Lua
+namespace lua
 {
 	namespace HttpClient
 	{

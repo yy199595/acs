@@ -62,9 +62,9 @@ void Debug::Log(std::unique_ptr<custom::LogInfo> log)
 	{
 		Debug::Backtrace(log->Stack);
 	}
-//#ifdef __CONSOLE_LOG__
-//	Debug::Console(*log);
-//#endif
+#ifdef __CONSOLE_LOG__
+	Debug::Console(*log);
+#endif
 	if (logComponent != nullptr)
 	{
 		logComponent->PushLog(std::move(log));

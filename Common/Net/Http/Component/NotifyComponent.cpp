@@ -164,9 +164,4 @@ namespace acs
 			});
 		};
 	}
-
-	void NotifyComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
-	{
-
-	}
 }

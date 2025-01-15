@@ -48,17 +48,3 @@ namespace lua
 		return 1;
 	}
 }
-
-namespace lua
-{
-	int lib::luaopen_ljwt(lua_State* L)
-	{
-		luaL_Reg l[] = {
-				{ "encode", lua::ljwt::Create },
-				{ "decode", lua::ljwt::Verify },
-				{ nullptr, nullptr}
-		};
-		luaL_newlib(L, l);
-		return 1;
-	}
-}

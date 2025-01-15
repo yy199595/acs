@@ -28,6 +28,7 @@ namespace acs
 		double GetMemorySize();
 		double CollectGarbage();
 		Lua::LuaModule * LoadModule(const std::string & name);
+		void AddCCModule(const char * module, lua_CFunction func);
 	protected:
 		bool Awake() final;
 		void Start() final;

@@ -18,15 +18,22 @@ namespace lua
 	namespace lib
 	{
 		extern int luaopen_lfs(lua_State* L);
+		extern int luaopen_loss(lua_State* L);
 		extern int luaopen_ljwt(lua_State* L);
 		extern int luaopen_lfmt(lua_State* L);
 		extern int luaopen_lmd5(lua_State* L);
 		extern int luaopen_lapp(lua_State* L);
+		extern int luaopen_llog(lua_State* L);
 		extern int luaopen_ljson(lua_State* L);
+		extern int luaopen_lhttp(lua_State* L);
 		extern int luaopen_lbson(lua_State * L);
-		extern int luaopen_lbase64(lua_State* L);
-		extern int luaopen_lmonogodb(lua_State* L);
 
+		extern int luaopen_lproto(lua_State* L);
+		extern int luaopen_lbase64(lua_State* L);
+		extern int luaopen_ltimer(lua_State* L);
+		extern int luaopen_lredisdb(lua_State* L);
+		extern int luaopen_lmonogodb(lua_State* L);
+		extern int luaopen_lsqlitedb(lua_State* L);
 	}
 }
 

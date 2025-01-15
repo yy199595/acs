@@ -11,20 +11,18 @@
 namespace acs
 {
 	class WsClientComponent final : public Component,
-									 public IRpc<rpc::Message, rpc::Message>, public rpc::IInnerSender, public ILuaRegister
+									 public IRpc<rpc::Message, rpc::Message>, public rpc::IInnerSender
 	{
 	public:
 		WsClientComponent();
-	public:
-		int Remove(int id);
-		int Connect(const std::string & address);
 	private:
 		bool LateAwake() final;
 		void OnClientError(int id, int code) final;
 		void OnSendFailure(int id, rpc::Message *message) final;
-		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		void OnMessage(rpc::Message *request, rpc::Message *response) noexcept final;
 	private:
+		void Remove(int id) final;
+		int Connect(const std::string & address) final;
 		int Send(int id, rpc::Message * message) noexcept final;
 		char GetNet() const noexcept final { return rpc::Net::Client; }
 	private:

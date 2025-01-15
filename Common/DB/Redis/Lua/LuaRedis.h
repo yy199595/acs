@@ -5,7 +5,7 @@
 #ifndef APP_LUAREDIS_H
 #define APP_LUAREDIS_H
 #include"Lua/Engine/Define.h"
-namespace Lua
+namespace lua
 {
 	namespace redis
 	{

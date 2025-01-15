@@ -2,7 +2,7 @@
 #include"Timer/Timer/DelayTimer.h"
 #include"Entity/Actor/App.h"
 #include"Lua/Engine/ModuleClass.h"
-#include"Timer/Lua/Timer.h"
+#include "Lua/Lib/Lib.h"
 namespace acs
 {
 	TimerComponent::TimerComponent()
@@ -51,14 +51,6 @@ namespace acs
 		}
 		long long id = timerBase->GetTimerId();
 		return this->AddTimer(std::move(timerBase)) ? id : 0;
-	}
-
-	void TimerComponent::OnLuaRegister(Lua::ModuleClass &luaRegister)
-	{
-		luaRegister.AddFunction("Add", Lua::Timer::Add);
-		luaRegister.AddFunction("Del", Lua::Timer::Remove);
-		luaRegister.AddFunction("AddUpdate", Lua::Timer::AddUpdate);
-		luaRegister.End("core.timer");
 	}
 
 	bool TimerComponent::CancelTimer(long long id)

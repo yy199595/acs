@@ -14,7 +14,7 @@ namespace Lua
 };
 namespace acs
 {
-	class ActorComponent final : public Component, public IServerRecord, public ILuaRegister
+	class ActorComponent final : public Component, public IServerRecord
 	{
 	public:
 		ActorComponent();
@@ -50,7 +50,6 @@ namespace acs
 		bool LoadServerFromFile();
 		void OnPlayerLogout(long long playerId, int);
 		void OnRecord(json::w::Document &document) final;
-		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		bool AddRandomActor(const std::string& name, Actor* actor);
 	private:
 		Lua::LuaModule* mLuaModule;

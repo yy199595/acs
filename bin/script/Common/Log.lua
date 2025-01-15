@@ -8,7 +8,7 @@ local Log = { }
 local lfmt = require("util.fmt")
 local string_format = lfmt.format
 local console = require("Console")
-local logger = require("util.logger")
+local logger = require("core.log")
 local debug_traceback = debug.traceback
 
 function Log.Info(fmt, ...)

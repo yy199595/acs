@@ -222,15 +222,6 @@ namespace acs
 		return pMessage;
 	}
 
-	void ProtoComponent::OnLuaRegister(Lua::ModuleClass &luaRegister)
-	{
-		luaRegister.AddFunction("New", Lua::MessageEx::New);
-		luaRegister.AddFunction("Import", Lua::MessageEx::Import);
-		luaRegister.AddFunction("Encode", Lua::MessageEx::Encode);
-		luaRegister.AddFunction("Decode", Lua::MessageEx::Decode);
-		luaRegister.AddFunction("ToJson", Lua::MessageEx::ToJson);
-		luaRegister.End("util.proto");
-	}
 
 	bool ProtoComponent::Write(lua_State * lua, const pb::Message& message)
 	{

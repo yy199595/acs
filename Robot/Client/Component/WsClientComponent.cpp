@@ -25,6 +25,8 @@ namespace acs
 		LOG_CHECK_RET_FALSE(this->mProto = this->GetComponent<ProtoComponent>())
 		LOG_CHECK_RET_FALSE(this->mLuaComponent = this->GetComponent<LuaComponent>())
 		LOG_CHECK_RET_FALSE(this->mDisComponent = this->GetComponent<DispatchComponent>())
+
+		this->mLuaComponent->AddCCModule("net.client", lua::lib::luaopen_lclient);
 		return true;
 	}
 
@@ -59,15 +61,6 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	void WsClientComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
-	{
-		luaRegister.AddFunction("Send", LuaWsClient::Send);
-		luaRegister.AddFunction("Call", LuaWsClient::Call);
-		luaRegister.AddFunction("Close", LuaWsClient::Close);
-		luaRegister.AddFunction("Connect", LuaWsClient::Connect);
-		luaRegister.End("net.client");
-	}
-
 	void WsClientComponent::OnSendFailure(int id, rpc::Message* message)
 	{
 		if(message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
@@ -98,16 +91,15 @@ namespace acs
 		}
 	}
 
-	int WsClientComponent::Remove(int id)
+	void WsClientComponent::Remove(int id)
 	{
 		auto iter = this->mClientMap.find(id);
 		if(iter == this->mClientMap.end())
 		{
-			return 0;
+			return;
 		}
 		iter->second->Close();
 		this->mClientMap.erase(iter);
-		return 1;
 	}
 
 	void WsClientComponent::OnClientError(int id, int code)

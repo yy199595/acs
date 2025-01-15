@@ -52,16 +52,3 @@ namespace lua
 		return component->AddTask(new LuaMongoTask(L, taskId))->Await();
 	}
 }
-
-namespace lua
-{
-	int lib::luaopen_lmonogodb(lua_State* L)
-	{
-		luaL_Reg l[] = {
-				{ "Run", lua::LuaMongo::Run },
-				{ nullptr, nullptr}
-		};
-		luaL_newlib(L, l);
-		return 1;
-	}
-}

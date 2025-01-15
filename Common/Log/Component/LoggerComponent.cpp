@@ -23,7 +23,7 @@
 #endif
 #include "Http/Component/NotifyComponent.h"
 #include "Server/Component/ThreadComponent.h"
-
+#include "Lua/Lib/Lib.h"
 namespace acs
 {
 	LoggerComponent::LoggerComponent()
@@ -96,12 +96,6 @@ namespace acs
 			}
 		}
 		return true;
-	}
-
-	void LoggerComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
-	{
-		luaRegister.AddFunction("Output", Lua::Log::Output);
-		luaRegister.AddFunction("Show", Lua::Console::Show).End("util.logger");
 	}
 
 	void LoggerComponent::OnDestroy()
@@ -195,12 +189,6 @@ namespace acs
 				fileConfig.Root = fmt::format("{}/{}",config.path, server) ;
 				logger->AddOutput<custom::FileOutput>(fileConfig);
 			}
-#ifdef __CONSOLE_LOG__
-			if(config.console)
-			{
-				logger->AddOutput<custom::ConsoleOutput>();
-			}
-#endif
 			if (!config.wx.empty() && !config.pem.empty())
 			{
 				logger->AddOutput<custom::WeChatOutput>(config.wx, config.pem);

@@ -49,7 +49,7 @@ namespace notify
 
 namespace acs
 {
-	class NotifyComponent final : public Component, public ILuaRegister, public IComplete
+	class NotifyComponent final : public Component, public IComplete
 	{
 	public:
 		NotifyComponent();
@@ -62,7 +62,6 @@ namespace acs
 	private:
 		bool Awake() final;
 		bool LateAwake() final;
-		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 	private:
 		std::string mWxUrl;
 		std::string mDingUrl;

@@ -77,12 +77,6 @@ namespace acs
 		virtual void OnLastFrameUpdate(long long) noexcept = 0;
 	};
 
-	class ILuaRegister
-	{
-	public:
-		virtual void OnLuaRegister(Lua::ModuleClass& luaRegister) = 0;
-	};
-
 	// 热重载调用
 	class IHotfix
 	{
