@@ -66,7 +66,7 @@ function Main:OnComplete()
         friends = { 1002, 1003, 1004},
     }
     local code, response = app:Call(nil, "Example.Ping", userInfo)
-    log.Debug("code={}  response={}", code, response)
+    log.Debug("code = {}  response = {}", code, response)
 end
 
 return Main

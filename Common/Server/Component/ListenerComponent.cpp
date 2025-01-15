@@ -192,7 +192,6 @@ namespace acs
 			this->mAcceptor->close(code);
 			threadSync.SetResult(code.value() == Asio::OK);
 		});
-		LOG_DEBUG("stop listen [{}]", this->mConfig.Addr);
 		return threadSync.Wait();
 #endif
 	}
