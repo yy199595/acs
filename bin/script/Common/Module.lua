@@ -12,7 +12,6 @@ local cor_resume = coroutine.resume
 
 local context = function(class, func, task, ...)
     local response = pcall(func, log_err, class, ...)
-    print(task)
     task:SetResult(response)
 end
 
