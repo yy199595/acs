@@ -26,6 +26,8 @@ namespace tcp
 	}
 #endif
 
+	Socket::~Socket() = default;
+
     void Socket::Init()
     {
         asio::error_code code;
