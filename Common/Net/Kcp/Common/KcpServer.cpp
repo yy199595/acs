@@ -132,9 +132,6 @@ namespace kcp
 				CONSOLE_LOG_ERROR("{}", std::string(this->mRecvBuffer.data(), len))
 				return;
 			}
-#ifdef __DEBUG__
-			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
-#endif
 			rpcPacket->SetNet(rpc::Net::Kcp);
 			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 		}
