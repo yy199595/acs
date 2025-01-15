@@ -37,6 +37,7 @@ namespace acs
 		bool OnHotFix() final;
 		void OnRecord(json::w::Document &document) final;
     private:
+		void LoadAllLib();
 		bool LoadAllFile();
 		void RegisterLuaClass();
 		void AddRequire(const std::string & direct);

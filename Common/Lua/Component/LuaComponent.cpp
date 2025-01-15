@@ -24,9 +24,12 @@
 #include "Core/Lua/LuaOs.h"
 #include "Proto/Lua/Bson.h"
 #include "Lua/Lib/Lib.h"
+
 #ifdef __ENABLE_OPEN_SSL__
+
 #include "Util/Ssl/rsa.h"
 #include "Util/Ssl/LuaRsa.h"
+
 #endif
 using namespace Lua;
 namespace acs
@@ -41,14 +44,34 @@ namespace acs
 	{
 		std::unique_ptr<json::r::Value> jsonObject;
 		this->mLuaConfig = std::make_unique<LuaConfig>();
-		const ServerConfig * config = ServerConfig::Inst();
+		const ServerConfig* config = ServerConfig::Inst();
 		LOG_CHECK_RET_FALSE(config->Get("lua", jsonObject));
 		LOG_CHECK_RET_FALSE(this->mLuaConfig->Init(*jsonObject));
 
 		this->mLuaEnv = luaL_newstate();
-		luaL_openlibs(mLuaEnv);
+		this->LoadAllLib();
 		this->RegisterLuaClass();
 		return true;
+	}
+
+	void LuaComponent::LoadAllLib()
+	{
+		luaL_openlibs(this->mLuaEnv);
+		Lua::ModuleClass moduleRegistry(this->mLuaEnv);
+		const luaL_Reg luaLibs[] = {
+				{ "util.fs", lua::lib::luaopen_lfs },
+				{ "util.md5", lua::lib::luaopen_lmd5 },
+				{ "util.fmt", lua::lib::luaopen_lfmt },
+				{ "util.jwt", lua::lib::luaopen_ljwt },
+				{ "core.app", lua::lib::luaopen_lapp },
+				{ "util.json", lua::lib::luaopen_ljson },
+				{ "util.bson", lua::lib::luaopen_lbson },
+				{ "util.base64", lua::lib::luaopen_lbase64 }
+		};
+		for (const luaL_Reg& luaLib: luaLibs)
+		{
+			moduleRegistry.Register(luaLib);
+		}
 	}
 
 	void LuaComponent::RegisterLuaClass()
@@ -120,10 +143,10 @@ namespace acs
 
 		Lua::ClassProxyHelper classProxyHelper4(this->mLuaEnv, "TcpSocket");
 		classProxyHelper4.BeginRegister<tcp::Socket>();
-		classProxyHelper4.PushExtensionFunction("Send", Lua::TcpSock::Send);
-		classProxyHelper4.PushExtensionFunction("Read", Lua::TcpSock::Read);
-		classProxyHelper4.PushExtensionFunction("Query", Lua::TcpSock::Query);
-		classProxyHelper4.PushExtensionFunction("Connect", Lua::TcpSock::Connect);
+		classProxyHelper4.PushExtensionFunction("Send", lua::TcpSock::Send);
+		classProxyHelper4.PushExtensionFunction("Read", lua::TcpSock::Read);
+		classProxyHelper4.PushExtensionFunction("Query", lua::TcpSock::Query);
+		classProxyHelper4.PushExtensionFunction("Connect", lua::TcpSock::Connect);
 
 #ifdef __ENABLE_OPEN_SSL__
 		Lua::ClassProxyHelper classProxyHelper7(this->mLuaEnv, "rsa");
@@ -138,96 +161,44 @@ namespace acs
 		classProxyHelper8.PushStaticFunction("range", help::Str::RandomString);
 
 		Lua::ClassProxyHelper classProxyHelper9(this->mLuaEnv, "table");
-		classProxyHelper9.PushStaticExtensionFunction("serialize", Lua::lfmt::serialize);
-		classProxyHelper9.PushStaticExtensionFunction("deserialize", Lua::lfmt::deserialize);
+		classProxyHelper9.PushStaticExtensionFunction("serialize", lua::lfmt::serialize);
+		classProxyHelper9.PushStaticExtensionFunction("deserialize", lua::lfmt::deserialize);
 	}
 
 	bool LuaComponent::LateAwake()
 	{
 		Lua::ModuleClass moduleRegistry(this->mLuaEnv);
 
-		moduleRegistry.Start();
-		moduleRegistry.AddFunction("Find", Lua::LuaFile::Find);
-		moduleRegistry.AddFunction("GetMd5", Lua::LuaFile::GetMd5);
-		moduleRegistry.AddFunction("IsExist", Lua::LuaFile::IsExist);
-		moduleRegistry.AddFunction("GetFiles", Lua::LuaFile::GetFiles);
-		moduleRegistry.AddFunction("GetFileName", Lua::LuaFile::GetFileName);
-		moduleRegistry.AddFunction("GetLastWriteTime", Lua::LuaFile::GetLastWriteTime).End("util.fs");
-
-		moduleRegistry.Start();
-		moduleRegistry.AddFunction("Stop", LuaActor::Stop);
-		moduleRegistry.AddFunction("Random", LuaActor::Random);
-		moduleRegistry.AddFunction("GetPath", LuaActor::GetPath);
-		moduleRegistry.AddFunction("NewGuid", LuaActor::NewGuid);
-		moduleRegistry.AddFunction("NewUuid", LuaActor::NewUuid);
-		moduleRegistry.AddFunction("AddListen", LuaActor::AddListen);
-		moduleRegistry.AddFunction("GetListen", LuaActor::GetListen);
-		moduleRegistry.AddFunction("GetConfig", LuaActor::GetConfig);
-		moduleRegistry.AddFunction("GetServers", LuaActor::GetServers);
-		moduleRegistry.AddFunction("MakeServer", LuaActor::MakeServer);
-		moduleRegistry.AddFunction("HasComponent", LuaActor::HasComponent).End("core.app");
-
-		moduleRegistry.Start();
-		moduleRegistry.AddFunction("read", lua::yyjson::read_file);
-		moduleRegistry.AddFunction("encode", lua::yyjson::encode);
-		moduleRegistry.AddFunction("pretty", lua::yyjson::pretty);
-		moduleRegistry.AddFunction("decode", lua::yyjson::decode).End("util.json");
-
-		moduleRegistry.Start();
-		moduleRegistry.AddFunction("encode", lua::lbson::encode);
-		moduleRegistry.AddFunction("decode", lua::lbson::decode).End("util.bson");
-
-
-		moduleRegistry.Start();
-		moduleRegistry.AddFunction("ToString", Lua::md5::ToString).End("util.md5");
-
-		moduleRegistry.Start();
-		moduleRegistry.AddFunction("Decode", Lua::base64::Decode);
-		moduleRegistry.AddFunction("Encode", Lua::base64::Encode).End("util.base64");
-
-		moduleRegistry.Start();
-		moduleRegistry.AddFunction("Create", lua::ljwt::Create);
-		moduleRegistry.AddFunction("Verify", lua::ljwt::Verify).End("util.jwt");
-
-		moduleRegistry.Start();
-		moduleRegistry.AddFunction("format", Lua::lfmt::format).End("util.fmt");
-
-		moduleRegistry.Start();
-		moduleRegistry.AddFunction("Make", Lua::LuaDir::Make);
-		moduleRegistry.AddFunction("IsExist", Lua::LuaDir::IsExist).End("util.dir");
-
-
 		std::vector<ILuaRegister*> components;
 		this->mApp->GetComponents(components);
 		for (ILuaRegister* component: components)
 		{
-			moduleRegistry.Start();
 			component->OnLuaRegister(moduleRegistry);
 		}
 		return this->LoadAllFile();
 	}
 
-	Lua::LuaModule * LuaComponent::LoadModule(const std::string& name)
+	Lua::LuaModule* LuaComponent::LoadModule(const std::string& name)
 	{
 		auto iter = this->mLuaModules.find(name);
-		if(iter != this->mLuaModules.end())
+		if (iter != this->mLuaModules.end())
 		{
 			return iter->second.get();
 		}
 
-		if(this->mModulePaths.find(name) == this->mModulePaths.end())
+		if (this->mModulePaths.find(name) == this->mModulePaths.end())
 		{
 			return nullptr;
 		}
 		lua_getglobal(this->mLuaEnv, "require");
 		lua_pushstring(this->mLuaEnv, name.c_str());
-		if(lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
+		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
 		{
 			LOG_ERROR("{}", lua_tostring(this->mLuaEnv, -1));
 			lua_pop(this->mLuaEnv, 1);
 			return nullptr;
 		}
-		LuaModule * luaModule = nullptr;
+		LuaModule* luaModule = nullptr;
 		luaL_checktype(this->mLuaEnv, -1, LUA_TTABLE);
 		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
 		std::unique_ptr<LuaModule> newModule = std::make_unique<LuaModule>(this->mLuaEnv, name, ref);
@@ -269,7 +240,7 @@ namespace acs
 				if (help::fs::GetFileName(filePath, moduleName))
 				{
 					auto iter = this->mModulePaths.find(moduleName);
-					if(iter != this->mModulePaths.end())
+					if (iter != this->mModulePaths.end())
 					{
 						LOG_ERROR("module name : {}  {}", moduleName, filePath);
 						return false;
@@ -321,11 +292,11 @@ namespace acs
 	void LuaComponent::CheckModuleHotfix(const std::string& module)
 	{
 		auto iter = this->mModulePaths.find(module);
-		if(iter == this->mModulePaths.end())
+		if (iter == this->mModulePaths.end())
 		{
 			return;
 		}
-		ModuleInfo * moduleInfo = iter->second.get();
+		ModuleInfo* moduleInfo = iter->second.get();
 		const std::string& path = moduleInfo->FullPath;
 		long long time = help::fs::GetLastWriteTime(path);
 		if (moduleInfo->LastWriteTime == time)
@@ -339,7 +310,7 @@ namespace acs
 			return;
 		}
 		auto iter1 = this->mLuaModules.find(module);
-		if(iter1 != this->mLuaModules.end())
+		if (iter1 != this->mLuaModules.end())
 		{
 			iter1->second->OnModuleHotfix();
 		}

@@ -7,7 +7,7 @@
 #include "Util/Crypt/md5.h"
 #include "Util/File/FileHelper.h"
 #include "Util/File/DirectoryHelper.h"
-namespace Lua
+namespace lua
 {
 	int LuaFile::GetFileName(lua_State* lua)
 	{
@@ -119,6 +119,27 @@ namespace Lua
 	{
 		std::string dir(luaL_checkstring(lua, 1));
 		lua_pushboolean(lua, help::dir::DirectorIsExist(dir));
+		return 1;
+	}
+}
+
+namespace lua
+{
+	int lib::luaopen_lfs(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{ "Find", lua::LuaFile::Find },
+				{ "GetMd5", lua::LuaFile::GetMd5 },
+				{ "IsExist", lua::LuaFile::IsExist },
+				{ "GetFiles", lua::LuaFile::GetFiles },
+				{ "GetFileName", lua::LuaFile::GetFileName },
+				{ "GetLastWriteTime", lua::LuaFile::GetLastWriteTime },
+
+				{ "MakeDir", lua::LuaDir::Make },
+				{ "IsExistDir", lua::LuaDir::IsExist },
+				{ nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
 		return 1;
 	}
 }

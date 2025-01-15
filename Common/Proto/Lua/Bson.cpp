@@ -339,4 +339,15 @@ namespace lua
 		}
 		return true;
 	}
+
+	int lib::luaopen_lbson(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{ "encode", lbson::encode },
+				{ "decode", lbson::decode },
+				{ nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
+	}
 }

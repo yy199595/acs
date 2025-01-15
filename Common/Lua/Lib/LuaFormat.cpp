@@ -689,7 +689,7 @@ static int fmt_format(fmt_State* S)
 
 
 
-namespace Lua
+namespace lua
 {
 
 // 辅助函数：序列化表
@@ -729,6 +729,19 @@ namespace Lua
 			result.append(str, size);
 			luaL_dostring(L, result.c_str());
 		}
+		return 1;
+	}
+}
+
+namespace lua
+{
+	int lib::luaopen_lfmt(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{ "format", lua::lfmt::format },
+				{ nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
 		return 1;
 	}
 }

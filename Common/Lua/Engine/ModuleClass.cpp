@@ -12,20 +12,15 @@ namespace Lua
 
 	}
 
-	ModuleClass & ModuleClass::Start()
+	void ModuleClass::Register(const luaL_Reg& luaLib)
 	{
-		lua_settop(this->mLua, 1);
-		lua_getfield(this->mLua, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
-
-		lua_newtable(this->mLua);
-		return *this;
+		luaL_requiref(this->mLua, luaLib.name, luaLib.func, 1);
+		lua_pop(this->mLua, 1);
 	}
 
-	ModuleClass & ModuleClass::AddFunction(const char* name, lua_CFunction func)
+	void ModuleClass::Register(const char* module, lua_CFunction func)
 	{
-		lua_pushstring(this->mLua, name);
-		lua_pushcfunction(this->mLua, func);
-		lua_rawset(this->mLua, -3);
-		return  *this;
+		luaL_requiref(this->mLua, module, func, 1);
+		lua_pop(this->mLua, 1);
 	}
 }

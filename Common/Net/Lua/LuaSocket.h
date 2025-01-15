@@ -5,7 +5,7 @@
 #ifndef APP_LUASOCKET_H
 #define APP_LUASOCKET_H
 #include"Lua/Engine/Define.h"
-namespace Lua
+namespace lua
 {
 	namespace TcpSock
 	{

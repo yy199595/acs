@@ -4,7 +4,7 @@
 
 #ifndef APP_AUTH_H
 #define APP_AUTH_H
-#include"Lua/Engine/LuaInclude.h"
+#include"Lua/Lib/Lib.h"
 namespace lua
 {
 	namespace ljwt

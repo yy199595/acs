@@ -1,6 +1,6 @@
 #pragma once
-#include"Lua/Engine/Define.h"
-namespace Lua
+#include"Lua/Lib/Lib.h"
+namespace lua
 {
 	namespace LuaMongo
 	{

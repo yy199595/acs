@@ -13,9 +13,8 @@ namespace Lua
 	public:
 		explicit ModuleClass(lua_State * lua);
 	public:
-		ModuleClass & Start();
-		void End(const char * name) { lua_setfield(this->mLua, -2, name);}
-		ModuleClass & AddFunction(const char * name, lua_CFunction func);
+		void Register(const luaL_Reg & luaLib);
+		void Register(const char * module, lua_CFunction func);
 	private:
 		lua_State * mLua;
 	};

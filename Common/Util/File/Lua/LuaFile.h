@@ -4,8 +4,8 @@
 
 #ifndef APP_LUAFILE_H
 #define APP_LUAFILE_H
-#include"Lua/Engine/Define.h"
-namespace Lua
+#include"Lua/Lib/Lib.h"
+namespace lua
 {
 	namespace LuaFile
 	{

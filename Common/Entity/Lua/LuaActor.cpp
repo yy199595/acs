@@ -332,3 +332,26 @@ namespace acs
 		return LuaActor::LuaPushCode(lua, XCode::Ok);
 	}
 }
+
+namespace lua
+{
+	int lib::luaopen_lapp(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{ "Stop", acs::LuaActor::Stop },
+				{ "Random", acs::LuaActor::Random },
+				{ "GetPath", acs::LuaActor::GetPath },
+				{ "NewGuid", acs::LuaActor::NewGuid },
+				{ "NewUuid", acs::LuaActor::NewUuid },
+				{ "AddListen", acs::LuaActor::AddListen },
+				{ "GetListen", acs::LuaActor::GetListen },
+				{ "GetConfig", acs::LuaActor::GetConfig },
+				{ "GetServers", acs::LuaActor::GetServers },
+				{ "MakeServer", acs::LuaActor::MakeServer },
+				{ "HasComponent", acs::LuaActor::HasComponent },
+				{ nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
+	}
+}

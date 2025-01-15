@@ -1,7 +1,6 @@
 #pragma once
-
+#include"Lua/Lib/Lib.h"
 #include"Yyjson/Src/yyjson.h"
-#include"Lua/Engine/LuaInclude.h"
 
 namespace lua
 {

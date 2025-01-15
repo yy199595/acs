@@ -5,15 +5,11 @@
 #include"LuaSocket.h"
 #include"Entity/Actor/App.h"
 #include"Util/Tools/String.h"
-#include"Udp/Common/UdpClient.h"
 #include"Network/Tcp/Socket.h"
 #include"Lua/Engine/UserDataParameter.h"
-#include"Udp/Component/UdpComponent.h"
-#include"Kcp/Common/KcpClient.h"
-#include"Kcp/Component/KcpComponent.h"
-#include "Async/Lua/LuaWaitTaskSource.h"
 
-namespace Lua
+
+namespace lua
 {
 	int TcpSock::Send(lua_State* L)
 	{

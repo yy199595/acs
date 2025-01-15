@@ -5,7 +5,7 @@
 #include"Mongo/Component/MongoDBComponent.h"
 
 using namespace acs;
-namespace Lua
+namespace lua
 {
 	int LuaMongo::Run(lua_State * L)
 	{
@@ -50,5 +50,18 @@ namespace Lua
 		int taskId = 0;
 		component->LuaSend(std::move(request), taskId);
 		return component->AddTask(new LuaMongoTask(L, taskId))->Await();
+	}
+}
+
+namespace lua
+{
+	int lib::luaopen_lmonogodb(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{ "Run", lua::LuaMongo::Run },
+				{ nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
 	}
 }

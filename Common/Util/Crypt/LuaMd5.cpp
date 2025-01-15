@@ -8,7 +8,7 @@
 #include"LuaMd5.h"
 #include"Proto/Bson/base64.h"
 #include"Util/Tools/String.h"
-namespace Lua
+namespace lua
 {
     int md5::ToString(lua_State *lua)
     {
@@ -32,7 +32,7 @@ namespace Lua
     }
 }
 
-namespace Lua
+namespace lua
 {
 	int base64::Encode(lua_State* l)
 	{
@@ -49,6 +49,31 @@ namespace Lua
 		const char * str = luaL_checklstring(l, 1, &size);
 		const std::string target = _bson::base64::decode(std::string(str, size));
 		lua_pushlstring(l, target.c_str(), target.size());
+		return 1;
+	}
+}
+
+
+namespace lua
+{
+	int lib::luaopen_lmd5(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{ "ToString", lua::md5::ToString },
+				{ nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
+	}
+
+	int lib::luaopen_lbase64(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{ "encode", lua::base64::Encode },
+				{ "decode", lua::base64::Decode },
+				{ nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
 		return 1;
 	}
 }

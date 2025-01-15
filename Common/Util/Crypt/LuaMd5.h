@@ -4,8 +4,8 @@
 
 #ifndef APP_LUAMD5_H
 #define APP_LUAMD5_H
-#include"Lua/Engine/Define.h"
-namespace Lua
+#include"Lua/Lib/Lib.h"
+namespace lua
 {
     namespace md5
     {

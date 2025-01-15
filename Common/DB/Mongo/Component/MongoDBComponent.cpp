@@ -243,7 +243,6 @@ namespace acs
 
 	void MongoDBComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
 	{
-		luaRegister.AddFunction("Run", Lua::LuaMongo::Run);
-		luaRegister.End("db.mongo");
+		luaRegister.Register("db.mongodb", lua::lib::luaopen_lmonogodb);
 	}
 }
