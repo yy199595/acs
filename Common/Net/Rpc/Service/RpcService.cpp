@@ -6,6 +6,7 @@
 #include "Proto/Lua/Message.h"
 
 #include"Core/System/System.h"
+
 namespace acs
 {
 	extern std::string GET_FUNC_NAME(const std::string& fullName)
@@ -14,14 +15,18 @@ namespace acs
 		return fullName.substr(pos + 2);
 	}
 
-	inline void lua_push_table_field(lua_State *lua, const char * name, long long value)
+	inline void lua_push_table_field(const rpc::Head & head, const char * key, lua_State* lua, const char* name)
 	{
-		lua_pushinteger(lua, value);
-		lua_setfield(lua, -2, name);
+		long long value = 0;
+		if(head.Get(key, value))
+		{
+			lua_pushinteger(lua, value);
+			lua_setfield(lua, -2, name);
+		}
 	}
 
 	RpcService::RpcService()
-		: mMethodRegister(this)
+			: mMethodRegister(this)
 	{
 		this->mProto = nullptr;
 		this->mLuaModule = nullptr;
@@ -30,35 +35,35 @@ namespace acs
 
 	bool RpcService::LateAwake()
 	{
-		const std::string & name = this->GetName();
+		const std::string& name = this->GetName();
 		LOG_CHECK_RET_FALSE(RpcConfig::Inst()->HasService(name))
-		if(!ClusterConfig::Inst()->GetServerName(name, this->mCluster))
+		if (!ClusterConfig::Inst()->GetServerName(name, this->mCluster))
 		{
 			LOG_WARN("{} not find cluster config", name);
 		}
-		auto * luaComponent = this->GetComponent<LuaComponent>();
-		if(luaComponent != nullptr)
+		auto* luaComponent = this->GetComponent<LuaComponent>();
+		if (luaComponent != nullptr)
 		{
 			this->mLuaModule = luaComponent->LoadModule(name);
-			if(this->mLuaModule != nullptr)
+			if (this->mLuaModule != nullptr)
 			{
 				this->mLuaModule->SetMember("__server", this->mCluster);
 			}
 		}
 		this->mProto = App::GetProto();
 		LOG_CHECK_RET_FALSE(this->OnInit());
-		if(this->mLuaModule != nullptr)
-		{		
+		if (this->mLuaModule != nullptr)
+		{
 			int code = this->mLuaModule->Call("Awake");
 			return code != XCode::CallLuaFunctionFail;
 		}
 		return true;
 	}
 
-	int RpcService::Invoke(const RpcMethodConfig * methodConfig, rpc::Message * message) noexcept
+	int RpcService::Invoke(const RpcMethodConfig* methodConfig, rpc::Message* message) noexcept
 	{
-		const std::string & method = methodConfig->Method;
-		if(this->mLuaModule != nullptr && this->mLuaModule->HasFunction(method))
+		const std::string& method = methodConfig->Method;
+		if (this->mLuaModule != nullptr && this->mLuaModule->HasFunction(method))
 		{
 			message->TempHead().Add("pb", methodConfig->Response);
 			if (!methodConfig->IsAsync)
@@ -67,45 +72,33 @@ namespace acs
 			}
 			return this->AwaitCallLua(methodConfig, *message);
 		}
-		ServiceMethod * target = this->mMethodRegister.GetMethod(method);
+		ServiceMethod* target = this->mMethodRegister.GetMethod(method);
 		return target == nullptr ? XCode::CallFunctionNotExist : target->Invoke(*message);
 	}
 
-	int RpcService::WriterToLua(const RpcMethodConfig * config, rpc::Message & message) noexcept
+	int RpcService::WriterToLua(const RpcMethodConfig* config, rpc::Message& message) noexcept
 	{
-		const rpc::Head & head = message.ConstHead();
+		const rpc::Head& head = message.ConstHead();
 		lua_State* lua = this->mLuaModule->GetLuaEnv();
 		lua_pushlstring(lua, config->Method.c_str(), config->Method.size());
-		lua_createtable(lua, 0, 3);
+		lua_createtable(lua, 0, 4);
 		{
 			tcp::IHeader::WriteLua(lua, head);
 			{
 				lua_setfield(lua, -2, "head");
 			}
-			if(config->IsClient)
-			{
-				long long playerId = 0;
-				if(head.Get(rpc::Header::player_id, playerId))
-				{
-					lua_push_table_field(lua, "playerId", playerId);
-				}
-			}
-			else
-			{
-				long long appId = 0;
-				if(head.Get(rpc::Header::app_id, appId))
-				{
-					lua_push_table_field(lua, "appId", appId);
-				}
-			}
+
+			lua_push_table_field(head, rpc::Header::app_id, lua, "appId");
+			lua_push_table_field(head, rpc::Header::player_id, lua, "playerId");
+
 			switch (message.GetProto())
 			{
 				case rpc::Porto::None:
 					return XCode::Ok;
 				case rpc::Porto::Json:
 				{
-					const std::string & data = message.GetBody();
-					if(!lua::yyjson::write(lua, data.c_str(), data.size()))
+					const std::string& data = message.GetBody();
+					if (!lua::yyjson::write(lua, data.c_str(), data.size()))
 					{
 						return XCode::ParseJsonFailure;
 					}
@@ -121,7 +114,7 @@ namespace acs
 				{
 					if (!config->Request.empty())
 					{
-						pb::Message * request = this->mProto->Temp(config->Request);
+						pb::Message* request = this->mProto->Temp(config->Request);
 						{
 							if (request == nullptr)
 							{
@@ -145,12 +138,12 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int RpcService::CallLua(const RpcMethodConfig * config, rpc::Message & message) noexcept
+	int RpcService::CallLua(const RpcMethodConfig* config, rpc::Message& message) noexcept
 	{
 		this->mLuaModule->GetMetaFunction("__Invoke");
 		lua_State* lua = this->mLuaModule->GetLuaEnv();
 		int code = this->WriterToLua(config, message);
-		if(code != XCode::Ok)
+		if (code != XCode::Ok)
 		{
 			return code;
 		}
@@ -163,22 +156,22 @@ namespace acs
 			return XCode::CallLuaFunctionFail;
 		}
 		message.SetProto(rpc::Porto::None);
-		if(!lua_isinteger(lua, -2))
+		if (!lua_isinteger(lua, -2))
 		{
 			LOG_ERROR("invoke ({}) return code unknown", config->FullName);
 			return XCode::Failure;
 		}
-		switch(lua_type(lua, -1))
+		switch (lua_type(lua, -1))
 		{
 			case LUA_TTABLE:
 			{
 				std::string pb;
-				if(message.TempHead().Del("pb", pb))
+				if (message.TempHead().Del("pb", pb))
 				{
 					MessageEncoder messageEncoder(lua);
 					message.SetProto(rpc::Porto::Protobuf);
-					pb::Message * data = this->mProto->Temp(pb);
-					if(data == nullptr)
+					pb::Message* data = this->mProto->Temp(pb);
+					if (data == nullptr)
 					{
 						return XCode::CreateProtoFailure;
 					}
@@ -208,11 +201,11 @@ namespace acs
 		return code;
 	}
 
-	int RpcService::AwaitCallLua(const RpcMethodConfig * config, rpc::Message& message) noexcept
+	int RpcService::AwaitCallLua(const RpcMethodConfig* config, rpc::Message& message) noexcept
 	{
 		this->mLuaModule->GetMetaFunction("__Call");
 		lua_State* lua = this->mLuaModule->GetLuaEnv();
-		if(this->WriterToLua(config, message) != XCode::Ok)
+		if (this->WriterToLua(config, message) != XCode::Ok)
 		{
 			return XCode::CallLuaFunctionFail;
 		}
@@ -245,7 +238,7 @@ namespace acs
 	void RpcService::OnAppStop()
 	{
 		this->OnStop();
-		if(this->mLuaModule != nullptr)
+		if (this->mLuaModule != nullptr)
 		{
 			this->mLuaModule->Await("OnStop");
 			this->mLuaModule = nullptr;

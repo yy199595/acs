@@ -11,7 +11,7 @@ namespace Lua
 	class ModuleClass
 	{
 	public:
-		ModuleClass(lua_State * lua);
+		explicit ModuleClass(lua_State * lua);
 	public:
 		ModuleClass & Start();
 		void End(const char * name) { lua_setfield(this->mLua, -2, name);}

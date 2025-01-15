@@ -81,6 +81,8 @@ namespace help
 				this->stringBuffer.clear();
 			}
 
+			inline void Pop() { this->stringBuffer.pop_back(); }
+
 		private:
 			std::string stringBuffer;
 		};

@@ -21,13 +21,9 @@
 #include "Core/Excel/excel.h"
 #include "Net/Lua/LuaSocket.h"
 #include "Net/Network/Tcp/Socket.h"
-#include "Util/Tools/LuaString.h"
-#include "Udp/Common/UdpClient.h"
-#include "Kcp/Common/KcpClient.h"
 #include "Core/Lua/LuaOs.h"
 #include "Proto/Lua/Bson.h"
 #include "Lua/Lib/Lib.h"
-#include "Lua/Socket/LuaClient.h"
 #ifdef __ENABLE_OPEN_SSL__
 #include "Util/Ssl/rsa.h"
 #include "Util/Ssl/LuaRsa.h"
@@ -123,21 +119,11 @@ namespace acs
 		classProxyHelper3.PushMemberFunction("GetSheets", &lxlsx::ExcelFile::GetSheets);
 
 		Lua::ClassProxyHelper classProxyHelper4(this->mLuaEnv, "TcpSocket");
-		classProxyHelper4.BeginRegister<lua::Client>();
+		classProxyHelper4.BeginRegister<tcp::Socket>();
 		classProxyHelper4.PushExtensionFunction("Send", Lua::TcpSock::Send);
 		classProxyHelper4.PushExtensionFunction("Read", Lua::TcpSock::Read);
 		classProxyHelper4.PushExtensionFunction("Query", Lua::TcpSock::Query);
-		classProxyHelper4.PushExtensionFunction("Close", Lua::TcpSock::Close);
 		classProxyHelper4.PushExtensionFunction("Connect", Lua::TcpSock::Connect);
-
-		Lua::ClassProxyHelper classProxyHelper5(this->mLuaEnv, "UdpSocket");
-		classProxyHelper5.BeginRegister<udp::Client>();
-		classProxyHelper5.PushExtensionFunction("Send", Lua::UdpSock::Send);
-
-		Lua::ClassProxyHelper classProxyHelper6(this->mLuaEnv, "KcpSocket");
-		classProxyHelper6.BeginRegister<kcp::Client>();
-		classProxyHelper6.PushExtensionFunction("New", Lua::KcpSock::New);
-		classProxyHelper6.PushExtensionFunction("Send", Lua::KcpSock::Send);
 
 #ifdef __ENABLE_OPEN_SSL__
 		Lua::ClassProxyHelper classProxyHelper7(this->mLuaEnv, "rsa");
@@ -147,6 +133,13 @@ namespace acs
 		classProxyHelper7.PushExtensionFunction("Encode", Lua::rsa::Encode);
 		classProxyHelper7.PushExtensionFunction("Decode", Lua::rsa::Decode);
 #endif
+
+		Lua::ClassProxyHelper classProxyHelper8(this->mLuaEnv, "string");
+		classProxyHelper8.PushStaticFunction("range", help::Str::RandomString);
+
+		Lua::ClassProxyHelper classProxyHelper9(this->mLuaEnv, "table");
+		classProxyHelper9.PushStaticExtensionFunction("serialize", Lua::lfmt::serialize);
+		classProxyHelper9.PushStaticExtensionFunction("deserialize", Lua::lfmt::deserialize);
 	}
 
 	bool LuaComponent::LateAwake()
@@ -160,9 +153,6 @@ namespace acs
 		moduleRegistry.AddFunction("GetFiles", Lua::LuaFile::GetFiles);
 		moduleRegistry.AddFunction("GetFileName", Lua::LuaFile::GetFileName);
 		moduleRegistry.AddFunction("GetLastWriteTime", Lua::LuaFile::GetLastWriteTime).End("util.fs");
-
-		moduleRegistry.Start();
-		moduleRegistry.AddFunction("New", Lua::UdpSock::New).End("net.udp");
 
 		moduleRegistry.Start();
 		moduleRegistry.AddFunction("Stop", LuaActor::Stop);
@@ -200,16 +190,11 @@ namespace acs
 		moduleRegistry.AddFunction("Verify", lua::ljwt::Verify).End("util.jwt");
 
 		moduleRegistry.Start();
-		moduleRegistry.AddFunction("format", Lua::lfmt::format);
-		moduleRegistry.AddFunction("serialize", Lua::lfmt::serialize);
-		moduleRegistry.AddFunction("deserialize", Lua::lfmt::deserialize).End("util.fmt");
+		moduleRegistry.AddFunction("format", Lua::lfmt::format).End("util.fmt");
 
 		moduleRegistry.Start();
 		moduleRegistry.AddFunction("Make", Lua::LuaDir::Make);
 		moduleRegistry.AddFunction("IsExist", Lua::LuaDir::IsExist).End("util.dir");
-
-		moduleRegistry.Start();
-		moduleRegistry.AddFunction("format", Lua::Str::Format).End("util.str");
 
 
 		std::vector<ILuaRegister*> components;

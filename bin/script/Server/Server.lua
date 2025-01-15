@@ -54,26 +54,15 @@ function Main:Update()
 end
 
 function Main:OnComplete()
-    local hosts = TcpSocket.Query("baidu.com")
-    log.Debug("{}", hosts)
-
-    for i = 1, 10 do
-        local request = "GET / HTTP/1.1\r\n"
-        request = request .. "HOST: " .. "baidu.com\r\n"
-        request = request .. "Connection: close\r\n\r\n"
-
-        local client = TcpSocket.Connect(hosts[1], 80)
-
-        print(client:Send(request))
-        local size, message = client:Read()
-        if size == 0 then
-            log.Error("read error", message)
-        end
-        client:Close()
-        coroutine.sleep(1000)
-        client = nil
-    end
-
+    local userInfo = {
+        _id = 1001,
+        sex = true,
+        nick = "xiao",
+        height = "175.5",
+        friends = { 1002, 1003, 1004},
+    }
+    local code, response = app:Call(nil, "Example.Ping", userInfo)
+    log.Debug("code={}  response={}", code, response)
 end
 
 return Main

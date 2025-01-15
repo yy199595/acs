@@ -1,0 +1,7 @@
+{
+	"Example.Ping": {
+		"Async": false,
+		"IsClient": false,
+		"Proto" : "json"
+	}
+}

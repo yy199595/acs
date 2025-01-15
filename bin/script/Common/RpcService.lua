@@ -10,9 +10,8 @@ local CODE_OK = XCode.Ok
 local CODE_CALL_FAIL = XCode.CallLuaFunctionFail
 local CODE_NOT_EXIST = XCode.CallFunctionNotExist
 
-
-local rpc_services = { }
 local RpcService = { }
+local rpc_services = { }
 
 local rpc = function(class, func, request, taskSource)
 	local status, code, response = xpcall(func, log_error, class, request)

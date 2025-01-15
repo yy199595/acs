@@ -66,9 +66,9 @@ namespace Lua
 		}
 		this->GetMetaFunction("Await");
 		lua_pushstring(this->mLua, func.c_str());
-		std::unique_ptr<WaitLuaTaskSource> task = std::make_unique<WaitLuaTaskSource>();
+		WaitLuaTaskSource * task = new WaitLuaTaskSource();
 		{
-			Lua::Parameter::Write<WaitLuaTaskSource*>(this->mLua, task.get());
+			Lua::Parameter::Write<WaitLuaTaskSource*>(this->mLua, task);
 			Lua::Parameter::WriteArgs(this->mLua, std::forward<Args>(args)...);
 		}
 		if(lua_pcall(this->mLua, sizeof...(Args) + 3, 1, 0) != LUA_OK)

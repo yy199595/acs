@@ -65,33 +65,33 @@ function table.is_array(t)
     return count == #t;
 end
 
-function table.serialize(t)
-    local result = "{"
-    local is_array = table.is_array(t)
-
-    for k, v in pairs(t) do
-        local key, value
-        if is_array then
-            -- 如果是数组，只输出值
-            value = (type(v) == "table") and table.serialize(v) or (type(v) == "string" and str_format("%q", v) or tostring(v))
-            result = result .. value .. ","
-        else
-            -- 如果是键值对表，输出键和值
-            key = (type(k) == "string") and str_format("[%q]", k) or str_format("[%s]", k)
-            value = (type(v) == "table") and table.serialize(v) or (type(v) == "string" and str_format("%q", v) or tostring(v))
-            result = result .. "  " .. key .. "=" .. value .. ","
-        end
-    end
-
-    result = result .. "}"
-    return result
-end
-
-function table.deserialize(str)
-    local code = "return " .. str
-    local ok, result = pcall(load, code)
-    if not ok then
-        return nil
-    end
-    return result()
-end
+--function table.serialize(t)
+--    local result = "{"
+--    local is_array = table.is_array(t)
+--
+--    for k, v in pairs(t) do
+--        local key, value
+--        if is_array then
+--            -- 如果是数组，只输出值
+--            value = (type(v) == "table") and table.serialize(v) or (type(v) == "string" and str_format("%q", v) or tostring(v))
+--            result = result .. value .. ","
+--        else
+--            -- 如果是键值对表，输出键和值
+--            key = (type(k) == "string") and str_format("[%q]", k) or str_format("[%s]", k)
+--            value = (type(v) == "table") and table.serialize(v) or (type(v) == "string" and str_format("%q", v) or tostring(v))
+--            result = result .. "  " .. key .. "=" .. value .. ","
+--        end
+--    end
+--
+--    result = result .. "}"
+--    return result
+--end
+--
+--function table.deserialize(str)
+--    local code = "return " .. str
+--    local ok, result = pcall(load, code)
+--    if not ok then
+--        return nil
+--    end
+--    return result()
+--end

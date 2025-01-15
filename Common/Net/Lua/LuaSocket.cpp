@@ -6,45 +6,64 @@
 #include"Entity/Actor/App.h"
 #include"Util/Tools/String.h"
 #include"Udp/Common/UdpClient.h"
-#include "Lua/Socket/LuaClient.h"
+#include"Network/Tcp/Socket.h"
 #include"Lua/Engine/UserDataParameter.h"
 #include"Udp/Component/UdpComponent.h"
 #include"Kcp/Common/KcpClient.h"
 #include"Kcp/Component/KcpComponent.h"
-#include "Server/Component/ThreadComponent.h"
+#include "Async/Lua/LuaWaitTaskSource.h"
+
 namespace Lua
 {
 	int TcpSock::Send(lua_State* L)
 	{
-		std::shared_ptr<lua::Client> luaClient = Lua::UserDataParameter::Read<std::shared_ptr<lua::Client>>(L, 1);
+		tcp::Socket* sock = Lua::UserDataParameter::Read<tcp::Socket*>(L, 1);
 		{
-			lua_pushthread(L);
-			auto taskSource = std::make_unique<acs::LuaWaitTaskSource>(L);
-
 			size_t size = 0;
 			const char* buff = luaL_checklstring(L, 2, &size);
-			return luaClient->Send(std::string(buff, size), std::move(taskSource));
+			try
+			{
+				size_t count = sock->Get().write_some(asio::buffer(buff, size));
+				lua_pushinteger(L, (int)count);
+				return 1;
+			}
+			catch (const asio::system_error& code)
+			{
+				luaL_error(L, "send : %s", code.what());
+				return 0;
+			}
 		}
 	}
 
 	int TcpSock::Read(lua_State* L)
 	{
-		std::shared_ptr<lua::Client> luaClient = Lua::UserDataParameter::Read<std::shared_ptr<lua::Client>>(L, 1);
+		tcp::Socket* sock = Lua::UserDataParameter::Read<tcp::Socket*>(L, 1);
 		{
-			lua_pushthread(L);
-			auto taskSource = std::make_unique<acs::LuaWaitTaskSource>(L);
+			size_t size = 0;
+			std::string result;
+			char buffer[128] = { 0 };
+			do
+			{
+				Asio::Code code;
+				Asio::Socket& socket = sock->Get();
+				size = socket.read_some(asio::buffer(buffer), code);
+				if (size > 0)
+				{
+					result.append(buffer, size);
+				}
+				if(code.value() != Asio::OK)
+				{
+					if(code != asio::error::eof)
+					{
+						luaL_error(L, "%s", code.message().c_str());
+						return 0;
+					}
+				}
+			} while (size > 0);
 
-			return luaClient->Read(std::move(taskSource));
+			lua_pushlstring(L, result.c_str(), result.size());
+			return 1;
 		}
-	}
-
-	int TcpSock::Close(lua_State* L)
-	{
-		std::shared_ptr<lua::Client> luaClient = Lua::UserDataParameter::Read<std::shared_ptr<lua::Client>>(L, 1);
-		{
-			luaClient->Close();
-		}
-		return 0;
 	}
 
 	int TcpSock::Query(lua_State* L)
@@ -85,91 +104,30 @@ namespace Lua
 	{
 		std::string host(luaL_checkstring(L, 1));
 		const int port = (int)luaL_checkinteger(L, 2);
-		Asio::Context& main = acs::App::Inst()->GetContext();
-		Asio::Context& context = acs::App::Get<acs::ThreadComponent>()->GetContext();
-		std::unique_ptr<tcp::Socket> socket = std::make_unique<tcp::Socket>(context);
+		Asio::Context& io = acs::App::Inst()->GetContext();
+		std::unique_ptr<tcp::Socket> socket = std::make_unique<tcp::Socket>(io);
+		try
 		{
-			socket->Init(host, port);
+			if (help::Str::IsIpAddress(host))
+			{
+				Asio::Address address = asio::ip::make_address(host);
+				{
+					Asio::EndPoint endPoint(address, port);
+					socket->Get().connect(endPoint);
+				}
+				Lua::UserDataParameter::UserDataStruct<tcp::Socket*>::WritePtr(L, socket.release());
+				return 1;
+			}
+			Asio::Resolver resolver(io);
+			Asio::ResolverQuery query(host, std::to_string(port));
+			asio::connect(socket->Get(), resolver.resolve(query));
+			Lua::UserDataParameter::UserDataStruct<tcp::Socket*>::WritePtr(L, socket.release());
+			return 1;
 		}
-		std::shared_ptr<lua::Client> luaClient = std::make_shared<lua::Client>(main, socket.release());
-		if (!luaClient->Start())
+		catch (const asio::system_error& code)
 		{
-			luaL_error(L, "connect [%s:%d]", host.c_str(), port);
+			luaL_error(L, "connect : %s", code.what());
 			return 0;
 		}
-		Lua::UserDataParameter::UserDataStruct<std::shared_ptr<lua::Client>>::Write(L, luaClient);
-		return 1;
-	}
-
-	int UdpSock::New(lua_State* L)
-	{
-		std::string ip;
-		unsigned short port = 0;
-		std::string addr(luaL_checkstring(L, 1));
-		if(!help::Str::SplitAddr(addr, ip, port))
-		{
-			luaL_error(L, "decode %s fail", addr.c_str());
-			return 0;
-		}
-		Asio::Context& ctx = acs::App::Inst()->GetContext();
-		asio::ip::udp::endpoint remote(asio::ip::make_address(ip), port);
-		acs::UdpComponent * udpComponent = acs::App::Get<acs::UdpComponent>();
-		udp::Client * udpClient = new udp::Client(ctx, udpComponent, remote, ctx);
-		{
-			udpClient->StartReceive();
-			Lua::UserDataParameter::UserDataStruct<udp::Client*>::WritePtr(L, udpClient);
-		}
-		return 1;
-	}
-
-	int UdpSock::Send(lua_State* L)
-	{
-		udp::Client * udpClient = Lua::UserDataParameter::Read<udp::Client*>(L, 1);
-		if(udpClient == nullptr)
-		{
-			return 0;
-		}
-		size_t size = 0;
-		const char * message = luaL_checklstring(L, 2, &size);
-		tcp::TextProto * textProto = new tcp::TextProto(message, size);
-		{
-			udpClient->Send(textProto);
-			lua_pushboolean(L, true);
-		}
-		return 1;
-	}
-
-	int KcpSock::New(lua_State* L)
-	{
-		std::string ip;
-		unsigned short port = 0;
-		std::string address(luaL_checkstring(L, 1));
-		if(!help::Str::SplitAddr(address, ip, port))
-		{
-			return 0;
-		}
-		Asio::Context& context = acs::App::Inst()->GetContext();
-		asio::ip::udp::endpoint endpoint(asio::ip::make_address(ip), port);
-		acs::KcpComponent * kcpComponent = acs::App::Get<acs::KcpComponent>();
-		kcp::Client * kcpClient = new kcp::Client(context, kcpComponent, endpoint, context);
-		{
-			Lua::UserDataParameter::UserDataStruct<kcp::Client*>::WritePtr(L, kcpClient);
-		}
-		return 1;
-	}
-
-	int KcpSock::Send(lua_State* L)
-	{
-		kcp::Client * kcpClient = Lua::UserDataParameter::Read<kcp::Client*>(L, 1);
-		if(kcpClient == nullptr)
-		{
-			lua_error(L);
-			return 0;
-		}
-		size_t size = 0;
-		const char * message = luaL_checklstring(L, 2, &size);
-		kcpClient->Send(new tcp::TextProto(message, size));
-		lua_pushboolean(L, true);
-		return 1;
 	}
 }

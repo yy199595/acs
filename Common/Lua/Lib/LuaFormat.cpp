@@ -81,8 +81,7 @@ static void serializeTable(lua_State* L, int index, help::str::Stream& result)
 	{
 		key.clear();
 		value.clear();
-		int valueType = lua_type(L, -1);
-		switch (valueType)
+		switch (lua_type(L, -1))
 		{
 			case LUA_TTABLE:
 			{
@@ -116,10 +115,6 @@ static void serializeTable(lua_State* L, int index, help::str::Stream& result)
 			{
 				value = lua_toboolean(L, -1) ? "true" : "false";
 				break;
-			}
-			default:
-			{
-				value = "\"unsupported\"";
 			}
 		}
 		if (!is_array)
@@ -157,21 +152,20 @@ static void serializeTable(lua_State* L, int index, help::str::Stream& result)
 					key = "[" + value + "]";
 					break;
 				}
-				default:
-				{
-					key = "[\"unsupported\"]";
-				}
 			}
-			result << key << "=" << value << ",";
+			if(!key.empty() && !value.empty())
+			{
+				result << key << "=" << value << ",";
+			}
 		}
-		else
+		else if(!value.empty())
 		{
 			result << value << ",";
 		}
 
 		lua_pop(L, 1); // 弹出值，保留键用于下次迭代
 	}
-
+	result.Pop();
 	result << "}";
 }
 /* read argid */

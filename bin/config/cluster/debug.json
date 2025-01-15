@@ -9,7 +9,8 @@
             "EventSystem",
             "ChatSystem",
             "LoginSystem",
-            "ChatComponent"
+            "ChatComponent",
+            "Example"
         ],
         "http" : [
             "Admin",

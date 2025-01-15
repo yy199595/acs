@@ -138,6 +138,10 @@ namespace tcp
 
 	bool IHeader::Add(const std::string& k, const std::string& v)
 	{
+		if(k.empty() || v.empty())
+		{
+			return false;
+		}
 		auto iter = this->mHeader.find(k);
 		if(iter != this->mHeader.end())
 		{

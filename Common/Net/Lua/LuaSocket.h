@@ -12,20 +12,7 @@ namespace Lua
 		extern int Send(lua_State*);
 		extern int Read(lua_State*);
 		extern int Query(lua_State*);
-		extern int Close(lua_State*);
 		extern int Connect(lua_State*);
-	}
-
-	namespace UdpSock
-	{
-		extern int New(lua_State*);
-		extern int Send(lua_State*);
-	}
-
-	namespace KcpSock
-	{
-		extern int New(lua_State *);
-		extern int Send(lua_State *);
 	}
 }
 
