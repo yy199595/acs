@@ -56,25 +56,25 @@ end
 
 function Main:OnComplete()
 
-    local tcp = require("net.tcp")
-    local rsa = require("util.rsa")
-    local aes = require("util.aes")
-    local json = require("util.json")
-    local base64 = require("util.base64")
-    local client = rsa.create("./public.key", "private.key")
-
-    local key = string.range(32)
-
-    local input = json.encode({
-        user_id = 10002,
-        nick = "name",
-        age = 10,
-        list = { 101, 102, 103}
-    })
-
-    local str = aes.encode(key, input)
-    print(key, string.len(input), base64.encode(str))
-    table.print(aes.decode(key, str))
+    --local tcp = require("net.tcp")
+    --local rsa = require("util.rsa")
+    --local aes = require("util.aes")
+    --local json = require("util.json")
+    --local base64 = require("util.base64")
+    --local client = rsa.create("./public.key", "private.key")
+    --
+    --local key = string.range(32)
+    --
+    --local input = json.encode({
+    --    user_id = 10002,
+    --    nick = "name",
+    --    age = 10,
+    --    list = { 101, 102, 103}
+    --})
+    --
+    --local str = aes.encode(key, input)
+    --print(key, string.len(input), base64.encode(str))
+    --table.print(aes.decode(key, str))
 end
 
 return Main

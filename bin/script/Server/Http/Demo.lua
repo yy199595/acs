@@ -11,7 +11,7 @@ end
 function Demo:Ping(request)
     self.count = self.count + 1
     log.Debug("count => {}", self.count)
-    return XCode.Ok
+    return XCode.Ok, "Pong"
 end
 
 return Demo

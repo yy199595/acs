@@ -1,4 +1,4 @@
-# <center>acs(Async Cpp Server) 是一个轻量级，分布式异步服务器框架
+# <center>acs(Async Cpp Server) 一个轻量级，分布式异步服务器框架
 # 特点：
 ### 1. 跨平台
 支持windows，Linux，Mac(支持m1和intel芯片)
