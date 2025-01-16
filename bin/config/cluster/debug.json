@@ -3,7 +3,6 @@
     },
     "server": {
         "rpc": [
-            "MongoDB",
             "NodeSystem",
             "GateSystem",
             "EventSystem",
@@ -27,7 +26,6 @@
             "LoggerComponent",
             "ConfigComponent",
             "ActorComponent",
-            "GateComponent",
             "ProtoComponent",
             "HttpWebComponent",
             "WXNoticeComponent",
@@ -35,8 +33,6 @@
             "HttpApiComponent",
             "KcpComponent",
             "UdpComponent",
-            "RedisComponent",
-            "MongoDBComponent",
             "WsClientComponent"
         ]
     }
