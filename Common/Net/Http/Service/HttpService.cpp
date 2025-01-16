@@ -132,7 +132,7 @@ namespace acs
 			if (lua_pcall(lua, 4, 1, 0) != LUA_OK)
 			{
 				std::string error;
-				this->mLuaModule->SpliteError(error);
+				this->mLuaModule->SplitError(error);
 				LOG_ERROR("{} error:{}", method, error);
 				return XCode::CallLuaFunctionFail;
 			}

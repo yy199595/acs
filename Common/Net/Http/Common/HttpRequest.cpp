@@ -152,14 +152,14 @@ namespace http
 			lua_rawset(lua, -3);
 		}
 		{
-			long long playerId = 0;
-			lua_pushstring(lua, "query");
 			const http::FromContent& fromData = this->mUrl.GetQuery();
 			if(fromData.Size() > 0)
 			{
+				lua_pushstring(lua, "query");
 				(const_cast<http::FromContent&>(fromData)).WriteToLua(lua);
 				lua_rawset(lua, -3);
 			}
+			long long playerId = 0;
 			if(fromData.Get(http::query::UserId, playerId))
 			{
 				lua_pushstring(lua, "userId");
@@ -167,9 +167,10 @@ namespace http
 				lua_rawset(lua, -3);
 			}
 		}
+		if(this->mBody != nullptr)
 		{
 			lua_pushstring(lua, "data");
-			this->WriteMessageToLua(lua);
+			this->mBody->WriteToLua(lua);
 			lua_rawset(lua, -3);
 		}
 		return 1;

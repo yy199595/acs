@@ -150,7 +150,7 @@ namespace acs
 		if (lua_pcall(lua, 3, 2, 0) != LUA_OK)
 		{
 			std::string err;
-			this->mLuaModule->SpliteError(err);
+			this->mLuaModule->SplitError(err);
 			message.GetHead().Add("error", err);
 			LOG_ERROR("{} {}", config->FullName, err);
 			return XCode::CallLuaFunctionFail;
@@ -216,7 +216,7 @@ namespace acs
 		if (lua_pcall(lua, 4, 1, 0) != LUA_OK)
 		{
 			std::string err;
-			this->mLuaModule->SpliteError(err);
+			this->mLuaModule->SplitError(err);
 			LOG_ERROR("{} {}", config->FullName, err);
 			return XCode::CallLuaFunctionFail;
 		}

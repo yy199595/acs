@@ -28,6 +28,11 @@ namespace lua
 		extern int luaopen_lhttp(lua_State* L);
 		extern int luaopen_lbson(lua_State * L);
 
+		extern int luaopen_ltcp(lua_State * L);
+		extern int luaopen_lrsa(lua_State * L);
+		extern int luaopen_lraes(lua_State * L);
+
+
 		extern int luaopen_lproto(lua_State* L);
 		extern int luaopen_lbase64(lua_State* L);
 		extern int luaopen_ltimer(lua_State* L);

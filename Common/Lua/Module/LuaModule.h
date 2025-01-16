@@ -26,7 +26,7 @@ namespace Lua
 		bool HasFunction(const std::string & name);
 		bool GetMetaFunction(const std::string & name) noexcept;
 	public:
-		void SpliteError(std::string & error);
+		void SplitError(std::string & error);
 		void SetMember(const char* key, long long value);
 		inline lua_State * GetLuaEnv() { return this->mLua;}
 		void SetMember(const char* key, const std::string & value);

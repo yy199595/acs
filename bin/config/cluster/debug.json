@@ -20,7 +20,8 @@
             "QuickSDK",
             "FileUpload",
             "ResourceMgr",
-            "Collection"
+            "Collection",
+            "Demo"
         ],
         "component": [
             "LoggerComponent",

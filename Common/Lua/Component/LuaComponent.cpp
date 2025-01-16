@@ -23,6 +23,7 @@
 
 #include "Util/Ssl/rsa.h"
 #include "Util/Ssl/LuaRsa.h"
+#include "Lua/Socket/LuaTcpSocket.h"
 
 #endif
 using namespace Lua;
@@ -53,6 +54,9 @@ namespace acs
 		luaL_openlibs(this->mLuaEnv);
 		this->AddCCModule("util.fs", lua::lib::luaopen_lfs);
 		this->AddCCModule("util.md5", lua::lib::luaopen_lmd5);
+		this->AddCCModule("util.rsa", lua::lib::luaopen_lrsa);
+		this->AddCCModule("util.aes", lua::lib::luaopen_lraes);
+
 		this->AddCCModule("util.oss", lua::lib::luaopen_loss);
 		this->AddCCModule("util.fmt", lua::lib::luaopen_lfmt);
 		this->AddCCModule("util.jwt", lua::lib::luaopen_ljwt);
@@ -69,6 +73,7 @@ namespace acs
 		this->AddCCModule("core.log", lua::lib::luaopen_llog);
 		this->AddCCModule("core.timer", lua::lib::luaopen_ltimer);
 
+		this->AddCCModule("net.tcp", lua::lib::luaopen_ltcp);
 		this->AddCCModule("net.http", lua::lib::luaopen_lhttp);
 	}
 
@@ -110,7 +115,7 @@ namespace acs
 		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");
 		luaRegister1.BeginRegister<WaitLuaTaskSource>();
 		luaRegister1.PushCtor<WaitLuaTaskSource>();
-		luaRegister1.PushStaticExtensionFunction("SetResult", WaitLuaTaskSource::SetResult);
+		luaRegister1.PushExtensionFunction("SetResult", WaitLuaTaskSource::SetResult);
 
 
 		Lua::ClassProxyHelper luaRegister2(this->mLuaEnv, "LuaServiceTaskSource");
@@ -146,27 +151,29 @@ namespace acs
 		classProxyHelper3.PushMemberFunction("GetSheets", &lxlsx::ExcelFile::GetSheets);
 
 		Lua::ClassProxyHelper classProxyHelper4(this->mLuaEnv, "TcpSocket");
-		classProxyHelper4.BeginRegister<tcp::Socket>();
-		classProxyHelper4.PushExtensionFunction("Send", lua::TcpSock::Send);
-		classProxyHelper4.PushExtensionFunction("Read", lua::TcpSock::Read);
-		classProxyHelper4.PushExtensionFunction("Query", lua::TcpSock::Query);
-		classProxyHelper4.PushExtensionFunction("Connect", lua::TcpSock::Connect);
+		classProxyHelper4.BeginRegister<lua::TcpClient>();
+		classProxyHelper4.PushExtensionFunction("send", lua::TcpSock::Send);
+		classProxyHelper4.PushExtensionFunction("close", lua::TcpSock::Close);
+		classProxyHelper4.PushExtensionFunction("receive", lua::TcpSock::Read);
+		classProxyHelper4.PushExtensionFunction("set_timeout", lua::TcpSock::SetTimeout);
+
+		Lua::ClassProxyHelper classProxyHelper44(this->mLuaEnv, "TcpAcceptor");
+		classProxyHelper44.BeginRegister<Asio::Acceptor>();
+		classProxyHelper44.PushExtensionFunction("accept", lua::TcpSock::Accept);
 
 #ifdef __ENABLE_OPEN_SSL__
-		Lua::ClassProxyHelper classProxyHelper7(this->mLuaEnv, "rsa");
+		Lua::ClassProxyHelper classProxyHelper7(this->mLuaEnv, "RSAEncryptor");
 		classProxyHelper7.BeginRegister<ssl::RSAEncryptor>();
-		classProxyHelper7.PushCtor<ssl::RSAEncryptor>();
-		classProxyHelper7.PushExtensionFunction("Init", Lua::rsa::Init);
-		classProxyHelper7.PushExtensionFunction("Encode", Lua::rsa::Encode);
-		classProxyHelper7.PushExtensionFunction("Decode", Lua::rsa::Decode);
+		classProxyHelper7.PushExtensionFunction("encode", lua::rsa::Encode);
+		classProxyHelper7.PushExtensionFunction("decode", lua::rsa::Decode);
 #endif
 
 		Lua::ClassProxyHelper classProxyHelper8(this->mLuaEnv, "string");
 		classProxyHelper8.PushStaticFunction("range", help::Str::RandomString);
 
 		Lua::ClassProxyHelper classProxyHelper9(this->mLuaEnv, "table");
-		classProxyHelper9.PushStaticExtensionFunction("serialize", lua::lfmt::serialize);
-		classProxyHelper9.PushStaticExtensionFunction("deserialize", lua::lfmt::deserialize);
+		classProxyHelper9.PushExtensionFunction("serialize", lua::lfmt::serialize);
+		classProxyHelper9.PushExtensionFunction("deserialize", lua::lfmt::deserialize);
 	}
 
 	bool LuaComponent::LateAwake()

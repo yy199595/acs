@@ -8,30 +8,25 @@
 #include "Yyjson/Lua/ljson.h"
 #include "Lua/Engine/UserDataParameter.h"
 
-namespace Lua
+namespace lua
 {
 	int rsa::Init(lua_State* L)
 	{
-		ssl::RSAEncryptor* rsaEncryptor = UserDataParameter::Read<ssl::RSAEncryptor*>(L, 1);
-		if (rsaEncryptor == nullptr)
-		{
-			luaL_error(L, "rsa object is null");
-			return 0;
-		}
-		std::string pubKey = luaL_checkstring(L, 2);
-		std::string priKey = luaL_checkstring(L, 3);
+		std::string pubKey = luaL_checkstring(L, 1);
+		std::string priKey = luaL_checkstring(L, 2);
+		std::unique_ptr<ssl::RSAEncryptor> rsaEncryptor = std::make_unique<ssl::RSAEncryptor>();
 		if (!rsaEncryptor->Init(pubKey, priKey))
 		{
-			lua_pushboolean(L, false);
+			lua_pushnil(L);
 			return 0;
 		}
-		lua_pushboolean(L, true);
+		Lua::UserDataParameter::Write<ssl::RSAEncryptor*>(L, rsaEncryptor.release());
 		return 1;
 	}
 
 	int rsa::Encode(lua_State* L)
 	{
-		ssl::RSAEncryptor * rsaEncryptor = UserDataParameter::Read<ssl::RSAEncryptor*>(L, 1);
+		ssl::RSAEncryptor * rsaEncryptor = Lua::UserDataParameter::Read<ssl::RSAEncryptor*>(L, 1);
 		if(rsaEncryptor == nullptr)
 		{
 			return 0;
@@ -58,7 +53,7 @@ namespace Lua
 
 	int rsa::Decode(lua_State* L)
 	{
-		ssl::RSAEncryptor * rsaEncryptor = UserDataParameter::Read<ssl::RSAEncryptor*>(L, 1);
+		ssl::RSAEncryptor * rsaEncryptor = Lua::UserDataParameter::Read<ssl::RSAEncryptor*>(L, 1);
 		if(rsaEncryptor == nullptr)
 		{
 			return 0;

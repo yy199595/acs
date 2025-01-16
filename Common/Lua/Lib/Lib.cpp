@@ -16,7 +16,9 @@
 #include "Http/Lua/LuaHttp.h"
 #include "Proto/Lua/Message.h"
 #include "Oss/Lua/LuaOss.h"
-
+#include "Net/Lua/LuaSocket.h"
+#include "Util/Ssl/LuaRsa.h"
+#include "Auth/Lua/LuaAes.h"
 namespace lua
 {
 	int lib::luaopen_lfs(lua_State* L)
@@ -135,7 +137,6 @@ namespace lua
 				{ nullptr, nullptr}
 		};
 		luaL_newlib(L, l);
-		return 1;
 		return 1;
 	}
 }
@@ -264,6 +265,48 @@ namespace lua
 				{ "Add", lua::Timer::Add },
 				{ "Remove", lua::Timer::Remove },
 				{ "AddUpdate", lua::Timer::AddUpdate },
+				{ nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
+	}
+}
+
+namespace lua
+{
+	int lib::luaopen_ltcp(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{ "query", lua::TcpSock::Query },
+				{ "listen", lua::TcpSock::Listen },
+				{ "connect", lua::TcpSock::Connect },
+				{ nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
+	}
+}
+
+namespace lua
+{
+	int lib::luaopen_lrsa(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{ "create",  lua::rsa::Init},
+				{ nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
+	}
+}
+
+namespace lua
+{
+	int lib::luaopen_lraes(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{ "encode",  lua::laes::Encode},
+				{ "decode",  lua::laes::Decode},
 				{ nullptr, nullptr}
 		};
 		luaL_newlib(L, l);

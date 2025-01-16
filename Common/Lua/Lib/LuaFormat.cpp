@@ -4,6 +4,7 @@
 
 #include "Lib.h"
 #include "fmt.h"
+#include <unordered_set>
 #include "Util/Tools/StringStream.h"
 
 #define LUA_LIB
@@ -688,12 +689,8 @@ static int fmt_format(fmt_State* S)
 
 
 
-
 namespace lua
 {
-
-// 辅助函数：序列化表
-
 	int lfmt::format(lua_State* L)
 	{
 		size_t len;

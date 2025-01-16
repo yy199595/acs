@@ -112,7 +112,7 @@ namespace Lua
 		return false;
 	}
 
-	void LuaModule::SpliteError(std::string& error)
+	void LuaModule::SplitError(std::string& error)
 	{
 		const char * str = lua_tostring(this->mLua, -1);
 		if(str == nullptr)
@@ -136,7 +136,7 @@ namespace Lua
 	void LuaModule::OnCallError(const std::string & func)
 	{
 		std::string error;
-		this->SpliteError(error);
+		this->SplitError(error);
 		std::unique_ptr<custom::LogInfo> logInfo = std::make_unique<custom::LogInfo>();
 		{
 			logInfo->Level = custom::LogLevel::Error;

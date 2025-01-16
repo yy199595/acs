@@ -54,8 +54,6 @@ namespace Lua
 
 		ClassProxyHelper Clone(const std::string & name);
 
-		void PushStaticExtensionFunction(const char* name, lua_CFunction func);
-
 		template<typename Ret, typename ... Args>
 		void PushStaticFunction(const char* name, Ret(* func)(Args ...));
 

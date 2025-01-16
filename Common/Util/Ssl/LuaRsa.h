@@ -6,7 +6,7 @@
 #define APP_LUARSA_H
 #ifdef __ENABLE_OPEN_SSL__
 #include "Lua/Engine/LuaInclude.h"
-namespace Lua
+namespace lua
 {
 	namespace rsa
 	{

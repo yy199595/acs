@@ -1,3 +1,4 @@
+
 local proto = require("Proto")
 local Module = require("Module")
 local http = require("HttpComponent")
@@ -55,18 +56,25 @@ end
 
 function Main:OnComplete()
 
-    local ap = require("core.app")
+    local tcp = require("net.tcp")
+    local rsa = require("util.rsa")
+    local aes = require("util.aes")
     local json = require("util.json")
-    local bson = require("util.bson")
-    local userInfo = {
-        _id = 1001,
-        sex = true,
-        nick = "xiao",
-        height = "175.5",
-        friends = { 1002, 1003, 1004},
-    }
-    local code, response = app:Call(nil, "Example.Ping", userInfo)
-    log.Debug("code = {}  response = {}", code, response)
+    local base64 = require("util.base64")
+    local client = rsa.create("./public.key", "private.key")
+
+    local key = string.range(32)
+
+    local input = json.encode({
+        user_id = 10002,
+        nick = "name",
+        age = 10,
+        list = { 101, 102, 103}
+    })
+
+    local str = aes.encode(key, input)
+    print(key, string.len(input), base64.encode(str))
+    table.print(aes.decode(key, str))
 end
 
 return Main

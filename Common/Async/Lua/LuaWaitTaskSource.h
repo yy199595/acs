@@ -30,11 +30,12 @@ namespace acs
 		void SetResult();
 
 		template<typename T>
-		void SetResult(T result);
+		inline void SetResult(T result);
+		inline void SetError(const char * error);
 		void SetResult(int code, std::unique_ptr<rpc::Message> response);
 
 		template<typename... Args>
-		void SetResults(Args &&... args)
+		inline void SetResults(Args &&... args)
 		{
 			size_t size = sizeof...(Args);
 			Lua::Parameter::WriteArgs(this->mLua, std::forward<Args>(args)...);
@@ -50,6 +51,11 @@ namespace acs
 	{
 		Lua::Parameter::Write(this->mLua, result);
         Lua::Coroutine::Resume(this->mLua, 1);
+	}
+
+	void LuaWaitTaskSource::SetError(const char* error)
+	{
+		Lua::Coroutine::Resume(this->mLua, 0);
 	}
 }
 #endif //APP_LUAWAITTASKSOURCE_H
