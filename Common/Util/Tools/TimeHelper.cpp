@@ -4,6 +4,8 @@
 #include<ctime>
 #include<sstream>
 #include <iomanip>
+#include <regex>
+
 using namespace std::chrono;
 
 namespace help
@@ -57,13 +59,13 @@ namespace help
         return std::string(str, size);
     }
 
-	long long Time::GetTimeByString(const std::string& str)
+	long long Time::GetTimeByString(const char * timeStr)
 	{
 		std::tm tm = {};
-		std::stringstream ss(str);
+		std::stringstream ss(timeStr);
 		ss >> std::get_time(&tm, TIME_FORMAT);
 		std::chrono::system_clock::time_point tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
-		return std::chrono::system_clock::to_time_t(tp);
+		return (long long)std::chrono::system_clock::to_time_t(tp);
 	}
 
     long long Time::NowMil()

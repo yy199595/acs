@@ -2,6 +2,7 @@
 #include<set>
 #include<memory>
 #include<unordered_map>
+#include<Core/Event/IEvent.h>
 #include"Lua/Module/LuaModule.h"
 #include"Lua/Config/LuaConfig.h"
 #include"Entity/Component/Component.h"
@@ -12,44 +13,43 @@ namespace acs
 	{
 	public:
 		std::string Name;
+		std::string FullName;
 		std::string FullPath; //完整路径
 		std::string LocalPath; //相对路径
 		long long LastWriteTime;
 	};
 
-    class LuaComponent final : public Component,
-			public IStart, public IComplete, public IHotfix,
-			public IServerRecord, public IDestroy
+	class LuaComponent final : public Component,
+							   public IStart, public IComplete, public IHotfix,
+							   public IServerRecord, public IDestroy
 	{
-	 public:
+	public:
 		LuaComponent();
 		~LuaComponent() final = default;
-    public:
+	public:
 		double GetMemorySize();
 		double CollectGarbage();
 		Lua::LuaModule * LoadModule(const std::string & name);
-		void AddCCModule(const char * module, lua_CFunction func);
 	protected:
 		bool Awake() final;
-		void Start() final;
+		void OnStart() final;
 		bool LateAwake() final;
 		void OnDestroy() final;
-		void Complete() final;
+		void OnComplete() final;
 		bool OnHotFix() final;
 		void OnRecord(json::w::Document &document) final;
-    private:
+	private:
 		void LoadAllLib();
 		bool LoadAllFile();
 		void RegisterLuaClass();
 		void AddRequire(const std::string & direct);
 		void CheckModuleHotfix(const std::string & module);
 	private:
-        lua_State* mLuaEnv;
+		lua_State* mLuaEnv;
+		lua::Config mConfig;
 		std::string mModulePath;
 		std::string mComponentPath;
-		Lua::LuaModule * mMainModule;
 		std::vector<std::string> mDoFiles;
-		std::unique_ptr<LuaConfig> mLuaConfig;
 		std::unordered_map<std::string, std::unique_ptr<ModuleInfo>> mModulePaths;
 		std::unordered_map<std::string, std::unique_ptr<Lua::LuaModule>> mLuaModules;
 	};

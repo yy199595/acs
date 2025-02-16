@@ -6,19 +6,19 @@
 
 namespace Lua
 {
-	ModuleClass::ModuleClass(lua_State* lua)
+	CCModule::CCModule(lua_State* lua)
 		: mLua(lua)
 	{
 
 	}
 
-	void ModuleClass::Register(const luaL_Reg& luaLib)
+	void CCModule::Open(const luaL_Reg& luaLib)
 	{
 		luaL_requiref(this->mLua, luaLib.name, luaLib.func, 1);
 		lua_pop(this->mLua, 1);
 	}
 
-	void ModuleClass::Register(const char* module, lua_CFunction func)
+	void CCModule::Open(const char* module, lua_CFunction func)
 	{
 		luaL_requiref(this->mLua, module, func, 1);
 		lua_pop(this->mLua, 1);

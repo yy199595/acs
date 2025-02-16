@@ -2,9 +2,10 @@
 // Created by mac on 2022/6/1.
 //
 
-#include"Message.h"
-#include"Entity/Actor/App.h"
-#include"Lua/Engine/UserDataParameter.h"
+#include "Message.h"
+#include "Entity/Actor/App.h"
+#include "Lua/Engine/UserDataParameter.h"
+
 
 using namespace acs;
 
@@ -146,16 +147,15 @@ namespace lua
 		{
 			return 0;
 		}
-		size_t index = 0;
+		int index = 0;
 		lua_newtable(lua);
-		int top = lua_gettop(lua);
 		for(const std::string & type : types)
 		{
 			index++;
 			lua_pushinteger(lua, index);
 			lua_pushstring(lua, type.c_str());
+			lua_settable(lua, -3);
 		}
-		lua_settop(lua, top);
 		return 1;
 	}
 }

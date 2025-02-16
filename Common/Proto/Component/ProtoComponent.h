@@ -4,7 +4,7 @@
 
 #ifndef APP_PROTOCOMPONENT_H
 #define APP_PROTOCOMPONENT_H
-
+#include"Yyjson/Object/JsonObject.h"
 #include"Proto/Include/Message.h"
 #include"google/protobuf/any.pb.h"
 #include"Entity/Component/Component.h"
@@ -12,6 +12,17 @@
 #include"google/protobuf/compiler/importer.h"
 
 struct lua_State;
+
+namespace proto
+{
+	struct Config : public json::Object<Config>
+	{
+	public:
+		std::string path;
+		std::vector<std::string> imports;
+	};
+}
+
 namespace acs
 {
 
@@ -34,7 +45,7 @@ namespace acs
 	class ProtoComponent final : public Component, public IHotfix
     {
     public:
-        ProtoComponent() = default;
+        ProtoComponent();
         ~ProtoComponent() final = default;
     public:
 		bool Load(const char * path);
@@ -55,6 +66,7 @@ namespace acs
         const pb::Message * FindMessage(const std::string & name);
 		void LoopMessage(const pb::Descriptor * descriptor, std::vector<std::string> & protos);
 	private:
+		proto::Config mConfig;
 		std::unique_ptr<ImportError> mImportError;
 		std::unique_ptr<pb::compiler::Importer> mImporter;
         std::unordered_map<std::string, long long> mFiles;

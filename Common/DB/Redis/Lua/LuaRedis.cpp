@@ -195,17 +195,24 @@ namespace lua
 			}
 		}
 		const char* channel = luaL_checkstring(lua, 1);
-		if(!subComponent->SubChannel(channel))
-		{
-			lua_pushboolean(lua, false);
-			return 1;
-		}
-		lua_pushboolean(lua, true);
+		lua_pushboolean(lua, subComponent->Sub(channel));
 		return 1;
 	}
 
 	int redis::UnSub(lua_State* lua)
 	{
-		return 0;
+		static RedisSubComponent* subComponent = nullptr;
+		if (subComponent == nullptr)
+		{
+			subComponent = App::Get<RedisSubComponent>();
+			if (subComponent == nullptr)
+			{
+				luaL_error(lua, "not add RedisSubComponent");
+				return 0;
+			}
+		}
+		const char* channel = luaL_checkstring(lua, 1);
+		lua_pushboolean(lua, subComponent->UnSub(channel));
+		return 1;
 	}
 }

@@ -9,8 +9,8 @@ namespace lua
 {
 	namespace LuaFile
 	{
+		int Write(lua_State * L);
 		int Find(lua_State * lua);
-		int GetMd5(lua_State * lua);
 		int IsExist(lua_State * lua);
 		int GetFiles(lua_State * lua);
 		int GetFileName(lua_State * lua);

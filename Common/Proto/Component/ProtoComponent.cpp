@@ -9,9 +9,9 @@
 #include"google/protobuf/util/json_util.h"
 #include"google/protobuf/dynamic_message.h"
 #include"Proto/Lua/Message.h"
-#include"Lua/Engine/ModuleClass.h"
 #include "google/protobuf/struct.pb.h"
 #include"Yyjson/Lua/ljson.h"
+#include "Lua/Lib/Lib.h"
 namespace acs
 {
     ImportError::ImportError()
@@ -35,17 +35,31 @@ namespace acs
 
 namespace acs
 {
+	ProtoComponent::ProtoComponent()
+	{
+		REGISTER_JSON_CLASS_FIELD(proto::Config, path);
+		REGISTER_JSON_CLASS_FIELD(proto::Config, imports);
+	}
+
     bool ProtoComponent::Awake()
-    {
-        std::string path;
-        const ServerConfig * config = ServerConfig::Inst();
-		if(config->GetPath("proto", path))
-        {
-			LOG_CHECK_RET_FALSE(this->Load(path.c_str()));
-        }
+	{
+		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
+			ccModule.Open("util.pb", lua::lib::luaopen_lproto);
+		});
+		ServerConfig& config = this->mApp->GetConfig();
+		LOG_CHECK_RET_FALSE(config.Get("pb", this->mConfig))
+		LOG_CHECK_RET_FALSE(this->Load(this->mConfig.path.c_str()));
+		if (!this->mConfig.imports.empty())
+		{
+			for (const std::string& path: this->mConfig.imports)
+			{
+				std::vector<std::string> types;
+				LOG_CHECK_RET_FALSE(this->Import(path.c_str(), types));
+			}
+		}
 		this->RegisterMessage<google::protobuf::Struct>();
-        return true;
-    }
+		return true;
+	}
 
     bool ProtoComponent::Load(const char * path)
     {
@@ -73,8 +87,7 @@ namespace acs
 
 	bool ProtoComponent::Import(const char * fileName, std::vector<std::string> & types)
 	{
-        std::string path;
-        ServerConfig::Inst()->GetPath("proto", path);
+        const std::string & path = this->mConfig.path;
         const std::string fullPath(fmt::format("{0}/{1}", path, fileName));
 		if(!help::fs::FileIsExist(fullPath))
 		{
@@ -104,7 +117,7 @@ namespace acs
 			if(descriptor->field_count() > 0)
 			{
 				const pb::Message * message = this->mDynamicMessageFactory->GetPrototype(descriptor);
-                //LOG_DEBUG("add new dynamic message {}",  message->GetTypeName());
+				types.emplace_back(message->GetTypeName());
                 this->mDynamicMessageMap.emplace(message->GetTypeName(), message);
 			}
 		}
@@ -121,7 +134,7 @@ namespace acs
 			if(descriptor1->field_count() > 0)
 			{
 				const pb::Message * message = this->mDynamicMessageFactory->GetPrototype(descriptor1);
-				LOG_DEBUG("add new dynamic message {}",  message->GetTypeName());
+				//LOG_DEBUG("add new dynamic message {}",  message->GetTypeName());
 				this->mDynamicMessageMap[message->GetTypeName()] = message;
 				protos.emplace_back(message->GetTypeName());
 			}

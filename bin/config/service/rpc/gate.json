@@ -12,5 +12,14 @@
     "GateSystem.Logout": {
         "Async": true,
         "IsClient": true
+    },
+    "GateSystem.Create": {
+        "Async": true,
+        "IsClient": false,
+        "Request" : "s2s.login.create"
+    },
+    "GateSystem.OnPlayerLogin": {
+        "Async": true,
+        "IsClient": false
     }
 }

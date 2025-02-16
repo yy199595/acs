@@ -34,6 +34,8 @@ namespace acs
 		LoginInfo login_info;
 		std::vector<int> item_list;
 		std::vector<FriendInfo> friend_list;
+		std::unordered_map<std::string, int> friend_sex;
+		std::unordered_map<std::string, FriendInfo> friend_map;
 	};
 }
 

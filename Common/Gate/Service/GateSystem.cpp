@@ -22,6 +22,7 @@ namespace acs
 		BIND_PLAYER_RPC_METHOD(GateSystem::Ping);
 		BIND_PLAYER_RPC_METHOD(GateSystem::Login);
 		BIND_PLAYER_RPC_METHOD(GateSystem::Logout);
+		BIND_PLAYER_RPC_METHOD(GateSystem::Create);
 		this->mActor = this->GetComponent<ActorComponent>();
 		return true;
     }
@@ -86,11 +87,23 @@ namespace acs
 		{
 			return XCode::NotFindUser;
 		}
+		s2s::login::create message;
+		{
+			message.set_user_id(userId);
+			message.set_sock_id(sockId);
+		}
+		return this->Create(message);
+	}
+
+	int GateSystem::Create(const s2s::login::create& request)
+	{
 		std::vector<int> servers;
 		if(!this->AllotServer(servers))
 		{
 			return XCode::AddressAllotFailure;
 		}
+		int sockId = request.sock_id();
+		long long userId = request.user_id();
 		int serverId = this->mApp->GetSrvId();
 		std::unique_ptr<Player> player = std::make_unique<Player>(userId, serverId, sockId);
 		{

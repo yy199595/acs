@@ -35,8 +35,8 @@
             "protocol" : "tcp",
             "address": "127.0.0.1:${https}",
             "component" : "HttpWebComponent",
-            "key": "",
-            "cert": ""
+            "key": "${WORK_DIR}/ssl/www.huanhu999.com.key",
+            "cert": "${WORK_DIR}/ssl/www.huanhu999.com.pem"
         },
         "master" : {
             "max_conn" : 128,
@@ -69,6 +69,7 @@
         "event": 1000,
         "name": "test",
         "host" : "127.0.0.1",
+        "start" : "2025-01-01 00:00:00",
         "secret" : "4437c3f2f3ec17e796467fa1b3288f9b"
     },
     "master": {
@@ -82,8 +83,14 @@
         "secret": "",
         "host" : ""
     },
+    "pb" : {
+        "path" : "${WORK_DIR}/proto",
+        "imports" : [
+
+        ]
+    },
     "path": {
-        "proto": "${WORK_DIR}/proto",
+        "backup" : "${WORK_DIR}/mongo",
         "lang" : "${WORK_DIR}/config/lang/lang.csv",
         "vip": "${WORK_DIR}/config/card/vip.json",
         "user": "${WORK_DIR}/config/user.json",
@@ -101,26 +108,16 @@
             "${WORK_DIR}/script/Component",
             "${WORK_DIR}/script/Server",
             "${WORK_DIR}/script/Client",
-            "${WORK_DIR}/script/Tools"
-        ]
+            "${WORK_DIR}/script/Tools",
+            "${WORK_DIR}/script/Example"
+        ],
+        "modules" : [],
+        "main" : "${lua}"
     },
     "ssl": {
         "client": {
             "pem": "${WORK_DIR}/ssl/ca.pem"
         }
-    },
-    "wx" : {
-        "app_id" : "",
-        "app_secret": "",
-
-        "mch_id" : "",
-        "mch_num": "",
-        "api_key" : "",
-        "api_cert" : "",
-        "api_v3_key" : "",
-        "notify_url" : "",
-        "complaint_url" : "",
-        "public_key" : ""
     },
     "whcbqhn": {
         "app_id": "",
@@ -129,5 +126,8 @@
     "quick" : {
         "md5_key" : "",
         "callback_key": ""
+    },
+    "deepseek" : {
+        "api-key" : "sk-db47efd147ec4a3bb8538ae5ba76e323"
     }
 }

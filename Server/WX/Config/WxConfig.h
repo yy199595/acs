@@ -5,6 +5,7 @@
 #ifndef APP_WXCONFIG_H
 #define APP_WXCONFIG_H
 #include<string>
+#include "Yyjson/Object/JsonObject.h"
 namespace wx
 {
 	struct LoginConfig

@@ -1,14 +1,19 @@
 {
 	"include": [
 		"com/db.json",
+		"com/wx.json",
 		"com/com.json",
-		"com/log.json"
+		"com/log.json",
+		"com/backup.json"
 	],
 	"core": {
 		"name": "${name}"
 	},
 	"lua": {
-		"main": "${lua}"
+		"main": "${lua}",
+		"modules" : [
+
+		]
 	},
 	"listen": {
 		"ws": {
@@ -34,7 +39,8 @@
 		"download": "${WORK_DIR}/www/dist",
 		"header": {
 			"Access-Control-Allow-Origin": "*"
-		}
+		},
+		"range-name" : "https://www.mocklib.com/mock/random/name"
 	},
 	"path": {
 		"machine": "",

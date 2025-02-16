@@ -15,6 +15,9 @@ namespace acs
 	{
 		this->mHttp = nullptr;
 		this->mToken.exp_time = 0;
+		wx::WhcbqhnConfig::RegisterField("app_id", &wx::WhcbqhnConfig::app_id, true);
+		wx::WhcbqhnConfig::RegisterField("app_secret", &wx::WhcbqhnConfig::app_secret, true);
+
 	}
 
 	bool WXNoticeComponent::Awake()
@@ -26,10 +29,8 @@ namespace acs
 		}
 		LOG_CHECK_RET_FALSE(jsonValue->Get("app_id", this->mAppId))
 		{
-			const ServerConfig& config = this->mApp->Config();
-			LOG_CHECK_RET_FALSE(config.Get("whcbqhn", jsonValue))
-			LOG_CHECK_RET_FALSE(jsonValue->Get("app_id", this->mConfig.app_id));
-			LOG_CHECK_RET_FALSE(jsonValue->Get("app_secret", this->mConfig.app_secret));
+			ServerConfig * config = ServerConfig::Inst();
+			LOG_CHECK_RET_FALSE(config->Get("whcbqhn", this->mConfig))
 		}
 		return true;
 	}
@@ -38,24 +39,6 @@ namespace acs
 	{
 		LOG_CHECK_RET_FALSE(this->mHttp = this->GetComponent<HttpComponent>())
 		return true;
-	}
-
-	void WXNoticeComponent::Complete()
-	{
-//		const std::string appid("wxdaabf12cb79dff86");
-//		const std::string openid("oej1o6uY7Z4IGoEHWAq7pWB2-4Dc");
-//		const std::string appsecret("1bb3de2bdf2f1dc1c0ee46054a1762ee");
-//
-//		this->mConfig.app_id = appid;
-//		this->mConfig.app_secret = appsecret;
-//
-//		wx::NoticeData noticeData;
-//
-//		noticeData.templateId = "76g0si38qbYUpV0kHrqR0-wkppsY8d8vI8krnOm3Fec";
-//		noticeData.data.emplace("keyword1", "WXNoticeComponent.cpp");
-//		noticeData.data.emplace("keyword2", fmt::format("金额 {:.2f}元", 5500 / 100.0f));
-//
-//		this->Send(openid, noticeData);
 	}
 
 	void WXNoticeComponent::OnWxUnsubscribe(const std::string& openId)

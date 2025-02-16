@@ -8,6 +8,8 @@ interface TokenData {
 
 interface AdminInfo {
     name : string,
+    token : string,
+    exp_time : number,
     login_ip : string,
     city_name : string,
     permission : number,
@@ -15,48 +17,35 @@ interface AdminInfo {
     create_time : number
 }
 
-export function get_token() : TokenData | null {
-    const token = localStorage.getItem(TokenKey)
-    if(token) {
-        const now = new Date().getTime() / 1000
-        const tokenData = JSON.parse(token)
-        if(tokenData.tick >= now) {
-            return tokenData
-        }
-        localStorage.removeItem(TokenKey)
+export namespace app {
+
+    export function remove_user_info() {
+        localStorage.removeItem("user_info")
     }
-    return null
-}
 
-export function add_token(token : TokenData) {
-    localStorage.setItem(TokenKey, JSON.stringify(token))
-}
+    export function get_user_info(): AdminInfo | null {
+        const value = localStorage.getItem("user_info")
+        if (value == null || value.length == 0) {
+            return null;
+        }
+        return JSON.parse(value);
+    }
 
-
-export function is_admin() {
-    try {
-        const tokenInfo = get_token()
-        if(tokenInfo == null)
-        {
+    export function is_admin() : boolean {
+        try {
+            const userInfo = get_user_info();
+            if(userInfo == null) {
+                return false;
+            }
+            return userInfo.permission === 100;
+        }
+        catch (e) {
             return false;
         }
-        const strArray = tokenInfo.token.split(".")
-        const jsonData = JSON.parse(atob(strArray[1]))
-        console.log(jsonData.p)
-        return  jsonData && jsonData.p == 100
-    }
-    catch (e) {
-        return false;
     }
 }
 
-export function remove_token() {
-    localStorage.removeItem(TokenKey)
-}
 
-export function delete_token() {
-    localStorage.removeItem(TokenKey)
-}
 
 export function logout() {
     return  request({

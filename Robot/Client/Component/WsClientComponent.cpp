@@ -20,13 +20,19 @@ namespace acs
 		this->mLuaComponent = nullptr;
 	}
 
+	bool WsClientComponent::Awake()
+	{
+		LuaCCModuleRegister::Add([](Lua::CCModule & moduleClass) {
+			moduleClass.Open("net.client", lua::lib::luaopen_lclient);
+		});
+		return true;
+	}
+
 	bool WsClientComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mProto = this->GetComponent<ProtoComponent>())
 		LOG_CHECK_RET_FALSE(this->mLuaComponent = this->GetComponent<LuaComponent>())
 		LOG_CHECK_RET_FALSE(this->mDisComponent = this->GetComponent<DispatchComponent>())
-
-		this->mLuaComponent->AddCCModule("net.client", lua::lib::luaopen_lclient);
 		return true;
 	}
 
@@ -41,7 +47,7 @@ namespace acs
 		int id = ++this->mIndex;
 		Asio::Context & context = this->mApp->GetContext();
 		std::unique_ptr<tcp::Socket> tcpSocket = std::make_unique<tcp::Socket>(context);
-		std::shared_ptr<ws::RequestClient> client = std::make_shared<ws::RequestClient>(id, this, context);
+		std::shared_ptr<ws::Client> client = std::make_shared<ws::Client>(id, this, context);
 		{
 			tcpSocket->Init(ip, port);
 			client->SetSocket(tcpSocket.release());

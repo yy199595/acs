@@ -1,6 +1,7 @@
 //
 // Created by leyi on 2024/2/22.
 //
+#ifdef __ENABLE_OPEN_SSL__
 
 #include <openssl/rand.h>
 #include <openssl/pem.h>
@@ -212,7 +213,7 @@ namespace acs
 		return this->mHttp->Do(std::move(request), std::move(res));
 	}
 
-	void WeChatComponent::Start()
+	void WeChatComponent::OnStart()
 	{
 		if (!this->DownCertificates())
 		{
@@ -1043,3 +1044,4 @@ namespace acs
 		}
 	}
 }
+#endif

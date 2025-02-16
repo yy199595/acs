@@ -40,11 +40,13 @@ namespace acs
 		nodeConfig->GetComponents(components);
 		nodeConfig->GetRpcServices(rpcService);
 		nodeConfig->GetHttpServices(httpService);
-		LOG_CHECK_RET_FALSE(this->AddComponent(components));
-		LOG_CHECK_RET_FALSE(this->AddRpcService(rpcService));
-		LOG_CHECK_RET_FALSE(this->AddHttpService(httpService));
-		LOG_CHECK_RET_FALSE(this->LoadListenConfig())
-
+		if(!rpcService.empty() || !httpService.empty())
+		{
+			LOG_CHECK_RET_FALSE(this->AddComponent(components));
+			LOG_CHECK_RET_FALSE(this->AddRpcService(rpcService));
+			LOG_CHECK_RET_FALSE(this->AddHttpService(httpService));
+			LOG_CHECK_RET_FALSE(this->LoadListenConfig())
+		}
 		return true;
 	}
 
@@ -127,11 +129,11 @@ namespace acs
 	{
 		std::vector<const char*> keys;
 		std::unique_ptr<json::r::Value> jsonObj;
-		const ServerConfig* config = ServerConfig::Inst();
+		ServerConfig & config = this->mApp->GetConfig();
 		{
-			LOG_CHECK_RET_FALSE(config->Get("core", jsonObj));
+			LOG_CHECK_RET_FALSE(config.Get("core", jsonObj));
 		}
-		LOG_CHECK_RET_FALSE(config->Get("listen", jsonObj));
+		LOG_CHECK_RET_FALSE(config.Get("listen", jsonObj));
 
 		std::unordered_map<std::string, int> ProtocolTypeMap = {
 				{ "tcp", proto_type::tcp },

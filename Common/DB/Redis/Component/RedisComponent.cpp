@@ -1,7 +1,5 @@
 ﻿#include"RedisComponent.h"
-#include"Redis/Lua/LuaRedis.h"
 #include"Timer/Timer/ElapsedTimer.h"
-#include"Lua/Engine/ModuleClass.h"
 #include "Lua/Lib/Lib.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Entity/Actor/App.h"
@@ -12,21 +10,22 @@
 
 namespace acs
 {
+	RedisComponent::RedisComponent()
+	{
+		redis::Config::RegisterField("ping", &redis::Config::Ping);
+		redis::Config::RegisterField("count", &redis::Config::Count);
+		redis::Config::RegisterField("debug", &redis::Config::Debug);
+		redis::Config::RegisterField("script", &redis::Config::Script);
+		redis::Config::RegisterField("passwd", &redis::Config::Password);
+		redis::Config::RegisterField("address", &redis::Config::Address, true);
+	}
+
     bool RedisComponent::Awake()
     {
-		std::unique_ptr<json::r::Value> redisObject;
-		if(!ServerConfig::Inst()->Get("redis", redisObject))
-		{
-			return false;
-		}
-		this->mConfig.Debug = false;
-		redisObject->Get("ping", this->mConfig.Ping);
-		redisObject->Get("count", this->mConfig.Count);
-		redisObject->Get("debug", this->mConfig.Debug);
-		redisObject->Get("script", this->mConfig.Script);
-		redisObject->Get("passwd", this->mConfig.Password);
-		redisObject->Get("address", this->mConfig.Address);
-		return true;
+		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
+			ccModule.Open("db.redis", lua::lib::luaopen_lredisdb);
+		});
+		return ServerConfig::Inst()->Get("redis", this->mConfig);
     }
 
 	void RedisComponent::OnRecord(json::w::Document& document)

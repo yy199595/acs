@@ -59,9 +59,9 @@ namespace redis
 #endif
 	}
 
-	void Client::OnConnect(bool result, int count)
+	void Client::OnConnect(const Asio::Code & code, int count)
 	{
-		if (result)
+		if (code.value() == Asio::OK)
 		{
 			this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
 			this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
@@ -97,7 +97,7 @@ namespace redis
 		if (!pwd.empty())  //验证密码
 		{
 			std::unique_ptr<redis::Request> authCommand = redis::Request::Make("AUTH", this->mConfig.Password);
-			std::unique_ptr<redis::Response> response = this->ReadResponse(std::move(authCommand));
+			std::unique_ptr<redis::Response> response = this->ReadResponse(authCommand);
 			if (response == nullptr || !response->IsOk())
 			{
 				this->mSocket->Close();

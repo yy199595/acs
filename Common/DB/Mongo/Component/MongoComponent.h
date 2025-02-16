@@ -93,10 +93,10 @@ namespace acs
 		std::unique_ptr<db::mongo::find_one::response> FindOnce(const db::mongo::find_one::request & request);
 		std::unique_ptr<db::mongo::find_modify ::response> FindAndModify(const db::mongo::find_modify::request & request);
 	public:
+		class Server * GetActor();
 		std::vector<std::string> GetDatabases();
 		std::vector<std::string> GetCollects(const std::string& db = "");
 	private:
-		class Server * GetActor();
 		std::unique_ptr<db::mongo::find::response> Find(const db::mongo::find::request & request);
 		std::unique_ptr<db::mongo::find::response> Find(const char * tab, const std::string & select, int limit = 1);
 		std::unique_ptr<db::mongo::find::response> Find(const char * tab, const json::w::Document & select, int limit = 1);

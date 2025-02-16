@@ -31,6 +31,10 @@ class login_requestDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<login_request> _instance;
 } _login_request_default_instance_;
+class login_createDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<login_create> _instance;
+} _login_create_default_instance_;
 class loginDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<login> _instance;
@@ -146,6 +150,20 @@ static void InitDefaultslogin_request_s2s_2fs2s_2eproto() {
 ::google::protobuf::internal::SCCInfo<1> scc_info_login_request_s2s_2fs2s_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultslogin_request_s2s_2fs2s_2eproto}, {
       &scc_info_server_info_s2s_2fs2s_2eproto.base,}};
+
+static void InitDefaultslogin_create_s2s_2fs2s_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::s2s::_login_create_default_instance_;
+    new (ptr) ::s2s::login_create();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::s2s::login_create::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_login_create_s2s_2fs2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultslogin_create_s2s_2fs2s_2eproto}, {}};
 
 static void InitDefaultslogin_s2s_2fs2s_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -403,6 +421,7 @@ void InitDefaults_s2s_2fs2s_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_server_info_s2s_2fs2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_server_s2s_2fs2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_login_request_s2s_2fs2s_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_login_create_s2s_2fs2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_login_s2s_2fs2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_logout_request_s2s_2fs2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_logout_s2s_2fs2s_2eproto.base);
@@ -423,7 +442,7 @@ void InitDefaults_s2s_2fs2s_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_forward_s2s_2fs2s_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_s2s_2fs2s_2eproto[21];
+::google::protobuf::Metadata file_level_metadata_s2s_2fs2s_2eproto[22];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_s2s_2fs2s_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_s2s_2fs2s_2eproto = nullptr;
 
@@ -448,6 +467,13 @@ const ::google::protobuf::uint32 TableStruct_s2s_2fs2s_2eproto::offsets[] PROTOB
   PROTOBUF_FIELD_OFFSET(::s2s::login_request, user_id_),
   PROTOBUF_FIELD_OFFSET(::s2s::login_request, client_id_),
   PROTOBUF_FIELD_OFFSET(::s2s::login_request, list_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::s2s::login_create, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::s2s::login_create, user_id_),
+  PROTOBUF_FIELD_OFFSET(::s2s::login_create, sock_id_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::login, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -570,30 +596,32 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 0, -1, sizeof(::s2s::server_info)},
   { 7, -1, sizeof(::s2s::server)},
   { 12, -1, sizeof(::s2s::login_request)},
-  { 20, -1, sizeof(::s2s::login)},
-  { 25, -1, sizeof(::s2s::logout_request)},
-  { 31, -1, sizeof(::s2s::logout)},
-  { 36, -1, sizeof(::s2s::log_show)},
-  { 44, -1, sizeof(::s2s::log_login)},
-  { 53, -1, sizeof(::s2s::log_behavior)},
-  { 61, -1, sizeof(::s2s::log)},
-  { 66, -1, sizeof(::s2s::allot_request)},
-  { 73, -1, sizeof(::s2s::allot_save)},
-  { 80, -1, sizeof(::s2s::allot)},
-  { 85, 92, sizeof(::s2s::location_add_ServicesEntry_DoNotUse)},
-  { 94, -1, sizeof(::s2s::location_add)},
-  { 101, -1, sizeof(::s2s::location_del)},
-  { 108, -1, sizeof(::s2s::location)},
-  { 113, -1, sizeof(::s2s::forward_sub)},
-  { 119, -1, sizeof(::s2s::forward_unsub)},
-  { 125, -1, sizeof(::s2s::forward_publish)},
-  { 132, -1, sizeof(::s2s::forward)},
+  { 20, -1, sizeof(::s2s::login_create)},
+  { 27, -1, sizeof(::s2s::login)},
+  { 32, -1, sizeof(::s2s::logout_request)},
+  { 38, -1, sizeof(::s2s::logout)},
+  { 43, -1, sizeof(::s2s::log_show)},
+  { 51, -1, sizeof(::s2s::log_login)},
+  { 60, -1, sizeof(::s2s::log_behavior)},
+  { 68, -1, sizeof(::s2s::log)},
+  { 73, -1, sizeof(::s2s::allot_request)},
+  { 80, -1, sizeof(::s2s::allot_save)},
+  { 87, -1, sizeof(::s2s::allot)},
+  { 92, 99, sizeof(::s2s::location_add_ServicesEntry_DoNotUse)},
+  { 101, -1, sizeof(::s2s::location_add)},
+  { 108, -1, sizeof(::s2s::location_del)},
+  { 115, -1, sizeof(::s2s::location)},
+  { 120, -1, sizeof(::s2s::forward_sub)},
+  { 126, -1, sizeof(::s2s::forward_unsub)},
+  { 132, -1, sizeof(::s2s::forward_publish)},
+  { 139, -1, sizeof(::s2s::forward)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_server_info_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_server_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_login_request_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_login_create_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_login_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_logout_request_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_logout_default_instance_),
@@ -617,35 +645,36 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_s2s_2fs2s_2eproto = {
   {}, AddDescriptors_s2s_2fs2s_2eproto, "s2s/s2s.proto", schemas,
   file_default_instances, TableStruct_s2s_2fs2s_2eproto::offsets,
-  file_level_metadata_s2s_2fs2s_2eproto, 21, file_level_enum_descriptors_s2s_2fs2s_2eproto, file_level_service_descriptors_s2s_2fs2s_2eproto,
+  file_level_metadata_s2s_2fs2s_2eproto, 22, file_level_enum_descriptors_s2s_2fs2s_2eproto, file_level_service_descriptors_s2s_2fs2s_2eproto,
 };
 
 const char descriptor_table_protodef_s2s_2fs2s_2eproto[] =
   "\n\rs2s/s2s.proto\022\003s2s\"*\n\006server\032 \n\004info\022\n"
-  "\n\002id\030\001 \001(\005\022\014\n\004name\030\002 \001(\t\"V\n\005login\032M\n\007req"
-  "uest\022\017\n\007user_id\030\001 \001(\003\022\021\n\tclient_id\030\002 \001(\005"
-  "\022\036\n\004list\030\003 \003(\0132\020.s2s.server.info\"$\n\006logo"
-  "ut\032\032\n\007request\022\017\n\007user_id\030\001 \001(\003\"\311\001\n\003log\0324"
-  "\n\004show\022\014\n\004name\030\001 \001(\t\022\r\n\005level\030\002 \001(\005\022\017\n\007c"
-  "ontent\030\003 \001(\t\032P\n\005login\022\017\n\007user_id\030\001 \001(\003\022\017"
-  "\n\007user_ip\030\002 \001(\t\022\022\n\nlogin_time\030\003 \001(\003\022\021\n\ts"
-  "erver_ip\030\004 \001(\t\032:\n\010behavior\022\017\n\007user_id\030\001 "
-  "\001(\003\022\014\n\004type\030\002 \001(\005\022\017\n\007address\030\003 \001(\t\"\\\n\005al"
-  "lot\032)\n\007request\022\r\n\005token\030\001 \001(\t\022\017\n\007user_id"
-  "\030\002 \001(\003\032(\n\004save\022\017\n\007service\030\001 \001(\t\022\017\n\007addre"
-  "ss\030\002 \001(\t\"\260\001\n\010location\032z\n\003add\022\017\n\007user_id\030"
-  "\001 \001(\003\0221\n\010services\030\002 \003(\0132\037.s2s.location.a"
-  "dd.ServicesEntry\032/\n\rServicesEntry\022\013\n\003key"
-  "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032(\n\003del\022\017\n\007user"
-  "_id\030\001 \001(\003\022\020\n\010services\030\002 \003(\t\"j\n\007forward\032\027"
-  "\n\003sub\022\020\n\010channels\030\001 \003(\t\032\031\n\005unsub\022\020\n\010chan"
-  "nels\030\001 \003(\t\032+\n\007publish\022\017\n\007channel\030\001 \001(\t\022\017"
-  "\n\007message\030\002 \001(\tb\006proto3"
+  "\n\002id\030\001 \001(\005\022\014\n\004name\030\002 \001(\t\"\202\001\n\005login\032M\n\007re"
+  "quest\022\017\n\007user_id\030\001 \001(\003\022\021\n\tclient_id\030\002 \001("
+  "\005\022\036\n\004list\030\003 \003(\0132\020.s2s.server.info\032*\n\006cre"
+  "ate\022\017\n\007user_id\030\001 \001(\003\022\017\n\007sock_id\030\002 \001(\005\"$\n"
+  "\006logout\032\032\n\007request\022\017\n\007user_id\030\001 \001(\003\"\311\001\n\003"
+  "log\0324\n\004show\022\014\n\004name\030\001 \001(\t\022\r\n\005level\030\002 \001(\005"
+  "\022\017\n\007content\030\003 \001(\t\032P\n\005login\022\017\n\007user_id\030\001 "
+  "\001(\003\022\017\n\007user_ip\030\002 \001(\t\022\022\n\nlogin_time\030\003 \001(\003"
+  "\022\021\n\tserver_ip\030\004 \001(\t\032:\n\010behavior\022\017\n\007user_"
+  "id\030\001 \001(\003\022\014\n\004type\030\002 \001(\005\022\017\n\007address\030\003 \001(\t\""
+  "\\\n\005allot\032)\n\007request\022\r\n\005token\030\001 \001(\t\022\017\n\007us"
+  "er_id\030\002 \001(\003\032(\n\004save\022\017\n\007service\030\001 \001(\t\022\017\n\007"
+  "address\030\002 \001(\t\"\260\001\n\010location\032z\n\003add\022\017\n\007use"
+  "r_id\030\001 \001(\003\0221\n\010services\030\002 \003(\0132\037.s2s.locat"
+  "ion.add.ServicesEntry\032/\n\rServicesEntry\022\013"
+  "\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032(\n\003del\022\017\n"
+  "\007user_id\030\001 \001(\003\022\020\n\010services\030\002 \003(\t\"j\n\007forw"
+  "ard\032\027\n\003sub\022\020\n\010channels\030\001 \003(\t\032\031\n\005unsub\022\020\n"
+  "\010channels\030\001 \003(\t\032+\n\007publish\022\017\n\007channel\030\001 "
+  "\001(\t\022\017\n\007message\030\002 \001(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_s2s_2fs2s_2eproto = {
   false, InitDefaults_s2s_2fs2s_2eproto, 
   descriptor_table_protodef_s2s_2fs2s_2eproto,
-  "s2s/s2s.proto", &assign_descriptors_table_s2s_2fs2s_2eproto, 783,
+  "s2s/s2s.proto", &assign_descriptors_table_s2s_2fs2s_2eproto, 828,
 };
 
 void AddDescriptors_s2s_2fs2s_2eproto() {
@@ -1578,6 +1607,314 @@ void login_request::InternalSwap(login_request* other) {
 }
 
 ::google::protobuf::Metadata login_request::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2fs2s_2eproto);
+  return ::file_level_metadata_s2s_2fs2s_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void login_create::InitAsDefaultInstance() {
+}
+class login_create::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int login_create::kUserIdFieldNumber;
+const int login_create::kSockIdFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+login_create::login_create()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:s2s.login.create)
+}
+login_create::login_create(const login_create& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::memcpy(&user_id_, &from.user_id_,
+    static_cast<size_t>(reinterpret_cast<char*>(&sock_id_) -
+    reinterpret_cast<char*>(&user_id_)) + sizeof(sock_id_));
+  // @@protoc_insertion_point(copy_constructor:s2s.login.create)
+}
+
+void login_create::SharedCtor() {
+  ::memset(&user_id_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&sock_id_) -
+      reinterpret_cast<char*>(&user_id_)) + sizeof(sock_id_));
+}
+
+login_create::~login_create() {
+  // @@protoc_insertion_point(destructor:s2s.login.create)
+  SharedDtor();
+}
+
+void login_create::SharedDtor() {
+}
+
+void login_create::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const login_create& login_create::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_login_create_s2s_2fs2s_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void login_create::Clear() {
+// @@protoc_insertion_point(message_clear_start:s2s.login.create)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&user_id_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&sock_id_) -
+      reinterpret_cast<char*>(&user_id_)) + sizeof(sock_id_));
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* login_create::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<login_create*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // int64 user_id = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
+        msg->set_user_id(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // int32 sock_id = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
+        msg->set_sock_id(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool login_create::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:s2s.login.create)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // int64 user_id = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
+                 input, &user_id_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // int32 sock_id = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &sock_id_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:s2s.login.create)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:s2s.login.create)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void login_create::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:s2s.login.create)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int64 user_id = 1;
+  if (this->user_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->user_id(), output);
+  }
+
+  // int32 sock_id = 2;
+  if (this->sock_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->sock_id(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:s2s.login.create)
+}
+
+::google::protobuf::uint8* login_create::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.login.create)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int64 user_id = 1;
+  if (this->user_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->user_id(), target);
+  }
+
+  // int32 sock_id = 2;
+  if (this->sock_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->sock_id(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.login.create)
+  return target;
+}
+
+size_t login_create::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:s2s.login.create)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // int64 user_id = 1;
+  if (this->user_id() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int64Size(
+        this->user_id());
+  }
+
+  // int32 sock_id = 2;
+  if (this->sock_id() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->sock_id());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void login_create::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.login.create)
+  GOOGLE_DCHECK_NE(&from, this);
+  const login_create* source =
+      ::google::protobuf::DynamicCastToGenerated<login_create>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.login.create)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.login.create)
+    MergeFrom(*source);
+  }
+}
+
+void login_create::MergeFrom(const login_create& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.login.create)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.user_id() != 0) {
+    set_user_id(from.user_id());
+  }
+  if (from.sock_id() != 0) {
+    set_sock_id(from.sock_id());
+  }
+}
+
+void login_create::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.login.create)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void login_create::CopyFrom(const login_create& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.login.create)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool login_create::IsInitialized() const {
+  return true;
+}
+
+void login_create::Swap(login_create* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void login_create::InternalSwap(login_create* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(user_id_, other->user_id_);
+  swap(sock_id_, other->sock_id_);
+}
+
+::google::protobuf::Metadata login_create::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2fs2s_2eproto);
   return ::file_level_metadata_s2s_2fs2s_2eproto[kIndexInFileMessages];
 }
@@ -4669,7 +5006,7 @@ void location_add_ServicesEntry_DoNotUse::MergeFrom(const location_add_ServicesE
 }
 ::google::protobuf::Metadata location_add_ServicesEntry_DoNotUse::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2fs2s_2eproto);
-  return ::file_level_metadata_s2s_2fs2s_2eproto[13];
+  return ::file_level_metadata_s2s_2fs2s_2eproto[14];
 }
 void location_add_ServicesEntry_DoNotUse::MergeFrom(
     const ::google::protobuf::Message& other) {
@@ -6848,6 +7185,9 @@ template<> PROTOBUF_NOINLINE ::s2s::server* Arena::CreateMaybeMessage< ::s2s::se
 }
 template<> PROTOBUF_NOINLINE ::s2s::login_request* Arena::CreateMaybeMessage< ::s2s::login_request >(Arena* arena) {
   return Arena::CreateInternal< ::s2s::login_request >(arena);
+}
+template<> PROTOBUF_NOINLINE ::s2s::login_create* Arena::CreateMaybeMessage< ::s2s::login_create >(Arena* arena) {
+  return Arena::CreateInternal< ::s2s::login_create >(arena);
 }
 template<> PROTOBUF_NOINLINE ::s2s::login* Arena::CreateMaybeMessage< ::s2s::login >(Arena* arena) {
   return Arena::CreateInternal< ::s2s::login >(arena);

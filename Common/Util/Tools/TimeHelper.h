@@ -57,7 +57,7 @@ namespace help
         extern std::string GetYearMonthDayString(long long t = 0);
 
 		// 根据字符串获取时间戳
-		extern long long GetTimeByString(const std::string & str);
+		extern long long GetTimeByString(const char * str);
 
         //获取今天零点时间戳
         extern long long GetNewTime(int day = 0, int hour = 0, int minute = 0, int second = 0);

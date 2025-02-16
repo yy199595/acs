@@ -155,6 +155,8 @@ namespace http
 		constexpr const char* MP4 = "video/mp4";
 		constexpr const char* AVI = "video/avi";
 
+		constexpr const char * ZIP = "application/zip";
+
 		constexpr const char* TEXT = "text/plain";
 		constexpr const char* JSON = "application/json";
 		constexpr const char* PB = "application/x-protobuf";
@@ -193,6 +195,7 @@ namespace http
     XX("cc", http::Header::TEXT)              	\
     XX("json", http::Header::JSON)      		\
 	XX("xml", http::Header::XML)         		\
+	XX("zip", http::Header::ZIP)         		\
 
 namespace http
 {

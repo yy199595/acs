@@ -21,11 +21,9 @@ namespace help
         //转小写
         extern std::string Tolower(const std::string & str);
 
-        extern std::string CreateNewToken();
-
         extern void ClearBlank(std::string &input);
 
-        extern std::string RandomString(size_t size = 64);
+        extern std::string RandomString(int size = 64);
 
         extern bool GetFileName(const std::string &path, std::string & name);
 

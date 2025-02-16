@@ -26,16 +26,9 @@ namespace acs
 		int RpcInterface(const http::FromContent & request, json::w::Document & response);
 		int HttpInterface(const http::FromContent & request, json::w::Document & response);
 	private:
-		int Register(const json::r::Document & request);
-		int Update(const http::Request & request, http::Response &);
-		int Login(const http::Request & request, json::w::Document & response);
-		int List(const http::FromContent & request, json::w::Document & response);
-		int Remove(const http::FromContent & request, json::w::Document & response);
-	private:
 		void AddRpcData(json::w::Value & response, const RpcMethodConfig * config);
 	private:
 		class ProtoComponent * mProto;
-		class AdminComponent * mAdmin;
 		class ActorComponent * mActorComponent;
 	};
 }

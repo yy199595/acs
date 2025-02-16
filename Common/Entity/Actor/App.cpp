@@ -14,23 +14,29 @@
 #include "Cluster/Component/LaunchComponent.h"
 #include "Log/Component/LoggerComponent.h"
 #include "Timer/Component/TimerComponent.h"
-
+#include "Cluster/Config/ClusterConfig.h"
 #include "Config/Base/LangConfig.h"
 
 #ifdef __ENABLE_OPEN_SSL__
 
 #include "Auth/Aes/Aes.h"
 #include "Auth/Jwt/Jwt.h"
-#include "Cluster/Config/ClusterConfig.h"
+#else
 
+#include "Util/Crypt/Mask.h"
+#include "Proto/Bson/base64.h"
+
+#endif
+
+#ifndef __DEBUG__
+#include "Http/Component/NotifyComponent.h"
 #endif
 
 namespace acs
 {
 	App::App(int id, ServerConfig& config) :
 			Server(id, config.Name()), mSignal(mContext),
-			mContext(1), mThreadId(std::this_thread::get_id()),
-			mStartTime(help::Time::NowMil()), mConfig(config)
+			mContext(1), mStartTime(help::Time::NowMil()), mConfig(config)
 	{
 		this->mLogicFps = 0;
 		this->mTickCount = 0;
@@ -46,7 +52,7 @@ namespace acs
 #ifdef __ENABLE_OPEN_SSL__
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 		OpenSSL_add_all_algorithms();
-    	ERR_load_crypto_strings();
+		ERR_load_crypto_strings();
 #else
 		OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CONFIG, nullptr);
 #endif
@@ -65,12 +71,12 @@ namespace acs
 		{
 			return false;
 		}
-		if (!os::System::GetEnv("cluster", cluster))
+		if (os::System::GetEnv("cluster", cluster))
 		{
-			return false;
+			path = fmt::format("{}/{}.json", path, cluster);
 		}
 		TextConfig* config = new ClusterConfig();
-		if (!config->LoadConfig(fmt::format("{}/{}.json", path, cluster)))
+		if (!config->LoadConfig(path))
 		{
 			return false;
 		}
@@ -305,26 +311,37 @@ namespace acs
 		return std::to_string(guid);
 	}
 
-#ifdef __ENABLE_OPEN_SSL__
 
 	std::string App::Sign(json::w::Document& document)
 	{
 		std::string data;
 		document.Encode(&data);
-		return jwt::Create(data, this->mConfig.GetSecretKey());
+		const std::string& key = this->mConfig.GetSecretKey();
+#ifdef __ENABLE_OPEN_SSL__
+		return jwt::Create(data, key);
+#else
+		help::Mask::Encode(data, key);
+		return _bson::base64::encode(data);
+#endif
 	}
 
 	bool App::DecodeSign(const std::string& sign, json::r::Document& document)
 	{
+		const std::string& key = this->mConfig.GetSecretKey();
+#ifdef __ENABLE_OPEN_SSL__
 		std::string data;
-		if (!jwt::Verify(sign, this->mConfig.GetSecretKey(), data))
+		if (!jwt::Verify(sign, key, data))
 		{
 			return false;
 		}
 		return document.Decode(data);
+#else
+		std::string output = _bson::base64::decode(sign);
+		help::Mask::Decode(output, key);
+		return document.Decode(output);
+#endif
 	}
 
-#endif
 
 	void App::Stop()
 	{
@@ -370,7 +387,7 @@ namespace acs
 		}
 #ifndef __DEBUG__
 		long long t = help::Time::NowMil() - t1;
-		GroupNotifyComponent* groupNotifyComponent = this->GetComponent<GroupNotifyComponent>();
+		NotifyComponent* groupNotifyComponent = this->GetComponent<NotifyComponent>();
 		if(groupNotifyComponent != nullptr)
 		{
 			notify::TemplateCard cardInfo;
@@ -399,7 +416,7 @@ namespace acs
 			{
 				LOG_FATAL("{} start time out", name);
 			});
-			component->Start();
+			component->OnStart();
 			timerComponent->CancelTimer(timeId);
 			if (timer.GetMs() > 100)
 			{
@@ -419,7 +436,7 @@ namespace acs
 			{
 				LOG_ERROR("{0}.Complete call timeout", component->GetName());
 			});
-			complete->Complete();
+			complete->OnComplete();
 			if (timer.GetMs() > 100)
 			{
 				LOG_DEBUG("[{}ms] => {}.Complete", timer.GetMs(), name);
@@ -430,7 +447,7 @@ namespace acs
 		this->mStatus = ServerStatus::Ready;
 		long long t = help::Time::NowMil() - this->mStartTime;
 #ifndef __DEBUG__
-		GroupNotifyComponent* groupNotifyComponent = this->GetComponent<GroupNotifyComponent>();
+		NotifyComponent* groupNotifyComponent = this->GetComponent<NotifyComponent>();
 		if(groupNotifyComponent != nullptr)
 		{
 			notify::TemplateCard cardInfo;
@@ -444,6 +461,6 @@ namespace acs
 			groupNotifyComponent->SendToWeChat(cardInfo);
 		}
 #endif
-		LOG_INFO("  ===== start {} ok [{:.2f}s] =======", this->Name(), t / 1000.0f);
+		LOG_INFO("  ===== start {} ok [{:.3f}s] =======", this->Name(), t / 1000.0f);
 	}
 }

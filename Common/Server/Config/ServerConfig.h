@@ -6,7 +6,7 @@
 
 namespace acs
 {
-	class ServerConfig final : public JsonConfig, public ConstSingleton<ServerConfig>
+	class ServerConfig final : public JsonConfig, public Singleton<ServerConfig>
     {
     public:
         explicit ServerConfig();

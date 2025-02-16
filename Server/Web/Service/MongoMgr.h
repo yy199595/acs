@@ -15,10 +15,11 @@ namespace acs
 	private:
 		bool OnInit() final;
 	private:
-		int Export(const http::FromContent& request, http::Response& response);
+		int Backup(const http::FromContent & request, json::w::Document & response);
+		int Recover(const http::FromContent & request, json::w::Document & response);
 	private:
-		std::string mLogDir;
-		class MongoComponent* mMongo;
+		std::string mBackupPath;
+		class MongoDBComponent* mMongo;
 	};
 }
 

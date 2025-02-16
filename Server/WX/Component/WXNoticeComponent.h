@@ -5,11 +5,12 @@
 #ifndef APP_WXNOTICECOMPONENT_H
 #define APP_WXNOTICECOMPONENT_H
 #include "unordered_map"
+#include "Yyjson/Object/JsonObject.h"
 #include "Entity/Component/Component.h"
 
 namespace wx
 {
-	struct WhcbqhnConfig
+	struct WhcbqhnConfig : public json::Object<WhcbqhnConfig>
 	{
 		std::string app_id;
 		std::string app_secret;
@@ -31,7 +32,7 @@ namespace wx
 namespace acs
 {
 	//微信公众号通知
-	class WXNoticeComponent final : public Component, public IComplete
+	class WXNoticeComponent final : public Component
 	{
 	public:
 		WXNoticeComponent();
@@ -39,7 +40,6 @@ namespace acs
 	private:
 		bool Awake() final;
 		bool LateAwake() final;
-		void Complete() final;
 	public:
 		void OnWxSubscribe(const std::string & openId);
 		void OnWxUnsubscribe(const std::string & openId);

@@ -20,7 +20,7 @@ namespace http
 namespace http
 {
 	class Content;
-	class SessionClient;
+	class Session;
 }
 
 namespace acs
@@ -55,7 +55,7 @@ namespace acs
 		unsigned int mSuccessCount; //成功次数
 		unsigned int mFailureCount; //失败次数
         math::NumberPool<int> mNumPool;
-		std::unordered_map<int, std::shared_ptr<http::SessionClient>> mHttpClients;
+		std::unordered_map<int, std::shared_ptr<http::Session>> mHttpClients;
 	};
 }
 

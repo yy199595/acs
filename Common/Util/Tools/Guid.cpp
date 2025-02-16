@@ -3,7 +3,6 @@
 //
 
 #include "Guid.h"
-#include "Util/Crypt/md5.h"
 #include"Util/Tools/TimeHelper.h"
 namespace help
 {
@@ -17,11 +16,6 @@ namespace help
 }
 namespace help
 {
-    std::string ID::UUid()
-    {
-        std::string str = std::to_string(ID::Create());
-        return help::md5::GetMd5(str);
-    }
 
     long long ID::Create()
     {
@@ -44,6 +38,20 @@ namespace help
         }
         return mLastTime << 31 | (int) type << 16 | (++mIndex2);
     }
+
+	int ID::New(long long startTime, int id)
+	{
+		static int counter = 0;
+		static long long lastTime = 0;
+		long long nowTime = Time::NowSec();
+		long long timeDiff = nowTime - startTime;
+		if(lastTime != nowTime)
+		{
+			counter = 0;
+			lastTime = nowTime;
+		}
+		return (timeDiff % 100000000) * 100 + id * 10 + counter++;
+	}
 }
 
 namespace help

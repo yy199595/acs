@@ -1,3 +1,6 @@
+
+#ifdef __ENABLE_OPEN_SSL__
+
 #include "WXBizDataCrypt.h"
 
 #include <cstring>
@@ -153,5 +156,7 @@ int WXBizDataCrypt::DecodeBase64(const std::string sSrc, std::string & sTarget)
 
 
 }
+
+#endif
 
 

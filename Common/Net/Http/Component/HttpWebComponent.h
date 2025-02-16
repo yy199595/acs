@@ -57,6 +57,7 @@ namespace acs
 		class CoroutineComponent * mCoroutine;
 		std::unordered_map<std::string, std::string> mDefaultHeader;
 		custom::HashMap<std::string, class HttpService *> mHttpServices;
+		class IRequest<HttpMethodConfig, http::Request, http::Response> * mRecord;
 	};
 }
 

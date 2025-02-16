@@ -17,8 +17,8 @@ namespace acs
 		RedisSubComponent();
 		~RedisSubComponent() final = default;
 	public:
-		int SubChannel(const std::string & chanel);
-		int UnSubChannel(const std::string & chanel);
+		bool Sub(const std::string & chanel);
+		bool UnSub(const std::string & chanel);
 	private:
 		bool Awake() final;
 		bool LateAwake() final;
@@ -26,8 +26,9 @@ namespace acs
 		void OnMessage(int, redis::Request *request, redis::Response *response) noexcept final;
 	private:
 		redis::Config mConfig;
+		class DispatchComponent * mDispatch;
 		std::shared_ptr<redis::Client> mClient;
-		std::unordered_map<std::string, int> mChannels;
+		std::unordered_set<std::string> mChannels;
 	};
 }
 

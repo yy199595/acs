@@ -29,14 +29,14 @@ namespace rpc
 	// rpc消息头
 	namespace Header
 	{
-		constexpr char* func = "func";
-		constexpr char* code = "code";
-		constexpr char* sock_id = "sock";
-		constexpr char* player_id = "pid";
-		constexpr char* client_sock_id = "cli";
-		constexpr char* forward_tar = "tar";
-		constexpr char* app_id = "aid";
-		constexpr char * from_addr = "from_addr";
+		constexpr const char* func = "func";
+		constexpr const char* code = "code";
+		constexpr const char* sock_id = "sock";
+		constexpr const char* player_id = "pid";
+		constexpr const char* client_sock_id = "cli";
+		constexpr const char* forward_tar = "tar";
+		constexpr const char* app_id = "aid";
+		constexpr const char * from_addr = "from_addr";
 	}
 
 	//协议类型

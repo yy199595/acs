@@ -6,8 +6,8 @@
 #include "QuickComponent.h"
 #include "Entity/Actor/App.h"
 
-#include "Util/Crypt/md5.h"
 #include "Util/Tools/Math.h"
+#include "Util/Crypt/MD5Helper.h"
 #include "Http/Component/HttpComponent.h"
 #include "Http/Common/Content.h"
 #include "Http/Common/HttpResponse.h"

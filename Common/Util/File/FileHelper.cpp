@@ -1,11 +1,9 @@
 #include <sys/stat.h>
 #include "FileHelper.h"
 #include <fstream>
-
-#ifdef _WIN32
-
+#ifdef __OS_WIN__
 #include <io.h>
-
+#include <codecvt>
 #define stat _stat
 #else
 #include <unistd.h>
@@ -97,7 +95,13 @@ namespace help
 	bool fs::FileIsExist(const std::string& path)
 	{
 #ifdef _WIN32
-		return _access(path.c_str(), 0) == 0;
+		if(_access(path.c_str(), 0) == 0)
+		{
+			return true;
+		}
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+		std::wstring newPath = converter.from_bytes(path);
+		return  _waccess(newPath.c_str(), 0) == 0;
 #else
 		return access(path.c_str(), F_OK) == 0;
 #endif
@@ -142,20 +146,31 @@ namespace help
 	{
 		std::ifstream fs;
 		fs.open(path, std::ios::in);
-		if (!fs.is_open())
+		if(!fs.is_open())
 		{
+#ifdef __OS_WIN__
+			std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+			std::wstring newPath = converter.from_bytes(path);
+			fs.open(newPath, std::ios::in);
+			if (!fs.is_open())
+			{
+				return false;
+			}
+#else
 			return false;
+#endif
 		}
 		char buffer[128] = { 0 };
-		while (!fs.eof())
+		do
 		{
 			fs.read(buffer, sizeof(buffer));
-			const size_t count = fs.gcount();
+			size_t count = fs.gcount();
 			if (count > 0)
 			{
 				outFile.append(buffer, count);
 			}
 		}
+		while (!fs.eof());
 		fs.close();
 		return true;
 	}

@@ -9,9 +9,13 @@ namespace lua
 {
 	namespace Sqlite
 	{
+		int Set(lua_State * lua);
+		int Get(lua_State * lua);
+		int Del(lua_State * lua);
+		int SetTimeout(lua_State * lua);
+
 		int Exec(lua_State* lua);
-		int Find(lua_State* lua);
-		int FindOne(lua_State* lua);
+		int Query(lua_State* lua);
 	}
 }
 #endif //APP_COMMON_SQLITE_LUA_LUASQLITE_H

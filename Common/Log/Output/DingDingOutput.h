@@ -5,8 +5,10 @@
 #ifndef APP_DINGDINGOUTPUT_H
 #define APP_DINGDINGOUTPUT_H
 #include"Log/Common/Logger.h"
+#ifdef __ENABLE_OPEN_SSL__
 #include<asio/ssl/context.hpp>
-#include"Http/Client/RequestClient.h"
+#endif
+#include"Http/Client/Client.h"
 namespace custom
 {
 	class DingDingOutput : public IOutput
@@ -22,7 +24,7 @@ namespace custom
 		std::string mPem;
 		asio::ssl::context mCtx;
 #endif
-		std::shared_ptr<http::RequestClient> mClient;
+		std::shared_ptr<http::Client> mClient;
 	};
 }
 

@@ -44,7 +44,7 @@ struct TableStruct_s2s_2fs2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[21]
+  static const ::google::protobuf::internal::ParseTable schema[22]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -100,6 +100,9 @@ extern log_showDefaultTypeInternal _log_show_default_instance_;
 class login;
 class loginDefaultTypeInternal;
 extern loginDefaultTypeInternal _login_default_instance_;
+class login_create;
+class login_createDefaultTypeInternal;
+extern login_createDefaultTypeInternal _login_create_default_instance_;
 class login_request;
 class login_requestDefaultTypeInternal;
 extern login_requestDefaultTypeInternal _login_request_default_instance_;
@@ -134,6 +137,7 @@ template<> ::s2s::log_behavior* Arena::CreateMaybeMessage<::s2s::log_behavior>(A
 template<> ::s2s::log_login* Arena::CreateMaybeMessage<::s2s::log_login>(Arena*);
 template<> ::s2s::log_show* Arena::CreateMaybeMessage<::s2s::log_show>(Arena*);
 template<> ::s2s::login* Arena::CreateMaybeMessage<::s2s::login>(Arena*);
+template<> ::s2s::login_create* Arena::CreateMaybeMessage<::s2s::login_create>(Arena*);
 template<> ::s2s::login_request* Arena::CreateMaybeMessage<::s2s::login_request>(Arena*);
 template<> ::s2s::logout* Arena::CreateMaybeMessage<::s2s::logout>(Arena*);
 template<> ::s2s::logout_request* Arena::CreateMaybeMessage<::s2s::logout_request>(Arena*);
@@ -511,6 +515,125 @@ class login_request :
 };
 // -------------------------------------------------------------------
 
+class login_create :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.login.create) */ {
+ public:
+  login_create();
+  virtual ~login_create();
+
+  login_create(const login_create& from);
+
+  inline login_create& operator=(const login_create& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  login_create(login_create&& from) noexcept
+    : login_create() {
+    *this = ::std::move(from);
+  }
+
+  inline login_create& operator=(login_create&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const login_create& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const login_create* internal_default_instance() {
+    return reinterpret_cast<const login_create*>(
+               &_login_create_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  void Swap(login_create* other);
+  friend void swap(login_create& a, login_create& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline login_create* New() const final {
+    return CreateMaybeMessage<login_create>(nullptr);
+  }
+
+  login_create* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<login_create>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const login_create& from);
+  void MergeFrom(const login_create& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(login_create* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int64 user_id = 1;
+  void clear_user_id();
+  static const int kUserIdFieldNumber = 1;
+  ::google::protobuf::int64 user_id() const;
+  void set_user_id(::google::protobuf::int64 value);
+
+  // int32 sock_id = 2;
+  void clear_sock_id();
+  static const int kSockIdFieldNumber = 2;
+  ::google::protobuf::int32 sock_id() const;
+  void set_sock_id(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:s2s.login.create)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int64 user_id_;
+  ::google::protobuf::int32 sock_id_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2fs2s_2eproto;
+};
+// -------------------------------------------------------------------
+
 class login :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.login) */ {
  public:
@@ -549,7 +672,7 @@ class login :
                &_login_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   void Swap(login* other);
   friend void swap(login& a, login& b) {
@@ -605,6 +728,7 @@ class login :
   // nested types ----------------------------------------------------
 
   typedef login_request request;
+  typedef login_create create;
 
   // accessors -------------------------------------------------------
 
@@ -656,7 +780,7 @@ class logout_request :
                &_logout_request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   void Swap(logout_request* other);
   friend void swap(logout_request& a, logout_request& b) {
@@ -768,7 +892,7 @@ class logout :
                &_logout_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(logout* other);
   friend void swap(logout& a, logout& b) {
@@ -875,7 +999,7 @@ class log_show :
                &_log_show_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(log_show* other);
   friend void swap(log_show& a, log_show& b) {
@@ -1017,7 +1141,7 @@ class log_login :
                &_log_login_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(log_login* other);
   friend void swap(log_login& a, log_login& b) {
@@ -1166,7 +1290,7 @@ class log_behavior :
                &_log_behavior_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(log_behavior* other);
   friend void swap(log_behavior& a, log_behavior& b) {
@@ -1300,7 +1424,7 @@ class log :
                &_log_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(log* other);
   friend void swap(log& a, log& b) {
@@ -1409,7 +1533,7 @@ class allot_request :
                &_allot_request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(allot_request* other);
   friend void swap(allot_request& a, allot_request& b) {
@@ -1536,7 +1660,7 @@ class allot_save :
                &_allot_save_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(allot_save* other);
   friend void swap(allot_save& a, allot_save& b) {
@@ -1671,7 +1795,7 @@ class allot :
                &_allot_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(allot* other);
   friend void swap(allot& a, allot& b) {
@@ -1803,7 +1927,7 @@ class location_add :
                &_location_add_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(location_add* other);
   friend void swap(location_add& a, location_add& b) {
@@ -1931,7 +2055,7 @@ class location_del :
                &_location_del_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   void Swap(location_del* other);
   friend void swap(location_del& a, location_del& b) {
@@ -2066,7 +2190,7 @@ class location :
                &_location_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    17;
 
   void Swap(location* other);
   friend void swap(location& a, location& b) {
@@ -2174,7 +2298,7 @@ class forward_sub :
                &_forward_sub_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    18;
 
   void Swap(forward_sub* other);
   friend void swap(forward_sub& a, forward_sub& b) {
@@ -2302,7 +2426,7 @@ class forward_unsub :
                &_forward_unsub_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    19;
 
   void Swap(forward_unsub* other);
   friend void swap(forward_unsub& a, forward_unsub& b) {
@@ -2430,7 +2554,7 @@ class forward_publish :
                &_forward_publish_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    20;
 
   void Swap(forward_publish* other);
   friend void swap(forward_publish& a, forward_publish& b) {
@@ -2565,7 +2689,7 @@ class forward :
                &_forward_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    21;
 
   void Swap(forward* other);
   friend void swap(forward& a, forward& b) {
@@ -2776,6 +2900,38 @@ inline const ::google::protobuf::RepeatedPtrField< ::s2s::server_info >&
 login_request::list() const {
   // @@protoc_insertion_point(field_list:s2s.login.request.list)
   return list_;
+}
+
+// -------------------------------------------------------------------
+
+// login_create
+
+// int64 user_id = 1;
+inline void login_create::clear_user_id() {
+  user_id_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 login_create::user_id() const {
+  // @@protoc_insertion_point(field_get:s2s.login.create.user_id)
+  return user_id_;
+}
+inline void login_create::set_user_id(::google::protobuf::int64 value) {
+  
+  user_id_ = value;
+  // @@protoc_insertion_point(field_set:s2s.login.create.user_id)
+}
+
+// int32 sock_id = 2;
+inline void login_create::clear_sock_id() {
+  sock_id_ = 0;
+}
+inline ::google::protobuf::int32 login_create::sock_id() const {
+  // @@protoc_insertion_point(field_get:s2s.login.create.sock_id)
+  return sock_id_;
+}
+inline void login_create::set_sock_id(::google::protobuf::int32 value) {
+  
+  sock_id_ = value;
+  // @@protoc_insertion_point(field_set:s2s.login.create.sock_id)
 }
 
 // -------------------------------------------------------------------
@@ -3732,6 +3888,8 @@ inline void forward_publish::set_allocated_message(::std::string* message) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

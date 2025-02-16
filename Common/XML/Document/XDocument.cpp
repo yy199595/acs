@@ -51,7 +51,12 @@ namespace xml
 		{
 			return false;
 		}
-		value.assign(element->GetText());
+		const char * text = element->GetText();
+		if(text == nullptr)
+		{
+			return false;
+		}
+		value.assign(text);
 		return true;
 	}
 
@@ -61,12 +66,32 @@ namespace xml
 		{
 			return false;
 		}
+
 		tinyxml2::XMLElement * element = this->mElement->FirstChildElement(key);
 		if(element == nullptr)
 		{
 			return false;
 		}
 		value = std::make_unique<XElement>(element, this->mDocument);
+		return true;
+	}
+
+	bool XElement::Get(const char* key, std::vector<std::unique_ptr<xml::XElement>>& value) const
+	{
+		if(this->mElement == nullptr)
+		{
+			return false;
+		}
+		tinyxml2::XMLElement * xmlElement = this->mElement->FirstChildElement(key);
+		if(xmlElement == nullptr)
+		{
+			return false;
+		}
+		while(xmlElement != nullptr)
+		{
+			value.emplace_back(std::make_unique<XElement>(xmlElement, this->mDocument));
+			xmlElement = xmlElement->NextSiblingElement(key);
+		}
 		return true;
 	}
 }

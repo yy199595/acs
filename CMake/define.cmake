@@ -8,6 +8,30 @@ else ()
     #add_compile_options(-fno-exceptions) # 添加全局编译选项
 endif ()
 
+#if(WIN32)
+#    # 通过执行 chcp 命令获取当前代码页
+#    execute_process(
+#            COMMAND chcp
+#            OUTPUT_VARIABLE CHCP_OUTPUT
+#            OUTPUT_STRIP_TRAILING_WHITESPACE
+#    )
+#    string(REGEX MATCH "([0-9]+)" _ ${CHCP_OUTPUT})
+#    if(CMAKE_MATCH_1)
+#        set(CODE_PAGE ${CMAKE_MATCH_1})
+#        # 简单的代码页到编码的映射
+#        if(CODE_PAGE STREQUAL "65001")
+#            set(SYSTEM_ENCODING "UTF-8")
+#        elseif(CODE_PAGE STREQUAL "936")
+#            set(SYSTEM_ENCODING "GBK")
+#        else()
+#            set(SYSTEM_ENCODING "Unknown (Code Page: ${CODE_PAGE})")
+#        endif()
+#        message(STATUS "System encoding (from chcp): ${SYSTEM_ENCODING}")
+#    else()
+#        message(STATUS "Could not determine code page from chcp output: ${CHCP_OUTPUT}")
+#    endif()
+#endif()
+
 
 add_definitions(-w) #忽略警告
 add_definitions(-D ASIO_HAS_CHRONO)
@@ -15,6 +39,7 @@ add_definitions(-D ASIO_STANDALONE)
 add_definitions(-D ASIO_HAS_MOVE)
 add_definitions(-D ASIO_HAS_THREADS)
 add_definitions(-D ASIO_HAS_STD_THREAD)
+
 if (MSVC)
     add_definitions(-D _WIN32_WINNT=0x0601)
     add_compile_options(/W4 /wd4100 /wd4127 /wd4819)
@@ -49,21 +74,11 @@ option(__CONSOLE_LOG__ "控制台打印日志" ON)
 option(__ENABLE_SYSTEM_DEBUG "打印系统日志" ON)
 option(__ENABLE_OPEN_SSL__ "开启openssl" ON)
 option(__MEMOEY_CHECK__ "开启内存检查" OFF)
-option(__ENABLE_OPEN_WOLF_SSL__ "开启wolfssl" OFF)
 
 option(__ENABLE_MEMORY_CHECK__ "开启内存检查" OFF)
 
 option(__SHARE_PTR_COUNTER__ "开启指针计算查询" OFF)
 option(__MEMORY_POOL_OPERATOR__ "使用重载对象内存池" OFF)
-
-option(__MONGO_DB_AUTH_SHA256__ "mongodb使用sha256认证" ON)
-
-if (__MONGO_DB_AUTH_SHA256__)
-    message("mongodb使用sha256认证")
-    add_definitions(-D __MONGO_DB_AUTH_SHA256__)
-else ()
-    message("mongodb使用sha1认证")
-endif ()
 
 if (APPLE)
     option(__ENABLE_DING_DING_PUSH "开启钉钉通知" OFF)
@@ -111,12 +126,7 @@ else ()
 endif ()
 
 if (__ENABLE_OPEN_SSL__)
-    if (__ENABLE_OPEN_WOLF_SSL__)
-        message("使用wolfssl")
-        add_definitions(-D __ENABLE_OPEN_WOLF_SSL__)
-    else ()
-        message("使用openssl")
-    endif ()
+    message("使用openssl")
     add_definitions(-D __ENABLE_OPEN_SSL__)
 endif ()
 

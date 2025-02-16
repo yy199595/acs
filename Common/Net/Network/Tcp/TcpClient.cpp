@@ -63,7 +63,7 @@ namespace tcp
 				self->mSocket->SslSocket().async_handshake(asio::ssl::stream_base::client,
 						[self](const asio::error_code& err)
 						{
-							self->OnConnect(err.value() == Asio::OK, self->mConnectCount);
+							self->OnConnect(err, self->mConnectCount);
 						});
 				return;
 			}
@@ -72,7 +72,7 @@ namespace tcp
 			{
 				self->mConnectCount = 0;
 			}
-			self->OnConnect(code.value() == Asio::OK, self->mConnectCount);
+			self->OnConnect(code, self->mConnectCount);
 		});
 	}
 
@@ -83,7 +83,8 @@ namespace tcp
 			int connectPort = 0;
 			if (!help::Math::ToNumber(port, connectPort))
 			{
-				this->OnConnect(false, 1);
+				Asio::Code code(asio::error::address_family_not_supported);
+				this->OnConnect(code, 1);
 				return;
 			}
 			this->mSocket->Init(host, connectPort);
@@ -101,7 +102,7 @@ namespace tcp
 		Asio::Resolver::iterator iterator = resolver.resolve(query, code);
 		if (code.value() != Asio::OK)
 		{
-			this->OnConnect(false, 1);
+			this->OnConnect(code, 1);
 			return;
 		}
 		std::shared_ptr<Client> self = this->shared_from_this();
@@ -115,7 +116,7 @@ namespace tcp
 						[self](const asio::error_code& err)
 						{
 							//CONSOLE_LOG_FATAL("{}", err.message())
-							self->OnConnect(err.value() == Asio::OK, self->mConnectCount);
+							self->OnConnect(err, self->mConnectCount);
 						});
 				return;
 			}
@@ -124,7 +125,7 @@ namespace tcp
 			{
 				self->mConnectCount = 0;
 			}
-			self->OnConnect(code.value() == Asio::OK, self->mConnectCount);
+			self->OnConnect(code, self->mConnectCount);
 		});
 	}
 
@@ -379,10 +380,12 @@ namespace tcp
 			return false;
 		}
 		asio::connect(sock, iterator, code);
+#ifdef __ENABLE_OPEN_SSL__
 		if(this->mSocket->IsOpenSsl())
 		{
 			this->mSocket->SslSocket().handshake(asio::ssl::stream_base::client, code);
 		}
+#endif
 		return code.value() == Asio::OK;
 	}
 
@@ -536,7 +539,27 @@ namespace tcp
 		{
 			if (code.value() == Asio::OK)
 			{
-				self->OnTimeout(flag);
+				Asio::Code code(asio::error::timed_out);
+				switch(flag)
+				{
+					case TimeoutFlag::Connect:
+					{
+						self->OnConnect(code, 1);
+						break;
+					}
+					case TimeoutFlag::ReadLine:
+					case TimeoutFlag::ReadSome:
+					case TimeoutFlag::ReadCount:
+					{
+						self->OnReadError(code);
+						break;
+					}
+					case TimeoutFlag::Write:
+					{
+						self->OnSendMessage(code);
+						break;
+					}
+				}
 			}
 		});
 	};

@@ -12,6 +12,17 @@ namespace Lua
 {
 	class LuaModule;
 };
+
+namespace actor
+{
+	struct Info
+	{
+		long long id;
+		std::string name;
+		std::unordered_map<std::string, std::string> listens;
+	};
+}
+
 namespace acs
 {
 	class ActorComponent final : public Component, public IServerRecord

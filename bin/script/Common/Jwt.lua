@@ -7,12 +7,12 @@ local core = app:GetConfig("core")
 
 function jwt.Create(data)
     local key = core.secret
-    return ljwt.Create(key, data)
+    return ljwt.encode(key, data)
 end
 
 function jwt.Verify(token)
     local key = core.secret
-    return ljwt.Verify(token, key)
+    return ljwt.decode(token, key)
 end
 
 return jwt

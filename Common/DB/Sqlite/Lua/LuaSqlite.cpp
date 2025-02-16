@@ -10,7 +10,7 @@
 using namespace acs;
 namespace lua
 {
-	int Sqlite::Exec(lua_State* lua)
+	inline SqliteComponent * GetComponent()
 	{
 		static SqliteComponent * sqliteComponent = nullptr;
 		if(sqliteComponent == nullptr)
@@ -18,32 +18,72 @@ namespace lua
 			sqliteComponent = App::Get<SqliteComponent>();
 			if(sqliteComponent == nullptr)
 			{
-				luaL_error(lua, "not find SqliteComponent");
-				return 0;
+				return nullptr;
 			}
 		}
-		std::string db(luaL_checkstring(lua, 1));
-		const char * sql = luaL_checkstring(lua, 2);
-		lua_pushinteger(lua, sqliteComponent->Exec(db, sql));
+		return sqliteComponent;
+	}
+
+	int Sqlite::Get(lua_State* L)
+	{
+		std::string value;
+		std::string key(luaL_checkstring(L, 1));
+		SqliteComponent * sqliteComponent = GetComponent();
+		if(!sqliteComponent->Get(key, value))
+		{
+			return 0;
+		}
+		yyjson::write(L, value.c_str(), value.size());
 		return 1;
 	}
 
-	int Sqlite::Find(lua_State* lua)
+	int Sqlite::Set(lua_State* L)
 	{
-		static SqliteComponent * sqliteComponent = nullptr;
-		if(sqliteComponent == nullptr)
+		std::string value;
+		std::string key(luaL_checkstring(L, 1));
+		luaL_checktype(L, 2, LUA_TTABLE);
+		if(!yyjson::read(L, 2, value))
 		{
-			sqliteComponent = App::Get<SqliteComponent>();
-			if(sqliteComponent == nullptr)
-			{
-				luaL_error(lua, "not find SqliteComponent");
-				return 0;
-			}
+			luaL_error(L, "cast json fail");
+			return 0;
 		}
+		SqliteComponent * sqliteComponent = GetComponent();
+		lua_pushboolean(L, sqliteComponent->Set(key, value));
+		return 1;
+	}
+
+	int Sqlite::Del(lua_State* L)
+	{
+		std::string key(luaL_checkstring(L, 1));
+		SqliteComponent * sqliteComponent = GetComponent();
+		lua_pushboolean(L, sqliteComponent->Del(key));
+		return 1;
+	}
+
+	int Sqlite::SetTimeout(lua_State* L)
+	{
+		std::string key(luaL_checkstring(L, 1));
+		int timeout = (int)luaL_checkinteger(L, 2);
+		SqliteComponent * sqliteComponent = GetComponent();
+		lua_pushboolean(L, sqliteComponent->SetTimeout(key, timeout));
+		return 1;
+	}
+
+	int Sqlite::Exec(lua_State* lua)
+	{
+		SqliteComponent * sqliteComponent = GetComponent();
+		const char * sql = luaL_checkstring(lua, 1);
+		lua_pushinteger(lua, sqliteComponent->Exec(sql));
+		return 1;
+	}
+
+	int Sqlite::Query(lua_State* lua)
+	{
+		SqliteComponent * sqliteComponent = GetComponent();
+
 		std::vector<std::string> result;
-		std::string db(luaL_checkstring(lua, 1));
-		const char * sql = luaL_checkstring(lua, 2);
-		int code = sqliteComponent->Query(db, sql, result);
+		const char * sql = luaL_checkstring(lua, 1);
+		int code = sqliteComponent->Query(sql, result);
 		if(code != XCode::Ok)
 		{
 			lua_pushinteger(lua, code);
@@ -59,34 +99,6 @@ namespace lua
 			lua::yyjson::write(lua, json.c_str(), json.size());
 			lua_settable(lua, -3);
 		}
-		return 2;
-	}
-
-	int Sqlite::FindOne(lua_State* lua)
-	{
-		static SqliteComponent * sqliteComponent = nullptr;
-		if(sqliteComponent == nullptr)
-		{
-			sqliteComponent = App::Get<SqliteComponent>();
-			if(sqliteComponent == nullptr)
-			{
-				luaL_error(lua, "not find SqliteComponent");
-				return 0;
-			}
-		}
-		size_t size = 0;
-		std::vector<std::string> result;
-		std::string db(lua_tostring(lua, 1));
-		const char * sql = luaL_checklstring(lua, 2, &size);
-		int code = sqliteComponent->Query(db, sql, result);
-		if(code != XCode::Ok)
-		{
-			lua_pushinteger(lua, code);
-			return 1;
-		}
-		lua_pushinteger(lua, code);
-		const std::string & json = result.at(0);
-		lua::yyjson::write(lua, json.c_str(), json.size());
 		return 2;
 	}
 }

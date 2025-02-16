@@ -71,5 +71,15 @@
         "Async": true,
         "Request": "com.type.string",
         "Response": "com.array.string"
+    },
+    "MongoDB.Backup": {
+        "Async": true,
+        "Request": "db.mongo.backup.request",
+        "Response": "db.mongo.response"
+    },
+    "MongoDB.Recover": {
+        "Async": true,
+        "Request": "db.mongo.recover.request",
+        "Response": "db.mongo.response"
     }
 }

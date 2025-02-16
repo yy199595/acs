@@ -1,11 +1,9 @@
 
 require("TableUtil")
-local xpcll = xpcall
 local log = require("Log")
 local this = require("net.http")
 local tab_concat = table.concat
 local str_format = string.format
-local log_error  = log.Error
 local HttpComponent =  { }
 
 function HttpComponent:FormatUrl(url, query)

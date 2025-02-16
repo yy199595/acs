@@ -8,7 +8,7 @@
 #include"Entity/Actor/App.h"
 #include"Server/Config/CodeConfig.h"
 #include"Http/Common/HttpResponse.h"
-#include"Http/Client/SessionClient.h"
+#include"Http/Client/Session.h"
 #include"Server/Component/ThreadComponent.h"
 
 #include "Core/System/System.h"
@@ -25,7 +25,7 @@ namespace acs
 	{
 		int sockId = this->mNumPool.BuildNumber();
 		Asio::Context & io = this->mApp->GetContext();
-		std::shared_ptr<http::SessionClient> handlerClient = std::make_shared<http::SessionClient>(this, io);
+		std::shared_ptr<http::Session> handlerClient = std::make_shared<http::Session>(this, io);
 		{
 			handlerClient->StartReceive(sockId, socket);
 			this->mHttpClients.emplace(sockId, handlerClient);

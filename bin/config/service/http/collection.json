@@ -50,5 +50,27 @@
         "Request" : {
             "tab" : "xx.xx"
         }
+    },
+    "/table_mgr/backup": {
+        "Type": "GET",
+        "Async": true,
+        "Auth": false,
+        "Desc": "备份一个表的数据",
+        "Bind": "MongoMgr.Backup",
+        "Request" : {
+            "tab" : "表名",
+            "name" : "文件夹"
+        }
+    },
+    "/table_mgr/recover": {
+        "Type": "GET",
+        "Async": true,
+        "Auth": false,
+        "Desc": "恢复文件夹数据到一个库",
+        "Bind": "MongoMgr.Recover",
+        "Request" : {
+            "db" : "库名",
+            "name" : "文件夹"
+        }
     }
 }

@@ -3,6 +3,7 @@
 //
 
 #include "RecordComponent.h"
+#include "Util/Tools/Guid.h"
 #include "Http/Common/HttpRequest.h"
 #include "Http/Common/HttpResponse.h"
 #include "Rpc/Config/MethodConfig.h"
@@ -20,11 +21,11 @@ namespace acs
 
 	bool RecordComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mMongo = this->GetComponent<MongoComponent>())
-		return true;
+		this->mMongo = this->GetComponent<MongoComponent>();
+		return this->mMongo != nullptr;
 	}
 
-	void RecordComponent::Complete()
+	void RecordComponent::OnComplete()
 	{
 		this->mMongo->SetIndex(HTTP_RECORD_LIST, "time", -1);
 	}
@@ -36,11 +37,15 @@ namespace acs
 			return;
 		}
 		json::w::Document document;
+		long long id = help::ID::Create();
 		long long nowTime = help::Time::NowSec();
-		document.Add("url", config.Path);
-		document.Add("desc", config.Desc);
-		document.Add("method", config.Type);
-		document.Add("time", nowTime);
+		{
+			document.Add("url", config.Path);
+			document.Add("desc", config.Desc);
+			document.Add("method", config.Type);
+			document.Add("time", nowTime);
+			document.Add("_id", std::to_string(id));
+		}
 		if(request.GetBody() != nullptr)
 		{
 			std::string req = request.GetBody()->ToStr();

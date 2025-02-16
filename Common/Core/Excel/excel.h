@@ -1,35 +1,44 @@
 #pragma once
 
 #include <map>
+#include <utility>
 #include <vector>
 #include <string>
 #include <cmath>
 #include "miniz.h"
+#include <codecvt>
 #include "XML/Src/tinyxml2.h"
-
-using namespace tinyxml2;
 
 namespace lxlsx
 {
-    bool is_date_ime(uint32_t id) {
+    inline bool is_date_ime(uint32_t id)
+    {
         return (id >= 14 && id <= 22) || (id >= 27 && id <= 36) || (id >= 45 && id <= 47)
             || (id >= 50 && id <= 58) || (id >= 71 && id <= 81);
     }
 
-    bool is_custom(uint32_t id) {
+    inline bool is_custom(uint32_t id)
+    {
         return id > 165;
     }
 
     class Cell
     {
     public:
-        void _gc() {}
+        void _gc()
+        {
+        }
+
         std::string type;
         std::string value;
         std::string fmt_code;
         uint32_t fmt_id = 0;
 
-        Cell* clone() const {
+    public:
+        Cell() = default;
+
+        Cell* clone() const
+        {
             Cell* cl = new Cell();
             cl->type = type;
             cl->value = value;
@@ -39,23 +48,39 @@ namespace lxlsx
         }
     };
 
+
     class Sheet
     {
     public:
-        ~Sheet() {
-            for (auto cell : cells){ delete cell; }
+        ~Sheet()
+        {
+            for (auto cell : cells)
+            {
+                delete cell;
+            }
         }
 
-        void _gc() {}
-        Cell* get_cell(uint32_t row, uint32_t col) {
+        Sheet() = default;
+
+        explicit Sheet(std::string name) : name(std::move(name))
+        {
+        }
+
+        void _gc()
+        {
+        }
+
+        Cell* get_cell(uint32_t row, uint32_t col)
+        {
             if (row < first_row || row > last_row || col < first_col || col > last_col)
                 return nullptr;
             uint32_t index = (row - 1) * (last_col - first_col + 1) + (col - first_col);
             return cells[index];
         }
 
-        void add_cell(uint32_t row, uint32_t col, Cell* co) {
-             if (row < first_row || row > last_row || col < first_col || col > last_col)
+        void add_cell(uint32_t row, uint32_t col, Cell * co)
+        {
+            if (row < first_row || row > last_row || col < first_col || col > last_col)
                 return;
             uint32_t index = (row - 1) * (last_col - first_col + 1) + (col - first_col);
             cells[index] = co;
@@ -70,117 +95,151 @@ namespace lxlsx
         uint32_t last_col = 0;
         uint32_t first_row = 0;
         uint32_t first_col = 0;
-        std::vector<Cell*> cells = {};
+        std::vector<Cell *> cells = {};
     };
 
     class ExcelFile
     {
     public:
-        ~ExcelFile() {
+        ~ExcelFile()
+        {
             mz_zip_reader_end(&archive);
-            for (auto sh : excel_sheets) { delete sh; }
-        }
-
-
-        bool Open(const char* filename) {
-            memset(&archive, 0, sizeof(archive));
-            if (mz_zip_reader_init_file(&archive, filename, 0)) {
-                read_work_book("xl/workbook.xml");
-                read_shared_strings("xl/sharedStrings.xml");
-                read_work_book_rels("xl/_rels/workbook.xml.rels");
-                read_styles("xl/styles.xml");
-                for (auto s : excel_sheets) {
-                    read_sheet(s);
-                }
-                return true;
+            for (auto sh : excel_sheets)
+            {
+                delete sh;
             }
-            return false;
         }
 
-        Sheet* GetSheet(const char* name){
-            for (auto sh : excel_sheets) {
+
+        bool Open(const char* filename, std::string& error)
+        {
+            memset(&archive, 0, sizeof(archive));
+            if (!mz_zip_reader_init_file(&archive, filename, 0))
+            {
+#ifdef __OS_WIN__
+                FILE* pFile = nullptr;
+                std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+                std::wstring newPath = converter.from_bytes(filename);
+                _wfopen_s(&pFile, newPath.c_str(), L"rb");
+                if (!mz_zip_reader_init_cfile(&archive, pFile, 0, 0))
+                {
+                    error.assign(mz_zip_get_error_string(archive.m_last_error));
+                    return false;
+                }
+#else
+				return false;
+#endif
+            }
+
+            read_work_book("xl/workbook.xml");
+            read_shared_strings("xl/sharedStrings.xml");
+            read_work_book_rels("xl/_rels/workbook.xml.rels");
+            read_styles("xl/styles.xml");
+            for (Sheet* s : excel_sheets)
+            {
+                read_sheet(s);
+            }
+            return true;
+        }
+
+        Sheet* GetSheet(const char* name)
+        {
+            for (auto sh : excel_sheets)
+            {
                 if (sh->name == name) return sh;
             }
             return nullptr;
         }
 
-        std::vector<Sheet*> GetSheets() {
+        inline std::vector<Sheet *> GetSheets()
+        {
             return this->excel_sheets;
         }
 
-
     private:
-        bool open_xml(const char* filename, XMLDocument& doc){
+        bool open_xml(const char* filename, tinyxml2::XMLDocument& doc)
+        {
             uint32_t index = mz_zip_reader_locate_file(&archive, filename, nullptr, 0);
             size_t size = 0;
             auto data = (const char*)mz_zip_reader_extract_to_heap(&archive, index, &size, 0);
-            if (data && doc.Parse(data, size) == XML_SUCCESS) {
+            if (data && doc.Parse(data, size) == tinyxml2::XML_SUCCESS)
+            {
                 delete[] data;
                 return true;
             }
             return false;
         }
 
-        void read_sheet(Sheet* sh) {
-            XMLDocument doc;
+        void read_sheet(Sheet* sh)
+        {
+            tinyxml2::XMLDocument doc;
             if (!open_xml(sh->path.c_str(), doc)) return;
 
-            XMLElement* root = doc.FirstChildElement("worksheet");
-            XMLElement* dim = root->FirstChildElement("dimension");
-            XMLElement* shdata = root->FirstChildElement("sheetData");
+            tinyxml2::XMLElement* root = doc.FirstChildElement("worksheet");
+            tinyxml2::XMLElement* dim = root->FirstChildElement("dimension");
+            tinyxml2::XMLElement* shdata = root->FirstChildElement("sheetData");
             parse_range(dim, shdata, sh);
             sh->cells.resize(sh->last_col * sh->last_row);
-            XMLElement* row = shdata->FirstChildElement("row");
-            while (row) {
+            tinyxml2::XMLElement* row = shdata->FirstChildElement("row");
+            while (row)
+            {
                 uint32_t row_idx = row->IntAttribute("r");
-                XMLElement* c = row->FirstChildElement("c");
-                while (c) {
+                tinyxml2::XMLElement* c = row->FirstChildElement("c");
+                while (c)
+                {
                     uint32_t col_idx = 0;
-                    Cell* cel = new Cell;
+                    std::unique_ptr<Cell> cel = std::make_unique<Cell>();
                     parse_cell(c->Attribute("r"), row_idx, col_idx);
-                    read_cell(cel, c->Attribute("t"), c->Attribute("s"), c->FirstChildElement("v"));
-                    sh->add_cell(row_idx, col_idx, cel);
+                    read_cell(cel.get(), c->Attribute("t"), c->Attribute("s"), c->FirstChildElement("v"));
+                    sh->add_cell(row_idx, col_idx, cel.release());
                     c = c->NextSiblingElement("c");
                 }
                 row = row->NextSiblingElement("row");
             }
-            XMLElement* mcell = root->FirstChildElement("mergeCells");
-            if (mcell) {
+            tinyxml2::XMLElement* mcell = root->FirstChildElement("mergeCells");
+            if (mcell)
+            {
                 mcell = mcell->FirstChildElement("mergeCell");
-                while (mcell) {
+                while (mcell)
+                {
                     merge_cells(sh, mcell->Attribute("ref"));
                     mcell = mcell->NextSiblingElement("mergeCell");
                 }
             }
         }
 
-        void read_styles(const char* filename){
-            XMLDocument doc;
+        void read_styles(const char* filename)
+        {
+            tinyxml2::XMLDocument doc;
             if (!open_xml(filename, doc)) return;
 
-            XMLElement* styleSheet = doc.FirstChildElement("styleSheet");
+            tinyxml2::XMLElement* styleSheet = doc.FirstChildElement("styleSheet");
             if (styleSheet == nullptr) return;
-            XMLElement* numFmts = styleSheet->FirstChildElement("numFmts");
+            tinyxml2::XMLElement* numFmts = styleSheet->FirstChildElement("numFmts");
             if (numFmts == nullptr) return;
 
             std::map<int, std::string> custom_date_formats;
-            for (XMLElement* numFmt = numFmts->FirstChildElement(); numFmt; numFmt = numFmt->NextSiblingElement()) {
-                uint32_t id = atoi(numFmt->Attribute("numFmtId"));
+            for (tinyxml2::XMLElement* numFmt = numFmts->FirstChildElement(); numFmt; numFmt = numFmt->NextSiblingElement())
+            {
+                uint32_t id = std::atoi(numFmt->Attribute("numFmtId"));
                 std::string fmt = numFmt->Attribute("formatCode");
                 custom_date_formats.emplace(id, fmt);
             }
 
-            XMLElement* cellXfs = styleSheet->FirstChildElement("cellXfs");
+            tinyxml2::XMLElement* cellXfs = styleSheet->FirstChildElement("cellXfs");
             if (cellXfs == nullptr) return;
 
             uint32_t i = 0;
-            for (XMLElement* cellXf = cellXfs->FirstChildElement(); cellXf; cellXf = cellXf->NextSiblingElement()) {
+            for (tinyxml2::XMLElement* cellXf = cellXfs->FirstChildElement(); cellXf; cellXf = cellXf->NextSiblingElement())
+            {
                 const char* fi = cellXf->Attribute("numFmtId");
-                if (fi) {
+                if (fi)
+                {
                     std::string fmt;
-                    uint32_t formatId = atoi(fi);
+                    uint32_t formatId = std::atoi(fi);
                     auto iter = custom_date_formats.find(formatId);
-                    if (iter != custom_date_formats.end()) {
+                    if (iter != custom_date_formats.end())
+                    {
                         fmt = iter->second;
                     }
                     form_ids.emplace(i, formatId);
@@ -190,40 +249,47 @@ namespace lxlsx
             }
         }
 
-        void read_work_book(const char* filename) {
-            XMLDocument doc;
+        void read_work_book(const char* filename)
+        {
+            tinyxml2::XMLDocument doc;
             if (!open_xml(filename, doc)) return;
-            XMLElement* e = doc.FirstChildElement("workbook");
-            XMLElement * sheets = e->FirstChildElement("sheets");       
-            XMLElement * sheet = sheets->FirstChildElement("sheet");
-            while (sheet != nullptr) 
+            tinyxml2::XMLElement* e = doc.FirstChildElement("workbook");
+            tinyxml2::XMLElement* sheets = e->FirstChildElement("sheets");
+            tinyxml2::XMLElement* sheet = sheets->FirstChildElement("sheet");
+            while (sheet != nullptr)
             {
-                Sheet* s = new Sheet();
-                s->rid = sheet->Attribute("r:id");
-                s->name = sheet->Attribute("name");
-                s->sheet_id = sheet->IntAttribute("sheetId");
-                s->visible = (sheet->Attribute("state") && !strcmp(sheet->Attribute("state"), "hidden"));
-                sheet = sheet->NextSiblingElement("sheet");
-                excel_sheets.push_back(s);
+                std::unique_ptr<Sheet> s = std::make_unique<Sheet>();
+                {
+                    s->rid = sheet->Attribute("r:id");
+                    s->name = sheet->Attribute("name");
+                    s->sheet_id = sheet->IntAttribute("sheetId");
+                    s->visible = (sheet->Attribute("state") && !strcmp(sheet->Attribute("state"), "hidden"));
+                    sheet = sheet->NextSiblingElement("sheet");
+                }
+                excel_sheets.emplace_back(s.release());
             }
         }
 
-        void read_shared_strings(const char* filename) {
-            XMLDocument doc;
+        void read_shared_strings(const char* filename)
+        {
+            tinyxml2::XMLDocument doc;
             if (!open_xml(filename, doc)) return;
-            XMLElement* e = doc.FirstChildElement("sst");
+            tinyxml2::XMLElement* e = doc.FirstChildElement("sst");
             e = e->FirstChildElement("si");
-            while (e) {
-                XMLElement* t = e->FirstChildElement("t");
-                if (t) {
+            while (e)
+            {
+                tinyxml2::XMLElement* t = e->FirstChildElement("t");
+                if (t)
+                {
                     const char* text = t->GetText();
                     shared_string.emplace_back(text ? text : "");
                     e = e->NextSiblingElement("si");
                     continue;
                 }
                 std::string value;
-                XMLElement* r = e->FirstChildElement("r");
-                while (r) {
+                tinyxml2::XMLElement* r = e->FirstChildElement("r");
+                while (r)
+                {
                     t = r->FirstChildElement("t");
                     const char* text = t->GetText();
                     if (text) value.append(text);
@@ -234,15 +300,19 @@ namespace lxlsx
             }
         }
 
-        void read_work_book_rels(const char* filename){
-            XMLDocument doc;
+        void read_work_book_rels(const char* filename)
+        {
+            tinyxml2::XMLDocument doc;
             if (!open_xml(filename, doc)) return;
-            XMLElement* e = doc.FirstChildElement("Relationships");
+            tinyxml2::XMLElement* e = doc.FirstChildElement("Relationships");
             e = e->FirstChildElement("Relationship");
-            while (e) {
+            while (e)
+            {
                 const char* rid = e->Attribute("Id");
-                for (auto sheet : excel_sheets) {
-                    if (sheet->rid == rid) {
+                for (auto sheet : excel_sheets)
+                {
+                    if (sheet->rid == rid)
+                    {
                         sheet->path = "xl/" + std::string(e->Attribute("Target"));
                         break;
                     }
@@ -251,17 +321,21 @@ namespace lxlsx
             }
         }
 
-        void read_cell(Cell* c, const char* t, const char* s, XMLElement* v){
-            if (!v || !v->GetText()) {
+        void read_cell(Cell* c, const char* t, const char* s, tinyxml2::XMLElement* v)
+        {
+            if (!v || !v->GetText())
+            {
                 c->type = "blank";
                 return;
             }
             c->type = "error";
             c->value = v->GetText();
-            if (!t || !strcmp(t, "n")) {
+            if (!t || !strcmp(t, "n"))
+            {
                 c->type = "number";
-                if (s) {
-                    uint32_t idx = atoi(s);
+                if (s)
+                {
+                    uint32_t idx = std::atoi(s);
                     auto it = form_ids.find(idx);
                     if (it == form_ids.end()) return;
                     uint32_t format_id = it->second;
@@ -269,53 +343,72 @@ namespace lxlsx
                     if (it2 == fmt_codes.end()) return;
                     c->fmt_id = format_id;
                     c->fmt_code = it2->second;
-                    if (is_date_ime(format_id)) {
+                    if (is_date_ime(format_id))
+                    {
                         c->type = "date";
-                    } else if (is_custom(format_id)) {
+                    }
+                    else if (is_custom(format_id))
+                    {
                         c->type = "custom";
                     }
                     return;
                 }
             }
             if (!t) return;
-            if (!strcmp(t, "s")) {
+            if (!strcmp(t, "s"))
+            {
                 c->type = "string";
-                c->value = shared_string[atoi(v->GetText())];
-            } else if (!strcmp(t, "inlineStr")) {
+                c->value = shared_string[std::atoi(v->GetText())];
+            }
+            else if (!strcmp(t, "inlineStr"))
+            {
                 c->type = "string";
-            } else if (!strcmp(t, "str")) {
+            }
+            else if (!strcmp(t, "str"))
+            {
                 c->type = "string";
-            } else if (!strcmp(t, "b")) {
+            }
+            else if (!strcmp(t, "b"))
+            {
                 c->type = "bool";
             }
         }
 
-        void parse_cell(const std::string& value, uint32_t& row, uint32_t& col) {
+        void parse_cell(const std::string& value, uint32_t& row, uint32_t& col)
+        {
             col = 0;
             uint32_t arr[10];
             uint32_t index = 0;
-            while (index < value.length()) {
+            while (index < value.length())
+            {
                 if (isdigit(value[index])) break;
                 arr[index] = value[index] - 'A' + 1;
                 index++;
             }
-            for (uint32_t i = 0; i < index; i++) {
+            for (uint32_t i = 0; i < index; i++)
+            {
                 col += (arr[i] * pow(26, index - i - 1));
             }
             row = atol(value.c_str() + index);
         }
 
-        void merge_cells(Sheet* sh, const std::string& value) {
+        void merge_cells(Sheet* sh, const std::string& value)
+        {
             size_t index = value.find_first_of(':');
-            if (index != std::string::npos) {
+            if (index != std::string::npos)
+            {
                 uint32_t first_row = 0, first_col = 0, last_row = 0, last_col = 0;
                 parse_cell(value.substr(0, index), first_row, first_col);
                 parse_cell(value.substr(index + 1), last_row, last_col);
                 Cell* valc = sh->get_cell(first_row, first_col);
-                if (valc) {
-                    for (uint32_t i = first_row;  i <= last_row; ++i) {
-                        for (uint32_t j = first_col; j <= last_col; ++j) {
-                            if (i != first_row || j != first_col) {
+                if (valc)
+                {
+                    for (uint32_t i = first_row; i <= last_row; ++i)
+                    {
+                        for (uint32_t j = first_col; j <= last_col; ++j)
+                        {
+                            if (i != first_row || j != first_col)
+                            {
                                 sh->add_cell(i, j, valc->clone());
                             }
                         }
@@ -324,24 +417,30 @@ namespace lxlsx
             }
         }
 
-        void parse_range(XMLElement* dim, XMLElement* shdata, Sheet* sh) {
-            if (dim) {
+        void parse_range(tinyxml2::XMLElement* dim, tinyxml2::XMLElement* shdata, Sheet* sh)
+        {
+            if (dim)
+            {
                 std::string value = dim->Attribute("ref");
                 size_t index = value.find_first_of(':');
-                if (index != std::string::npos) {
+                if (index != std::string::npos)
+                {
                     parse_cell(value.substr(0, index), sh->first_row, sh->first_col);
                     parse_cell(value.substr(index + 1), sh->last_row, sh->last_col);
                     return;
                 }
             }
-            XMLElement* row = shdata->FirstChildElement("row");
-            while (row) {
+            tinyxml2::XMLElement* row = shdata->FirstChildElement("row");
+            while (row)
+            {
                 sh->last_row = row->IntAttribute("r");
                 if (sh->first_row == 0) sh->first_row = sh->last_row;
-                if (sh->last_col == 0) {
+                if (sh->last_col == 0)
+                {
                     sh->first_col = 1;
-                    XMLElement* c = row->FirstChildElement("c");
-                    while (c ) {
+                    tinyxml2::XMLElement* c = row->FirstChildElement("c");
+                    while (c)
+                    {
                         c = c->NextSiblingElement("c");
                         sh->last_col++;
                     }
@@ -351,7 +450,7 @@ namespace lxlsx
         }
 
         mz_zip_archive archive;
-        std::vector<Sheet*> excel_sheets;
+        std::vector<Sheet *> excel_sheets;
         std::vector<std::string> shared_string;
         std::map<uint32_t, uint32_t> form_ids;
         std::map<uint32_t, std::string> fmt_codes;

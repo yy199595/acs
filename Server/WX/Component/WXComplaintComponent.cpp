@@ -2,13 +2,12 @@
 // Created by yy on 2024/6/30.
 //
 
+#ifdef __ENABLE_OPEN_SSL__
+
 #include "WXComplaintComponent.h"
 #include "XCode/XCode.h"
 #include "Util/Tools/TimeHelper.h"
-#include "Util/Tools/Math.h"
 #include "Http/Component/NotifyComponent.h"
-#include "Mongo/Component/MongoComponent.h"
-#include "WX/Define/db.h"
 #include "Http/Common/Content.h"
 #include "Config/Base/LangConfig.h"
 #include "WX/Component/WeChatComponent.h"
@@ -79,8 +78,10 @@ namespace acs
 		{
 			return XCode::RequestWxApiError;
 		}
-		response.AddJson("data", jsonData->JsonStr());
+		response.AddObject("data", jsonData->JsonStr());
 		return XCode::Ok;
 	}
 
 }
+
+#endif

@@ -16,12 +16,13 @@ namespace acs
 	public:
 		TcpClientComponent();
 	private:
+		bool Awake() final;
 		bool LateAwake() final;
 		void OnClientError(int id, int code) final;
 		void OnSendFailure(int id, rpc::Message *message) final;
 		void OnMessage(rpc::Message *request, rpc::Message *response) noexcept final;
 	private:
-		void Remove(int id);
+		void Remove(int id) final;
 		int Connect(const std::string & address) final;
 		int Send(int id, rpc::Message * message) noexcept final;
 		char GetNet() const noexcept final { return rpc::Net::Client; }

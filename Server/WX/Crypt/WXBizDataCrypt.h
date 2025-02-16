@@ -1,4 +1,6 @@
 
+#ifdef __ENABLE_OPEN_SSL__
+
 #pragma once
 
 #include <string>
@@ -61,3 +63,4 @@ private:
 
 }
 
+#endif

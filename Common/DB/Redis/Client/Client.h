@@ -23,7 +23,7 @@ namespace redis
 		void Send(std::unique_ptr<Request> command);
 		std::unique_ptr<Response> Sync(std::unique_ptr<Request> command);
 	protected:
-		void OnConnect(bool result, int count) final;
+		void OnConnect(const Asio::Code & code, int count) final;
 		std::unique_ptr<Response> ReadResponse(const std::unique_ptr<Request>& command);
 	private:
 		void OnResponse();

@@ -10,14 +10,14 @@
 namespace acs
 {
 
-    HttpService::HttpService()
-		: mServiceRegister(this)
-    {
+	HttpService::HttpService()
+			: mServiceRegister(this)
+	{
 		this->mLuaModule = nullptr;
-    }
+	}
 
-    bool HttpService::LateAwake()
-    {
+	bool HttpService::LateAwake()
+	{
 		const std::string & name = this->GetName();
 		LOG_CHECK_RET_FALSE(HttpConfig::Inst()->HasService(name))
 		LuaComponent * luaComponent = this->GetComponent<LuaComponent>();
@@ -30,39 +30,12 @@ namespace acs
 			LOG_ERROR("[{}] Init Fail", name)
 			return false;
 		}
-		if(this->mLuaModule != nullptr)
-		{
-			int code = this->mLuaModule->Call("Awake");
-			return code != XCode::CallLuaFunctionFail;
-		}
 		return true;
-    }
-
-	void HttpService::Start()
-	{
-		this->OnStart();
-		IF_NOT_NULL_CALL(this->mLuaModule, Await, "OnStart");
-	}
-
-	void HttpService::Complete()
-	{
-		this->OnComplete();
-		IF_NOT_NULL_CALL(this->mLuaModule, Await, "OnComplete")
-	}
-
-	void HttpService::OnDestroy()
-	{
-		this->OnStop();
-		if (this->mLuaModule != nullptr)
-		{
-			this->mLuaModule->Await("OnStop");
-			this->mLuaModule = nullptr;
-		}
 	}
 
 	int HttpService::Invoke(const HttpMethodConfig * config, const http::Request& request, http::Response& response) noexcept
 	{
-		const std::string & method = config->Method;		
+		const std::string & method = config->Method;
 		if(this->mLuaModule != nullptr && this->mLuaModule->HasFunction(method))
 		{
 			if(!config->IsAsync)

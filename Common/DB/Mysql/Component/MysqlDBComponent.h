@@ -1,70 +1,53 @@
-//
-// Created by zmhy0073 on 2022/7/16.
-//
-#ifdef __ENABLE_MYSQL__
-#ifndef SERVER_MYSQLRPCCOMPONENT_H
-#define SERVER_MYSQLRPCCOMPONENT_H
 
-#include"Core/Queue/Queue.h"
-#include"Mysql/Client/MysqlDefine.h"
-#include"Mysql/Client/MysqlMessage.h"
-#include"Util/Tools/NumberBuilder.h"
-#include "Mysql/Config/MysqlConfig.h"
-#include"Rpc/Component/RpcTaskComponent.h"
+#include "Mysql/Client/Client.h"
+#include "Mysql/Common/MysqlProto.h"
+#include "Rpc/Component/RpcComponent.h"
 
-struct lua_State;
 namespace acs
 {
-	class MysqlTask : public IRpcTask<Mysql::Response>, protected WaitTaskSourceBase
-    {
-    public:
-        explicit MysqlTask(int taskId);
-    public:
-        inline Mysql::Response * Await();
-		inline void OnResponse(Mysql::Response * response) final;
+	class MysqlTask final : public IRpcTask<mysql::Response>, protected WaitTaskSourceBase
+	{
+	public:
+		explicit MysqlTask(int taskId);
+	public:
+		inline std::unique_ptr<mysql::Response> Await();
+		inline void OnResponse(std::unique_ptr<mysql::Response> response) noexcept final;
 	private:
-        Mysql::Response * mMessage;
-    };
-
-	inline Mysql::Response* MysqlTask::Await()
+		std::unique_ptr<mysql::Response> mMessage;
+	};
+	inline std::unique_ptr<mysql::Response> MysqlTask::Await()
 	{
 		this->YieldTask();
-		return this->mMessage;
+		return std::move(this->mMessage);
 	}
-
-	inline void MysqlTask::OnResponse(Mysql::Response* response)
+	inline void MysqlTask::OnResponse(std::unique_ptr<mysql::Response> response) noexcept
 	{
-		this->mMessage = response;
+		this->mMessage = std::move(response);
 		this->ResumeTask();
 	}
 }
 
 namespace acs
 {
-    class MysqlClient;
-	class MysqlDBComponent final : public RpcTaskComponent<int, Mysql::Response>,
-		public IRpc<Mysql::IRequest, Mysql::Response>, public ILuaRegister, public IDestroy
-    {
+	class MysqlDBComponent : public RpcComponent<mysql::Response>,
+							 public IRpc<mysql::Request, mysql::Response>
+	{
 	public:
-		bool Execute(std::unique_ptr<Mysql::IRequest> command);
-		bool SyncExecute(std::unique_ptr<Mysql::IRequest> command);
-		Mysql::Response * Run(std::unique_ptr<Mysql::IRequest> command);
-		bool Send(std::unique_ptr<Mysql::IRequest> command, int & rpcId);
-		const mysql::MysqlConfig & Config() const { return this->mConfig; }
-		std::unique_ptr<Mysql::Response> SyncRun(std::unique_ptr<Mysql::IRequest> command);
-	 private:
+		MysqlDBComponent();
+	public:
+		void Send(std::unique_ptr<mysql::Request> request);
+		void Send(std::unique_ptr<mysql::Request> request, int & rpcId);
+		std::unique_ptr<mysql::Response> Run(std::unique_ptr<mysql::Request> request);
+	private:
+		void Send(int id, std::unique_ptr<mysql::Request> request);
+	private:
 		bool Awake() final;
 		bool LateAwake() final;
-		void OnDestroy() final;
-		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
-		void OnMessage(Mysql::IRequest *request, Mysql::Response * message) final;
+		void OnMessage(int id, mysql::Request *request, mysql::Response *response) noexcept final;
 	private:
-		mysql::MysqlConfig mConfig;
-		math::NumberPool<int> mNumPool;
-		custom::Queue<MysqlClient *> mMysqlClients;
-    };
+		mysql::Config mConfig;
+		custom::Queue<int> mFreeClients;
+		std::queue<std::unique_ptr<mysql::Request>> mMessages;
+		std::unordered_map<int, std::shared_ptr<mysql::Client>> mClients;
+	};
 }
-
-
-#endif //SERVER_MYSQLRPCCOMPONENT_H
-#endif

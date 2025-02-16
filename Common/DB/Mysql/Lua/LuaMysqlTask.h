@@ -1,30 +1,20 @@
-//
-// Created by yjz on 2023/3/24.
-//
-#ifdef __ENABLE_MYSQL__
 
-#ifndef APP_DATABASE_MYSQL_LUA_LUAMYSQLTASK_H
-#define APP_DATABASE_MYSQL_LUA_LUAMYSQLTASK_H
-#include"Mysql/Client/MysqlMessage.h"
-#include"Rpc/Async/RpcTaskSource.h"
+#pragma once
+
+#include "Rpc/Async/RpcTaskSource.h"
+#include "Mysql/Common/MysqlProto.h"
 struct lua_State;
-
-constexpr int LUA_MYSQL_EXEC = 1;
-constexpr int LUA_MYSQL_QUERY = 2;
-constexpr int LUA_MYSQL_QUERY_ONE = 3;
-constexpr int LUA_MYSQL_CREATE_TABLE = 4;
-
 namespace acs
 {
 
-	class LuaMysqlTask : public IRpcTask<Mysql::Response>
+	class LuaMysqlTask : public IRpcTask<mysql::Response>
 	{
 	public:
 		LuaMysqlTask(lua_State* lua, int id);
-		~LuaMysqlTask();
+		~LuaMysqlTask() final;
 	public:
 		int Await();
-		void OnResponse(Mysql::Response * response) final;
+		void OnResponse(std::unique_ptr<mysql::Response> response) noexcept final ;
 	private:
 		int mRef;
 		lua_State* mLua;
@@ -32,6 +22,3 @@ namespace acs
 }
 
 
-#endif //APP_DATABASE_MYSQL_LUA_LUAMYSQLTASK_H
-
-#endif

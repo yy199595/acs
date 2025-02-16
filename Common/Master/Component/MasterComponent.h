@@ -15,8 +15,8 @@ namespace acs
 	public:
 		bool SyncServer(long long id = 0);
 	private:
-		void Complete() final;
 		bool LateAwake() final;
+		void OnComplete() final;
 		bool RegisterServer() const;
 	private:
 		std::string mHost;

@@ -1,7 +1,7 @@
 //
 // Created by yy on 2024/5/18.
 //
-
+#ifdef __ENABLE_OPEN_SSL__
 #include "WeChat.h"
 #include "Entity/Actor/App.h"
 #include "WX/Component/WeChatComponent.h"
@@ -107,3 +107,4 @@ namespace acs
 		return XCode::Ok;
 	}
 }
+#endif

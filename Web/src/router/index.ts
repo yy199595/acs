@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 import Home from '../views/home.vue';
-import {get_token} from "../api/token";
+import {app} from "../api/token";
 
 const routes: RouteRecordRaw[] = [
     {
@@ -167,10 +167,10 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
 
-    const tokenData = get_token()
+    const userInfo = app.get_user_info()
     console.log(from.path, "=>", to.path)
     document.title = `${to.meta.title}`;
-    if (!tokenData && to.path !== '/login') {
+    if (!userInfo && to.path !== '/login') {
         next('/login');
     } else {
         next()

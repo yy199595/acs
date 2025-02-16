@@ -1,5 +1,4 @@
 ﻿#include"String.h"
-#include"Util/Crypt/md5.h"
 #include<regex>
 #include<sstream>
 #include <codecvt>
@@ -106,7 +105,7 @@ namespace help
         };
 
         int level = 0;
-        for (string::size_type index = 0; index < json.size(); index++)
+        for (size_t index = 0; index < json.size(); index++)
         {
             char c = json[index];
 
@@ -142,7 +141,7 @@ namespace help
 		return format;
     }
 
-    std::string Str::RandomString(size_t size)
+    std::string Str::RandomString(int size)
     {
 		std::string result;
 		result.resize(size);
@@ -156,12 +155,7 @@ namespace help
 		return result;
     }
 
-    std::string Str::CreateNewToken()
-    {
-        const int size = help::Rand::Random<int>(30, 100);
-        return md5::GetMd5(RandomString(size));
-    }
-}// namespace StringHelper
+}
 
 namespace help
 {

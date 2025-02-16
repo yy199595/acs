@@ -8,8 +8,8 @@ namespace help
     {
     public:
         static long long Create();
-        static std::string UUid();
         static long long Create(short type);
+		static int New(long long startTime, int id);
     private:
         static int mIndex1;
         static short mIndex2;

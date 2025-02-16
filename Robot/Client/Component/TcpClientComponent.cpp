@@ -20,12 +20,19 @@ namespace acs
 		this->mLuaComponent = nullptr;
 	}
 
+	bool TcpClientComponent::Awake()
+	{
+		LuaCCModuleRegister::Add([](Lua::CCModule & moduleClass) {
+			moduleClass.Open("net.client", lua::lib::luaopen_lclient);
+		});
+		return true;
+	}
+
 	bool TcpClientComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mProto = this->GetComponent<ProtoComponent>())
 		LOG_CHECK_RET_FALSE(this->mLuaComponent = this->GetComponent<LuaComponent>())
 		LOG_CHECK_RET_FALSE(this->mDisComponent = this->GetComponent<DispatchComponent>())
-		this->mLuaComponent->AddCCModule("net.client", lua::lib::luaopen_lclient);
 		return true;
 	}
 

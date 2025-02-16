@@ -22,46 +22,6 @@ namespace json
 
 namespace json
 {
-	bool w::Value::Push(bool v)
-	{
-		if (!this->IsArray())
-		{
-			return false;
-		}
-		yyjson_mut_val* val = yyjson_mut_bool(this->mDoc, v);
-		return yyjson_mut_arr_add_val(this->mValue, val);
-	}
-
-	bool w::Value::Push(int v)
-	{
-		return this->Push((long long)v);
-	}
-
-	bool w::Value::Push(float v)
-	{
-		return this->Push((double)v);
-	}
-
-	bool w::Value::Push(double v)
-	{
-		if (!this->IsArray())
-		{
-			return false;
-		}
-		yyjson_mut_val* val = yyjson_mut_real(this->mDoc, v);
-		return yyjson_mut_arr_add_val(this->mValue, val);
-	}
-
-	bool w::Value::Push(long long v)
-	{
-		if (!this->IsArray())
-		{
-			return false;
-		}
-		yyjson_mut_val* val = yyjson_mut_int(this->mDoc, v);
-		return yyjson_mut_arr_add_val(this->mValue, val);
-	}
-
 	bool w::Value::Push(const char* v)
 	{
 		if (!this->IsArray())
@@ -96,7 +56,7 @@ namespace json
 		return yyjson_mut_arr_add_val(this->mValue, val);
 	}
 
-	bool w::Value::PushJson(const std::string& json)
+	bool w::Value::PushObject(const std::string& json)
 	{
 		if (!this->IsArray())
 		{
@@ -119,82 +79,33 @@ namespace json
 
 namespace json
 {
-	bool w::Value::Add(const char* k, int v)
-	{
-		return this->Add(k, (long long)v);
-	}
-
 	bool w::Value::Add(const char* k, bool v)
 	{
 		if (!this->IsObject())
 		{
 			return false;
 		}
-		return yyjson_mut_obj_add_bool(this->mDoc, this->mValue, k, v);
-	}
-
-	bool w::Value::AddNull(const char* key)
-	{
-		if (!this->IsObject())
-		{
-			return false;
-		}
-		return yyjson_mut_obj_add_null(this->mDoc, this->mValue, key);
-	}
-
-	bool w::Value::Add(const char* k, char v)
-	{
-		if (!this->IsObject())
-		{
-			return false;
-		}
-		return yyjson_mut_obj_add_int(this->mDoc, this->mValue, k, v);
-	}
-
-	bool w::Value::Add(const char* key, size_t v)
-	{
-		return this->Add(key, (long long)v);
-	}
-
-	bool w::Value::Add(const char* key, float value)
-	{
-		if (!this->IsObject())
-		{
-			return false;
-		}
-		return yyjson_mut_obj_add_real(this->mDoc, this->mValue, key, value);
-	}
-
-	bool w::Value::Add(const char* key, double value)
-	{
-		if (!this->IsObject())
-		{
-			return false;
-		}
-		return yyjson_mut_obj_add_real(this->mDoc, this->mValue, key, value);
-	}
-
-	bool w::Value::Add(const char* k, unsigned int v)
-	{
-		return this->Add(k, (long long)v);
+		yyjson_mut_val * val = yyjson_mut_bool(this->mDoc, v);
+		yyjson_mut_val * key = yyjson_mut_strcpy(this->mDoc, k);
+		return yyjson_mut_obj_add(this->mValue, key, val);
 	}
 
 	bool w::Value::Add(const char* k, const char* v)
 	{
-		if (!this->IsObject())
-		{
-			return false;
-		}
-		return yyjson_mut_obj_add_strcpy(this->mDoc, this->mValue, k, v);
+		yyjson_mut_val * val = yyjson_mut_strcpy(this->mDoc, v);
+		yyjson_mut_val * key = yyjson_mut_strcpy(this->mDoc, k);
+		return yyjson_mut_obj_add(this->mValue, key, val);
 	}
 
-	bool w::Value::Add(const char* k, long long v)
+	bool w::Value::AddNull(const char* k)
 	{
 		if (!this->IsObject())
 		{
 			return false;
 		}
-		return yyjson_mut_obj_add_int(this->mDoc, this->mValue, k, v);
+		yyjson_mut_val * val = yyjson_mut_null(this->mDoc);
+		yyjson_mut_val * key = yyjson_mut_strcpy(this->mDoc, k);
+		return yyjson_mut_obj_add(this->mValue, key, val);
 	}
 
 	bool w::Value::Add(const char* k, const json::w::Value& v)
@@ -252,47 +163,21 @@ namespace json
 		{
 			return false;
 		}
-		return yyjson_mut_obj_add_strncpy(this->mDoc, this->mValue, k, v, size);
+		yyjson_mut_val * key = yyjson_mut_strcpy(this->mDoc, k);
+		yyjson_mut_val * val = yyjson_mut_strncpy(this->mDoc, v, size);
+		return yyjson_mut_obj_add(this->mValue, key, val);
 	}
 
-	bool w::Value::Add(const char* key, const std::vector<std::string>& value)
-	{
-		if (!this->IsObject())
-		{
-			return false;
-		}
-		std::unique_ptr<Value> jsonArray = this->AddArray(key);
-		for (const std::string& val: value)
-		{
-			jsonArray->Push(val);
-		}
-		return true;
-	}
-
-	bool w::Value::Add(const char* key, const std::vector<int>& value)
-	{
-		if (!this->IsObject())
-		{
-			return false;
-		}
-		std::unique_ptr<Value> jsonArray = this->AddArray(key);
-		for (const int& val: value)
-		{
-			jsonArray->Push(val);
-		}
-		return true;
-	}
-
-	bool w::Value::AddJson(const char* k, const std::string& json)
+	bool w::Value::AddObject(const char* k, const std::string& json)
 	{
 		if (json.empty())
 		{
 			return false;
 		}
-		return this->AddJson(k, json.c_str(), json.size());
+		return this->AddObject(k, json.c_str(), json.size());
 	}
 
-	bool w::Value::AddJson(const char* json, size_t size)
+	bool w::Value::AddObject(const char* json, size_t size)
 	{
 		if (!this->IsArray())
 		{
@@ -311,7 +196,7 @@ namespace json
 		return result;
 	}
 
-	bool w::Value::AddJson(const char* k, const char* json, size_t size)
+	bool w::Value::AddObject(const char* k, const char* json, size_t size)
 	{
 		if (!this->IsObject())
 		{
@@ -487,33 +372,6 @@ namespace json
 			return true;
 		}
 
-		bool Value::Get(const char* k, int& v) const
-		{
-			yyjson_val* val = yyjson_obj_get(this->mValue, k);
-			if (!yyjson_is_int(val))
-			{
-				if (yyjson_is_str(val))
-				{
-					const char* str = yyjson_get_str(val);
-					return help::Math::ToNumber(str, v);
-				}
-				return false;
-			}
-			v = yyjson_get_int(val);
-			return true;
-		}
-
-		bool Value::Get(const char* k, char& v) const
-		{
-			yyjson_val* val = yyjson_obj_get(this->mValue, k);
-			if (!yyjson_is_int(val))
-			{
-				return false;
-			}
-			v = (char)yyjson_get_int(val);
-			return true;
-		}
-
 		int Value::GetInt(const char* k, int defaultVal) const
 		{
 			yyjson_val* val = yyjson_obj_get(this->mValue, k);
@@ -522,28 +380,6 @@ namespace json
 				return defaultVal;
 			}
 			return yyjson_get_int(val);
-		}
-
-		bool Value::Get(const char* k, long long& v) const
-		{
-			yyjson_val* val = yyjson_obj_get(this->mValue, k);
-			if (!yyjson_is_int(val))
-			{
-				return false;
-			}
-			v = yyjson_get_sint(val);
-			return true;
-		}
-
-		bool Value::Get(const char* k, double& v) const
-		{
-			yyjson_val* val = yyjson_obj_get(this->mValue, k);
-			if (!yyjson_is_num(val))
-			{
-				return false;
-			}
-			v = yyjson_get_num(val);
-			return true;
 		}
 
 		bool Value::Get(const char* k, std::string& v) const
@@ -580,27 +416,6 @@ namespace json
 			}
 			return true;
 		}
-
-		bool Value::Get(const char* k, std::vector<int>& value) const
-		{
-			yyjson_val* jsonArr = yyjson_obj_get(this->mValue, k);
-			if (!yyjson_is_arr(jsonArr))
-			{
-				return false;
-			}
-			size_t size = yyjson_arr_size(jsonArr);
-			value.reserve(size);
-			for (size_t index = 0; index < size; index++)
-			{
-				yyjson_val* item = yyjson_arr_get(jsonArr, index);
-				if (!yyjson_is_num(item))
-				{
-					return false;
-				}
-				value.emplace_back(yyjson_get_int(item));
-			}
-			return true;
-		}
 	}
 }
 
@@ -608,48 +423,6 @@ namespace json
 {
 	namespace r
 	{
-		bool Value::Get(int& v) const
-		{
-			if (!yyjson_is_int(this->mValue))
-			{
-				return false;
-			}
-			v = yyjson_get_int(this->mValue);
-			return true;
-		}
-
-
-		bool Value::Get(float& v) const
-		{
-			if (!yyjson_is_real(this->mValue))
-			{
-				return false;
-			}
-			v = (float)yyjson_get_real(this->mValue);
-			return true;
-		}
-
-		bool Value::Get(unsigned int& v) const
-		{
-			if (!yyjson_is_uint(this->mValue))
-			{
-				return false;
-			}
-			v = (unsigned int)yyjson_get_uint(this->mValue);
-			return true;
-		}
-
-
-		bool Value::Get(long long& v) const
-		{
-			if (!yyjson_is_num(this->mValue))
-			{
-				return false;
-			}
-			v = yyjson_get_sint(this->mValue);
-			return true;
-		}
-
 		bool Value::Get(bool& v) const
 		{
 			if (!yyjson_is_bool(this->mValue))
@@ -752,6 +525,22 @@ namespace json
 			return result;
 		}
 
+		std::vector<const char*> Value::GetAllKey() const
+		{
+			std::vector<const char *> keys;
+			if(yyjson_is_obj(this->mValue))
+			{
+				yyjson_obj_iter iter;
+				yyjson_obj_iter_init(this->mValue, &iter);
+				keys.reserve(yyjson_obj_size(this->mValue));
+				while (yyjson_val* k = yyjson_obj_iter_next(&iter))
+				{
+					keys.emplace_back(yyjson_get_str(k));
+				}
+			}
+			return keys;
+		}
+
 		size_t Value::GetKeys(std::vector<const char*>& keys) const
 		{
 			if (!yyjson_is_obj(this->mValue))
@@ -759,7 +548,6 @@ namespace json
 				return -1;
 			}
 			yyjson_obj_iter iter;
-			keys.reserve(this->MemberCount());
 			yyjson_obj_iter_init(this->mValue, &iter);
 			keys.reserve(yyjson_obj_size(this->mValue));
 			while (yyjson_val* k = yyjson_obj_iter_next(&iter))

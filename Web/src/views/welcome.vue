@@ -50,16 +50,16 @@
                 <el-card shadow="hover" style="height: 100%">
                     <h4>操作记录</h4>
                     <el-table :data="tab.list" border style="margin-top: 20px">
-                        <el-table-column label="用户" prop="name"></el-table-column>
-                        <el-table-column label="方法" prop="method"></el-table-column>
-                        <el-table-column label="路径" prop="url" show-overflow-tooltip></el-table-column>
-                        <el-table-column label="描述" prop="desc" show-overflow-tooltip></el-table-column>
-                        <el-table-column label="时间" prop="time" show-overflow-tooltip
+                        <el-table-column min-width="100" label="用户" prop="name"></el-table-column>
+                        <el-table-column min-width="100" label="方法" prop="method"></el-table-column>
+                        <el-table-column min-width="150" label="路径" prop="url" show-overflow-tooltip></el-table-column>
+                        <el-table-column min-width="100" label="描述" prop="desc" show-overflow-tooltip></el-table-column>
+                        <el-table-column min-width="150" label="时间" prop="time" show-overflow-tooltip
                                          :formatter="format_time"></el-table-column>
-                        <el-table-column label="查看">
+                        <el-table-column label="查看" fixed="right" min-width="200" align="center" v-if="user.permission === 100">
                             <template #default="scope">
                                 <el-button type="primary" @click="look_http(scope.row)">查看</el-button>
-                                <el-button type="danger" v-if="user.permission === 100">删除</el-button>
+                                <el-button type="danger">删除</el-button>
                             </template>
                         </el-table-column>
                         <!--                        <el-table-column label="请求" prop="request" show-overflow-tooltip></el-table-column>-->
@@ -79,16 +79,8 @@
                 </el-card>
             </el-col>
         </el-row>
-        <el-dialog title="查看http请求" v-model="view.show">
-            <el-descriptions column="1">
-                <el-descriptions-item label="请求">
-                    <json-viewer :data="view.request" :key="view.index"></json-viewer>
-                </el-descriptions-item>
-                <el-descriptions-item label="返回">
-                    <json-viewer :data="view.response" :key="view.index"></json-viewer>
-                </el-descriptions-item>
-            </el-descriptions>
-
+        <el-dialog v-model="view.show">
+            <json-viewer style="max-width: 100%" :data="view.data" :key="view.index"></json-viewer>
         </el-dialog>
     </div>
 </template>
@@ -102,6 +94,7 @@ import axios from "axios";
 import service from "../utils/request";
 import {httpRequest} from "../utils/httpRequest";
 import JsonViewer from "./json_view.vue";
+import {ElMessage} from "element-plus";
 
 
 export default {
@@ -147,8 +140,9 @@ export default {
             view: {
                 index: 0,
                 show: false,
-                request: {},
-                response: {}
+                data : {
+
+                }
             },
             format_time: format_time,
             format_permiss: format_permiss
@@ -160,10 +154,16 @@ export default {
             const date = new Date(timestamp);
             return date.toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai', hour12: false});
         },
-        look_http(data) {
+        async look_http(data) {
             this.view.index++
-            this.view.request = this.parse_data(data.request)
-            this.view.response = this.parse_data(data.response)
+            const response = await httpRequest.GET(`/record/find?id=${data._id}`)
+            if(response.data.code !== 0) {
+                ElMessage.error(response.data.error)
+                return
+            }
+            const result = response.data.data
+            this.view.data.request = this.parse_data(result.request)
+            this.view.data.response = this.parse_data(result.response)
             this.view.show = true
         },
 
@@ -202,7 +202,7 @@ export default {
         if (user_json && user_json.length > 0) {
             this.user = JSON.parse(user_json)
             try {
-                const response = await axios.get(`http://ip-api.com/json/${this.user.login_ip}?lang=zh-CN`)
+                const response = await axios.get(`https://ip-api.com/json/${this.user.login_ip}?lang=zh-CN`)
                 this.user.city_name = response.data.city
             } catch (e) {
                 this.user.city_name = "未知"
@@ -219,6 +219,10 @@ export default {
 <style>
 .preserve-space {
     white-space: pre;
+}
+.json-viewer {
+    max-width: 100%; /* 让组件宽度不超过父级 */
+    overflow-x: auto; /* 允许横向滚动，防止内容撑破 */
 }
 </style>
 

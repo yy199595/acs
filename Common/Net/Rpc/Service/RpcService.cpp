@@ -52,11 +52,6 @@ namespace acs
 		}
 		this->mProto = App::GetProto();
 		LOG_CHECK_RET_FALSE(this->OnInit());
-		if (this->mLuaModule != nullptr)
-		{
-			int code = this->mLuaModule->Call("Awake");
-			return code != XCode::CallLuaFunctionFail;
-		}
 		return true;
 	}
 
@@ -221,27 +216,5 @@ namespace acs
 			return XCode::CallLuaFunctionFail;
 		}
 		return luaTaskSource->Await();
-	}
-
-	void RpcService::Start()
-	{
-		this->OnStart();
-		IF_NOT_NULL_CALL(this->mLuaModule, Await, "OnStart")
-	}
-
-	void RpcService::Complete()
-	{
-		this->OnComplete();
-		IF_NOT_NULL_CALL(this->mLuaModule, Await, "OnComplete")
-	}
-
-	void RpcService::OnAppStop()
-	{
-		this->OnStop();
-		if (this->mLuaModule != nullptr)
-		{
-			this->mLuaModule->Await("OnStop");
-			this->mLuaModule = nullptr;
-		}
 	}
 }

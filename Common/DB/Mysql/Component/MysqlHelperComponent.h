@@ -1,6 +1,5 @@
 ﻿
-#ifdef __ENABLE_MYSQL__
-
+#pragma once
 
 #include"XCode/XCode.h"
 #include"Message/s2s/db.pb.h"
@@ -27,5 +26,3 @@ namespace acs
 		class ActorComponent * mActComponent;
 	};
 }
-
-#endif

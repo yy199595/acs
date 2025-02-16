@@ -11,7 +11,9 @@ namespace acs
 {
 	FileUpload::FileUpload()
 	{
+#ifdef __ENABLE_OPEN_SSL__
 		this->mOss = nullptr;
+#endif
 	}
 
 	bool FileUpload::Awake()
@@ -26,14 +28,15 @@ namespace acs
 
 	bool FileUpload::OnInit()
 	{
-		BIND_COMMON_HTTP_METHOD(FileUpload::Oss);
-		BIND_COMMON_HTTP_METHOD(FileUpload::Icon);
-		BIND_COMMON_HTTP_METHOD(FileUpload::Code);
-		BIND_COMMON_HTTP_METHOD(FileUpload::Club);
 		BIND_COMMON_HTTP_METHOD(FileUpload::File);
+#ifdef __ENABLE_OPEN_SSL__
+		BIND_COMMON_HTTP_METHOD(FileUpload::Oss);
 		this->mOss = this->GetComponent<OssComponent>();
+#endif
 		return true;
 	}
+
+#ifdef __ENABLE_OPEN_SSL__
 
 	int FileUpload::Oss(const http::FromContent& request, json::w::Document & response)
 	{
@@ -112,24 +115,7 @@ namespace acs
 		this->mOss->Sign(policy, *jsonData);
 		return XCode::Ok;
 	}
-
-	int FileUpload::Icon(const http::Request& request, http::Response& response)
-	{
-		const std::string name("icon");
-		return this->OnUpload(request, name, response);
-	}
-
-	int FileUpload::Club(const http::Request& request, http::Response& response)
-	{
-		const std::string name("club");
-		return this->OnUpload(request, name, response);
-	}
-
-	int FileUpload::Code(const http::Request& request, http::Response& response)
-	{
-		const std::string name("code");
-		return this->OnUpload(request, name, response);
-	}
+#endif
 
 	int FileUpload::File(const http::Request &request, http::Response &response)
 	{
@@ -148,36 +134,6 @@ namespace acs
 		const std::string & path = multiData->Path();
 		const std::string& name = multiData->FileName();
 		const std::string url = fmt::format("{}/{}", this->mDoMain, name);
-		response.SetContent(http::Header::TEXT, url);
-		return XCode::Ok;
-	}
-
-	int FileUpload::OnUpload(const http::Request& request, const std::string& name, http::Response& response)
-	{
-		int userId = 0;
-		const http::Content* data = request.GetBody();
-		request.GetUrl().GetQuery().Get(http::query::UserId, userId);
-		const http::MultipartFromContent* multiData = data->To<const http::MultipartFromContent>();
-		if (multiData == nullptr)
-		{
-			return XCode::CallArgsError;
-		}
-		if (!multiData->IsDone())
-		{
-			return XCode::CallArgsError;
-		}
-		std::string fileType;
-		const std::string & path = multiData->Path();
-		if(!help::fs::GetFileType(path, fileType))
-		{
-			return XCode::Failure;
-		}
-		const std::string newName = fmt::format("{}/{}.{}", userId, name, fileType);
-		if(!help::fs::ChangeName(path, newName))
-		{
-			return XCode::Failure;
-		}
-		const std::string url = fmt::format("{}/{}", this->mDoMain, newName);
 		response.SetContent(http::Header::TEXT, url);
 		return XCode::Ok;
 	}

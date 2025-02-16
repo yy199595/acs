@@ -24,7 +24,7 @@ namespace http
 #endif
     {
 	 public:
-		Response();
+		Response(HttpStatus code = HttpStatus::OK);
 		~Response() override = default;
 	public:
 		void Clear() override;

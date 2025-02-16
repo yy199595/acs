@@ -6,6 +6,7 @@
 #define APP_XDOCUMENT_H
 #include <string>
 #include <memory>
+#include <vector>
 #include "XML/Src/tinyxml2.h"
 
 namespace xml
@@ -19,6 +20,7 @@ namespace xml
 		bool Get(const char * key, double & value) const;
 		bool Get(const char * key, std::string & value) const;
 		bool Get(const char * key, std::unique_ptr<xml::XElement> & value) const;
+		bool Get(const char * key, std::vector<std::unique_ptr<xml::XElement>> & value) const;
 	public:
 		bool GetAttribute(const char * key, int & value);
 		bool GetAttribute(const char * key, std::string & value);

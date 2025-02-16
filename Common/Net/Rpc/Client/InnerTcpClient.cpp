@@ -70,9 +70,9 @@ namespace rpc
 		}
 	}
 
-	void InnerTcpClient::OnConnect(bool result, int count)
+	void InnerTcpClient::OnConnect(const Asio::Code &code, int count)
 	{
-		if (result)
+		if (code.value() == Asio::OK)
 		{
 			this->StopTimer();
 			this->ClearSendStream();
@@ -98,24 +98,6 @@ namespace rpc
 			return;
 		}
 		this->CloseSocket(XCode::NetSendFailure);
-	}
-
-	void InnerTcpClient::OnTimeout(tcp::TimeoutFlag flag)
-	{
-		switch (flag)
-		{
-			case tcp::TimeoutFlag::Write:
-				this->CloseSocket(XCode::SendDataTimeout);
-				break;
-			case tcp::TimeoutFlag::Connect:
-				this->CloseSocket(XCode::ConnectTimeout);
-				break;
-			case tcp::TimeoutFlag::ReadLine:
-			case tcp::TimeoutFlag::ReadSome:
-			case tcp::TimeoutFlag::ReadCount:
-				this->CloseSocket(XCode::ReadDataTimeout);
-				break;
-		}
 	}
 
 	void InnerTcpClient::CloseSocket()

@@ -2,6 +2,7 @@
 // Created by 64658 on 2025/1/16.
 //
 
+#ifdef __ENABLE_OPEN_SSL__
 #include "LuaAes.h"
 #include "Auth/Aes/Aes.h"
 namespace lua
@@ -34,3 +35,4 @@ namespace lua
 		return 1;
 	}
 }
+#endif

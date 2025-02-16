@@ -1,19 +1,21 @@
-require("TableUtil")
-local app = require("App")
-local fs = require("util.fs")
+
+local lfmt = require("util.fmt")
 local log = require("Console")
-local director = require("util.dir")
-local config = app:GetConfig("excel")
+local app = require("core.app")
+local fs = require("util.fs")
+local lxlsx = require("util.lxlsx")
+local serverConfig = app.GetConfig()
+local config = serverConfig["excel"]
 local Module = require("Module")
 local Excel = Module()
 
 Excel.Handler = { }
 Excel.Line = {
-    CommentLine = 1, --注释行
-    ValueTypeLine = 3, --字段类型行
-    FieldNameLine = 2, --字段名字行
+    CommentLine = 3, --注释行
+    ValueTypeLine = 2, --字段类型行
+    FieldNameLine = 1, --字段名字行
     ValueStartLine = 4, --数据起始行
-    ValueStartCol = 3 --数据起始列
+    ValueStartCol = 1 --数据起始列
 }
 
 function Excel:IsIgnore(str)
@@ -28,16 +30,28 @@ end
 function Excel:IsValid(str)
     return str:match("^%w+$") ~= nil
 end
+-- 40%
+function GetProcess(index, sum)
+    local result = { }
+    local process = (index / sum) * 100
+    table.insert(result, lfmt.format(" {:.2f}% ", process))
+    for i = 1, math.floor(process) do
+        table.insert(result, "=")
+    end
+    return table.concat(result, "")
+end
 
-function Excel:Awake()
+function Excel:OnAwake()
     self.output = config.output
+    self.Handler["cs"] = require("CsExport")
     self.Handler["cpp"] = require("CppExport")
     self.Handler["lua"] = require("LuaExport")
     self.Handler["json"] = require("JsonExport")
 
+
     local files = fs.GetFiles(config.dir, "xlsx")
-    if files == nil then
-        log.Error("目录不存在或者目录有中文路径")
+    if files == nil  then
+        log.Error("[{}]目录不存在", config.dir)
         return
     end
     if #files == 0 then
@@ -49,23 +63,25 @@ function Excel:Awake()
             log.Error("没有设置文件输出路径")
             return
         end
-        director.Make(output.path)
+        fs.MakeDir(output.path)
         if self.Handler[output.type] == nil then
-            log.Error("找不到导出处理函数:%s", output.type)
+            log.Error("找不到导出处理函数: {}", output.type)
             return
         end
+        self.Handler[output.type].config = output
     end
-
-    for _, path in ipairs(files) do
+    local sum = #files
+    for idx, path in ipairs(files) do
         if self:IsIgnore(path) then
             goto continue
         end
-        local excelFile = ExcelFile.New()
-        if not excelFile:Open(path) then
-            log.Error("打开文件[%s]失败", path)
+        local ok, excelFile = pcall(lxlsx.new, path)
+        if not ok then
+            log.Error(excelFile)
         else
             local name = fs.GetFileName(path)
             self:OnReadFile(excelFile, name)
+            log.Info("{}", GetProcess(idx, sum))
         end
         :: continue ::
     end
@@ -84,32 +100,43 @@ function Excel:OnReadSheet(sheet, fileName)
 
     local types = {}
     local fields = {}
+    local descs = { }
     local name = sheet:get_name()
     local last_row = sheet:get_last_row()
     local last_col = sheet:get_last_col()
 
     for y = self.Line.ValueStartCol, last_col do
         local cell = sheet:get_cell(self.Line.FieldNameLine, y)
+
         if not cell then
-            error(string.format("文件:%s 分页:%s %s行不存在", fileName, name, y))
+            goto continue
         end
         local value = cell:get_value()
         if not value and #value <= 0 then
             error(string.format("文件:%s 分页:%s %s行数据不合法", fileName, name, y))
         end
+        if self:IsIgnore(value) then
+            goto continue
+        end
+        local cell1 = sheet:get_cell(self.Line.CommentLine, y)
+        if cell1 then
+            descs[value] = cell1:get_value()
+        end
         fields[y] = value
+        ::continue::
     end
 
     for y = self.Line.ValueStartCol, last_col do
         local cell = sheet:get_cell(self.Line.ValueTypeLine, y)
         if not cell then
-            error(string.format("文件:%s 分页:%s %s行不存在", fileName, name, y))
+            goto continue
         end
         local value = cell:get_value()
         if not value and #value <= 0 then
-            error(string.format("文件:%s 分页:%s %s行数据不合法", fileName, name, y))
+            log.Error("文件:{} 分页:{} {}行数据不合法", fileName, name, y)
         end
         types[y] = value
+        ::continue::
     end
     local documents = {}
     for x = self.Line.ValueStartLine, last_row do
@@ -121,13 +148,18 @@ function Excel:OnReadSheet(sheet, fileName)
                 if value and #value > 0 then
                     local type = types[y]
                     local filed = fields[y]
-                    if filed == nil then
-                        log.Error("[%s=>%s] 字段名(%s) 不存在", fileName, name, y)
+                    if filed == nil or filed == "" then
+                        goto continue
+                    end
+                    local target = self:DecodeByType(type, value)
+                    if target == nil then
+                        log.Error("file:{} x:{} y:{}", fileName, x, y)
                         return false
                     end
-                    item[filed] = self:DecodeByType(type, value)
+                    item[filed] = target
                 end
             end
+            ::continue::
         end
         if next(item) then
             table.insert(documents, item)
@@ -139,20 +171,17 @@ function Excel:OnReadSheet(sheet, fileName)
             log.Error("找不到导出处理函数:%s", output.type)
             return
         end
-        local content = handler.Run(documents, types, fields, name)
+        local content = handler.Run(documents, types, fields, name, descs)
         if content == nil or content == "" then
             return false
         end
         local dir = output.path
         local path = string.format("%s/%s%s", dir, name, output.ext)
-        local file = io.open(path, "w")
-        if file == nil then
-            log.Error("打开文件[%s]失败", path)
+        if not fs.Write(path, content) then
+            log.Error("打开文件[{}]失败", path)
             return false
         end
-        file:write(content)
-        file:close()
-        log.Debug("导出文件%s到(%s)成功", name, path)
+       --log.Debug("导出文件{}到{}成功", name, path)
     end
 
     return true
@@ -169,9 +198,9 @@ function Excel:OnReadFile(excelFile, fileName)
             goto continue
         end
         if self:OnReadSheet(sheet, fileName) then
-            log.Debug("导出文件分页 [%s=>%s] 成功", fileName, name)
+            log.Debug("导出文件分页[{}:{}]成功", fileName, name)
         else
-            log.Error("导出文件分页 [%s=>%s] 失败", fileName, name)
+            log.Error("导出文件分页[{}:{}]失败", fileName, name)
         end
         :: continue ::
     end

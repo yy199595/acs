@@ -70,7 +70,7 @@ namespace acs
 		return jsonData != nullptr && jsonData->Get("code", code) && code == XCode::Ok;
 	}
 
-	void MasterComponent::Complete()
+	void MasterComponent::OnComplete()
 	{
 		int count = 0;
 		CoroutineComponent* coroutine = App::Coroutine();

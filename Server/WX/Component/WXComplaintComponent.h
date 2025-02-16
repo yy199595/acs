@@ -2,6 +2,8 @@
 // Created by yy on 2024/6/30.
 //
 
+#ifdef __ENABLE_OPEN_SSL__
+
 #ifndef APP_WXCOMPLAINTCOMPONENT_H
 #define APP_WXCOMPLAINTCOMPONENT_H
 
@@ -78,3 +80,5 @@ namespace acs
 
 
 #endif //APP_WXCOMPLAINTCOMPONENT_H
+
+#endif

@@ -1,6 +1,5 @@
 ﻿#include"TimerComponent.h"
 #include"Timer/Timer/DelayTimer.h"
-#include"Entity/Actor/App.h"
 #include"Lua/Engine/ModuleClass.h"
 #include "Lua/Lib/Lib.h"
 namespace acs
@@ -12,6 +11,10 @@ namespace acs
 
 	bool TimerComponent::Awake()
 	{
+		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
+			ccModule.Open("core.timer", lua::lib::luaopen_ltimer);
+		});
+
 		for (int index = 0; index < this->LayerCount; index++)
 		{
 			int count = index == 0

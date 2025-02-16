@@ -48,21 +48,20 @@ namespace acs
 		bool LoadLang() const;
 		long long MakeGuid();
 		std::string NewUuid();
+		inline ServerConfig & GetConfig() { return this->mConfig; }
 		unsigned int StartCoroutine(std::function<void()> && func);
 		inline Asio::Context & GetContext() { return this->mContext; }
         bool OnDelComponent(Component *component) final { return false; }
-        inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
 	public:
 		template<typename T>
 		static inline T * Get() { return App::Inst()->GetComponent<T>(); }
 		static inline ActorComponent * ActorMgr() { return App::Inst()->mActor; }
 		static inline ProtoComponent * GetProto() { return App::Inst()->mProto; }
 		static inline CoroutineComponent* Coroutine() { return App::Inst()->mCoroutine; }
-#ifdef __ENABLE_OPEN_SSL__
+
 	public:
 		std::string Sign(json::w::Document & document);
 		bool DecodeSign(const std::string & sign, json::r::Document & document);
-#endif
     private:
 		bool LoadComponent();
 		bool InitComponent();
@@ -77,7 +76,6 @@ namespace acs
 		long long mLastGuidTime;
 		long long mNextNewDayTime; //下次新的一天时间
 		asio::signal_set mSignal;
-		std::thread::id mThreadId;
         const long long mStartTime;
 		ActorComponent * mActor;
 		ProtoComponent * mProto;

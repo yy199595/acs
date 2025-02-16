@@ -23,16 +23,17 @@ namespace acs
 		std::string channel;
 		const std::string & message = request.GetBody();
 		LOG_ERROR_CHECK_ARGS(request.ConstHead().Get("channel", channel));
-		rpc::Message * eventMessage = new rpc::Message();
+		std::unique_ptr<rpc::Message> eventMessage = std::make_unique<rpc::Message>();
 		{
 			eventMessage->SetType(rpc::Type::Request);
 			eventMessage->SetContent(rpc::Porto::Json, message);
 			eventMessage->GetHead().Add(rpc::Header::func, channel);
 		}
-		if(this->mDispatch->OnMessage(eventMessage) != XCode::Ok)
+		if(this->mDispatch->OnMessage(eventMessage.get()) != XCode::Ok)
 		{
-			delete eventMessage;
+			return XCode::Ok;
 		}
+		eventMessage.release();
 		return XCode::Ok;
 	}
 }

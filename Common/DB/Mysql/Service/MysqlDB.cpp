@@ -1,9 +1,7 @@
 ﻿
-#ifdef __ENABLE_MYSQL__
 
 #include"MysqlDB.h"
 #include"Entity/Actor/App.h"
-#include"Mysql/Client/MysqlMessage.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Mysql/Component/MysqlDBComponent.h"
 
@@ -11,8 +9,8 @@ namespace acs
 {
 	MysqlDB::MysqlDB()
 	{
-		this->mMysqlComponent = nullptr;
-		this->mProtoComponent = nullptr;
+		this->mProto = nullptr;
+		this->mMysql = nullptr;
 	}
 
 	bool MysqlDB::Awake()
@@ -23,28 +21,30 @@ namespace acs
 
 	bool MysqlDB::OnInit()
 	{
-		BIND_SERVER_RPC_METHOD(MysqlDB::Add);
 		BIND_SERVER_RPC_METHOD(MysqlDB::Save);
 		BIND_SERVER_RPC_METHOD(MysqlDB::Exec);
 		BIND_SERVER_RPC_METHOD(MysqlDB::Query);
+		BIND_SERVER_RPC_METHOD(MysqlDB::Index);
 		BIND_SERVER_RPC_METHOD(MysqlDB::Update);
 		BIND_SERVER_RPC_METHOD(MysqlDB::Delete);
 		BIND_SERVER_RPC_METHOD(MysqlDB::Create);
-		this->mProtoComponent = this->GetComponent<ProtoComponent>();
-		this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
+		BIND_SERVER_RPC_METHOD(MysqlDB::Insert);
+		BIND_SERVER_RPC_METHOD(MysqlDB::FindPage);
+		LOG_CHECK_RET_FALSE(this->mProto = this->GetComponent<ProtoComponent>())
+		LOG_CHECK_RET_FALSE(this->mMysql = this->GetComponent<MysqlDBComponent>())
 		return true;
 	}
 
-    void MysqlDB::OnStop()
+    void MysqlDB::OnDestroy()
     {
-        	
+
     }
 
     int MysqlDB::Create(const db::mysql::create &request)
     {
         std::unique_ptr<Message> message;
 		const std::string & table = request.table();
-		if(!this->mProtoComponent->New(table, message))
+		if(!this->mProto->New(table, message))
 		{
 			return XCode::CallArgsError;
 		}
@@ -75,31 +75,50 @@ namespace acs
             this->mMainKeys[table] = keys[0];
         }
 
-        std::unique_ptr<Mysql::MakeTabRequest> command =
-			std::make_unique<Mysql::MakeTabRequest>(table, std::move(message), keys);
-		return this->mMysqlComponent->Execute(std::move(command)) ? XCode::Ok : XCode::Failure;
-    }
+		return XCode::Ok;
+	}
 
-	int MysqlDB::Add(const db::mysql::add& request)
+	int MysqlDB::Index(const db::mysql::index& request)
+	{
+		std::string sql;
+		const std::string & tab = request.tab();
+		const std::string & field = request.name();
+		if(!this->mSqlHelper.CreateIndex(tab, field, request.unique(),sql))
+		{
+			return XCode::CallArgsError;
+		}
+		std::unique_ptr<mysql::Request> mysqlRequest = std::make_unique<mysql::Request>(sql);
+		std::unique_ptr<mysql::Response> mysqlResponse = this->mMysql->Run(std::move(mysqlRequest));
+		return mysqlResponse && mysqlResponse->IsOk() ? XCode::Ok : XCode::Failure;
+	}
+
+	int MysqlDB::Insert(const db::mysql::insert& request, db::mysql::response &response)
     {
 		json::r::Document document;
 		const std::string & tab = request.table();
-		const std::string & json = request.data();
+		const std::string & json = request.document();
 		if(!document.Decode(json.c_str(), json.size()))
 		{
 			return XCode::ParseJsonFailure;
 		}
-
 		std::string sql;
 		if(!this->mSqlHelper.Insert(tab, document, sql))
 		{
 			return XCode::Failure;
 		}
-		std::unique_ptr<Mysql::SqlRequest> command = std::make_unique<Mysql::SqlRequest>(sql);
-		return this->mMysqlComponent->Execute(std::move(command))? XCode::Ok : XCode::MysqlInvokeFailure;
+		std::unique_ptr<mysql::Request> mysqlRequest = std::make_unique<mysql::Request>(sql);
+		std::unique_ptr<mysql::Response> mysqlResponse = this->mMysql->Run(std::move(mysqlRequest));
+		LOG_ERROR_RETURN_CODE(mysqlResponse != nullptr, XCode::Failure);
+		if(!mysqlResponse->IsOk())
+		{
+			response.set_error(mysqlResponse->GetBuffer());
+			return XCode::Failure;
+		}
+		response.set_count(mysqlResponse->GetOKResponse().mAffectedRows);
+		return XCode::Ok;
     }
 
-	int MysqlDB::Save(const db::mysql::save& request)
+	int MysqlDB::Save(const db::mysql::save& request, db::mysql::response &response)
     {
 		json::r::Document document;
 		const std::string & tab = request.table();
@@ -113,70 +132,83 @@ namespace acs
         {
             return XCode::CallArgsError;
         }
-		std::unique_ptr<Mysql::SqlRequest> command = std::make_unique<Mysql::SqlRequest>(sql);
-		return this->mMysqlComponent->Execute(std::move(command)) ? XCode::Ok : XCode::MysqlInvokeFailure;
+		std::unique_ptr<mysql::Request> mysqlRequest = std::make_unique<mysql::Request>(sql);
+		std::unique_ptr<mysql::Response> mysqlResponse = this->mMysql->Run(std::move(mysqlRequest));
+		LOG_ERROR_RETURN_CODE(mysqlResponse != nullptr, XCode::Failure);
+		if(!mysqlResponse->IsOk())
+		{
+			response.set_error(mysqlResponse->GetBuffer());
+			return XCode::Failure;
+		}
+		response.set_count(mysqlResponse->GetOKResponse().mAffectedRows);
+		return XCode::Ok;
     }
 
-	int MysqlDB::Update(const db::mysql::update& request)
+	int MysqlDB::Update(const db::mysql::update& request, db::mysql::response & response)
     {
         std::string sql;
 		const std::string & table = request.table();
-		const std::string & where = request.where_json();
-		const std::string & update = request.update_json();
-        if (!this->mSqlHelper.Update(table, where, update, sql))
+		const std::string & where = request.filter();
+		const std::string & update = request.document();
+        if (!this->mSqlHelper.Update(table, where, update, request.limit(), sql))
         {
             return XCode::CallArgsError;
         }
-		const std::string & fullName = request.table();
-		std::unique_ptr<Mysql::SqlRequest> command = std::make_unique<Mysql::SqlRequest>(sql);
-		return this->mMysqlComponent->Execute(std::move(command)) ? XCode::Ok : XCode::MysqlInvokeFailure;
+		std::unique_ptr<mysql::Request> mysqlRequest = std::make_unique<mysql::Request>(sql);
+		std::unique_ptr<mysql::Response> mysqlResponse = this->mMysql->Run(std::move(mysqlRequest));
+		LOG_ERROR_RETURN_CODE(mysqlResponse != nullptr, XCode::Failure);
+
+		if(!mysqlResponse->IsOk())
+		{
+			response.set_error(mysqlResponse->GetBuffer());
+			return XCode::Failure;
+		}
+		response.set_count(mysqlResponse->GetOKResponse().mAffectedRows);
+		return XCode::Ok;
     }
 
-	int MysqlDB::Delete(const db::mysql::remove& request)
+	int MysqlDB::Delete(const db::mysql::del& request, db::mysql::response &response)
     {
         std::string sql;
 		const std::string & table = request.table();
-		const std::string & where = request.where_json();
-		if (!this->mSqlHelper.Delete(table, where, sql))
+		const std::string & where = request.filter();
+		if (!this->mSqlHelper.Delete(table, where, request.limit(), sql))
         {
             return XCode::CallArgsError;
         }
-		std::unique_ptr<Mysql::SqlRequest> command = std::make_unique<Mysql::SqlRequest>(sql);
-		return this->mMysqlComponent->Execute(std::move(command)) ? XCode::Ok : XCode::MysqlInvokeFailure;
+		std::unique_ptr<mysql::Request> mysqlRequest = std::make_unique<mysql::Request>(sql);
+		std::unique_ptr<mysql::Response> mysqlResponse = this->mMysql->Run(std::move(mysqlRequest));
+		if(mysqlResponse == nullptr || !mysqlResponse->IsOk())
+		{
+			return XCode::Failure;
+		}
+		return XCode::Ok;
     }
 
-	int MysqlDB::Exec(const db::mysql::exec& request, db::mysql::response& response)
+	int MysqlDB::Exec(const db::mysql::exec& request, db::mysql::query::response & response)
 	{
 		const std::string & sql = request.sql();
-		if(!request.query())
+		std::unique_ptr<mysql::Request> mysqlRequest = std::make_unique<mysql::Request>(sql);
+		std::unique_ptr<mysql::Response> mysqlResponse = this->mMysql->Run(std::move(mysqlRequest));
+		LOG_ERROR_RETURN_CODE(mysqlResponse != nullptr, XCode::Failure);
+
+		if(!mysqlResponse->IsOk())
 		{
-			auto command = std::make_unique<Mysql::SqlRequest>(sql);
-			Mysql::Response * result = this->mMysqlComponent->Run(std::move(command));
-			if (!result->IsOk())
-			{
-				response.set_error(result->GetError());
-				return XCode::MysqlInvokeFailure;
-			}
-			return XCode::Ok;
+			response.set_error(mysqlResponse->GetBuffer());
+			return XCode::Failure;
 		}
-		auto command = std::make_unique<Mysql::FindRequest>(sql);
-		Mysql::Response * result = this->mMysqlComponent->Run(std::move(command));
-		if (!result->IsOk())
+		const mysql::Result & mysqlResult = mysqlResponse->GetResult();
+		for(const std::string & result : mysqlResult.contents)
 		{
-			response.set_error(result->GetError());
-			return XCode::MysqlInvokeFailure;
-		}
-		for (size_t index = 0; index < result->ArraySize(); index++)
-		{
-			response.add_jsons(result->Get(index));
+			response.add_jsons(result);
 		}
 		return XCode::Ok;
 	}
 
-	int MysqlDB::Query(const db::mysql::query& request, db::mysql::response& response)
+	int MysqlDB::Query(const db::mysql::query::request& request, db::mysql::query::response& response)
 	{
 		const std::string& table = request.table();
-		const std::string& where = request.where_json();
+		const std::string& where = request.filter();
 
 		LOG_ERROR_CHECK_ARGS(!table.empty());
 
@@ -195,19 +227,60 @@ namespace acs
 		{
 			return XCode::CallArgsError;
 		}
-		auto command = std::make_unique<Mysql::FindRequest>(sql);
-		Mysql::Response * result = this->mMysqlComponent->Run(std::move(command));
-		if (!result->IsOk())
+		std::unique_ptr<mysql::Request> mysqlRequest = std::make_unique<mysql::Request>(sql);
+		std::unique_ptr<mysql::Response> mysqlResponse = this->mMysql->Run(std::move(mysqlRequest));
+		LOG_ERROR_RETURN_CODE(mysqlResponse != nullptr, XCode::Failure);
+
+		if(!mysqlResponse->IsOk())
 		{
-			response.set_error(result->GetError());
-			return XCode::MysqlInvokeFailure;
+			response.set_error(mysqlResponse->GetBuffer());
+			return XCode::Failure;
 		}
-		for (size_t index = 0; index < result->ArraySize(); index++)
+		const mysql::Result & mysqlResult = mysqlResponse->GetResult();
+		for(const std::string & result : mysqlResult.contents)
 		{
-			response.add_jsons(result->Get(index));
+			response.add_jsons(result);
+		}
+		return XCode::Ok;
+	}
+
+	int MysqlDB::FindPage(const db::mysql::query::page& request, db::mysql::query::response& response)
+	{
+		const std::string& table = request.table();
+		const std::string& where = request.filter();
+
+		LOG_ERROR_CHECK_ARGS(!table.empty());
+
+		std::string sql;
+		std::vector<std::string> fields;
+		if(request.fields_size() > 0)
+		{
+			fields.reserve(request.fields_size());
+			for(int index = 0; index < request.fields_size(); index++)
+			{
+				fields.emplace_back(request.fields(index));
+			}
+		}
+		if (!this->mSqlHelper.Select(table, where, fields, 0, sql))
+		{
+			return XCode::CallArgsError;
+		}
+		int offset = (request.page() - 1) * request.limit();
+		sql.append(fmt::format(" LIMIT {}, {}", offset, request.limit()));
+		std::unique_ptr<mysql::Request> mysqlRequest = std::make_unique<mysql::Request>(sql);
+		std::unique_ptr<mysql::Response> mysqlResponse = this->mMysql->Run(std::move(mysqlRequest));
+		LOG_ERROR_RETURN_CODE(mysqlResponse != nullptr, XCode::Failure);
+
+		if(!mysqlResponse->IsOk())
+		{
+			response.set_error(mysqlResponse->GetBuffer());
+			return XCode::Failure;
+		}
+		const mysql::Result & mysqlResult = mysqlResponse->GetResult();
+		for(const std::string & result : mysqlResult.contents)
+		{
+			response.add_jsons(result);
 		}
 		return XCode::Ok;
 	}
 }// namespace Sentry
-
-#endif

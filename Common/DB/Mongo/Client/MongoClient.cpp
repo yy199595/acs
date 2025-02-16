@@ -3,11 +3,11 @@
 //
 
 
-#include "md5.h"
 #include"MongoClient.h"
 #include"XCode/XCode.h"
 #include <utility>
 #include "Util/Crypt/sha1.h"
+#include "Util/Crypt/MD5Helper.h"
 #include"Proto/Bson/base64.h"
 #include"Util/Tools/String.h"
 #include"Mongo/Config/MongoConfig.h"
@@ -20,11 +20,8 @@ namespace mongo
 	std::string SumHex(const std::string& key)
 	{
 		std::string result;
-		char buffer[16] = {0};
 		std::regex regex1(".");
-		::md5(key.c_str(), key.size(), buffer);
-
-		std::string target(buffer, 16);
+		std::string target = help::md5::GetMd5(key);
 		auto begin = std::sregex_iterator(target.begin(), target.end(), regex1);
 		for(auto iter = begin; iter != std::sregex_iterator(); iter++)
 		{
@@ -101,24 +98,6 @@ namespace mongo
 //		{
 //			LOG_WARN("mongo cmd count:{}", this->mSendMessages.Size());
 //		}
-	}
-
-	void Client::OnTimeout(tcp::TimeoutFlag flag)
-	{
-		switch(flag)
-		{
-			case tcp::TimeoutFlag::Write:
-				this->OnResponse(XCode::SendDataTimeout);
-				break;
-			case tcp::TimeoutFlag::Connect:
-				this->OnResponse(XCode::ConnectTimeout);
-				break;
-			case tcp::TimeoutFlag::ReadLine:
-			case tcp::TimeoutFlag::ReadSome:
-			case tcp::TimeoutFlag::ReadCount:
-				this->OnResponse(XCode::ReadDataTimeout);
-				break;
-		}
 	}
 
 	void Client::OnSendMessage(const Asio::Code & code)
@@ -205,7 +184,9 @@ namespace mongo
         bson::Reader::Document * document2 = response2->Document();
         if(!document2->Get("payload", parsedSource))
         {
+#ifdef __DEBUG__
 			CONSOLE_LOG_ERROR("{}", response2->ToJson());
+#endif
             return false;
         }
         bool done = false;
@@ -391,9 +372,9 @@ namespace mongo
 		return response;
 	}
 
-	void Client::OnConnect(bool result, int count)
+	void Client::OnConnect(const Asio::Code & code, int count)
 	{
-		if(!result)
+		if(code.value() != Asio::OK)
 		{
 			this->OnResponse(XCode::NetConnectFailure);
 			return;

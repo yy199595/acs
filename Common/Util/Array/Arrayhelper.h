@@ -11,7 +11,7 @@ namespace help
 {
 	namespace Array
 	{
-		std::string Concat(const std::vector<std::string> & list, const char c)
+		inline std::string Concat(const std::vector<std::string> & list, const char c)
 		{
 			if(list.size() == 1)
 			{

@@ -33,7 +33,7 @@ namespace tcp
 #ifdef __SHARE_PTR_COUNTER__
 		~Socket() final = default;
 #else
-		~Socket();
+		~Socket() { }
 #endif
 
 #ifdef __MEMORY_POOL_OPERATOR__

@@ -93,26 +93,29 @@ namespace custom
 			this->Init();
 			this->SwitchFile();
 		}
-		this->mDevStream.write(time.c_str(), (int)time.size());
 		switch (logData.Level)
 		{
 			case LogLevel::Debug:
+				this->mDevStream.write(time.c_str(), (int)time.size()) << " ";
 				this->mDevStream.write(LogDebug.c_str(), (int)LogDebug.size());
 				break;
 			case LogLevel::Info:
+				this->mDevStream.write(time.c_str(), (int)time.size()) << " ";
 				this->mDevStream.write(LogInfo.c_str(), (int)LogInfo.size());
 				break;
 			case LogLevel::Warn:
+				this->mDevStream.write(time.c_str(), (int)time.size()) << " ";
 				this->mDevStream.write(LogWarn.c_str(), (int)LogWarn.size());
 				break;
 			case LogLevel::Error:
+				this->mDevStream.write(time.c_str(), (int)time.size()) << " ";
 				this->mDevStream.write(LogError.c_str(), (int)LogError.size());
 				break;
 			case LogLevel::Fatal:
+				this->mDevStream.write(time.c_str(), (int)time.size()) << " ";
 				this->mDevStream.write(LogFatal.c_str(), (int)LogFatal.size());
 				break;
 		}
-		this->mDevStream << " ";
 		if (!logData.File.empty())
 		{
 			this->mDevStream.write(logData.File.c_str(), (int)logData.File.size());

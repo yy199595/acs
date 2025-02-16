@@ -192,6 +192,7 @@ namespace ws
 					this->mMessage[i] ^= this->mMaskingKey[i % 4];
 				}
 			}
+			return tcp::ReadDone;
 		}
 		return tcp::ReadSomeMessage;
 	}

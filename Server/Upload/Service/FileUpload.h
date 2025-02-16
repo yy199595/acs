@@ -27,16 +27,15 @@ namespace acs
 		bool Awake() final;
 		bool OnInit() final;
 	private:
-		int Icon(const http::Request & request, http::Response & response);
-		int Club(const http::Request & request, http::Response & response);
-		int Code(const http::Request & request, http::Response & response);
 		int File(const http::Request & request, http::Response & response);
+#ifdef __ENABLE_OPEN_SSL__
 		int Oss(const http::FromContent & request, json::w::Document & response);
-	private:
-		int OnUpload(const http::Request & request, const std::string & name, http::Response & response);
+#endif
 	private:
 		std::string mDoMain;
+#ifdef __ENABLE_OPEN_SSL__
 		class OssComponent * mOss;
+#endif
 	};
 }
 

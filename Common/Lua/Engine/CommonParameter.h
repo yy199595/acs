@@ -40,6 +40,7 @@ namespace Lua
 		{
 			return static_cast<long long>(luaL_checkinteger(lua, index));
         }
+
 		template<> inline unsigned long long Read(lua_State* lua, int index)
 		{
 			return static_cast<unsigned long long>(luaL_checkinteger(lua, index));

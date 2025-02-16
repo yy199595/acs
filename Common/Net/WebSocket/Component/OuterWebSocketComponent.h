@@ -7,8 +7,8 @@
 namespace ws
 {
 	class Message;
-	class SessionClient;
-	class RequestClient;
+	class Session;
+	class Client;
 }
 
 #include "Rpc/Component/RpcComponent.h"
@@ -38,7 +38,7 @@ namespace acs
 		unsigned int mSumCount;
 		class GateComponent * mGate;
 		math::NumberPool<int> mClientPool;
-		std::unordered_map<int, std::shared_ptr<ws::SessionClient>> mSessions;
+		std::unordered_map<int, std::shared_ptr<ws::Session>> mSessions;
 	};
 }
 

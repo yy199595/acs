@@ -29,7 +29,7 @@ namespace acs
 			auto iter = mTypeInfoMap.find(name);
 			if (iter != mTypeInfoMap.end())
 			{
-				return false;
+				throw std::logic_error("add " + name + " failure");
 			}
 			auto type = new TypeProxy<T>(name);
 			mTypeInfoMap.insert(std::make_pair(type->Name, type));

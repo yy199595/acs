@@ -30,7 +30,7 @@
 	},
 	"/admin/info": {
 		"Type": "GET",
-		"Auth": false,
+		"Auth": true,
 		"Async": true,
 		"Permiss": 20,
 		"Bind": "Admin.Info",

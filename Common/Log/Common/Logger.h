@@ -7,6 +7,7 @@
 #include"Level.h"
 #include<Core/Map/HashMap.h>
 #include<Core/Thread/AsioThread.h>
+#include <Yyjson/Object/JsonObject.h>
 namespace custom
 {
 	struct FileConfig
@@ -19,12 +20,12 @@ namespace custom
 		std::string Name;	//日志名字
 	};
 
-	struct LogConfig
+	struct LogConfig : public json::Object<LogConfig>
 	{
-		int max_line = 0;
-		int max_size = 0;
+		std::string levelName;
+		int max_line = 1024 * 10;
+		int max_size = 1024 * 1024;
 		bool open = true;
-		bool console = false;
 		std::string path;
 		std::string name;
 		std::string pem;
@@ -37,6 +38,7 @@ namespace custom
 	class IOutput
 	{
 	public:
+		virtual  ~IOutput() = default;
 		IOutput() : mLevel(custom::LogLevel::None) { }
 	public:
 		void SetLevel(custom::LogLevel level) { this->mLevel = level; }

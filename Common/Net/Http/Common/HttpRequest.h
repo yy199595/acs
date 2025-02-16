@@ -47,9 +47,11 @@ namespace http
 		bool SetUrl(const std::string & url, const http::FromContent & query);
 		int WriteToLua(lua_State *lua) const final;
 		inline void SetTimeout(int second) { this->mTimeout = second; }
+#ifdef __ENABLE_OPEN_SSL__
 	public:
 		const std::string & GetVerifyFile() const { return this->mVerifyFile; }
 		void SetVerifyFile(const std::string & path) { this->mVerifyFile = path; }
+#endif
 	public:
 		bool IsMethod(const std::string & method) const;
 		void SetContent(const json::w::Document & document);
@@ -68,7 +70,9 @@ namespace http
 		http::Url mUrl;
 		int mDecodeStatus;
 		long long mConeSize;
-		std::string mVerifyFile;
+#ifdef __ENABLE_OPEN_SSL__
+		std::string mVerifyFile; //证书路径
+#endif
 		std::unique_ptr<http::Content> mBody;
     };
 }

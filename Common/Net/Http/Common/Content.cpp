@@ -410,7 +410,10 @@ namespace http
 
 	void FileContent::OnWriteHead(std::ostream& os)
 	{
-		os << http::Header::ContentType << ": " << this->mType << "\r\n";
+		if(!this->mType.empty())
+		{
+			os << http::Header::ContentType << ": " << this->mType << "\r\n";
+		}
 		os << http::Header::ContentLength << ": " << this->mFileSize << "\r\n";
 	}
 
@@ -468,7 +471,7 @@ namespace http
 
 	int FileContent::OnWriteBody(std::ostream& os)
 	{
-		thread_local static char buff[1024] = { 0 };
+		char buff[512] = { 0 };
 		size_t size = this->mFile.read(buff, sizeof(buff)).gcount();
 		if (size > 0)
 		{

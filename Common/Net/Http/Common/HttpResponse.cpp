@@ -10,7 +10,8 @@
 
 namespace http
 {
-	Response::Response()
+	Response::Response(HttpStatus code)
+		: mCode((int)code)
 	{
 		this->mContSize = 0;
 		this->mBody = nullptr;
@@ -51,10 +52,10 @@ namespace http
 					this->mParseState = tcp::Decode::MessageBody;
 					break;
 			}
-			if(this->mCode != (int)HttpStatus::OK)
-			{
-				return tcp::ReadDone;
-			}
+//			if(this->mCode != (int)HttpStatus::OK)
+//			{
+//				return tcp::ReadDone;
+//			}
 			if(this->mBody == nullptr)
 			{
 				std::string content_type;
@@ -80,6 +81,10 @@ namespace http
 					return tcp::ReadOneLine;
 				}
 				return tcp::ReadDecodeError;
+			}
+			else if(this->mContSize == 0)
+			{
+				return tcp::ReadDone;
 			}
 		}
 		if (this->mParseState == tcp::Decode::MessageBody)
@@ -222,7 +227,7 @@ namespace http
 		json::w::Document js;
 		js.Add("status", this->mCode);
 		js.Add("status_text", this->mError);
-		js.AddJson("header", this->mHead.ToString());
+		js.AddObject("header", this->mHead.ToString());
 		if(this->mBody != nullptr)
 		{
 			js.Add("data", this->mBody->ToStr());

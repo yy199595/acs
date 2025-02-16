@@ -22,110 +22,41 @@ namespace Lua
         template<typename T>
         struct IsCommonParameter
         {
-            constexpr static bool value = false;
+            constexpr static bool value = std::is_integral<T>::value ||
+					std::is_floating_point<T>::value || std::is_enum<T>::value || std::is_void<T>::value;
         };
 
-        /*template<typename T>
-        struct IsCommonParameter<const T> { constexpr static  bool value = false; };*/
-
-        template<>
-        struct IsCommonParameter<int>
+        template<> struct IsCommonParameter<bool>
         {
             constexpr static bool value = true;
         };
 
-        template<>
-        struct IsCommonParameter<unsigned int>
+        template<> struct IsCommonParameter<std::string>
         {
             constexpr static bool value = true;
         };
 
-        template<>
-        struct IsCommonParameter<long long>
+        template<> struct IsCommonParameter<const std::string>
         {
             constexpr static bool value = true;
         };
 
-        template<>
-        struct IsCommonParameter<float>
+        template<> struct IsCommonParameter<const std::string &>
         {
             constexpr static bool value = true;
         };
 
-        template<>
-        struct IsCommonParameter<double>
+        template<> struct IsCommonParameter<std::string &>
         {
             constexpr static bool value = true;
         };
 
-        template<>
-        struct IsCommonParameter<unsigned long long>
+        template<> struct IsCommonParameter<const char *>
         {
             constexpr static bool value = true;
         };
 
-        template<>
-        struct IsCommonParameter<const unsigned long long>
-        {
-            constexpr static bool value = true;
-        };
-
-        template<>
-        struct IsCommonParameter<short>
-        {
-            constexpr static bool value = true;
-        };
-
-        template<>
-        struct IsCommonParameter<unsigned short>
-        {
-            constexpr static bool value = true;
-        };
-
-        template<>
-        struct IsCommonParameter<bool>
-        {
-            constexpr static bool value = true;
-        };
-
-        template<>
-        struct IsCommonParameter<std::string>
-        {
-            constexpr static bool value = true;
-        };
-
-        template<>
-        struct IsCommonParameter<const std::string>
-        {
-            constexpr static bool value = true;
-        };
-
-        template<>
-        struct IsCommonParameter<const std::string &>
-        {
-            constexpr static bool value = true;
-        };
-
-        template<>
-        struct IsCommonParameter<std::string &>
-        {
-            constexpr static bool value = true;
-        };
-
-        template<>
-        struct IsCommonParameter<const char *>
-        {
-            constexpr static bool value = true;
-        };
-
-        template<>
-        struct IsCommonParameter<char *>
-        {
-            constexpr static bool value = true;
-        };
-
-        template<>
-        struct IsCommonParameter<void>
+        template<> struct IsCommonParameter<char *>
         {
             constexpr static bool value = true;
         };

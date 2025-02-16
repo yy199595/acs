@@ -4,15 +4,17 @@
 #include"MongoDBComponent.h"
 #include"Entity/Actor/App.h"
 #include"Util/Tools/TimeHelper.h"
-#include"Mongo/Lua/LuaMongo.h"
 #include"Yyjson/Lua/ljson.h"
 #include"Lua/Engine/ModuleClass.h"
 #include"Timer/Timer/ElapsedTimer.h"
 #include"Server/Config/ServerConfig.h"
 #include"Server/Component/ThreadComponent.h"
-
+#include "Proto/Component/ProtoComponent.h"
 // use admin 	=>db.createUser({ user: 'root', pwd: '199595yjz.', roles: [{ role: 'root', db: 'yjz' }] })
 // use yjz 		=> db.createUser({ user: 'root', pwd: '199595yjz.', roles: [{ role: 'readWrite', db: 'yjz' }] })
+
+const std::string LOG_NAME("mongo");
+
 namespace acs
 {
 	MongoTask::MongoTask(int id)
@@ -67,20 +69,22 @@ namespace acs
 
 namespace acs
 {
+	MongoDBComponent::MongoDBComponent()
+	{
+		mongo::MongoConfig::RegisterField("db", &mongo::MongoConfig::DB);
+		mongo::MongoConfig::RegisterField("ping", &mongo::MongoConfig::Ping);
+		mongo::MongoConfig::RegisterField("user", &mongo::MongoConfig::User);
+		mongo::MongoConfig::RegisterField("debug", &mongo::MongoConfig::Debug);
+		mongo::MongoConfig::RegisterField("log", &mongo::MongoConfig::LogPath);
+		mongo::MongoConfig::RegisterField("count", &mongo::MongoConfig::MaxCount);
+		mongo::MongoConfig::RegisterField("passwd", &mongo::MongoConfig::Password);
+		mongo::MongoConfig::RegisterField("address", &mongo::MongoConfig::Address, true);
+	}
+
 	bool MongoDBComponent::Awake()
 	{
-		std::unique_ptr<json::r::Value> mongoObject;
-		if(!ServerConfig::Inst()->Get("mongo", mongoObject))
-		{
-			return false;
-		}
-		mongoObject->Get("db", this->mConfig.DB);
-		mongoObject->Get("ping", this->mConfig.Ping);
-		mongoObject->Get("user", this->mConfig.User);
-		mongoObject->Get("debug", this->mConfig.Debug);
-		mongoObject->Get("count", this->mConfig.MaxCount);
-		mongoObject->Get("address", this->mConfig.Address);
-		mongoObject->Get("passwd", this->mConfig.Password);
+		ServerConfig & config = this->mApp->GetConfig();
+		LOG_CHECK_RET_FALSE(config.Get("mongo", this->mConfig));
 		this->mCommand = fmt::format("{}.$cmd", this->mConfig.DB);
 		return true;
 	}
@@ -226,7 +230,6 @@ namespace acs
 			LOG_ERROR("mongo[{}] request:{}", id, request->ToString());
 			return;
 		}
-		//LOG_DEBUG("mongo[{}] request:{}", id, request->ToString());
 		iter->second->SendMongoCommand(std::move(request));
 	}
 

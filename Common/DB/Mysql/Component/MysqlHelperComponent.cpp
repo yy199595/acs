@@ -1,4 +1,4 @@
-#ifdef __ENABLE_MYSQL__
+
 
 #include"MysqlHelperComponent.h"
 #include"Util/Tools/String.h"
@@ -22,10 +22,10 @@ namespace acs
 
 	int MysqlHelperComponent::Add(const Message& message, int flag)
 	{
-		db::mysql::add request;
+		db::mysql::insert request;
 		{
 			request.set_flag(flag);
-			if(!pb_json::MessageToJsonString(message, request.mutable_data()).ok())
+			if(!pb_json::MessageToJsonString(message, request.mutable_document()).ok())
 			{
 				return XCode::ProtoCastJsonFailure;
 			}
@@ -62,10 +62,10 @@ namespace acs
 
 	int MysqlHelperComponent::Delete(const std::string& table, const std::string& deleteJson, int flag)
 	{
-		db::mysql::remove request;
+		db::mysql::del request;
 		{
 			request.set_table(table);
-			request.set_where_json(deleteJson);
+			request.set_filter(deleteJson);
 		}
 		const static std::string func("MysqlDB.Delete");
 		Server * targetServer = this->mActComponent->Random(this->mServer);
@@ -83,8 +83,8 @@ namespace acs
 		{
 			request.set_flag(flag);
 			request.set_table(table);
-			request.set_where_json(whereJson);
-			request.set_update_json(updateJson);
+			request.set_filter(whereJson);
+			request.set_document(updateJson);
 		}
 		const static std::string func("MysqlDB.Update");
 		Server * targetServer = this->mActComponent->Random(this->mServer);
@@ -97,9 +97,9 @@ namespace acs
 
 	int MysqlHelperComponent::QueryOnce(const std::string& json, pb::Message * response)
 	{
-		db::mysql::query request;
+		db::mysql::query::request request;
 		{
-			request.set_where_json(json);
+			request.set_filter(json);
 			request.set_table(response->GetTypeName());
 		}
 		const static std::string func("MysqlDB.Query");
@@ -108,8 +108,8 @@ namespace acs
 		{
 			return XCode::AddressAllotFailure;
 		}
-		std::unique_ptr<db::mysql::response> result
-			= std::unique_ptr<db::mysql::response>();
+		std::unique_ptr<db::mysql::query::response> result
+			= std::unique_ptr<db::mysql::query::response>();
 		int code = targetServer->Call(func, request, result.get());
 		if (code != XCode::Ok)
 		{
@@ -128,5 +128,3 @@ namespace acs
 		return XCode::Ok;
 	}
 }
-
-#endif

@@ -5,10 +5,13 @@ local json = require("util.json")
 local Component = require("Component")
 
 local MYSQL_DB = "MysqlDB"
-local MYSQL_INSERT = "MysqlDB.Add"
+local MYSQL_Exec = "MysqlDB.Exec"
+local MYSQL_INDEX = "MysqlDB.Index"
 local MYSQL_QUERY = "MysqlDB.Query"
+local MYSQL_INSERT = "MysqlDB.Insert"
 local MYSQL_UPDATE = "MysqlDB.Update"
 local MYSQL_DELETE = "MysqlDB.Delete"
+local MYSQL_FIND_PAGE = "MysqlDB.FindPage"
 
 
 local json_encode = json.encode
@@ -31,18 +34,19 @@ function MysqlComponent:Insert(tab, data)
     local actorId = self:GetActorId()
     return app:Call(actorId, MYSQL_INSERT, {
         table = tab,
-        data = json_encode(data)
+        document = json_encode(data)
     })
 end
 
 ---@param tab string
 ---@param filter table
 ---@return number
-function MysqlComponent:Delete(tab, filter)
+function MysqlComponent:Delete(tab, filter, limit)
     local actorId = self:GetActorId()
     return app:Call(actorId, MYSQL_DELETE, {
         table = tab,
-        where_json = json_encode(filter)
+        limit = limit or 1,
+        filter = json_encode(filter)
     })
 end
 
@@ -54,7 +58,7 @@ function MysqlComponent:FindOne(tab, filter, fields)
     local request = {
         table = tab,
         limit = 1,
-        where_json = json_encode(filter)
+        filter = json_encode(filter)
     }
     if fields and next(fields) then
         request.fields = fields
@@ -64,8 +68,7 @@ function MysqlComponent:FindOne(tab, filter, fields)
     if code ~= XCode.Ok or #results == 0 then
         return nil
     end
-    local str = results[1]
-    return json_decode(str)
+    return json_decode(results[1])
 end
 
 ---@param tab string
@@ -82,7 +85,7 @@ function MysqlComponent:Find(tab, filter, fields, limit)
         request.fields = fields
     end
     if filter and next(filter) then
-        request.where_json = json_encode(filter)
+        request.filter = json_encode(filter)
     end
     local actorId = self:GetActorId()
     local code, response = app:Call(actorId, MYSQL_QUERY, request)
@@ -100,13 +103,75 @@ end
 ---@param filter table
 ---@param update table
 ---@return number
-function MysqlComponent:Update(tab, filter, update)
+function MysqlComponent:Update(tab, filter, update, limit)
     local actorId = self:GetActorId()
     return app:Call(actorId, MYSQL_UPDATE, {
         table = tab,
-        where_json = json_encode(filter),
-        update_json = json_encode(update)
+        limit = limit or 1,
+        filter = json_encode(filter),
+        document = json_encode(update)
     })
+end
+
+---@param tab string
+---@param field string
+---@param unique boolean
+function MysqlComponent:CreateIndex(tab, field, unique)
+    local actorId = self:GetActorId()
+    return app:Call(actorId, MYSQL_INDEX, {
+        tab = tab,
+        name = field,
+        unique = unique,
+    })
+end
+
+---@param tab string
+---@param filter table
+---@param fields table
+---@param page number
+---@param count number
+function MysqlComponent:FindPage(tab, filter, fields, page, count)
+    local request = {
+        table = tab,
+        page = page or 1,
+        limit = count or 10
+    }
+    if fields and next(fields) then
+        request.fields = fields
+    end
+    if filter and next(filter) then
+        request.filter = json_encode(filter)
+    end
+    local actorId = self:GetActorId()
+    local code, response = app:Call(actorId, MYSQL_FIND_PAGE, request)
+    if code ~= XCode.Ok or #response.jsons == 0 then
+        return nil
+    end
+    local jsons = { }
+    for _, str in ipairs(response.jsons) do
+        table_insert(jsons, json_decode(str))
+    end
+    return jsons
+end
+
+function MysqlComponent:Count(tab, filter)
+    local sql = string.format("SELECT COUNT(*) FROM")
+end
+
+---@param sql string
+function MysqlComponent:Exec(sql)
+    local actorId = self:GetActorId()
+    local code, response = app:Call(actorId, MYSQL_Exec, {
+        sql = sql
+    })
+    if code ~= XCode.Ok or #response.jsons == 0 then
+        return nil
+    end
+    local jsons = { }
+    for _, str in ipairs(response.jsons) do
+        table_insert(jsons, json_decode(str))
+    end
+    return jsons
 end
 
 return MysqlComponent

@@ -1,38 +1,41 @@
 {
     "sub": {
         "ping": 0,
-        "debug" : false,
+        "debug": false,
         "passwd": "199595yjz.",
         "address": "${db}:6379"
     },
-
     "redis": {
         "ping": 15,
         "index": 0,
         "count": 1,
-        "debug" : false,
+        "debug": false,
         "passwd": "199595yjz.",
         "address": "${db}:6379",
         "script": "${WORK_DIR}/config/db/redis"
     },
     "mysql": {
-        "ping" : 30,
-        "count": 4,
-        "db" : "yy",
-        "user": "root",
-        "passwd": "",
-        "address": "127.0.0.1:3306"
+        "ping": 30,
+        "count": 1,
+        "db": "yjz",
+        "address": "127.0.0.1:3306",
+        "user": "debian-sys-maint",
+        "passwd": "13oc5QKIaY3nFagc",
+        "script": "${WORK_DIR}/sql/mysql.sql"
     },
     "mongo": {
         "ping": 15,
         "count": 1,
-        "debug" : false,
+        "debug": false,
         "db": "yjz",
         "user": "root",
-        "passwd": "199595yjz.",
-        "address": "${db}:27017"
+        "passwd": "",
+        "address": "${db}:27017",
+        "log": "${WORK_DIR}/mongo"
     },
-    "leveldb": {
-        "address": "${db}:7788"
+    "sqlite": {
+        "db": "yy",
+        "dir": "${WORK_DIR}/sqlite",
+        "script": "${WORK_DIR}/sql/sqlite.sql"
     }
 }

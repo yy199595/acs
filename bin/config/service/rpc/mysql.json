@@ -1,25 +1,28 @@
 {
-    "MysqlDB.Add": {
+    "MysqlDB.Insert": {
         "Async": true,
-        "Request": "db.mysql.add"
+        "Request": "db.mysql.insert",
+        "Response": "db.mysql.response"
     },
     "MysqlDB.Save": {
         "Async": true,
-        "Request": "db.mysql.save"
+        "Request": "db.mysql.save",
+        "Response": "db.mysql.response"
     },
     "MysqlDB.Exec": {
         "Async": true,
         "Request": "db.mysql.exec",
-        "Response": "db.mysql.response"
+        "Response": "db.mysql.query.response"
     },
     "MysqlDB.Query": {
         "Async": true,
-        "Request": "db.mysql.query",
-        "Response": "db.mysql.response"
+        "Request": "db.mysql.query.request",
+        "Response": "db.mysql.query.response"
     },
     "MysqlDB.Update": {
         "Async": true,
-        "Request": "db.mysql.update"
+        "Request": "db.mysql.update",
+        "Response": "db.mysql.response"
     },
     "MysqlDB.Create": {
         "Async": true,
@@ -28,6 +31,17 @@
     "MysqlDB.Delete": {
         "Async": true,
         "Type": "Server",
-        "Request": "db.mysql.remove"
+        "Request": "db.mysql.del",
+        "Response": "db.mysql.response"
+    },
+    "MysqlDB.Index": {
+        "Async": true,
+        "Request": "db.mysql.index",
+        "Desc" : "创建一个索引"
+    },
+    "MysqlDB.FindPage": {
+        "Async": true,
+        "Request": "db.mysql.query.page",
+        "Response": "db.mysql.query.response"
     }
 }

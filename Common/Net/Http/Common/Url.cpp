@@ -65,9 +65,13 @@ namespace http
 		{
 			return tcp::ReadDecodeError;
 		}
-		this->mUrl = std::move(results[1]);
-		this->mMethod = std::move(results[0]);
-		this->mVersion = std::move(results[2]);
+		this->mUrl = results[1];
+		this->mMethod = results[0];
+		this->mVersion = results[2];
+		if(this->mVersion != http::Version)
+		{
+			return tcp::ReadDecodeError;
+		}
 		if(this->mMethod.empty() || this->mUrl.empty() || this->mVersion.empty())
 		{
 			CONSOLE_LOG_ERROR("line data : {}", lineData);

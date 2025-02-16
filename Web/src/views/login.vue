@@ -39,7 +39,7 @@ import {ElMessage} from 'element-plus';
 import type {FormInstance, FormRules} from 'element-plus';
 import {Lock, User} from '@element-plus/icons-vue';
 import {RequestLogin, LoginReqData} from "../api/login";
-import {add_token, remove_token} from "../api/token";
+import {app} from "../api/token";
 
 interface LoginInfo {
     username: string;
@@ -71,11 +71,10 @@ const submitForm = async () => {
             passwd: param.password,
         }
     try {
-        remove_token()
+        app.remove_user_info()
         const response = await RequestLogin(login_req)
         if (response.data.code == 0) {
-            add_token(response.data.data)
-            localStorage.setItem("user_info", JSON.stringify(response.data.info))
+            localStorage.setItem("user_info", JSON.stringify(response.data.data))
             await router.push('/');
         } else {
             ElMessage.error(response.data.error)

@@ -9,12 +9,12 @@
 #include"Rpc/Config/ServiceConfig.h"
 namespace json
 {
-    class Writer;
+	class Writer;
 }
 namespace http
 {
-    class Request;
-    class Response;
+	class Request;
+	class Response;
 }
 namespace Lua
 {
@@ -22,21 +22,14 @@ namespace Lua
 }
 namespace acs
 {
-    class HttpService : public Component, public IStart, public IDestroy, public IComplete
+	class HttpService : public Component
 	{
-	 public:
+	public:
 		HttpService();
-    	~HttpService() override = default;
-	 protected:
-		virtual bool OnInit() = 0;
-		virtual void OnStop() { }
-		virtual void OnStart() { }
-		virtual void OnComplete() { }
+		~HttpService() override = default;
 	protected:
-		void Start() final;
-		void Complete() final;
-		void OnDestroy() final;
 		bool LateAwake() final;
+		virtual bool OnInit() = 0;
 		HttpServiceRegister & GetRegister() { return this->mServiceRegister;}
 	public:
 		Lua::LuaModule * GetLuaModule() { return this->mLuaModule; }

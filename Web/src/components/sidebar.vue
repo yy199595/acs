@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import {computed, onMounted, ref} from 'vue';
-import {is_admin} from "../api/token";
+import {app} from "../api/token";
 import {useSidebarStore} from '../store/sidebar';
 import {useRoute, useRouter} from 'vue-router';
 import {RequestGetMenus} from "../api/server"
@@ -90,7 +90,7 @@ onMounted(async () => {
         from_data.value = result.data as MenuInfo[]
         for (const resultElement of from_data.value) {
             resultElement.show = true
-            if(resultElement.admin && !is_admin())
+            if(resultElement.admin && !app.is_admin())
             {
                 resultElement.show = false
             }
@@ -99,7 +99,7 @@ onMounted(async () => {
                 for (let i = 0; i < resultElement.subs.length; i++) {
                     const resultElementElement = resultElement.subs[i]
                     resultElementElement.show = true
-                    if(resultElementElement.admin && !is_admin())
+                    if(resultElementElement.admin && !app.is_admin())
                     {
                         resultElementElement.show = false
                     }

@@ -4,27 +4,44 @@
 #include"Proto/Include/Message.h"
 #include"Util/Tools/NumberBuilder.h"
 #include"Entity/Component/Component.h"
+#include "Yyjson/Object/JsonObject.h"
+namespace sqlite
+{
+	struct Config : public json::Object<Config>
+	{
+	public:
+		std::string db;
+		std::string dir;
+		std::string script;
+	};
+}
+
 namespace acs
 {
 	class SqlHelper;
-	class SqliteComponent final : public Component, public IDestroy
+	class SqliteComponent final : public Component, public IDestroy, public IHotfix
 	{
 	public:
-		SqliteComponent() = default;
+		SqliteComponent();
 	public:
-		void Close(const std::string & db);
-		int Exec(const std::string & tab, const char * sql);
-		int Exec(const std::string & tab, const char * sql, std::string & err);
-		int Query(const std::string & tab, const char * sql, std::vector<std::string> & result);
+		bool Exec(const char * sql);
+		bool Exec(const char * sql, std::string & err);
+		bool Query(const char * sql, std::vector<std::string> & result);
 		int MakeTable(const std::string & tab, const pb::Message & message, const std::vector<std::string> & keys);
+	public:
+		bool Del(const std::string & key);
+		bool Get(const std::string & key, std::string & value);
+		bool SetTimeout(const std::string & key, int timeout);
+		bool Set(const std::string & key, const std::string & value);
 	private:
 		bool Awake() final;
+		bool OnHotFix() final;
+		bool LateAwake() final;
 		void OnDestroy() final;
-		sqlite3 * GetClient(const std::string & tab);
+		bool InvokeSqlFromPath(const std::string & path);
 	private:
 		std::string mName;
-		std::string mSaveDir;
-		help::NumberBuilder<int, 10> mNumbers;
-		std::unordered_map<std::string, sqlite3 *> mDatabases;
+		sqlite3 * mDatabase;
+		sqlite::Config mConfig;
 	};
 }

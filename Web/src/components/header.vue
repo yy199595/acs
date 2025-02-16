@@ -48,7 +48,7 @@ import { onMounted } from 'vue';
 import { useSidebarStore } from '../store/sidebar';
 import { useRouter } from 'vue-router';
 import imgurl from '../assets/img/img.jpg';
-import {logout, remove_token} from "../api/token";
+import {logout, app} from "../api/token";
 
 const username: string | null = localStorage.getItem('ms_username');
 const message: number = 2;
@@ -70,7 +70,7 @@ const router = useRouter();
 const handleCommand = (command: string) => {
 
     if (command == 'logout') {
-        remove_token()
+        app.remove_user_info()
         router.push('/login');
     } else if (command == 'user') {
         router.push('/user');

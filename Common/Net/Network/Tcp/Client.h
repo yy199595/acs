@@ -57,9 +57,8 @@ namespace tcp
 		void StartTimer(int timeout, TimeoutFlag flag);
 	protected:
 		virtual void OnUpdate() { }
-		virtual void OnTimeout(TimeoutFlag flag) { }
 		virtual void OnReadError(const Asio::Code & code) = 0;
-		virtual void OnConnect(bool result, int count) { throw std::logic_error("");}
+		virtual void OnConnect(const Asio::Code & code, int count) { }
         virtual void OnReceiveLine(std::istream & readStream, size_t size) {}
         virtual void OnReceiveMessage(std::istream & readStream, size_t size, const asio::error_code & code) {}
 	protected:

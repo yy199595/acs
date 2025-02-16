@@ -19,9 +19,7 @@
 #include "Log/Service/Log.h"
 #include "Gate/Service/GateSystem.h"
 #include "Common/Service/NodeSystem.h"
-#include "Web/Service/Admin.h"
 #include "Common/Service/LoginSystem.h"
-#include "Sqlite/Service/SqliteDB.h"
 #include "Master/Component/MasterComponent.h"
 #include "Gate/Component/GateComponent.h"
 
@@ -49,17 +47,16 @@
 #include "Watch/Service/Watch.h"
 #include "Watch/Component/WatchComponent.h"
 
-#include "Http/Component/HttpApiComponent.h"
 #include "Udp/Component/UdpComponent.h"
 #include "Kcp/Component/KcpComponent.h"
 
 #include "WebSocket/Component/InnerWebSocketComponent.h"
 #include "WebSocket/Component/OuterWebSocketComponent.h"
-#ifdef __ENABLE_MYSQL__
+
 #include "Mysql/Service/MysqlDB.h"
 #include "Mysql/Component/MysqlDBComponent.h"
 #include "Mysql/Component/MysqlHelperComponent.h"
-#endif
+
 
 #include "Core/System/System.h"
 #include "Redis/Component/RedisComponent.h"
@@ -76,7 +73,6 @@
 
 #include "Upload/Service/FileUpload.h"
 
-#include "Web/Component/AdminComponent.h"
 #include "Oss/Component/OssComponent.h"
 #include "WX/Component/WXNoticeComponent.h"
 
@@ -87,6 +83,8 @@
 #include "Event/Service/EventSystem.h"
 
 #include "Client/Component/WsClientComponent.h"
+#include "Web/Service/Admin.h"
+
 using namespace acs;
 
 void RegisterComponent()
@@ -113,30 +111,22 @@ void RegisterComponent()
 	REGISTER_COMPONENT(MongoComponent);
 	REGISTER_COMPONENT(MongoDBComponent);
 
-#ifdef __ENABLE_MYSQL__
 	REGISTER_COMPONENT(MysqlDBComponent);
 	REGISTER_COMPONENT(MysqlHelperComponent);
-#endif
 
 	REGISTER_COMPONENT(LuaComponent);
 	REGISTER_COMPONENT(HttpComponent);
 	REGISTER_COMPONENT(LoggerComponent);
 	REGISTER_COMPONENT(HttpWebComponent);
-	REGISTER_COMPONENT(HttpApiComponent);
 	REGISTER_COMPONENT(TcpClientComponent);
 	REGISTER_COMPONENT(ListenerComponent);
 
-	REGISTER_COMPONENT(WeChatComponent);
-	REGISTER_COMPONENT(AdminComponent);
 	REGISTER_COMPONENT(RecordComponent);
 
-	REGISTER_COMPONENT(OssComponent);
 	REGISTER_COMPONENT(DelayQueueComponent);
 	REGISTER_COMPONENT(WXNoticeComponent);
 
 	REGISTER_COMPONENT(NotifyComponent);
-
-	REGISTER_COMPONENT(WXComplaintComponent);
 
 	REGISTER_COMPONENT(WatchComponent);
 	REGISTER_COMPONENT(UdpComponent);
@@ -145,6 +135,11 @@ void RegisterComponent()
 	REGISTER_COMPONENT(InnerWebSocketComponent);
 	REGISTER_COMPONENT(OuterWebSocketComponent);
 	REGISTER_COMPONENT(WsClientComponent);
+#ifdef __ENABLE_OPEN_SSL__
+	REGISTER_COMPONENT(WeChatComponent);
+	REGISTER_COMPONENT(WXComplaintComponent);
+#endif
+	REGISTER_COMPONENT(OssComponent);
 }
 
 void RegisterAll()
@@ -152,20 +147,18 @@ void RegisterAll()
 	RegisterComponent();
 
 	REGISTER_COMPONENT(Log);
+	REGISTER_COMPONENT(Admin);
 	REGISTER_COMPONENT(GateSystem);
 	REGISTER_COMPONENT(NodeSystem);
 	REGISTER_COMPONENT(LoginSystem);
 
-	REGISTER_COMPONENT(Admin);
 	REGISTER_COMPONENT(Master);
 	REGISTER_COMPONENT(MongoDB);
-	REGISTER_COMPONENT(SqliteDB);
-#ifdef __ENABLE_MYSQL__
 	REGISTER_COMPONENT(MysqlDB);
-#endif
 
+#ifdef __ENABLE_OPEN_SSL__
 	REGISTER_COMPONENT(WeChat);
-
+#endif
 	REGISTER_COMPONENT(ChatSystem);
 	REGISTER_COMPONENT(LogMgr);
 	REGISTER_COMPONENT(ResourceMgr);
@@ -178,12 +171,8 @@ void RegisterAll()
 	REGISTER_COMPONENT(MongoMgr);
 	REGISTER_COMPONENT(EventSystem);
 }
-
 int main(int argc, char** argv)
 {
-#ifdef __OS_WIN__
-	//system("chcp 65001 > nul");
-#endif
 	int id = 0;
 	RegisterAll();
 	std::string path;

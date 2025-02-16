@@ -5,53 +5,37 @@
 #ifndef APP_OSSCOMPONENT_H
 #define APP_OSSCOMPONENT_H
 
-#ifdef __ENABLE_OPEN_SSL__
 #include"Http/Client/Http.h"
 #include "Http/Common/HttpRequest.h"
 #include "Entity/Component/Component.h"
 
+#include "Oss/Config/Config.h"
+
+
 namespace oss
 {
-	struct Config
+	struct Object
 	{
+		int size = 0;
 		std::string key;
-		std::string bucket;
-		std::string region;
-		std::string secret;
-		std::string host;
+		long long lastWriteTime;
 	};
-
-	struct Policy
+	struct List
 	{
-		long long expiration;
-		long long max_length;
-		std::string file_type;
-		std::string file_name;
-		std::string upload_dir;
-		std::vector<std::string> limit_type;
+		std::string name;
+		std::string prefix;
+		std::vector<Object> contents;
 	};
+}
 
-	struct FromData
-	{
-		std::string policy;
-		std::string OSSAccessKeyId;
-		std::string signature;
-		std::string key;
-
-		std::string url;
-	};
-
-	struct Response
-	{
-		std::string url;
-		std::string data;
-		HttpStatus code = HttpStatus::OK;
-	};
+namespace http
+{
+	class Response;
 }
 
 namespace acs
 {
-	class OssComponent final : public Component, public IComplete
+	class OssComponent final : public Component
 	{
 	public:
 		OssComponent();
@@ -59,10 +43,23 @@ namespace acs
 	private:
 		bool Awake() final;
 		bool LateAwake() final;
-		void Complete() final;
+	public:
+		bool Delete(const std::string & objectKey);
+		bool Delete(const oss::Config& config, const std::string & objectKey);
+	public:
+		std::unique_ptr<oss::List> List(const std::string & dir, int count = 100);
+		std::unique_ptr<oss::List> List(const oss::Config& config, const std::string & dir, int count = 100);
+	public:
+		bool Download(const std::string & objectKey, const std::string & path);
+		bool Download(const oss::Config& config, const std::string & objectKey, const std::string & path);
 	public:
 		std::unique_ptr<http::Request> New(const std::string& path, const std::string & dir);
+		std::unique_ptr<http::Request> New(const char * method, const oss::Config & config, const std::string& objectKey, bool contentType = false);
+	public:
 		std::unique_ptr<oss::Response> Upload(const std::string& path, const std::string & dir);
+		std::unique_ptr<oss::Response> Upload(const oss::Config & config, const std::string& path, const std::string & dir);
+	private:
+		std::unique_ptr<http::Response> Run(const std::string & url, std::unique_ptr<http::Request> request);
 	public:
 		void Sign(const oss::Policy& policy, oss::FromData & fromData);
 		void Sign(const oss::Policy & policy, json::w::Value & document);
@@ -73,6 +70,4 @@ namespace acs
 }
 
 
-#endif //__ENABLE_OPEN_SSL__
-
-#endif // APP_OSSCOMPONENT_H
+#endif

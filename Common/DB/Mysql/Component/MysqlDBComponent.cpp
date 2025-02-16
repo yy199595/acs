@@ -1,166 +1,141 @@
 //
 // Created by zmhy0073 on 2022/7/16.
 //
-#ifdef __ENABLE_MYSQL__
 
+#include "MysqlDBComponent.h"
+#include "Entity/Actor/App.h"
+#include "Server/Config/ServerConfig.h"
+#include "Server/Component/ThreadComponent.h"
+#include "Timer/Timer/ElapsedTimer.h"
+#include "Message/s2s/registry.pb.h"
+#include "Util/Sql/SqlHelper.h"
+#include "Util/Tools/Random.h"
+#include "Lua/Lib/Lib.h"
+#include "Util/File/FileHelper.h"
 
-#include"MysqlDBComponent.h"
-#include"Entity/Actor/App.h"
-#include"Util/Sql/SqlHelper.h"
-#include"Mysql/Client/MysqlClient.h"
-#include"Mysql/Lua/LuaMysql.h"
-#include"Lua/Engine/ModuleClass.h"
-#include"Timer/Timer/ElapsedTimer.h"
-#include"Proto/Component/ProtoComponent.h"
 namespace acs
 {
-    MysqlTask::MysqlTask(int taskId)
-        : IRpcTask<Mysql::Response>(taskId), mMessage(nullptr)
-    {
+	MysqlTask::MysqlTask(int taskId)
+		: IRpcTask<mysql::Response>(taskId)
+	{
 
-    }
+	}
 }
 
 namespace acs
 {
+	MysqlDBComponent::MysqlDBComponent()
+	{
+		REGISTER_JSON_CLASS_FIELD(mysql::Config, db);
+		REGISTER_JSON_CLASS_FIELD(mysql::Config, user);
+		REGISTER_JSON_CLASS_FIELD(mysql::Config, ping);
+		REGISTER_JSON_CLASS_FIELD(mysql::Config, count);
+		REGISTER_JSON_CLASS_FIELD(mysql::Config, passwd);
+		REGISTER_JSON_CLASS_FIELD(mysql::Config, script);
+		REGISTER_JSON_CLASS_MUST_FIELD(mysql::Config, address);
+	}
+
 	bool MysqlDBComponent::Awake()
 	{
-		std::unique_ptr<json::r::Value> mysqlObject;
-		if(!ServerConfig::Inst()->Get("mysql", mysqlObject))
-		{
-			return false;
-		}
-		LOG_CHECK_RET_FALSE(mysqlObject->Get("db", this->mConfig.DB))
-		LOG_CHECK_RET_FALSE(mysqlObject->Get("user", this->mConfig.User))
-		LOG_CHECK_RET_FALSE(mysqlObject->Get("ping", this->mConfig.Ping))
-		LOG_CHECK_RET_FALSE(mysqlObject->Get("count", this->mConfig.MaxCount))
-		LOG_CHECK_RET_FALSE(mysqlObject->Get("passwd", this->mConfig.Password))
-		LOG_CHECK_RET_FALSE(mysqlObject->Get("address", this->mConfig.Address))
-		std::unique_ptr<json::r::Value> mysqlArray;
-		if(mysqlObject->Get("table", mysqlArray) && mysqlArray->IsArray())
-		{
-			for(size_t index = 0; index < mysqlArray->MemberCount(); index++)
-			{
-				std::string proto;
-				if(mysqlArray->Get(index, proto))
-				{
-					this->mConfig.Tables.emplace_back(proto);
-				}
-			}
-		}
-		return true;
+		this->mConfig.count = 1;
+		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
+			ccModule.Open("db.mysql", lua::lib::luaopen_lmysqldb);
+		});
+		return ServerConfig::Inst()->Get("mysql", this->mConfig);
 	}
 
 	bool MysqlDBComponent::LateAwake()
 	{
-#ifdef __DEBUG__
-		this->mConfig.MaxCount = 1;
-#endif
-		MysqlClient * mysqlClient = nullptr;
-		for (int index = 0; index < this->mConfig.MaxCount; index++)
+		ThreadComponent * threadComponent = this->GetComponent<ThreadComponent>();
+		for(int index = 0; index < this->mConfig.count; index++)
 		{
+			int id = index + 1;
 			timer::ElapsedTimer timer1;
-			mysqlClient = new MysqlClient(this, this->mConfig);
+			Asio::Context & main = this->mApp->GetContext();
+			tcp::Socket * tcpSocket = threadComponent->CreateSocket(this->mConfig.address);
+			std::shared_ptr<mysql::Client> mysqlClient = std::make_shared<mysql::Client>(id, tcpSocket, this, this->mConfig, main);
+			if(!mysqlClient->Connect())
 			{
-				LOG_CHECK_RET_FALSE(mysqlClient->Start());
-				const std::string & address = this->mConfig.Address;
-				LOG_INFO("[{}ms] connect mysql [{}] ok", timer1.GetMs(), address);
-
+				LOG_ERROR("connect mysql [{}] fail", this->mConfig.address)
+				return false;
 			}
-			this->mMysqlClients.Push(mysqlClient);
+			this->mFreeClients.Push(id);
+			this->mClients.emplace(id, mysqlClient);
+			LOG_INFO("[{}ms] connect mysql [{}] ok", timer1.GetMs(), this->mConfig.address)
 		}
-		ProtoComponent * proto = acs::App::GetProto();
-		for(const std::string & path : this->mConfig.Tables)
-		{
-			std::vector<std::string> types;
-			proto->Import(path.c_str(), types);
-		}
-		return this->mConfig.MaxCount > 0;
-	}
-
-	void MysqlDBComponent::OnDestroy()
-	{
-		MysqlClient * mysqlClient = nullptr;
-		while(this->mMysqlClients.Pop(mysqlClient))
-		{
-			mysqlClient->Stop();
-		}
-	}
-
-	void MysqlDBComponent::OnMessage(Mysql::IRequest * request, Mysql::Response * message)
-	{
-		if(message != nullptr)
-		{
-			if(!message->GetError().empty())
-			{
-				std::string sql;
-				request->GetSql(sql);
-				LOG_ERROR("mysql request : {}", sql);
-				const std::string & err = message->GetError();
-				LOG_ERROR("[{}ms]mysql response : {}", request->GetMs(), err);
-			}
-		}
-		int key = request->GetRpcId();
-		this->OnResponse(key, message);
-		delete request;
-	}
-
-	void MysqlDBComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
-	{
-		luaRegister.AddFunction("Exec", Lua::LuaMysql::Exec);
-		luaRegister.AddFunction("Find", Lua::LuaMysql::Query);
-		luaRegister.AddFunction("FindOnce", Lua::LuaMysql::QueryOnce);
-		luaRegister.AddFunction("CreateTable", Lua::LuaMysql::CreateTable);
-		luaRegister.End("db.mysql");
-	}
-
-
-	Mysql::Response * MysqlDBComponent::Run(std::unique_ptr<Mysql::IRequest> command)
-	{
-		int rpcId = 0;
-		if (!this->Send(std::move(command), rpcId))
-		{
-			return nullptr;
-		}
-		return this->AddTask(rpcId, new MysqlTask(rpcId))->Await();
-	}
-
-	std::unique_ptr<Mysql::Response> MysqlDBComponent::SyncRun(std::unique_ptr<Mysql::IRequest> command)
-	{
-		MysqlClient * mysqlClient = nullptr;
-		if(!this->mMysqlClients.Pop(mysqlClient))
-		{
-			return nullptr;
-		}
-		this->mMysqlClients.Push(mysqlClient);
-		return mysqlClient->Sync(std::move(command));
-	}
-
-	bool MysqlDBComponent::Send(std::unique_ptr<Mysql::IRequest> command, int & rpcId)
-	{
-		MysqlClient * mysqlClient = nullptr;
-		command->SetRpcId(this->mNumPool.BuildNumber());
-		if (!this->mMysqlClients.Pop(mysqlClient))
-		{
-			return false;
-		}
-		rpcId = command->GetRpcId();
-		mysqlClient->Push(std::move(command));
-		this->mMysqlClients.Push(mysqlClient);
 		return true;
 	}
 
-	bool MysqlDBComponent::Execute(std::unique_ptr<Mysql::IRequest> command)
+	void MysqlDBComponent::OnMessage(int id, mysql::Request* request, mysql::Response* response) noexcept
 	{
-		Mysql::Response * response = this->Run(std::move(command));
-		return response != nullptr && response->IsOk();
+		if(this->mMessages.empty())
+		{
+			this->mFreeClients.Push(id);
+		}
+		else
+		{
+			std::unique_ptr<mysql::Request>& req = this->mMessages.front();
+			{
+				this->Send(id, std::move(req));
+				this->mMessages.front();
+			}
+		}
+		if(response->GetPackageCode() == mysql::PACKAGE_ERR)
+		{
+			LOG_ERROR("{}", request->ToString());
+			LOG_ERROR("{}", response->GetBuffer());
+		}
+		else
+		{
+//			const mysql::Result & result = response->GetResult();
+//			for(const std::string & json : result.contents)
+//			{
+//				jsonArray2->PushJson(json);
+//			}
+			//LOG_DEBUG("({})[{}ms] {}", result.contents.size(), request->GetCostTime(), request->ToString());
+//			LOG_INFO("result => {}", document.JsonString(true))
+		}
+		int rpcId = request->GetRpcId();
+		this->OnResponse(rpcId, std::unique_ptr<mysql::Response>(response));
 	}
 
-	bool MysqlDBComponent::SyncExecute(std::unique_ptr<Mysql::IRequest> command)
+	void MysqlDBComponent::Send(std::unique_ptr<mysql::Request> request, int& rpcId)
 	{
-		std::unique_ptr<Mysql::Response> response = this->SyncRun(std::move(command));
-		return response != nullptr && response->IsOk();
+		rpcId = this->BuildRpcId();
+		{
+			request->SetRpcId(rpcId);
+			this->Send(std::move(request));
+		}
+	}
+
+	void MysqlDBComponent::Send(int id, std::unique_ptr<mysql::Request> request)
+	{
+		auto iter = this->mClients.find(id);
+		if(iter == this->mClients.end())
+		{
+			return;
+		}
+		iter->second->Send(std::move(request));
+	}
+
+	void MysqlDBComponent::Send(std::unique_ptr<mysql::Request> request)
+	{
+		int id = 0;
+		if(!this->mFreeClients.Pop(id))
+		{
+			this->mMessages.emplace(std::move(request));
+			return;
+		}
+		this->Send(id, std::move(request));
+	}
+
+	std::unique_ptr<mysql::Response> MysqlDBComponent::Run(std::unique_ptr<mysql::Request> request)
+	{
+		int rpcId = this->BuildRpcId();
+		{
+			request->SetRpcId(rpcId);
+			this->Send(std::move(request));
+			return this->BuildRpcTask<MysqlTask>(rpcId)->Await();
+		}
 	}
 }
-
-#endif

@@ -23,7 +23,6 @@ namespace acs
     };
 
 
-
     template<typename T>
     class ConstSingleton
     {

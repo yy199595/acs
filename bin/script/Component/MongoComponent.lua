@@ -427,4 +427,32 @@ function MongoComponent:Sum(tab, filter, by, field)
     return responses
 end
 
+---@param tab string
+---@param name string
+function MongoComponent:Backup(tab, name)
+    local session = self:GetActorId()
+    local code, response = app:Call(session, "MongoDB.Backup", {
+        tab = tab,
+        name = name
+    })
+    if code ~= XCode.Ok then
+        return nil
+    end
+    return response.count
+end
+
+---@param db string
+---@param name string
+function MongoComponent:Recover(db, name)
+    local session = self:GetActorId()
+    local code, response = app:Call(session, "MongoDB.Recover", {
+        db = db,
+        name = name
+    })
+    if code ~= XCode.Ok then
+        return nil
+    end
+    return response.count
+end
+
 return MongoComponent

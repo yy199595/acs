@@ -25,6 +25,12 @@ namespace help
 			return id;
 		}
 
+		static int Add(std::function<void(Args ...)> && callback) {
+			int id = mNumPool.Pop();
+			mEvents.emplace(id, callback);
+			return id;
+		}
+
 		static bool Remove(int id)
 		{
 			auto iter = mEvents.find(id);

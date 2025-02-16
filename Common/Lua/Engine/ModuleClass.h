@@ -8,13 +8,13 @@
 #include<string>
 namespace Lua
 {
-	class ModuleClass
+	class CCModule
 	{
 	public:
-		explicit ModuleClass(lua_State * lua);
+		explicit CCModule(lua_State * lua);
 	public:
-		void Register(const luaL_Reg & luaLib);
-		void Register(const char * module, lua_CFunction func);
+		void Open(const luaL_Reg & luaLib);
+		void Open(const char * module, lua_CFunction func);
 	private:
 		lua_State * mLua;
 	};

@@ -1,19 +1,18 @@
 import axios, {AxiosInstance, AxiosError, AxiosResponse, AxiosRequestConfig} from 'axios';
-import {get_token} from "../api/token";
+import {app} from "../api/token";
 
 const service: AxiosInstance = axios.create({
-    //baseURL:"https://www.huwai.pro",
-    //baseURL: "http://127.0.0.1:8088",
+    baseURL: "http://127.0.0.1:8088",
     timeout: 5000
 });
 
 service.interceptors.request.use(
     (config: AxiosRequestConfig) => {
         if(config.url?.indexOf("/city/list") === -1) {
-            const tokenData = get_token()
-            if (tokenData != null) {
+            const userInfo = app.get_user_info()
+            if (userInfo != null) {
                 config.headers = {
-                    "Authorization": tokenData.token
+                    "Authorization": userInfo.token
                 }
             }
         }

@@ -4,9 +4,13 @@
 
 #include<ostream>
 #include"MongoMgr.h"
+#include"Entity/Actor/Server.h"
 #include"Core/System/System.h"
+#include"Util/Tools/TimeHelper.h"
+#include"Mongo/Component/MongoDBComponent.h"
+#include"Server/Config/ServerConfig.h"
 #include"Util/File/DirectoryHelper.h"
-#include"Mongo/Component/MongoComponent.h"
+#include "Util/File/FileHelper.h"
 
 namespace acs
 {
@@ -17,66 +21,122 @@ namespace acs
 
 	bool MongoMgr::OnInit()
 	{
-		BIND_COMMON_HTTP_METHOD(MongoMgr::Export);
-		this->mMongo = this->GetComponent<MongoComponent>();
+		BIND_COMMON_HTTP_METHOD(MongoMgr::Backup);
+		BIND_COMMON_HTTP_METHOD(MongoMgr::Recover);
+		LOG_CHECK_RET_FALSE(this->mMongo = this->GetComponent<MongoDBComponent>())
+		LOG_CHECK_RET_FALSE(ServerConfig::Inst()->GetPath("backup", this->mBackupPath))
 		return true;
 	}
 
-	int MongoMgr::Export(const http::FromContent& request, http::Response& response)
+	int MongoMgr::Backup(const http::FromContent& request, json::w::Document& response)
 	{
-		std::string tab;
-		std::string work = os::System::WorkPath();
-		LOG_ERROR_CHECK_ARGS(request.Get("tab", tab));
-		std::string dir = fmt::format("{}/export", work);
-		if (!help::dir::DirectorIsExist(dir))
-		{
-			help::dir::MakeDir(dir);
-		}
-		int page = 0;
-		std::string path = fmt::format("{}/{}.json", dir, tab);
-		std::ofstream ofs(path.c_str(), std::ios::out);
-		if (!ofs.is_open())
+		std::string tab, name;
+		LOG_ERROR_CHECK_ARGS(request.Get("tab", tab))
+		LOG_ERROR_CHECK_ARGS(request.Get("name", name))
+		if(this->mBackupPath.empty())
 		{
 			return XCode::Failure;
 		}
-		ofs << "[\n";
-		int count = 0;
-		json::w::Document filter;
-		db::mongo::find_page::request request1;
-		int sumCount = this->mMongo->Count(tab.c_str(), filter);
-		std::unique_ptr<db::mongo::find_page::response> response1 = std::make_unique<db::mongo::find_page::response>();
+		std::string dir = fmt::format("{}/{}", this->mBackupPath, name);
+		if(!help::dir::DirectorIsExist(dir))
+		{
+			help::dir::MakeDir(dir);
+		}
+		std::ofstream ofs;
+		std::string path = fmt::format("{}/{}.mb", dir, tab);
+		ofs.open(path, std::ios::ate | std::ios::app | std::ios::out | std::ios::binary);
+		if(!ofs.is_open())
+		{
+			return XCode::Failure;
+		}
+
+		int page = 0;
+		const int limit = 200;
+		unsigned int count = 0;
+		std::string jsonString;
+		std::unique_ptr<bson::Reader::Document> document1;
+		std::vector<std::unique_ptr<bson::Reader::Document>> results;
 		do
 		{
 			page++;
-			response1->Clear();
-			request1.set_tab(tab);
-			request1.set_page(page);
-			request1.set_count(200);
-			if (this->mMongo->FindPage(request1, response1.get()) != XCode::Ok)
+			results.clear();
+			int skip = (page - 1) * limit;
+			std::unique_ptr<mongo::Request> mongoRequest = std::make_unique<mongo::Request>();
 			{
-				break;
+				bson::Writer::Document document;
+				mongoRequest->GetCollection("find", tab);
 			}
-			for (int index = 0; index < response1->json_size(); index++)
+			mongoRequest->Skip(skip).Limit(limit);
+			std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
+			LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::Failure);
+
+			LOG_ERROR_RETURN_CODE(mongoResponse->Document()->Get("cursor", document1), XCode::FindMongoDocumentFail);
+			LOG_ERROR_RETURN_CODE(document1->Get("firstBatch", results), XCode::FindMongoDocumentFail);
+			for (std::unique_ptr<bson::Reader::Document>& document: results)
 			{
-				count++;
-				const std::string& json = response1->json(index);
-				ofs.write(json.c_str(), json.size());
-				if (count < sumCount)
+				++count;
+				document->WriterToJson(&jsonString);
+				ofs.write(jsonString.c_str(), (int)jsonString.size()) << "\n";
+			}
+		}
+		while(results.size() > 0);
+
+		ofs.close();
+		std::unique_ptr<json::w::Value> jsonValue = response.AddObject("data");
+		{
+			jsonValue->Add("count", count);
+			jsonValue->Add("name", name);
+		}
+		return XCode::Ok;
+	}
+
+	int MongoMgr::Recover(const http::FromContent& request, json::w::Document& response)
+	{
+		std::string name, db;
+		std::vector<std::string> filePaths;
+		std::vector<std::string> fileLines;
+		LOG_ERROR_CHECK_ARGS(request.Get("db", db))
+		LOG_ERROR_CHECK_ARGS(request.Get("name", name))
+		std::unique_ptr<json::w::Value> jsonValue = response.AddObject("data");
+		help::dir::GetFilePaths(fmt::format("{}/{}", this->mBackupPath, name), filePaths);
+		for(const std::string & filePath : filePaths)
+		{
+			int sumCount = 0;
+			fileLines.clear();
+			std::string table;
+			help::fs::GetFileName(filePath, table);
+			help::fs::ReadTxtFile(filePath, fileLines);
+			std::string targetTable = fmt::format("{}.{}", db, table);
+			for(size_t index = 0; index < fileLines.size(); index += 100)
+			{
+				std::unique_ptr<mongo::Request> mongoRequest = std::make_unique<mongo::Request>();
 				{
-					ofs << ",\n";
+					bson::Writer::Array documents;
+					for(size_t x = index; x < index + 100 && x < fileLines.size(); x++)
+					{
+						bson::Writer::Document document;
+						if(!document.FromByJson(fileLines[x]))
+						{
+							return XCode::Failure;
+						}
+						documents.Add(document);
+					}
+
+					mongoRequest->GetCollection("insert", targetTable).Insert(documents);
+				}
+				std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
+				if(mongoResponse && mongoResponse->Document() != nullptr)
+				{
+					int count = 0;
+					if (mongoResponse->Document()->Get("n", count))
+					{
+						sumCount+= count;
+					}
 				}
 			}
-			LOG_WARN("export {}.json {:.2f}%", tab, (count / (float)sumCount) * 100.0f);
-			ofs.flush();
-		} 
-		while (response1->json_size() > 0);
-		{
-			ofs << "\n]\n";
-			ofs.flush();
-			ofs.close();
+			jsonValue->Add(targetTable.c_str(), sumCount);
 		}
-		response.File(http::Header::JSON, path);
-		response.Header().Add("Content-Disposition", fmt::format("attachment; filename=\"{}.json\"", tab));
+
 		return XCode::Ok;
 	}
 }

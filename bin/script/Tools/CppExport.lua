@@ -1,8 +1,9 @@
 local CppExport = { }
 
-function CppExport.Run(documents, types, fields, name)
+function CppExport.Run(documents, types, fields, name, descs)
     local content = "#pragma once\n"
 
+    local config = CppExport.config
     local includes = { }
     local members = { }
     for i, field in pairs(fields) do
@@ -38,15 +39,16 @@ function CppExport.Run(documents, types, fields, name)
         content = content .. string.format("#include<%s>\n", include)
     end
 
-    content = content .. "namespace config\n{\n";
+    content = content .. "namespace " .. config.namespace .. "\n{\n";
     content = content .. string.format("%sstruct %s\n", string.rep("    ", 1), name);
     content = content .. string.rep("    ", 1) .. "{\n"
 
     for _, member in ipairs(members) do
+        local desc = descs[member.name]
         if not member.value then
-            content = content .. string.rep("  ", 2) .. string.format("    %s %s;\n", member.type, member.name)
+            content = content .. string.rep("  ", 2) .. string.format("    %s %s; //%s\n", member.type, member.name, desc)
         else
-            content = content .. string.rep("  ", 2) .. string.format("    %s %s = %s;\n", member.type, member.name, member.value)
+            content = content .. string.rep("  ", 2) .. string.format("    %s %s = %s; //%s\n", member.type, member.name, member.value, desc)
         end
     end
     content = content .. string.rep("    ", 1) .. "};\n"

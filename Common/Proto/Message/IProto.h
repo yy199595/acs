@@ -116,25 +116,10 @@ namespace tcp
 			char Buffer[sizeof(T)] = { 0 };
 		};
 
-		inline bool IsBitEnDian()
-		{
-			return (*(uint16_t*)"\x01\x00" != 0x0001);
-		}
-
-		// 转换成大端
-		template<typename T>
-		inline T ToBigEnDian(const T value)
-		{
-			if(IsBitEnDian())
-			{
-				return value;
-			}
-			// 如果是小端，进行字节序转换
-			T result = 0;
-			for (size_t i = 0; i < sizeof(T); ++i) {
-				result |= ((value >> (i * 8)) & 0xFF) << ((sizeof(T) - 1 - i) * 8);
-			}
-			return result;
+		// 判断是否是小端
+		inline bool IsLittleEndian() {
+			uint16_t value = 0x0001; // 2 字节的值 0x0001
+			return (*reinterpret_cast<uint8_t*>(&value) == 0x01); // 检查最低字节是否为 0x01
 		}
 
 		template<typename T>
@@ -154,15 +139,40 @@ namespace tcp
 		}
 
 		template<typename T>
-		inline void Read(const char * buffer, T & value)
-		{
+		inline void Read(const char* buffer, T& value, size_t size = sizeof(T), bool endian = true) {
 			value = 0;
-			size_t size = sizeof(T); // 获取类型 T 的字节大小
 
-			for (size_t i = 0; i < size; ++i) {
-				value |= (static_cast<T>(static_cast<unsigned char>(buffer[i])) << ((size - 1 - i) * 8));
+			// 判断当前机器的字节序
+			bool isLittle = IsLittleEndian();
+			if (endian) { // 数据是大端字节序
+				for (size_t i = 0; i < size; ++i) {
+					value |= (static_cast<T>(static_cast<unsigned char>(buffer[i])) << ((size - 1 - i) * 8));
+				}
+
+				// 如果当前机器是小端字节序，则需要将数据转换为小端
+				if (isLittle) {
+					T swappedValue = 0;
+					for (size_t i = 0; i < size; ++i) {
+						swappedValue |= ((value >> (i * 8)) & 0xFF) << ((size - 1 - i) * 8);
+					}
+					value = swappedValue;
+				}
+			} else { // 数据是小端字节序
+				for (size_t i = 0; i < size; ++i) {
+					value |= (static_cast<T>(static_cast<unsigned char>(buffer[i])) << (i * 8));
+				}
+
+				// 如果当前机器是大端字节序，则需要将数据转换为大端
+				if (!isLittle) {
+					T swappedValue = 0;
+					for (size_t i = 0; i < size; ++i) {
+						swappedValue |= ((value >> (i * 8)) & 0xFF) << ((size - 1 - i) * 8);
+					}
+					value = swappedValue;
+				}
 			}
 		}
+
 		template<typename T>
 		inline void Write(char * buffer, const T&value)
 		{

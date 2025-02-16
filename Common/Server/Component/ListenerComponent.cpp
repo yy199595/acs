@@ -14,7 +14,7 @@ namespace acs
 
 	ListenerComponent::ListenerComponent()
 #ifdef __ENABLE_OPEN_SSL__
-		: mSslCtx(asio::ssl::context::tlsv12)
+		: mSslCtx(asio::ssl::context::tlsv12_server)
 #endif
 	{
 		this->mAcceptor = nullptr;
@@ -49,10 +49,25 @@ namespace acs
 #ifdef __ENABLE_OPEN_SSL__
 		if (!config.Cert.empty())
 		{
-			const std::string& key = config.Key;
-			const std::string& cert = config.Cert;
-			this->mSslCtx.use_certificate_chain_file(cert);
-			this->mSslCtx.use_private_key_file(key, asio::ssl::context::pem);
+			try
+			{
+				const std::string& key = config.Key;
+				const std::string& cert = config.Cert;
+				this->mSslCtx.use_certificate_chain_file(cert);
+				this->mSslCtx.use_private_key_file(key, asio::ssl::context::pem);
+				this->mSslCtx.set_options(
+						asio::ssl::context::default_workarounds |
+						asio::ssl::context::no_sslv2 |
+						asio::ssl::context::no_sslv3 |
+						asio::ssl::context::no_tlsv1 |
+						asio::ssl::context::no_tlsv1_1 |
+						asio::ssl::context::single_dh_use);
+			}
+			catch (std::system_error & error)
+			{
+				LOG_ERROR("listen [{}] => {}", config.Name, error.what());
+				return false;
+			}
 		}
 #endif
 #ifdef ONLY_MAIN_THREAD
@@ -117,12 +132,13 @@ namespace acs
 		{
 			sock = this->mThreadComponent->CreateSocket(this->mSslCtx);
 		}
-#endif
-		if (this->mConfig.Cert.empty())
+		else
 		{
 			sock = this->mThreadComponent->CreateSocket();
 		}
-
+#else
+		sock = this->mThreadComponent->CreateSocket();
+#endif
 		auto callback = [this, sock](const Asio::Code& code)
 		{
 			do
@@ -132,7 +148,6 @@ namespace acs
 					sock->Destroy();
 					break;
 				}
-				sock->Init();
 #ifdef __ENABLE_OPEN_SSL__
 				if (sock->IsOpenSsl())
 				{
@@ -146,6 +161,7 @@ namespace acs
 					}
 				}
 #endif
+				sock->Init();
 #ifdef ONLY_MAIN_THREAD
 				this->OnAcceptSocket(sock);
 #else

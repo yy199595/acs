@@ -4,13 +4,11 @@
 
 #ifndef APP_REDISCONFIG_H
 #define APP_REDISCONFIG_H
-#include<set>
-#include<string>
-#include<vector>
 #include<unordered_map>
+#include <Yyjson/Object/JsonObject.h>
 namespace redis
 {
-    struct Config final
+	struct Config final : public json::Object<Config>
     {
     public:
 		int Id;

@@ -1,43 +1,32 @@
 {
     "include": [
-        "com/com.json",
-        "com/log.json"
+        "com/com.json"
     ],
-    "log" : {
-        "wx": "",
-        "ding" : ""
-    },
     "core": {
         "name": "excel"
     },
     "lua": {
         "main": "Excel"
     },
-    "path": {
-        "cluster": "${WORK_DIR}/config/cluster/excel.json"
-    },
     "excel": {
-        "dir": "C:/Users/64658/Desktop/tmp/tmp/excel",
+        "dir": "C:\\Users\\64658\\Desktop\\project\\策划\\配置表",
         "output": [
             {
                 "type": "json",
                 "ext": ".json",
-                "path": "C:/Users/64658/Desktop/tmp/tmp/excel/json"
+                "path": "C:\\Users\\64658\\Desktop\\project\\策划\\tool\\json"
             },
             {
-                "type": "lua",
-                "ext": ".lua",
-                "path": "C:/Users/64658/Desktop/tmp/tmp/excel/lua"
-            },
-            {
-                "type": "cpp",
-                "ext": ".h",
-                "path": "C:/Users/64658/Desktop/tmp/tmp/excel/cpp"
+                "type": "cs",
+                "ext": ".cs",
+                "namespace" : "ETModel",
+                "path": "C:\\Users\\64658\\Desktop\\project\\develop\\hepingzhizheng\\Assets\\_Scripts\\Framework\\Controllers\\Config\\Configmodel"
             }
         ],
         "ignore": [
             "@",
-            "#"
+            "#",
+            "Sheet"
         ]
     }
 }

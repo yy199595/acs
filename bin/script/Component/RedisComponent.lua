@@ -1,11 +1,10 @@
 local type = _G.type
-
 local tab_pack = table.pack
 local tab_insert = table.insert
 local str_format = string.format
 local json = require("util.json")
 local Component = require("Component")
-local _, redis = pcall(require, "db.redis")
+local redis = require("db.redis")
 
 local RedisComponent = Component()
 
@@ -185,13 +184,13 @@ end
 
 ---@param channel string
 ---@return boolean
-function RedisComponent:SubChannel(channel)
+function RedisComponent:Sub(channel)
     return redis.Sub(channel)
 end
 
 ---@param channel string
-function RedisComponent:UnSubChannel(channel)
-
+function RedisComponent:UnSub(channel)
+    return redis.UnSub(channel)
 end
 
 return RedisComponent

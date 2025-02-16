@@ -11,7 +11,7 @@ namespace http
 	class Content;
 	class Request;
 	class Response;
-	class RequestClient;
+	class Client;
 }
 namespace acs
 {
@@ -31,19 +31,17 @@ namespace acs
 		int Send(std::unique_ptr<http::Request> request, std::function<void(std::unique_ptr<http::Response>)> && cb);
 		int Send(std::unique_ptr<http::Request> request, std::unique_ptr<http::Response> response, int & taskId); // 异步发送
 	private:
-#ifdef __ENABLE_OPEN_SSL__
 		bool Awake() final;
-#endif
         bool LateAwake() final;
 		void OnDelTask(int key) final;
-		std::shared_ptr<http::RequestClient> CreateClient(http::Request * request);
+		std::shared_ptr<http::Client> CreateClient(http::Request * request);
 		void OnMessage(http::Request *request, http::Response *response) noexcept final;
 	private:
         class ThreadComponent * mNetComponent;
 #ifdef __ENABLE_OPEN_SSL__
+		std::string mPemPath;
 		std::unordered_map<std::string, std::unique_ptr<asio::ssl::context>> mSslContexts;
 #endif
-		std::string mPemPath;
-		custom::HashMap<int, std::shared_ptr<http::RequestClient>> mUseClients;
+		custom::HashMap<int, std::shared_ptr<http::Client>> mUseClients;
 	};
 }

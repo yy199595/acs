@@ -43,15 +43,6 @@ namespace rpc
 		});
 	}
 
-	void OuterTcpClient::OnTimeout(tcp::TimeoutFlag flag)
-	{
-		long long nowTime = help::Time::NowSec();
-		if(nowTime - this->mLastRecvTime >= 30)
-		{
-			this->CloseSocket(XCode::NetTimeout);
-		}
-	}
-
 	void OuterTcpClient::OnReadError(const Asio::Code& code)
 	{
 		this->CloseSocket(XCode::NetReadFailure);

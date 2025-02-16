@@ -7,8 +7,8 @@
 namespace ws
 {
 	class Message;
-	class SessionClient;
-	class RequestClient;
+	class Session;
+	class Client;
 }
 
 #include "Rpc/Component/RpcComponent.h"
@@ -36,8 +36,8 @@ namespace acs
 		class ThreadComponent * mThread;
 		math::NumberPool<int> mClientPool;
 		class DispatchComponent * mDispatch;
-		std::unordered_map<int, std::shared_ptr<ws::RequestClient>> mClients;
-		std::unordered_map<int, std::shared_ptr<ws::SessionClient>> mSessions;
+		std::unordered_map<int, std::shared_ptr<ws::Client>> mClients;
+		std::unordered_map<int, std::shared_ptr<ws::Session>> mSessions;
 	};
 }
 

@@ -6,7 +6,7 @@
 #define APP_WSCLIENTCOMPONENT_H
 #include"Rpc/Common/Message.h"
 #include"Entity/Component/Component.h"
-#include"WebSocket/Client/WebSocketClient.h"
+#include"WebSocket/Client/Client.h"
 
 namespace acs
 {
@@ -16,6 +16,7 @@ namespace acs
 	public:
 		WsClientComponent();
 	private:
+		bool Awake() final;
 		bool LateAwake() final;
 		void OnClientError(int id, int code) final;
 		void OnSendFailure(int id, rpc::Message *message) final;
@@ -32,8 +33,7 @@ namespace acs
 		class ProtoComponent * mProto;
 		class LuaComponent * mLuaComponent;
 		class DispatchComponent * mDisComponent;
-		std::queue<std::unique_ptr<ws::RequestClient>> mClientQueue;
-		std::unordered_map<int, std::shared_ptr<ws::RequestClient>> mClientMap;
+		std::unordered_map<int, std::shared_ptr<ws::Client>> mClientMap;
 
 	};
 }

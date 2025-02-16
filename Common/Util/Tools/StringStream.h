@@ -76,7 +76,7 @@ namespace help
 				return this->stringBuffer;
 			}
 
-			inline inline void Clear()
+			inline void Clear()
 			{
 				this->stringBuffer.clear();
 			}

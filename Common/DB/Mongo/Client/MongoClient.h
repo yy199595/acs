@@ -28,7 +28,6 @@ namespace mongo
 		bool StartAuthBySha1();
 		void OnResponse(int code);
 		std::unique_ptr<Response> ReadResponse();
-		void OnTimeout(tcp::TimeoutFlag flag) final;
 		void OnReadError(const Asio::Code &code) final;
 		void OnReceiveMessage(std::istream & is, size_t, const Asio::Code &) final;
 		std::unique_ptr<Response> SyncSendMongoCommand(const std::unique_ptr<Request>& request);
@@ -36,7 +35,7 @@ namespace mongo
 		void OnResponse(int code, std::unique_ptr<Request> request, std::unique_ptr<Response> response);
 	private:
 		void OnSendMessage(size_t size) final;
-		void OnConnect(bool result, int count) final;
+		void OnConnect(const Asio::Code &, int count) final;
 		void OnSendMessage(const asio::error_code &code) final;
 	private:
 		Component * mComponent;

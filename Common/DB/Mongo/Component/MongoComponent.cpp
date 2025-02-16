@@ -6,7 +6,7 @@
 #include"Entity/Actor/App.h"
 #include"Mongo/Service/MongoDB.h"
 #include"Cluster/Config/ClusterConfig.h"
-
+#include"Lua/Lib/Lib.h"
 namespace acs
 {
 	MongoComponent::MongoComponent()
@@ -16,6 +16,9 @@ namespace acs
 
 	bool MongoComponent::Awake()
 	{
+		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
+			ccModule.Open("db.mongo", lua::lib::luaopen_lmonogodb);
+		});
 		const std::string& name = ComponentFactory::GetName<MongoDB>();
 		return ClusterConfig::Inst()->GetServerName(name, this->mServer);
 	}
@@ -374,7 +377,7 @@ namespace acs
 		}
 		for (int i = 0; i < result->jsons_size(); ++i)
 		{
-			response->PushJson(result->jsons(i));
+			response->PushObject(result->jsons(i));
 		}
 		return XCode::Ok;
 	}

@@ -12,7 +12,8 @@ Console.LogError = 4
 Console.LogFatal = 5
 
 local debug_module = os.debug
-local string_format = string.format
+local lfmt = require("util.fmt")
+local string_format = lfmt.format
 local console = require("core.log")
 
 function Console.Show(type, fmt, ...)

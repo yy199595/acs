@@ -2,6 +2,7 @@
 // Created by 64658 on 2025/1/16.
 //
 
+#ifdef __ENABLE_OPEN_SSL__
 #ifndef APP_LUAAES_H
 #define APP_LUAAES_H
 #include "Lua/Engine/LuaInclude.h"
@@ -17,3 +18,4 @@ namespace lua
 
 
 #endif //APP_LUAAES_H
+#endif

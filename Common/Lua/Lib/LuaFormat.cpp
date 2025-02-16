@@ -3,8 +3,6 @@
 //
 
 #include "Lib.h"
-#include "fmt.h"
-#include <unordered_set>
 #include "Util/Tools/StringStream.h"
 
 #define LUA_LIB
@@ -14,52 +12,6 @@
 
 #include <cstring>
 #include <cfloat>
-
-#if LUA_VERSION_NUM == 501
-static void luaL_tolstring(lua_State *L, int idx, size_t *len) {
-	int tt; const char *kind; (void)len;
-	if (luaL_callmeta(L, idx, "__tostring")) {
-		if (!lua_isstring(L, -1))
-			luaL_error(L, "'__tostring' must return a string");
-		return;
-	}
-	switch (lua_type(L, idx)) {
-	case LUA_TSTRING:
-		lua_pushvalue(L, idx); break;
-	case LUA_TBOOLEAN:
-		lua_pushstring(L, (lua_toboolean(L, idx) ? "true" : "false"));
-		break;
-	case LUA_TNIL:
-		lua_pushliteral(L, "nil");
-		break;
-	default:
-		tt = luaL_getmetafield(L, idx, "__name");
-		kind = (tt == LUA_TSTRING) ? lua_tostring(L, -1) :
-			luaL_typename(L, idx);
-		lua_pushfstring(L, "%s: %p", kind, lua_topointer(L, idx));
-		if (tt != LUA_TNIL) lua_remove(L, -2);
-	}
-}
-#endif
-
-#if LUA_VERSION_NUM < 502 && !defined(LUA_OK)
-static lua_Integer lua_tointegerx(lua_State *L, int idx, int *isint) {
-	lua_Integer i = lua_tointeger(L, idx);
-	*isint = i == 0 ? lua_type(L, idx)==LUA_TNUMBER : lua_tonumber(L, idx)==i;
-	return i;
-}
-#endif
-
-#if LUA_VERSION_NUM < 503
-static void lua_geti(lua_State *L, int idx, int i)
-{ lua_pushinteger(L, i); lua_gettable(L, idx); }
-
-static int lua_isinteger(lua_State *L, int idx) {
-	lua_Number v = lua_tonumber(L, idx);
-	if (v == 0.0 && lua_type(L,idx) != LUA_TNUMBER) return 0;
-	return (lua_Number)(lua_Integer)v == v;
-}
-#endif
 
 typedef struct fmt_State
 {
@@ -723,6 +675,7 @@ namespace lua
 		std::string result = "return \n";
 		const char * str = luaL_checklstring(L, -1, &size);
 		{
+			result.reserve(result.size() + size);
 			result.append(str, size);
 			luaL_dostring(L, result.c_str());
 		}

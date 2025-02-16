@@ -4,22 +4,18 @@
 
 #ifndef APP_LUACONFIG_H
 #define APP_LUACONFIG_H
-#include<vector>
-#include<string>
-#include"Yyjson/Document/Document.h"
 
+#include"Yyjson/Object/JsonObject.h"
 struct lua_State;
-namespace acs
+
+namespace lua
 {
-	class LuaConfig
+	struct Config : public json::Object<Config>
 	{
 	public:
-		bool Init(const json::r::Value & data);
-		const std::string & Main() const { return this->mMain; }
-		std::vector<std::string> Requires() const { return this->mRequires; }
-	private:
-		std::string mMain;
-		std::vector<std::string> mRequires;
+		std::string main;
+		std::vector<std::string> require;
+		std::vector<std::string> modules;
 	};
 }
 

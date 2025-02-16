@@ -1,12 +1,10 @@
 //
 // Created by yy on 2023/8/12.
 //
-
+#include "Lua/Lib/Lib.h"
 #include "LoggerComponent.h"
 #include "Entity/Actor/App.h"
 #include "Core/System/System.h"
-#include "Lua/Engine/ModuleClass.h"
-#include "Log/Lua/LuaLogger.h"
 #include "Util/Tools/TimeHelper.h"
 #include "Log/Output/FileOutput.h"
 #ifdef __CONSOLE_LOG__
@@ -15,7 +13,6 @@
 #include "Log/Output/WeChatOutput.h"
 #include "Log/Output/MongoOutput.h"
 
-#include "Config/Base/LangConfig.h"
 #ifdef __ENABLE_DING_DING_PUSH
 #include "Http/Common/HttpRequest.h"
 #include "Http/Common/HttpResponse.h"
@@ -23,12 +20,23 @@
 #endif
 #include "Http/Component/NotifyComponent.h"
 #include "Server/Component/ThreadComponent.h"
-#include "Lua/Lib/Lib.h"
+
 namespace acs
 {
 	LoggerComponent::LoggerComponent()
 	{
+		this->mConsole = 1;
 		this->mThread = nullptr;
+		custom::LogConfig::RegisterField("wx", &custom::LogConfig::wx);
+		custom::LogConfig::RegisterField("pem", &custom::LogConfig::pem);
+		custom::LogConfig::RegisterField("open", &custom::LogConfig::open);
+		custom::LogConfig::RegisterField("ding", &custom::LogConfig::ding);
+		custom::LogConfig::RegisterField("name", &custom::LogConfig::name);
+		custom::LogConfig::RegisterField("path", &custom::LogConfig::path);
+		custom::LogConfig::RegisterField("mongo", &custom::LogConfig::mongo);
+		custom::LogConfig::RegisterField("level", &custom::LogConfig::levelName);
+		custom::LogConfig::RegisterField("max_line", &custom::LogConfig::max_line);
+		custom::LogConfig::RegisterField("max_size", &custom::LogConfig::max_size);
 	}
 
 	LoggerComponent::~LoggerComponent()
@@ -41,56 +49,30 @@ namespace acs
 		std::string name;
 		os::System::GetEnv("name", name);
 		std::unique_ptr<json::r::Value> jsonArray;
+		LuaCCModuleRegister::Add([](Lua::CCModule& ccModule)
+		{
+			ccModule.Open("core.log", lua::lib::luaopen_llog);
+		});
+		os::System::GetEnv("console", this->mConsole);
 		this->mThread = this->GetComponent<ThreadComponent>();
-
 		std::unordered_map<std::string, custom::LogLevel> logLevelMap = {
+				{"none", custom::LogLevel::None, },
 				{ "debug", custom::LogLevel::Debug, },
-				{ "info", custom::LogLevel::Info, },
-				{ "warn", custom::LogLevel::Warn, },
+				{ "info",  custom::LogLevel::Info, },
+				{ "warn",  custom::LogLevel::Warn, },
 				{ "error", custom::LogLevel::Error, },
 				{ "fatal", custom::LogLevel::Fatal, },
 		};
-
-		if (this->mApp->Config().Get("log", jsonArray))
+		this->mApp->Config().Get("log", this->mConfig);
+		for (custom::LogConfig& config: this->mConfig)
 		{
-			for(size_t  index = 0; index < jsonArray->MemberCount(); index++)
+			auto iter = logLevelMap.find(config.levelName);
+			if (iter == logLevelMap.end())
 			{
-				std::unique_ptr<json::r::Value> jsonObject;
-				if (!jsonArray->Get(index, jsonObject))
-				{
-					return false;
-				}
-				std::string level;
-				custom::LogConfig config;
-				config.max_line = 1024 * 10;
-				config.max_line = 1024 * 1024;
-				LOG_CHECK_RET_FALSE(jsonObject->Get("level", level));
-				LOG_CHECK_RET_FALSE(jsonObject->Get("name", config.name))
-				auto iter = logLevelMap.find(level);
-				if(iter == logLevelMap.end())
-				{
-					return false;
-				}
-				config.level = iter->second;
-				jsonObject->Get("wx", config.wx);
-				jsonObject->Get("open", config.open);
-				jsonObject->Get("ding", config.ding);
-
-				jsonObject->Get("pem", config.pem);
-				jsonObject->Get("path", config.path);
-				jsonObject->Get("mongo", config.mongo);
-				jsonObject->Get("max_size", config.max_size);
-				jsonObject->Get("max_line", config.max_line);
-
-				jsonObject->Get("console", config.console);
-
-				this->mConfig.emplace_back(config);
+				return false;
 			}
-		}
-
-		for(const custom::LogConfig & config : this->mConfig)
-		{
-			if(config.open && !this->Create(config))
+			config.level = iter->second;
+			if (config.open && !this->Create(config))
 			{
 				return false;
 			}
@@ -144,6 +126,10 @@ namespace acs
 
 	void LoggerComponent::PushLog(std::unique_ptr<custom::LogInfo> log)
 	{
+		if(this->mConsole == 1)
+		{
+			Debug::Console(*log);
+		}
 		custom::Logger* logger = this->GetLogger(log->Level);
 		if (logger != nullptr)
 		{
@@ -177,7 +163,8 @@ namespace acs
 
 	bool LoggerComponent::Create(const custom::LogConfig & config)
 	{
-		custom::Logger * logger = new custom::Logger(config.name, this->mThread->GetContext());
+		Asio::Context & context = this->mThread->GetContext();
+		std::unique_ptr<custom::Logger> logger = std::make_unique<custom::Logger>(config.name, context);
 		{
 			if (!config.path.empty())
 			{
@@ -191,11 +178,13 @@ namespace acs
 			}
 			if (!config.wx.empty() && !config.pem.empty())
 			{
+				//微信通知组件
 				logger->AddOutput<custom::WeChatOutput>(config.wx, config.pem);
 			}
 			mongo::MongoConfig mongoConfig;
 			if (!config.mongo.empty() && mongoConfig.FromString(config.mongo))
 			{
+				// mongodb组件
 				logger->AddOutput<custom::MongoOutput>(mongoConfig);
 			}
 		}
@@ -203,8 +192,12 @@ namespace acs
 		{
 			return false;
 		}
-		this->mLoggers.emplace(config.name, logger);
-		this->mLevelLoggers.emplace(config.level, logger);
+		custom::Logger * newLogger = logger.release();
+		if(config.level > custom::LogLevel::None)
+		{
+			this->mLevelLoggers.emplace(config.level, newLogger);
+		}
+		this->mLoggers.emplace(config.name, newLogger);
 		return true;
 	}
 }

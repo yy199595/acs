@@ -1,7 +1,7 @@
 //
 // Created by leyi on 2024/2/22.
 //
-
+#ifdef __ENABLE_OPEN_SSL__
 #ifndef APP_WECHATCOMPONENT_H
 #define APP_WECHATCOMPONENT_H
 #include "WX/Config/WxConfig.h"
@@ -192,7 +192,7 @@ namespace acs
 		~WeChatComponent() final = default;
 	private:
 		bool Awake() final;
-		void Start() final;
+		void OnStart() final;
 		bool LateAwake() final;
 	public:
 		bool CreateOrder(wx::OrderInfo * orderInfo);
@@ -234,3 +234,5 @@ namespace acs
 
 
 #endif //APP_WECHATCOMPONENT_H
+
+#endif

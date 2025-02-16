@@ -1,14 +1,38 @@
 //
 // Created by leyi on 2023/6/29.
 //
-
+#ifdef __OS_WIN__
+#include <codecvt>
+#endif
 #include "LuaFile.h"
-#include "fstream"
-#include "Util/Crypt/md5.h"
 #include "Util/File/FileHelper.h"
 #include "Util/File/DirectoryHelper.h"
 namespace lua
 {
+	int LuaFile::Write(lua_State * L)
+	{
+		size_t size = 0;
+		std::ofstream ofs;
+		const std::string path(luaL_checkstring(L, 1));
+		const char * content = luaL_checklstring(L, 2, &size);
+#ifdef __OS_WIN__
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+		std::wstring newPath = converter.from_bytes(path);
+		ofs.open(newPath, std::ios::ate);
+#else
+		ofs.open(path, std::ios::ate);
+#endif
+		if(!ofs.is_open())
+		{
+			return 0;
+		}
+		ofs.write(content, size);
+		ofs.flush();
+		ofs.close();
+		lua_pushinteger(L, size);
+		return 1;
+	}
+
 	int LuaFile::GetFileName(lua_State* lua)
 	{
 		std::string path(luaL_checkstring(lua, 1));
@@ -74,25 +98,11 @@ namespace lua
 		lua_createtable(lua, 0, files.size());
 		for(size_t index = 0; index < files.size(); index++)
 		{
-			const std::string & path = files[index];
+			std::string & path = files[index];
 			lua_pushstring(lua, path.c_str());
 			lua_seti(lua, -2, index + 1);
 		}
 		return 1;
-	}
-
-	int LuaFile::GetMd5(lua_State* lua)
-	{
-		std::string path(luaL_checkstring(lua, 1));
-		std::ifstream fs(path, std::ios::in);
-		if(fs.is_open())
-		{
-			MD5 md5(fs);
-			const std::string str = md5.toString();
-			lua_pushlstring(lua, str.c_str(), str.size());
-			return 1;
-		}
-		return 0;
 	}
 
 	int LuaFile::GetLastWriteTime(lua_State* lua)

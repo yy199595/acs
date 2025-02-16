@@ -2,15 +2,15 @@
 // Created by yjz on 2023/3/24.
 //
 
-#ifdef __ENABLE_MYSQL__
+
 
 #include"LuaMysqlTask.h"
 #include"Lua/Engine/Define.h"
-
+#include "Yyjson/Lua/ljson.h"
 namespace acs
 {
 	LuaMysqlTask::LuaMysqlTask(lua_State *lua, int id)
-		: IRpcTask<Mysql::Response>(id), mLua(lua)
+		: IRpcTask<mysql::Response>(id), mLua(lua)
 	{
 		this->mRef = 0;
 		if(lua_isthread(this->mLua, -1))
@@ -36,14 +36,82 @@ namespace acs
 		return lua_yield(this->mLua, 0);
 	}
 
-	void LuaMysqlTask::OnResponse(Mysql::Response * response)
+	inline void lua_push_value(lua_State * L, const char * key, bool value)
+	{
+		lua_pushstring(L, key);
+		lua_pushboolean(L, value);
+		lua_rawset(L, -3);
+	}
+
+	inline void lua_push_value(lua_State * L, const char * key, unsigned int value)
+	{
+		lua_pushstring(L, key);
+		lua_pushinteger(L, value);
+		lua_rawset(L, -3);
+	}
+	inline void lua_push_value(lua_State * L, const char * key, const std::string & value)
+	{
+		lua_pushstring(L, key);
+		lua_pushlstring(L, value.c_str(), value.size());
+		lua_rawset(L, -3);
+	}
+
+	void LuaMysqlTask::OnResponse(std::unique_ptr<mysql::Response> response) noexcept
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_State* coroutine = lua_tothread(this->mLua, -1);
-		
-		int count = response->WriteToLua(this->mLua);
-		Lua::Coroutine::Resume(coroutine, this->mLua, count);
+
+		lua_newtable(this->mLua);
+		{
+			bool ok = response->IsOk();
+			lua_push_value(this->mLua, "ok", ok);
+			switch(response->GetPackageCode())
+			{
+				case mysql::PACKAGE_OK:
+				{
+					const mysql::OKResponse & result = response->GetOKResponse();
+					{
+						lua_pushstring(this->mLua, "result");
+						lua_createtable(this->mLua, 0, 4);
+						{
+							lua_push_value(this->mLua, "warn_count", result.mWarningCount);
+							lua_push_value(this->mLua, "server_status", result.mServerStatus);
+							lua_push_value(this->mLua, "affected_rows", result.mAffectedRows);
+							lua_push_value(this->mLua, "last_insert_id", result.mLastInsertId);
+						}
+						lua_rawset(this->mLua, -3);
+					}
+					break;
+				}
+				case mysql::PACKAGE_ERR:
+				{
+					lua_pushstring(this->mLua, "result");
+					lua_createtable(this->mLua, 0, 2);
+					{
+						lua_push_value(this->mLua, "error", response->GetBuffer());
+						lua_push_value(this->mLua, "code", (unsigned int)response->GetErrorCode());
+					}
+					lua_rawset(this->mLua, -3);
+					break;
+				}
+				default:
+				{
+					const mysql::Result & result = response->GetResult();
+					{
+						int index = 1;
+						lua_pushstring(this->mLua, "result");
+						lua_createtable(this->mLua, 0, result.contents.size());
+						for(const std::string & json : result.contents)
+						{
+							lua::yyjson::write(this->mLua, json.c_str(), json.size());
+							lua_seti(this->mLua, -2, index++);
+						}
+						lua_rawset(this->mLua, -3);
+					}
+					break;
+				}
+			}
+		}
+		Lua::Coroutine::Resume(coroutine, 1);
 	}
 }
-
-#endif

@@ -5,7 +5,7 @@
 #include"Yyjson/Document/Document.h"
 namespace Lua
 {
-    class ModuleClass;
+    class CCModule;
 }
 
 namespace acs
@@ -14,13 +14,13 @@ namespace acs
 	class IStart
 	{
 	public:
-		virtual void Start() = 0;
+		virtual void OnStart() = 0;
 	};
 
 	class IComplete
 	{
 	public:
-		virtual void Complete() { }; //启动完毕
+		virtual void OnComplete() { }; //启动完毕
 	};
 
 	class IAppStop

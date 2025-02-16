@@ -2,31 +2,22 @@
 // Created by leyi on 2024/1/18.
 //
 
-#include"RedisSubComponent.h"
-#include"Entity/Actor/App.h"
-#include"Server/Component/ThreadComponent.h"
+#include "XCode/XCode.h"
+#include "RedisSubComponent.h"
+#include "Entity/Actor/App.h"
 #include "Lua/Engine/ModuleClass.h"
-
+#include "Rpc/Component/DispatchComponent.h"
+#include "Server/Component/ThreadComponent.h"
 namespace acs
 {
 	RedisSubComponent::RedisSubComponent()
 	{
-		this->mClient = nullptr;
+		this->mDispatch = nullptr;
 	}
 
 	bool RedisSubComponent::Awake()
 	{
-		std::unique_ptr<json::r::Value> redisObject;
-		if(!ServerConfig::Inst()->Get("sub", redisObject))
-		{
-			return false;
-		}
-		this->mConfig.Debug = false;
-		redisObject->Get("ping", this->mConfig.Ping);
-		redisObject->Get("debug", this->mConfig.Debug);
-		redisObject->Get("passwd", this->mConfig.Password);
-		redisObject->Get("address", this->mConfig.Address);
-		return true;
+		return ServerConfig::Inst()->Get("sub", this->mConfig);
 	}
 
 	bool RedisSubComponent::LateAwake()
@@ -49,6 +40,7 @@ namespace acs
 					redis::Request::Make("MONITOR");
 			this->mClient->Sync(std::move(request));
 		}
+		LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>())
 		return true;
 	}
 
@@ -58,52 +50,47 @@ namespace acs
 		auto iter = this->mChannels.begin();
 		for (; iter != this->mChannels.end(); iter++)
 		{
-			request->AddParameter(iter->first);
+			request->AddParameter(*iter);
 		}
 		request->SetRpcId(1);
 		this->mClient->Send(std::move(request));
 	}
 
-	int RedisSubComponent::SubChannel(const std::string& channel)
+	bool RedisSubComponent::Sub(const std::string& channel)
 	{
 		auto iter = this->mChannels.find(channel);
-		if(iter == this->mChannels.end())
+		if (iter != this->mChannels.end())
 		{
-			this->mChannels[channel] = 0;
+			return false;
 		}
-		if(this->mChannels[channel] == 0)
+
+		this->mChannels.insert(channel);
+		std::unique_ptr<redis::Request> request =
+				redis::Request::Make("SUBSCRIBE", channel);
 		{
-			this->mChannels[channel]++;
-			std::unique_ptr<redis::Request> request =
-					redis::Request::Make("SUBSCRIBE", channel);
-			{
-				request->SetRpcId(1);
-				this->mClient->Send(std::move(request));
-				LOG_DEBUG("sub redis channel => {}", channel);
-			}
+			request->SetRpcId(1);
+			this->mClient->Send(std::move(request));
+			LOG_DEBUG("sub redis channel => {}", channel);
 		}
-		return this->mChannels[channel];
+		return true;
 	}
 
-	int RedisSubComponent::UnSubChannel(const std::string& channel)
+	bool RedisSubComponent::UnSub(const std::string& channel)
 	{
 		auto iter = this->mChannels.find(channel);
-		if(iter == this->mChannels.end())
+		if (iter == this->mChannels.end())
 		{
-			return 0;
+			return false;
 		}
-		int count = iter->second--;
-		if(iter->second <= 0)
+
+		std::unique_ptr<redis::Request> request =
+				redis::Request::Make("UNSUBSCRIBE", channel);
 		{
-			this->mChannels.erase(iter);
-			std::unique_ptr<redis::Request> request =
-					redis::Request::Make("UNSUBSCRIBE", channel);
-			{
-				request->SetRpcId(1);
-				this->mClient->Send(std::move(request));
-			}
+			request->SetRpcId(1);
+			this->mClient->Send(std::move(request));
 		}
-		return count;
+		this->mChannels.erase(iter);
+		return true;
 	}
 
 	void RedisSubComponent::OnMessage(int, redis::Request* request, redis::Response* response) noexcept
@@ -123,11 +110,19 @@ namespace acs
 			}
 			const std::string& channel = channelData->Cast<redis::String>()->GetValue();
 			const std::string& message = messageData->Cast<redis::String>()->GetValue();
-
-			this->mApp->Publish(channel, rpc::Porto::Json, message);
+			std::unique_ptr<rpc::Message> rpcMessage = std::make_unique<rpc::Message>();
+			{
+				rpcMessage->SetType(rpc::Type::Request);
+				rpcMessage->SetContent(rpc::Porto::Json, message);
+				rpcMessage->GetHead().Add(rpc::Header::func, channel);
+			}
+			if(this->mDispatch->OnMessage(rpcMessage.get()) != XCode::Ok)
+			{
+				break;
+			}
+			rpcMessage.release();
 		}
 		while (false);
-		delete request;
 		delete response;
 		this->mClient->StartReceive();
 	}

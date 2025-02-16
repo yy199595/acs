@@ -17,6 +17,7 @@ namespace acs
 		int Ping(long long userId);
 		int Login(const rpc::Message & request);
 		int Logout(const rpc::Message & request);
+		int Create(const s2s::login::create & request);
 	private:
 		bool OnInit() final;
 	private:

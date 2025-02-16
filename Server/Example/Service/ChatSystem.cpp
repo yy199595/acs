@@ -38,6 +38,10 @@ namespace acs
 		PlayerAccountInfo::RegisterField("login_info", &PlayerAccountInfo::login_info);
 		PlayerAccountInfo::RegisterField("friend_list", &PlayerAccountInfo::friend_list);
 
+		PlayerAccountInfo::RegisterField("friend_map", &PlayerAccountInfo::friend_map);
+		PlayerAccountInfo::RegisterField("friend_sex", &PlayerAccountInfo::friend_sex);
+
+
 		PlayerAccountInfo playerAccountInfo;
 		{
 			playerAccountInfo.user_id = 10000;
@@ -64,12 +68,23 @@ namespace acs
 
 			friendInfo.add_time = help::Time::NowSec();
 			playerAccountInfo.friend_list.emplace_back(friendInfo);
+			playerAccountInfo.friend_map.emplace("xiaoming", friendInfo);
+			playerAccountInfo.friend_map.emplace("xiaohuang", friendInfo);
+
+			playerAccountInfo.friend_sex.emplace("xiaoming", 1);
+			playerAccountInfo.friend_sex.emplace("xiaohuang", 2);
+
 		}
+		playerAccountInfo.Set<long long>("user_id", 1004);
+		json::w::Document document;
+		document.Add("info", playerAccountInfo);
 
-		std::string json;
-		playerAccountInfo.Encode(json);
-		std::unique_ptr<PlayerAccountInfo> newPlayerAccountInfo = PlayerAccountInfo::Create(json);
+		std::string json = document.JsonString(true);
+		json::r::Document document1;
+		document1.Decode(json);
 
+		PlayerAccountInfo info2;
+		document1.Get("info", info2);
 		return true;
 	}
 

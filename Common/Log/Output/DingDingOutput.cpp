@@ -78,7 +78,7 @@ namespace custom
 #ifdef __ENABLE_OPEN_SSL__
 		this->mCtx.load_verify_file(this->mPem, code);
 #endif
-		this->mClient = std::make_shared<http::RequestClient>(nullptr, io);
+		this->mClient = std::make_shared<http::Client>(nullptr, io);
 		return code.value() == 0;
 	}
 }

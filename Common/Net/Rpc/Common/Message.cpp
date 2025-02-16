@@ -364,7 +364,7 @@ namespace rpc
 				break;
 			case rpc::Porto::Json:
 			{
-				jsonWriter.AddJson("data", this->mBody);
+				jsonWriter.AddObject("data", this->mBody);
 				break;
 			}
 			case rpc::Porto::Protobuf:

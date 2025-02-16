@@ -4,15 +4,14 @@
 #include"HttpComponent.h"
 #include"XCode/XCode.h"
 #include"Server/Component/ThreadComponent.h"
-#include"Http/Client/RequestClient.h"
+#include"Http/Client/Client.h"
 #include"Http/Task/HttpTask.h"
-#include"Http/Lua/LuaHttp.h"
 #include"Entity/Actor/App.h"
 #include"Lua/Engine/ModuleClass.h"
 #include"Http/Common/HttpRequest.h"
 #include"Util/File/DirectoryHelper.h"
-#include"Rpc/Component/DispatchComponent.h"
 
+#include "Lua/Lib/Lib.h"
 namespace acs
 {
 
@@ -21,9 +20,13 @@ namespace acs
 		this->mNetComponent = nullptr;
 	}
 
-#ifdef __ENABLE_OPEN_SSL__
+
 	bool HttpComponent::Awake()
 	{
+		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
+			ccModule.Open("net.http", lua::lib::luaopen_lhttp);
+		});
+#ifdef __ENABLE_OPEN_SSL__
 		std::unique_ptr<json::r::Value> jsonObj;
 		std::unique_ptr<json::r::Value> jsonValue;
 		if(!ServerConfig::Inst()->Get("ssl", jsonObj))
@@ -39,8 +42,10 @@ namespace acs
 		Asio::Code code;
 		jsonValue->Get("pem", this->mPemPath);
 		return code.value() == Asio::OK;
-	}
+#else
+		return true;
 #endif
+	}
 
 	bool HttpComponent::LateAwake()
 	{
@@ -48,7 +53,7 @@ namespace acs
 		return true;
 	}
 
-	std::shared_ptr<http::RequestClient> HttpComponent::CreateClient(http::Request * request)
+	std::shared_ptr<http::Client> HttpComponent::CreateClient(http::Request * request)
 	{
 		tcp::Socket* socketProxy = nullptr;
 #ifdef __ENABLE_OPEN_SSL__
@@ -87,7 +92,7 @@ namespace acs
 		socketProxy = this->mNetComponent->CreateSocket();
 #endif
 		Asio::Context & main = this->mApp->GetContext();
-		std::shared_ptr<http::RequestClient> httpClient = std::make_shared<http::RequestClient>(this, main);
+		std::shared_ptr<http::Client> httpClient = std::make_shared<http::Client>(this, main);
 		{
 			httpClient->SetSocket(socketProxy);
 		}
@@ -114,20 +119,24 @@ namespace acs
 
 	void HttpComponent::OnDelTask(int key)
 	{
-		std::shared_ptr<http::RequestClient> httpClient;
-		if(this->mUseClients.Del(key, httpClient))
-		{
-
-		}
+		this->mUseClients.Del(key);
 	}
 
 	int HttpComponent::Send(std::unique_ptr<http::Request> request, std::function<void(std::unique_ptr<http::Response>)> && cb)
 	{
+#ifndef __ENABLE_OPEN_SSL__
+		if(request->IsHttps())
+		{
+			const http::Url & url = request->GetUrl();
+			LOG_ERROR("[not ssl] => {}", url.ToStr());
+			return XCode::SendMessageFail;
+		}
+#endif
 		int rpcId = this->BuildRpcId();
 		request->Header().SetKeepAlive(false);
 		const http::Url & url = request->GetUrl();
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
-		std::shared_ptr<http::RequestClient> httpAsyncClient = this->CreateClient(request.get());
+		std::shared_ptr<http::Client> httpAsyncClient = this->CreateClient(request.get());
 		//LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
 		{
 			this->mUseClients.Add(rpcId, httpAsyncClient);
@@ -139,9 +148,17 @@ namespace acs
 
 	int HttpComponent::Send(std::unique_ptr<http::Request> request, std::unique_ptr<http::Response> response, int& rpcId)
 	{
+#ifndef __ENABLE_OPEN_SSL__
+		if(request->IsHttps())
+		{
+			const http::Url & url = request->GetUrl();
+			LOG_ERROR("[not ssl] => {}", url.ToStr());
+			return XCode::SendMessageFail;
+		}
+#endif
 		rpcId = this->BuildRpcId();
 		request->Header().SetKeepAlive(false);
-		std::shared_ptr<http::RequestClient> httpAsyncClient = this->CreateClient(request.get());
+		std::shared_ptr<http::Client> httpAsyncClient = this->CreateClient(request.get());
 		//LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
 		{
 			this->mUseClients.Add(rpcId, httpAsyncClient);
@@ -155,7 +172,10 @@ namespace acs
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 		{
 			int taskId = 0;
-			this->Send(std::move(request), std::move(response), taskId);
+			if(this->Send(std::move(request), std::move(response), taskId) != XCode::Ok)
+			{
+				return std::make_unique<http::Response>(HttpStatus::INTERNAL_SERVER_ERROR);
+			}
 			return this->BuildRpcTask<HttpRequestTask>(taskId)->Await();
 		}
 	}
@@ -166,7 +186,10 @@ namespace acs
 		{
 			int taskId = 0;
 			response->SetContent(std::move(body));
-			this->Send(std::move(request), std::move(response), taskId);
+			if(this->Send(std::move(request), std::move(response), taskId) != XCode::Ok)
+			{
+				return std::make_unique<http::Response>(HttpStatus::INTERNAL_SERVER_ERROR);
+			}
 			return this->BuildRpcTask<HttpRequestTask>(taskId)->Await();
 		}
 	}

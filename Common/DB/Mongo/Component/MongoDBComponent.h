@@ -55,15 +55,15 @@ namespace acs
 
 namespace acs
 {
-    class MongoDBComponent final : public RpcComponent<mongo::Response>,
+	class MongoDBComponent final : public RpcComponent<mongo::Response>,
 			public IRpc<mongo::Request, mongo::Response>, public IDestroy, public IServerRecord
 	{
 	public:
-		MongoDBComponent() = default;
+		MongoDBComponent();
 		~MongoDBComponent() final = default;
 	public:
-		std::unique_ptr<mongo::Response> Run(std::unique_ptr<mongo::Request> request);
 		void LuaSend(std::unique_ptr<mongo::Request> request, int & taskId);
+		std::unique_ptr<mongo::Response> Run(std::unique_ptr<mongo::Request> request);
 		std::unique_ptr<mongo::Response> Run(const std::string & db, std::unique_ptr<mongo::Request> request);
 	private:
 		bool Awake() final;

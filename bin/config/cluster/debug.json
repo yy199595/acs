@@ -4,9 +4,7 @@
     "server": {
         "rpc": [
             "NodeSystem",
-            "GateSystem",
             "EventSystem",
-            "ChatSystem",
             "LoginSystem",
             "ChatComponent",
             "Example"
@@ -15,7 +13,6 @@
             "Admin",
             "Watch",
             "LogMgr",
-            "Account",
             "QuickSDK",
             "FileUpload",
             "ResourceMgr",
@@ -30,10 +27,11 @@
             "HttpWebComponent",
             "WXNoticeComponent",
             "WatchComponent",
-            "HttpApiComponent",
             "KcpComponent",
             "UdpComponent",
-            "WsClientComponent"
+            "WsClientComponent",
+            "OssComponent",
+            "SqliteComponent"
         ]
     }
 }

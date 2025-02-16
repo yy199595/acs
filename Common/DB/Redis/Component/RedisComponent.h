@@ -23,7 +23,7 @@ namespace acs
 		 public IRpc<redis::Request, redis::Response>, public IDestroy, public IServerRecord
 	{
 	 public:
-		RedisComponent() = default;
+		RedisComponent();
     public:
 		bool Ping();
 		void Send(std::unique_ptr<redis::Request> request);
@@ -63,6 +63,7 @@ namespace acs
 	private:
 		redis::Config mConfig;
 		custom::Queue<int> mFreeClients; //空闲客户端
+		std::shared_ptr<redis::Client> mSubClient;
 		std::unordered_map<std::string, std::string> mLuaMap;
 		std::queue<std::unique_ptr<redis::Request>> mRequests;
 		std::unordered_map<int, std::shared_ptr<redis::Client>> mClients;

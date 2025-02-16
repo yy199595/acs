@@ -186,17 +186,24 @@ message mysql //mysql操作
         //google.protobuf.Any data = 3; //pb结构可以有默认值
     }
 
+    message index
+    {
+        string tab = 1;
+        string name = 2;
+        int32 sort = 3; //1:升序 2:降序
+        bool unique = 4;
+    }
+
     message exec
     {
         string sql = 1; //sql语句
-        bool query = 2; //是否是查询语句
     }
 
-    message add
+    message insert
     {
         int32 flag = 1;
         string table = 2;
-        string data = 3;
+        string document = 3;
     }
     message save
     {
@@ -206,28 +213,55 @@ message mysql //mysql操作
     }
     message query
     {
-        string table = 1;
-        int32 limit = 2;
-        string where_json = 3;
-        repeated string fields = 4;
+        message request
+        {
+            string table = 1;
+            int32 limit = 2;
+            string filter = 3;
+            repeated string fields = 4;
+        }
+        message page
+        {
+            string table = 1;
+            int32 limit = 2;
+            string filter = 3;
+            string sorter = 4;
+            int32 page = 5;
+            repeated string fields = 6;
+        }
+        message response
+        {
+            string error = 1;
+            repeated bytes jsons = 2;
+        }
     }
-    message remove
+    message del
     {
         int32 flag = 1;
         string table = 2;
-        string where_json = 3;
+        string filter = 3;
+        int32 limit = 4;
     }
+
+    message inc
+    {
+        string key = 1;
+        int32 count = 2;
+    }
+
     message update
     {
         int32 flag = 1;
         string table = 2;
-        string update_json = 3;
-        string where_json = 4;
+        string filter = 3;
+        string document = 4;
+        int32 limit = 5;
     }
+
     message response
     {
         string error = 1;
-        repeated bytes jsons = 2;
+        uint32 count = 2;
     }
 }
 

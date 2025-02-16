@@ -5,7 +5,7 @@
 #include"HttpWebComponent.h"
 #include"Entity/Actor/App.h"
 #include"Core/System/System.h"
-#include"Http/Client/SessionClient.h"
+#include"Http/Client/Session.h"
 #include"Http/Service/HttpService.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
@@ -18,6 +18,7 @@ namespace acs
 {
 	HttpWebComponent::HttpWebComponent()
 	{
+		this->mRecord = nullptr;
 		this->mConfig.Auth = true;
 		this->mConfig.RpcDebug = false;
 		this->mDispatch = nullptr;
@@ -52,6 +53,7 @@ namespace acs
 
 		this->mCoroutine = App::Coroutine();
 		this->mDispatch = this->GetComponent<DispatchComponent>();
+		this->mRecord = this->mApp->GetComponent<IRequest<HttpMethodConfig, http::Request, http::Response>>();
 		return this->ReadHttpConfig();
 	}
 
@@ -215,7 +217,11 @@ namespace acs
 		std::unique_ptr<http::Content> body;
 		if (!this->mFactory.New(cont_type, body))
 		{
-			return HttpStatus::UNSUPPORTED_MEDIA_TYPE;
+			if(!httpConfig->Content.empty())
+			{
+				return HttpStatus::UNSUPPORTED_MEDIA_TYPE;
+			}
+			body = std::make_unique<http::TextContent>();
 		}
 		long long contentLength = 0;
 		if (!request->ConstHeader().GetContentLength(contentLength))
@@ -410,7 +416,10 @@ namespace acs
 			}
 #endif
 		} while (false);
-
+		if(config->IsRecord && this->mRecord != nullptr)
+		{
+			this->mRecord->OnRequestDone(*config, *request, *response);
+		}
 		this->SendResponse(request->GetSockId(), code);
 	}
 

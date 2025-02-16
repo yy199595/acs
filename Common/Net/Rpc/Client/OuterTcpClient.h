@@ -27,7 +27,6 @@ namespace rpc
 		inline void BindPlayer(long long id) { this->mPlayerId = id; }
 		inline long long GetPlayerId() const { return this->mPlayerId; }
 	protected:
-		void OnTimeout(tcp::TimeoutFlag flag) final;
 		void OnReadError(const Asio::Code &code) final;
         void OnReceiveMessage(std::istream & readStream, size_t, const Asio::Code & code) final;
 	private:

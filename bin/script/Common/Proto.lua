@@ -1,4 +1,4 @@
-local proto = require("util.proto")
+local proto = require("util.pb")
 
 local ProtoHelper = { }
 

@@ -6,7 +6,7 @@
 #include"Yyjson/Lua/ljson.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Http/Component/HttpComponent.h"
-#include"Http/Client/RequestClient.h"
+#include"Http/Client/Client.h"
 #include"Proto/Component/ProtoComponent.h"
 
 #include"Http/Common/HttpRequest.h"

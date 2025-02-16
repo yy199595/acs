@@ -2,6 +2,7 @@
 // Created by yy on 2024/5/18.
 //
 
+#ifdef __ENABLE_OPEN_SSL__
 #ifndef APP_WECHAT_H
 #define APP_WECHAT_H
 #include "Http/Service/HttpService.h"
@@ -27,3 +28,5 @@ namespace acs
 
 
 #endif //APP_WECHAT_H
+
+#endif

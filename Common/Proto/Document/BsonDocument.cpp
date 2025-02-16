@@ -407,6 +407,11 @@ namespace bson
 					document.Add(key, arrayDocument);
 					return true;
 				}
+				case YYJSON_TYPE_NULL:
+				{
+					document.Add(key);
+					return true;
+				}
 			}
 			return false;
 		}
@@ -543,7 +548,7 @@ namespace bson
 				_bson::bsonelement bsonelement = bsonobjiterator.next();
 				this->WriterToJson(bsonelement, jsonWriter);
 			}
-            return jsonWriter.Encode(jsonStr, true) > 0;
+            return jsonWriter.Encode(jsonStr);
         }
 
         void Document::WriterToJson(const _bson::bsonelement &element, json::w::Value &json)

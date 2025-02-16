@@ -31,6 +31,7 @@ namespace acs
 		bool Awake() final;
 		void OnDestroy() final;
 	private:
+		int mConsole;
 		std::mutex mMutex;
 		class ThreadComponent * mThread;
 		std::vector<custom::LogConfig> mConfig;

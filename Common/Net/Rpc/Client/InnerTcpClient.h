@@ -25,11 +25,10 @@ namespace rpc
 		void CloseSocket(int code);
 		void OnSendMessage(size_t size) final;
 		void AddToSendQueue(rpc::Message * message);
-		void OnTimeout(tcp::TimeoutFlag flag) final;
-		void OnConnect(bool result, int count) final;
 		bool MakeMessage(const rpc::ProtoHead & header);
 		void OnReadError(const Asio::Code &code) final;
 		void OnSendMessage(const Asio::Code & code) final;
+		void OnConnect(const Asio::Code &code, int count) final;
 		void OnReceiveMessage(std::istream & is, size_t, const Asio::Code & code) final;
 	private:
 		bool mClose;
