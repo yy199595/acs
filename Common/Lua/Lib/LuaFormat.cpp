@@ -4,6 +4,7 @@
 
 #include "Lib.h"
 #include "Util/Tools/StringStream.h"
+#include "Log/Common/CommonLogDef.h"
 
 #define LUA_LIB
 
@@ -118,7 +119,10 @@ static void serializeTable(lua_State* L, int index, help::str::Stream& result)
 
 		lua_pop(L, 1); // 弹出值，保留键用于下次迭代
 	}
-	result.Pop();
+	if(result.Back() == ',')
+	{
+		result.Pop();
+	}
 	result << "}";
 }
 /* read argid */
@@ -655,6 +659,47 @@ namespace lua
 		return fmt_format(&S);
 	}
 
+	int lfmt::lprint(lua_State* L)
+	{
+		size_t size = 0;
+		lua_Debug luaDebug;
+		int count = lua_gettop(L);
+		if (lua_getstack(L, 1, &luaDebug) > 0)
+		{
+			lua_getinfo(L, "Sl", &luaDebug);
+			std::string file = FormatFileLine(luaDebug.short_src, luaDebug.currentline);
+			lua_writestring(file.c_str(), file.size());
+			lua_writestring(" ", 1);
+		}
+		for (int index = 1; index <= count; index++)
+		{
+			if(index > 1) {
+				lua_writestring("\t", 1);
+			}
+			switch (lua_type(L, index))
+			{
+				case LUA_TTABLE:
+				{
+					help::str::Stream result;
+					serializeTable(L, index, result);
+					const std::string& str = result.Serialize();
+					lua_writestring(str.c_str(), str.size());
+					break;
+				}
+				default:
+				{
+					const char* s = luaL_tolstring(L, index, &size);
+					lua_writestring(s, size);
+					break;
+				}
+			}
+			lua_pop(L, 1);
+		}
+		lua_writeline();
+		return 0;
+	}
+
+
 	int lfmt::serialize(lua_State* L)
 	{
 		if (!lua_istable(L, 1))
@@ -680,5 +725,28 @@ namespace lua
 			luaL_dostring(L, result.c_str());
 		}
 		return 1;
+	}
+
+	int lfmt::deserialize(lua_State* L, const std::string& lua)
+	{
+		std::string result = "return \n" + lua;
+		luaL_dostring(L, result.c_str());
+		if(!lua_istable(L, -1))
+		{
+			return LUA_ERRERR;
+		}
+		return LUA_OK;
+	}
+
+	int lfmt::serialize(lua_State* L, int index, std::string& str)
+	{
+		if (!lua_istable(L, index))
+		{
+			return LUA_ERRERR;
+		}
+		help::str::Stream result;
+		serializeTable(L, index, result);
+		str = result.Serialize();
+		return LUA_OK;
 	}
 }

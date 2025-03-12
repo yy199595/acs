@@ -36,6 +36,15 @@ namespace tcp
 		this->ClearRecvStream();
 	}
 
+	void Client::SetNoDelayAndKeepAlive()
+	{
+		if(this->mSocket)
+		{
+			this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
+			this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
+		}
+	}
+
 	void Client::Connect(int timeout)
 	{
 		Asio::Code code;
@@ -244,11 +253,12 @@ namespace tcp
 		asio::async_read(sock, this->mRecvBuffer, asio::transfer_at_least(1), callBack);
 	}
 
-	void Client::ReadLength(int length, int timeout)
+	void Client::ReadLength(size_t length, int timeout)
 	{
 		if (length <= 0)
 		{
 			//CONSOLE_LOG_FATAL("length = {}", length);
+			this->OnReadError(std::make_error_code(std::errc::bad_message));
 			return;
 		}
 		if (this->mMaxCount > 0 && length >= this->mMaxCount)
@@ -398,7 +408,35 @@ namespace tcp
 		}
 	}
 
-	bool Client::RecvSync(int length, size_t& size)
+	bool Client::RecvSomeSync(size_t& size)
+	{
+		try
+		{
+			if (this->mRecvBuffer.size() > 0)
+			{
+				size = this->mRecvBuffer.size();
+				return true;
+			}
+#ifdef __ENABLE_OPEN_SSL__
+			if (this->mSocket->IsOpenSsl())
+			{
+				Asio::ssl::Socket& sock = this->mSocket->SslSocket();
+				size = asio::read(sock, this->mRecvBuffer, asio::transfer_at_least(1));
+				return true;
+			}
+#endif
+			Asio::Socket& sock = this->mSocket->Get();
+			size = asio::read(sock, this->mRecvBuffer, asio::transfer_at_least(1));
+			return true;
+		}
+		catch (asio::error_code & code)
+		{
+			this->OnReadError(code);
+			return false;
+		}
+	}
+
+	bool Client::RecvSync(size_t length, size_t& size)
 	{
 		try
 		{
@@ -419,8 +457,9 @@ namespace tcp
 			size = asio::read(sock, this->mRecvBuffer, asio::transfer_exactly(length));
 			return true;
 		}
-		catch (asio::system_error& code)
+		catch (asio::error_code & code)
 		{
+			this->OnReadError(code);
 			return false;
 		}
 	}
@@ -441,8 +480,9 @@ namespace tcp
 			size = asio::read_until(sock, this->mRecvBuffer, "\r\n");
 			return true;
 		}
-		catch (asio::system_error& code)
+		catch (asio::error_code & code)
 		{
+			this->OnReadError(code);
 			return false;
 		}
 	}
@@ -472,9 +512,32 @@ namespace tcp
 			} while (length > 0);
 			return true;
 		}
-		catch (std::system_error& error)
+		catch (std::error_code& error)
 		{
-			//CONSOLE_LOG_ERROR("sync send {} err:{}", message->ToString(), error.what());
+			this->OnSendMessage(error);
+			return false;
+		}
+	}
+
+	bool Client::SendSync(const char* message, size_t size)
+	{
+		try
+		{
+#ifdef __ENABLE_OPEN_SSL__
+			if (this->mSocket->IsOpenSsl())
+			{
+				Asio::ssl::Socket& sock = this->mSocket->SslSocket();
+				return asio::write(sock, asio::buffer(message, size)) == size;
+			}
+			return asio::write(this->mSocket->Get(), asio::buffer(message, size)) == size;
+#else
+			return asio::write(this->mSocket->Get(), asio::buffer(message, size)) == size;
+#endif
+			return true;
+		}
+		catch (std::error_code& error)
+		{
+			this->OnSendMessage(error);
 			return false;
 		}
 	}

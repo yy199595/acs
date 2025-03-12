@@ -119,6 +119,10 @@ namespace mongo
 		{
 			MongoFactory::New(table, cmd.c_str(), mongoRequest);
 		}
+		else
+		{
+			mongoRequest = std::make_unique<Request>();
+		}
 		if(json.MemberCount() > 0 && json.IsObject() && json.MemberCount() > 0)
 		{
 			if (!mongoRequest->document.FromByJson(json))

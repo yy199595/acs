@@ -17,7 +17,7 @@ function MongoClient:Count(tab, filter)
         },
     }
     local str = json_encode(document)
-    local response = mongo.Run(tab, "count", str)
+    local response = mongo.run(tab, "count", str)
     if response and response.n then
         return response.n
     end
@@ -36,7 +36,7 @@ function MongoClient:FindOnce(tab, filter)
         },
     }
     local str = json_encode(document)
-    local response = mongo.Run(tab, "find", str)
+    local response = mongo.run(tab, "find", str)
     local documents = response.cursor.firstBatch
     if #documents == 0 then
         return nil
@@ -55,7 +55,7 @@ function MongoClient:Find(tab, filter)
         },
     }
     local str = json_encode(document)
-    local response = mongo.Run(tab, "find", str)
+    local response = mongo.run(tab, "find", str)
     return response.cursor.firstBatch
 end
 
@@ -63,7 +63,7 @@ end
 ---@param document table
 ---@return boolean
 function MongoClient:InsertOnce(tab, document)
-    local response = mongo.Run(tab, "insert", {
+    local response = mongo.run(tab, "insert", {
         documents = { document }
     })
     return response
@@ -77,7 +77,7 @@ function MongoClient:DeleteOnce(tab, filter)
         limit = 1,
         q = filter
     }
-    local response = mongo.Run(tab, "delete", { deletes = { document } })
+    local response = mongo.run(tab, "delete", { deletes = { document } })
     return response
 end
 
@@ -90,7 +90,7 @@ function MongoClient:UpdateOnce(tab, filter, update, upsert)
         upsert = upsert or false, -- true不存在则插入
         u = {  ["$set"] = update }
     }
-    local response = mongo.Run(tab, "update", { updates = { document } })
+    local response = mongo.run(tab, "update", { updates = { document } })
     return response and response.n == 1
 end
 

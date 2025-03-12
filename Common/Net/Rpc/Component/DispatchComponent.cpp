@@ -12,7 +12,6 @@
 #include"Entity/Actor/App.h"
 #include"Rpc/Common/Message.h"
 #include"Rpc/Service/RpcService.h"
-#include"Gate/Component/GateComponent.h"
 #include"Router/Component/RouterComponent.h"
 
 #include"Core/System/System.h"
@@ -23,9 +22,9 @@ namespace acs
 	{
 		this->mSumCount = 0;
 		this->mWaitCount = 0;
-		this->mGate = nullptr;
 		this->mRouter = nullptr;
 		this->mCoroutine = nullptr;
+		this->mGateSender = nullptr;
 	}
 
 	bool DispatchComponent::LateAwake()
@@ -37,7 +36,7 @@ namespace acs
 			const std::string& name = rpcService->GetName();
 			LOG_CHECK_RET_FALSE(this->mRpcServices.Add(name, rpcService));
 		}
-		this->mGate = this->GetComponent<GateComponent>();
+		this->mGateSender = this->mApp->GetComponent<rpc::IOuterSender>();
 		LOG_CHECK_RET_FALSE(this->mRouter = this->GetComponent<RouterComponent>())
 		LOG_CHECK_RET_FALSE(this->mCoroutine = this->GetComponent<CoroutineComponent>())
 		return true;
@@ -72,19 +71,26 @@ namespace acs
 //			LOG_DEBUG("[{}://{}] call ({})", methodConfig->NetName, fromAddress, methodConfig->FullName);
 //#endif
 			//LOG_DEBUG("call ({}) by {}", fullName, methodConfig->NetName);
-			if (!this->mRpcServices.Has(methodConfig->Service))
+			if (!this->mRpcServices.Has(methodConfig->service))
 			{
 				code = XCode::CallServiceNotFound;
-				LOG_ERROR("call {} not exist", methodConfig->Service);
+				LOG_ERROR("call [{}] not exist", methodConfig->service);
 				break;
 			}
-			if (!methodConfig->IsAsync)
+			if (!methodConfig->async)
 			{
 				this->Invoke(methodConfig, message);
 				break;
 			}
 			this->mCoroutine->Start(&DispatchComponent::Invoke, this, methodConfig, message);
-		} while (false);
+		}
+		while (false);
+		if(code != XCode::Ok)
+		{
+			int id = message->SockId();
+			this->mRouter->Send(id, code, message);
+			return XCode::Ok;
+		}
 		return code;
 	}
 
@@ -97,12 +103,12 @@ namespace acs
 #endif
 		do
 		{
-			const std::string& service = config->Service;
+			const std::string& service = config->service;
 			RpcService* logicService = this->mRpcServices.Find(service);
 			if (logicService == nullptr)
 			{
 				code = XCode::CallServiceNotFound;
-				LOG_ERROR("call {} server not found", config->FullName);
+				LOG_ERROR("call {} server not found", config->fullname);
 				break;
 			}
 			code = logicService->Invoke(config, message);
@@ -114,9 +120,9 @@ namespace acs
 //			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
 //			LOG_WARN("({}ms) invoke [{}] code:{} = {}", t, config->FullName, code, desc);
 //		}
-		if (config->Timeout > 0 && t >= config->Timeout)
+		if (config->timeout > 0 && t >= config->timeout)
 		{
-			LOG_WARN("({}ms) invoke [{}] too long time", t, config->FullName);
+			LOG_WARN("({}ms) invoke [{}] too long time", t, config->fullname);
 		}
 #endif
 		--this->mWaitCount;
@@ -141,10 +147,15 @@ namespace acs
 				return this->OnRequest(message);
 			case rpc::Type::Response:
 			{
-				if (this->mGate != nullptr && message->GetSource() == rpc::Source::Client)
+				if(message->GetSource() == rpc::Source::Client)
 				{
-					this->mGate->OnMessage(message);
-					return XCode::Ok;
+					if (this->mGateSender != nullptr)
+					{
+						int socketId = 0;
+						message->GetHead().Get(rpc::Header::sock_id, socketId);
+						this->mGateSender->Send(socketId, message);
+						return XCode::Ok;
+					}
 				}
 				int rpcId = message->GetRpcId();
 				this->OnResponse(rpcId, std::unique_ptr<rpc::Message>(message));
@@ -161,7 +172,7 @@ namespace acs
 
 	int DispatchComponent::OnClient(rpc::Message* message)
 	{
-		if (this->mGate == nullptr)
+		if (this->mGateSender == nullptr)
 		{
 			return XCode::NetWorkError;
 		}
@@ -173,18 +184,18 @@ namespace acs
 		}
 		message->SetType(rpc::Type::Request);
 		message->GetHead().Del(rpc::Header::client_sock_id);
-		this->mGate->Send(sockId, message);
+		this->mGateSender->Send(sockId, message);
 		return XCode::Ok;
 	}
 
 	int DispatchComponent::OnBroadcast(rpc::Message* message)
 	{
-		if (this->mGate == nullptr)
+		if (this->mGateSender == nullptr)
 		{
 			return XCode::Failure;
 		}
 		message->SetType(rpc::Type::Request);
-		this->mGate->Broadcast(message);
+		this->mGateSender->Broadcast(message);
 		return XCode::Ok;
 	}
 }// namespace Sentry

@@ -1,20 +1,20 @@
 {
     "/quick/pay": {
-        "Type": "POST",
-        "Async": true,
-        "Auth" : false,
-        "Bind": "QuickSDK.OnUserPay",
-        "Desc": "quick支付回调",
-        "ContentType": ""
+        "type": "POST",
+        "async": true,
+        "auth" : false,
+        "bind": "QuickSDK.OnUserPay",
+        "desc": "quick支付回调",
+        "content-type": ""
     },
     "/quick/login": {
-        "Type": "POST",
-        "Async": true,
-        "Auth" : false,
-        "Desc": "quick登录校验",
-        "Bind": "QuickSDK.OnUserLogin",
-        "ContentType": "application/json",
-        "Request": {
+        "type": "POST",
+        "async": true,
+        "auth" : false,
+        "desc": "quick登录校验",
+        "bind": "QuickSDK.OnUserLogin",
+        "content-type": "application/json",
+        "request": {
             "uid" : "",
             "token" : ""
         }

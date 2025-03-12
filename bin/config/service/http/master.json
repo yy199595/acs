@@ -1,16 +1,16 @@
 {
     "/master/push": {
-        "Type": "POST",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 100,
-        "Bind": "Master.Push",
-        "ContentType": "application/json",
-        "Desc": "注册服务器到中心",
+        "type": "POST",
+        "async": true,
+        "auth": true,
+        "permission": 100,
+        "bind": "Master.Push",
+        "content-type": "application/json",
+        "desc": "注册服务器到中心",
         "WhiteList" : [
             "127.0.0.1"
         ],
-        "Request": {
+        "request": {
             "id": 0,
             "name": "server",
             "listen": {
@@ -21,24 +21,24 @@
         }
     },
     "/master/find": {
-        "Type": "GET",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 100,
-        "Bind": "Master.Find",
-        "Desc": "查找服务器进程",
-        "Request": {
+        "type": "GET",
+        "async": true,
+        "auth": true,
+        "permission": 100,
+        "bind": "Master.Find",
+        "desc": "查找服务器进程",
+        "request": {
             "id": 0
         }
     },
     "/master/del": {
-        "Type": "DELETE",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 100,
-        "Bind": "Master.Del",
-        "Desc": "移除某个服务器",
-        "Request": {
+        "type": "DELETE",
+        "async": true,
+        "auth": true,
+        "permission": 100,
+        "bind": "Master.Del",
+        "desc": "移除某个服务器",
+        "request": {
             "id": 0
         }
     }

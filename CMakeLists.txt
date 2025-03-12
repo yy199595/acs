@@ -48,9 +48,11 @@ endif ()
 
 #第三方库包含
 
+
 include_directories(Libs/protobuf/src)
 include_directories(Libs/asio/include)
 include_directories(Libs/fmt/include)
+include_directories(Libs/lua5.4.6/src)
 
 #公共组件
 include_directories(${PROJECT_SOURCE_DIR}/Gen)
@@ -64,10 +66,12 @@ include_directories(${PROJECT_SOURCE_DIR}/Common/DB)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Net)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Lua/Src)
 
+
 if (__ENABLE_OPEN_SSL__)
     include_directories(Libs/openssl/include)
 endif ()
-#include(CMake/wolfssl.cmake)
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/lua5.4.6 ${PROJECT_SOURCE_DIR}/Libs/bin/lua)
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/protobuf/cmake ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf)
 
 file(GLOB_RECURSE src_proto "Gen/*.cpp" "Gen/*.cc")
@@ -117,6 +121,7 @@ endif ()
 
 if (WIN32)
     if (MSVC)
+        target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/lua/Debug/lua.lib)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/Debug/libprotobufd.lib)
         if (__ENABLE_OPEN_SSL__)
             target_link_libraries(app Crypt32)
@@ -136,6 +141,7 @@ elseif (APPLE)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/lib/libssl.a)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/lib/libcrypto.a)
     endif ()
+    target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/lua/liblua.a)
     target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/libprotobufd.a)
 elseif (UNIX)
     target_link_libraries(app pthread dl)
@@ -144,6 +150,7 @@ elseif (UNIX)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/lib/libssl.a)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/lib/libcrypto.a)
     endif ()
+    target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/lua/liblua.a)
     if (EXISTS ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/libprotobufd.a)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/libprotobufd.a)
     else ()

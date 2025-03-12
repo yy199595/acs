@@ -22,7 +22,7 @@ namespace acs
 
 	bool RedisSubComponent::LateAwake()
 	{
-		const std::string & address = this->mConfig.Address;
+		const std::string & address = this->mConfig.address;
 		ThreadComponent* component = this->GetComponent<ThreadComponent>();
 		{
 			Asio::Context & context = this->mApp->GetContext();
@@ -34,7 +34,7 @@ namespace acs
 				return false;
 			}
 		}
-		if(this->mConfig.Debug)
+		if(this->mConfig.debug)
 		{
 			std::unique_ptr<redis::Request> request =
 					redis::Request::Make("MONITOR");
@@ -64,14 +64,14 @@ namespace acs
 			return false;
 		}
 
-		this->mChannels.insert(channel);
-		std::unique_ptr<redis::Request> request =
-				redis::Request::Make("SUBSCRIBE", channel);
-		{
-			request->SetRpcId(1);
-			this->mClient->Send(std::move(request));
-			LOG_DEBUG("sub redis channel => {}", channel);
-		}
+//		this->mChannels.insert(channel);
+//		std::unique_ptr<redis::Request> request =
+//				redis::Request::Make("SUBSCRIBE", channel);
+//		{
+//			request->SetRpcId(1);
+//			this->mClient->Send(std::move(request));
+//			LOG_DEBUG("sub redis channel => {}", channel);
+//		}
 		return true;
 	}
 
@@ -97,19 +97,14 @@ namespace acs
 	{
 		do
 		{
-			if (response->GetType() != redis::Type::REDIS_ARRAY || response->GetArraySize() != 3)
+			const redis::Element & element = response->element;
+			if (element.type != redis::type::Array || element.list.size() != 3)
 			{
 				LOG_DEBUG("{}", response->ToString());
 				break;
 			}
-			const redis::Any* channelData = response->Get(1);
-			const redis::Any* messageData = response->Get(2);
-			if (!channelData->IsString() || !messageData->IsString())
-			{
-				break;
-			}
-			const std::string& channel = channelData->Cast<redis::String>()->GetValue();
-			const std::string& message = messageData->Cast<redis::String>()->GetValue();
+			const std::string& channel = element.list[1].message;
+			const std::string& message = element.list[2].message;
 			std::unique_ptr<rpc::Message> rpcMessage = std::make_unique<rpc::Message>();
 			{
 				rpcMessage->SetType(rpc::Type::Request);

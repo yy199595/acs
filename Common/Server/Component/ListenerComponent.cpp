@@ -39,20 +39,22 @@ namespace acs
 			return false;
 		}
 		Asio::Context& io = this->mThreadComponent->GetContext();
-		this->mTcpListen = this->GetComponent<ITcpListen>(config.Component);
+		this->mTcpListen = this->GetComponent<ITcpListen>(config.component);
 		if(this->mTcpListen == nullptr)
 		{
-			LOG_ERROR("not find listen => {}", config.Component);
+			LOG_ERROR("not find listen => {}", config.component);
 			return false;
 		}
+		std::string ip;
+		unsigned short port = 0;
 		this->mAcceptor = std::make_unique<Asio::Acceptor>(io);
 #ifdef __ENABLE_OPEN_SSL__
-		if (!config.Cert.empty())
+		if (!config.cert.empty() && !config.key.empty())
 		{
 			try
 			{
-				const std::string& key = config.Key;
-				const std::string& cert = config.Cert;
+				const std::string& key = config.key;
+				const std::string& cert = config.cert;
 				this->mSslCtx.use_certificate_chain_file(cert);
 				this->mSslCtx.use_private_key_file(key, asio::ssl::context::pem);
 				this->mSslCtx.set_options(
@@ -65,7 +67,7 @@ namespace acs
 			}
 			catch (std::system_error & error)
 			{
-				LOG_ERROR("listen [{}] => {}", config.Name, error.what());
+				LOG_ERROR("listen [{}] => {}", config.name, error.what());
 				return false;
 			}
 		}
@@ -91,7 +93,7 @@ namespace acs
 		custom::ThreadSync<bool> threadSync;
 		asio::post(io, [&threadSync, this, config]
 			{
-				Asio::EndPoint ep(asio::ip::address(), config.Port);
+				Asio::EndPoint ep(asio::ip::make_address(config.ip), config.port);
 				while (!this->mAcceptor->is_open())
 				{
 					try
@@ -99,13 +101,18 @@ namespace acs
 						this->mAcceptor->open(ep.protocol());
 						this->mAcceptor->set_option(asio::ip::tcp::acceptor::reuse_address(true));
 						this->mAcceptor->bind(ep);
-						this->mAcceptor->listen();
+						if(config.max_conn == 0)
+						{
+							this->mAcceptor->listen();
+							break;
+						}
+						this->mAcceptor->listen(config.max_conn);
 					}
 					catch (std::system_error& error)
 					{
 						this->mAcceptor->close();
 						std::this_thread::sleep_for(std::chrono::seconds(3));
-						CONSOLE_LOG_ERROR("listen [{}] {}", config.Addr, error.what());
+						CONSOLE_LOG_ERROR("listen [{}] {}", config.address, error.what());
 					}
 				}
 				threadSync.SetResult(this->mAcceptor->is_open());
@@ -120,25 +127,24 @@ namespace acs
 		return true;
 	}
 
+	tcp::Socket* ListenerComponent::CreateSocket()
+	{
+#ifdef __ENABLE_OPEN_SSL__
+		if (!this->mConfig.cert.empty() && !this->mConfig.key.empty())
+		{
+			return this->mThreadComponent->CreateSocket(this->mSslCtx);
+		}
+#endif
+		return this->mThreadComponent->CreateSocket();
+	}
+
 	void ListenerComponent::Accept()
 	{
 		if (this->mAcceptor == nullptr)
 		{
 			return;
 		}
-		tcp::Socket* sock = nullptr;
-#ifdef __ENABLE_OPEN_SSL__
-		if (!this->mConfig.Cert.empty())
-		{
-			sock = this->mThreadComponent->CreateSocket(this->mSslCtx);
-		}
-		else
-		{
-			sock = this->mThreadComponent->CreateSocket();
-		}
-#else
-		sock = this->mThreadComponent->CreateSocket();
-#endif
+		tcp::Socket* sock = this->CreateSocket();
 		auto callback = [this, sock](const Asio::Code& code)
 		{
 			do
@@ -148,20 +154,25 @@ namespace acs
 					sock->Destroy();
 					break;
 				}
+				sock->Init();
 #ifdef __ENABLE_OPEN_SSL__
 				if (sock->IsOpenSsl())
 				{
-					Asio::Code code1;
 					Asio::ssl::Socket& ssl = sock->SslSocket();
-					ssl.handshake(asio::ssl::stream_base::server, code1);
-					if (code1.value() != Asio::OK)
+					ssl.async_handshake(asio::ssl::stream_base::server,
+							[sock, this](const Asio::Code & code1)
 					{
-						sock->Destroy();
-						break;
-					}
+						if (code1.value() != Asio::OK)
+						{
+							sock->Destroy();
+							return;
+						}
+						Asio::Context& io = this->mApp->GetContext();
+						asio::post(io, [this, sock] { this->OnAcceptSocket(sock); });
+					});
+					break;
 				}
 #endif
-				sock->Init();
 #ifdef ONLY_MAIN_THREAD
 				this->OnAcceptSocket(sock);
 #else
@@ -169,16 +180,15 @@ namespace acs
 				asio::post(io, [this, sock] { this->OnAcceptSocket(sock); });
 #endif
 			} while (false);
-			if (this->mAcceptor == nullptr)
+			if (this->mAcceptor != nullptr)
 			{
-				return;
-			}
 #ifdef ONLY_MAIN_THREAD
-			this->Accept();
+				this->Accept();
 #else
-			const Asio::Executor& executor = this->mAcceptor->get_executor();
-			asio::post(executor, [this] { this->Accept(); });
+				const Asio::Executor& executor = this->mAcceptor->get_executor();
+				asio::post(executor, [this] { this->Accept(); });
 #endif
+			}
 		};
 
 		this->mAcceptor->async_accept(sock->Get(), callback);

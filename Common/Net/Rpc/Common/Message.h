@@ -130,6 +130,12 @@ namespace rpc
 		virtual int Send(int id, rpc::Message* message) noexcept = 0;
 		virtual void Broadcast(rpc::Message* message) noexcept = 0;
 	};
+
+	class IOuterMessage
+	{
+	public:
+		virtual int OnMessage(rpc::Message* message) noexcept = 0;
+	};
 }
 
 

@@ -1,85 +1,86 @@
 {
     "MongoDB.Insert": {
-        "Async": true,
-        "Request": "db.mongo.insert"
-    },
-    "MongoDB.Save": {
-        "Async": true,
-        "Request": "db.mongo.update"
+        "async": true,
+        "request": "db.mongo.insert"
     },
     "MongoDB.Delete": {
-        "Async": true,
-        "Request": "db.mongo.remove"
+        "async": true,
+        "request": "db.mongo.remove"
     },
     "MongoDB.Find": {
-        "Async": true,
-        "Request": "db.mongo.find.request",
-        "Response": "db.mongo.find.response"
+        "async": true,
+        "request": "db.mongo.find.request",
+        "response": "db.mongo.find.response"
+    },
+    "MongoDB.GetMore": {
+        "async": true,
+        "request": "db.mongo.find.more",
+        "response": "db.mongo.find.response"
     },
     "MongoDB.Inc": {
-        "Async": true,
-        "Request": "db.mongo.inc.request",
-        "Response": "db.mongo.inc.response"
+        "async": true,
+        "request": "db.mongo.inc.request",
+        "response": "db.mongo.inc.response"
     },
-    "MongoDB.Sum": {
-        "Async": true,
-        "Request": "db.mongo.sum.request",
-        "Response": "db.mongo.sum.response"
+    "MongoDB.Facet": {
+        "async": true,
+        "request": "db.mongo.aggregate.facet",
+        "response": "db.mongo.find.response"
+    },
+    "MongoDB.Aggregate": {
+        "async": true,
+        "request": "db.mongo.aggregate.request",
+        "response": "db.mongo.find.response"
     },
     "MongoDB.Count": {
-        "Async": true,
-        "Request": "db.mongo.count.request",
-        "Response": "db.mongo.count.response"
+        "async": true,
+        "request": "db.mongo.count.request",
+        "response": "db.mongo.count.response"
     },
     "MongoDB.FindOne": {
-        "Async": true,
-        "Request": "db.mongo.find_one.request",
-        "Response": "db.mongo.find_one.response"
+        "async": true,
+        "request": "db.mongo.find_one.request",
+        "response": "db.mongo.find_one.response"
+    },
+    "MongoDB.Distinct": {
+        "async": true,
+        "request": "db.mongo.find.distinct",
+        "response": "db.mongo.find_one.response"
     },
     "MongoDB.FindPage": {
-        "Async": true,
-        "Request": "db.mongo.find_page.request",
-        "Response": "db.mongo.find_page.response"
+        "async": true,
+        "request": "db.mongo.find.page",
+        "response": "db.mongo.find.response"
     },
     "MongoDB.Update": {
-        "Async": true,
-        "Request": "db.mongo.update"
+        "async": true,
+        "request": "db.mongo.update"
     },
     "MongoDB.Updates": {
-        "Async": true,
-        "Request": "db.mongo.updates"
+        "async": true,
+        "request": "db.mongo.updates"
     },
     "MongoDB.SetIndex": {
-        "Async": true,
-        "Request": "db.mongo.index"
+        "async": true,
+        "request": "db.mongo.index"
     },
-    "MongoDB.Command": {
-        "Async": true,
-        "Request": "db.mongo.command.request",
-        "Response": "db.mongo.command.response"
+    "MongoDB.Run": {
+        "async": true,
+        "request": "db.mongo.command.request",
+        "response": "db.mongo.command.response"
     },
     "MongoDB.FindAndModify": {
-        "Async": true,
-        "Request": "db.mongo.find_modify.request",
-        "Response": "db.mongo.find_modify.response"
+        "async": true,
+        "request": "db.mongo.find_modify.request",
+        "response": "db.mongo.find_modify.response"
     },
     "MongoDB.Databases": {
-        "Async": true,
-        "Response": "com.array.string"
+        "async": true,
+        "response": "com.array.string"
     },
     "MongoDB.Collections": {
-        "Async": true,
-        "Request": "com.type.string",
-        "Response": "com.array.string"
-    },
-    "MongoDB.Backup": {
-        "Async": true,
-        "Request": "db.mongo.backup.request",
-        "Response": "db.mongo.response"
-    },
-    "MongoDB.Recover": {
-        "Async": true,
-        "Request": "db.mongo.recover.request",
-        "Response": "db.mongo.response"
+        "async": true,
+        "request": "com.type.string",
+        "response": "com.array.string"
     }
 }

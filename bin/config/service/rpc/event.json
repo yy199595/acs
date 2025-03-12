@@ -1,5 +1,5 @@
 {
     "EventSystem.Publish": {
-        "Async": false
+        "async": false
     }
 }

@@ -24,18 +24,18 @@ namespace acs
                 LOG_ERROR("not find rpc config : {}", fullName);
                 return false;
             }
-			if(config->Proto == rpc::Porto::Protobuf)
+			if(config->proto == rpc::Porto::Protobuf)
 			{
-				const std::string& request = config->Request;
-				const std::string& response = config->Response;
+				const std::string& request = config->request;
+				const std::string& response = config->response;
 				if (!request.empty() && protoComponent->Temp(request) == nullptr)
 				{
-					LOG_ERROR("rpc config {} request message:{}", config->FullName, request);
+					LOG_ERROR("rpc config {} request message:{}", config->fullname, request);
 					return false;
 				}
 				if (!response.empty() && protoComponent->Temp(response) == nullptr)
 				{
-					LOG_ERROR("rpc config {} response message:{}", config->FullName, response);
+					LOG_ERROR("rpc config {} response message:{}", config->fullname, response);
 					return false;
 				}
 			}

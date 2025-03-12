@@ -153,35 +153,6 @@ namespace lua
         return 1;
     }
 
-    int redis::SyncRun(lua_State* lua)
-    {
-		static RedisComponent* redisComponent = nullptr;
-		if(redisComponent == nullptr)
-		{
-			redisComponent = App::Get<RedisComponent>();
-			if (redisComponent == nullptr)
-			{
-				luaL_error(lua, "RedisComponent Is Null");
-				return 0;
-			}
-		}
-        const char* command = luaL_checkstring(lua, 1);
-        std::unique_ptr<::redis::Request> request = std::make_unique<::redis::Request>();
-		{
-			request->SetCommand(command);
-			int count = (int)luaL_len(lua, 2);
-			for (int i = 0; i < count; i++)
-			{
-				lua_geti(lua, 2, i + 1);
-				int index = lua_absindex(lua, -1);
-				ReadFromIndex(lua, index, request.get());
-				lua_pop(lua, 1);
-			}
-		}
-        std::unique_ptr<::redis::Response> response = redisComponent->SyncRun(std::move(request));
-        return response != nullptr ? response->WriteToLua(lua) : 0;
-    }
-
 	int redis::Sub(lua_State* lua)
 	{
 		static RedisSubComponent * subComponent = nullptr;

@@ -199,13 +199,17 @@ namespace http
 
 	int FromContent::OnRecvMessage(std::istream& is, size_t size)
 	{
-		std::unique_ptr<char[]> buffer(new char[size]);
-		size_t count = is.readsome(buffer.get(), size);
-		this->mContent.assign(buffer.get(), count);
-		if (this->mContent.size() >= 1024)
+		size_t count = 0;
+		char buffer[256] = { 0};
+		do
 		{
-			return tcp::PacketLong;
+			count = is.readsome(buffer, sizeof(buffer));
+			if(count > 0)
+			{
+				this->mContent.append(buffer, count);
+			}
 		}
+		while(count > 0);
 		return tcp::ReadSomeMessage;
 	}
 

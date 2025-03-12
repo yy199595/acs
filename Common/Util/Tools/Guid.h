@@ -8,22 +8,11 @@ namespace help
     {
     public:
         static long long Create();
-        static long long Create(short type);
-		static int New(long long startTime, int id);
+        static long long Create(int id);
+		static long long Create(int id, int count);
     private:
         static int mIndex1;
         static short mIndex2;
         static long long mLastTime;
-    };
-
-    class ThreadGuid
-    {
-    public:
-        static long long Create();
-        long long Create(short type);
-    private:
-        static long long mLastTime;
-        static std::atomic_int mIndex1;
-        static std::atomic_int16_t mIndex2;
     };
 }// namespace Guid

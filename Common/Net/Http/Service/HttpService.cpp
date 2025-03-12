@@ -35,10 +35,10 @@ namespace acs
 
 	int HttpService::Invoke(const HttpMethodConfig * config, const http::Request& request, http::Response& response) noexcept
 	{
-		const std::string & method = config->Method;
+		const std::string & method = config->method;
 		if(this->mLuaModule != nullptr && this->mLuaModule->HasFunction(method))
 		{
-			if(!config->IsAsync)
+			if(!config->async)
 			{
 				return this->CallLua(method, request, response);
 			}
@@ -74,8 +74,8 @@ namespace acs
 			}
 			if (lua_istable(lua, -1))
 			{
-				json::w::Document document;
 				lua::JsonValue jsonValue;
+				json::w::Document document;
 				lua::yyjson::read(lua, -1, jsonValue);
 				{
 					document.Add("code", code);

@@ -121,6 +121,10 @@ namespace help
         char str[100];
         time_t t = time == 0 ? NowSec() : time;
         struct tm *pt = localtime(&t);
+		if(pt == nullptr)
+		{
+			return "";
+		}
         size_t size = strftime(str, sizeof(str), TIME_FORMAT, pt);
         return {str, size};
     }

@@ -5,7 +5,7 @@ message mongo
     message insert
     {
         string tab = 1;
-        repeated string jsons = 2;
+        repeated string documents = 2;
     }
 
     message find
@@ -13,41 +13,73 @@ message mongo
         message request
         {
             string tab = 1;
-            string json = 2;
             int32 limit = 3;
+            string filter = 2;
             repeated string fields = 4;
         }
+        message page
+        {
+            string tab = 1;
+            string filter = 2;
+            int32 page = 3;
+            int32 count = 4;
+            string sort = 6;
+            repeated string fields = 5;
+        }
+
+        message more
+        {
+            string tab = 1;
+            int64 cursor = 2;
+            int32 batchSize = 3;
+        }
+
+        message distinct
+        {
+            string tab = 1;
+            string key = 2;
+            string filter = 3;
+        }
+
         message response
         {
-            repeated bytes jsons = 1;
+            int64 cursor = 1;
+            repeated bytes documents = 2;
         }
+
     }
     message find_one
     {
         message request
         {
             string tab = 1;
-            string where = 2;
+            string filter = 2;
             repeated string fields = 3;
         }
         message response
         {
-            string json = 1;
+            string document = 1;
         }
     }
 
-    message sum
+    message aggregate
     {
         message request
         {
             string tab = 1;
             string by = 2;
+            string cmd = 5;
             string field = 3;
             string filter = 4;
+            int32 batchSize = 6;
         }
-        message response
+        message facet
         {
-            repeated string json = 1;
+            string tab = 1;
+            string _id = 2;
+            string group = 3;
+            int32 batchSize = 4;
+            repeated string match = 5;
         }
     }
 
@@ -56,7 +88,7 @@ message mongo
         message request
         {
             string tab = 1;
-            string where = 2;
+            string filter = 2;
         }
         message response
         {
@@ -64,27 +96,10 @@ message mongo
         }
     }
 
-    message find_page
-    {
-        message request
-        {
-            string tab = 1;
-            string where = 2;
-            int32 page = 3;
-            int32 count = 4;
-            string sort = 6;
-            repeated string fields = 5;
-        }
-        message response
-        {
-            repeated bytes json = 2;
-        }
-    }
-
     message remove
     {
         string tab = 1;
-        string json = 2;
+        string filter = 2;
         int32 limit = 3;
     }
     message index
@@ -97,14 +112,14 @@ message mongo
 
     message updater
     {
-        string filter = 1;
-        string document = 2;
+        string cmd = 1;
+        string filter = 2;
+        string document = 3;
     }
 
     message updates
     {
         string tab = 1;
-        string tag = 3;
         repeated updater document = 2;
     }
 
@@ -112,8 +127,7 @@ message mongo
     {
         string tab = 1;
         updater document = 2;
-        string tag = 3;
-        bool upsert = 4;
+        bool upsert = 3;
     }
 
     message response
@@ -138,13 +152,13 @@ message mongo
         message request
         {
             string tab = 1;
-            string query = 2;
+            string filter = 2;
             string update = 3;
             repeated string fields = 4;
         }
         message response
         {
-            string json = 1;
+            string document = 1;
         }
     }
 
@@ -154,11 +168,11 @@ message mongo
         {
             string tab = 1;
             string cmd = 2;
-            string json = 3;
+            string document = 3;
         }
         message response
         {
-            string json = 1;
+            string document = 1;
         }
     }
 
@@ -177,7 +191,7 @@ message mongo
     }
 }
 
-message mysql //mysql操作
+message sql //mysql操作
 {
     message create
     {
@@ -232,7 +246,7 @@ message mysql //mysql操作
         message response
         {
             string error = 1;
-            repeated bytes jsons = 2;
+            repeated bytes documents = 2;
         }
     }
     message del

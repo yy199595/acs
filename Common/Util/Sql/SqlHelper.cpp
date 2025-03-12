@@ -67,12 +67,17 @@ namespace acs
         return true;
     }
 
-	bool SqlHelper::Update(const std::string & table,
-		const std::string & filter, const std::string & update, int limit, std::string& sqlCommand)
+	bool SqlHelper::Update(const db::sql::update & request, std::string& sqlCommand)
 	{
+		const std::string & filter = request.filter();
+		const std::string & document = request.document();
+		if(request.table().empty() || document.empty())
+		{
+			return false;
+		}
 		json::r::Document document1;
 		json::r::Document document2;
-		if(!document1.Decode(filter)|| !document2.Decode(update))
+		if(!document1.Decode(filter)|| !document2.Decode(document))
 		{
 			return false;
 		}
@@ -80,7 +85,7 @@ namespace acs
 		size_t index = 0;
 		std::vector<const char *> keys;
 		this->mSqlCommandStream.str("");
-		this->mSqlCommandStream << "UPDATE " << table << " SET ";
+		this->mSqlCommandStream << "UPDATE " << request.table() << " SET ";
 		if(document2.GetKeys(keys) > 0)
 		{
 			std::unique_ptr<json::r::Value> value;
@@ -118,9 +123,9 @@ namespace acs
 				}
 			}
 		}
-		if(limit > 0)
+		if(request.limit() > 0)
 		{
-			this->mSqlCommandStream << " LIMIT " << limit;
+			this->mSqlCommandStream << " LIMIT " << request.limit();
 		}
 		sqlCommand = this->mSqlCommandStream.str();
 		return true;
@@ -170,10 +175,11 @@ namespace acs
 		return false;
 	}
 
-	bool SqlHelper::Delete(const std::string & table, const std::string & filter, int limit, std::string& sqlCommand)
+	bool SqlHelper::Delete(const db::sql::del & request, std::string& sql)
 	{
 		json::r::Document document1;
-        if(!document1.Decode(filter))
+		const std::string & filter = request.filter();
+        if(filter.empty() || !document1.Decode(filter))
         {
             return false;
         }
@@ -181,6 +187,7 @@ namespace acs
 		size_t index = 0;
 		std::vector<const char *> keys;
 		this->mSqlCommandStream.str("");
+		const std::string & table = request.table();
 		this->mSqlCommandStream << "DELETE FROM " << table << " WHERE ";
 		if(document1.GetKeys(keys) > 0)
 		{
@@ -202,77 +209,72 @@ namespace acs
 				}
 			}
 		}
-		if(limit > 0)
+		if(request.limit() > 0)
 		{
-			this->mSqlCommandStream << " LIMIT " << limit;
+			this->mSqlCommandStream << " LIMIT " << request.limit();
 		}
-		sqlCommand = this->mSqlCommandStream.str();
+		sql = this->mSqlCommandStream.str();
 		return true;
 	}
 
 
-	bool SqlHelper::Insert(const std::string& table, json::r::Document& message, std::string& sqlCommand)
+	bool SqlHelper::Insert(const db::sql::insert & request, std::string& sqlCommand)
 	{
-		return this->ToSqlCommand(table, "INSERT", message, sqlCommand);
-	}
-
-	bool SqlHelper::Replace(const std::string& table, json::r::Document& message, std::string& sqlCommand)
-	{
-		return this->ToSqlCommand(table, "REPLACE", message, sqlCommand);
-	}
-
-	bool SqlHelper::Select(const google::protobuf::Message& message,
-		const std::string& where, int limit, std::string& sqlCommand)
-	{
-		std::vector<std::string> fields;
-		const pb::Descriptor * descriptor = message.GetDescriptor();
-		for(int index = 0; index < descriptor->field_count(); index++)
+		json::r::Document document;
+		if(document.Decode(request.document()))
 		{
-			const pb::FieldDescriptor * fieldDescriptor = descriptor->field(index);
-			if(fieldDescriptor != nullptr)
-			{
-				fields.emplace_back(fieldDescriptor->name());
-			}
+			return false;
 		}
-		const std::string & table = message.GetTypeName();
-		return this->Select(table, where, fields, limit, sqlCommand);
+		const std::string & table = request.table();
+		return this->ToSqlCommand(table, "INSERT", document, sqlCommand);
 	}
 
-	bool SqlHelper::Select(const std::string & name, const std::string & where,
-		std::vector<std::string> & fields, int limit, std::string & sqlCommand)
+	bool SqlHelper::Replace(const db::sql::save & request, std::string& sqlCommand)
+	{
+		json::r::Document document;
+		if(document.Decode(request.data()))
+		{
+			return false;
+		}
+		const std::string & table = request.table();
+		return this->ToSqlCommand(table, "REPLACE", document, sqlCommand);
+	}
+
+	bool SqlHelper::Select(const db::sql::query::request & request, std::string & sql)
 	{
 		json::r::Document document;
 		this->mSqlCommandStream.str("");
-		if (!where.empty() && !document.Decode(where))
+		const std::string & filter = request.filter();
+		if (!filter.empty() && !document.Decode(filter))
 		{
 			return false;
 		}
 		this->mSqlCommandStream << "SELECT ";
-		if(fields.empty())
+		if(request.fields_size() == 0)
 		{
 			this->mSqlCommandStream << "*";
 		}
 		else
 		{
-			for (int index = 0; index < fields.size(); index++)
+			for (int index = 0; index < request.fields_size(); index++)
 			{
-				const std::string& field = fields.at(index);
+				const std::string& field = request.fields(index);
 				this->mSqlCommandStream << field;
-				if (index != fields.size() - 1)
+				if (index != request.fields_size() - 1)
 				{
 					this->mSqlCommandStream << ",";
 				}
 			}
 		}
 		std::vector<const char *> keys;
-		this->mSqlCommandStream << " FROM " << name;
+		this->mSqlCommandStream << " FROM " << request.table();
 		if(document.GetKeys(keys) <= 0)
 		{
-			sqlCommand = this->mSqlCommandStream.str();
+			sql = this->mSqlCommandStream.str();
 			return true;
 		}
 		size_t index = 0;
-		if(keys.size() > 0)
+		if(!keys.empty())
 		{
 			this->mSqlCommandStream << " WHERE ";
 			std::unique_ptr<json::r::Value> value;
@@ -293,11 +295,76 @@ namespace acs
 				}
 			}
 		}
-		if (limit != 0)
+		if (request.limit() != 0)
 		{
-			this->mSqlCommandStream << " LIMIT " << limit;
+			this->mSqlCommandStream << " LIMIT " << request.limit();
 		}
-		sqlCommand = this->mSqlCommandStream.str();
+		sql = this->mSqlCommandStream.str();
+		return true;
+	}
+
+	bool SqlHelper::FindPage(const db::sql::query::page& request, std::string& sql)
+	{
+		if(request.limit() <= 0 || request.page() <= 0)
+		{
+			return false;
+		}
+		json::r::Document document;
+		this->mSqlCommandStream.str("");
+		const std::string& filter = request.filter();
+		if (!filter.empty() && !document.Decode(filter))
+		{
+			return false;
+		}
+		this->mSqlCommandStream << "SELECT ";
+		if (request.fields_size() == 0)
+		{
+			this->mSqlCommandStream << "*";
+		}
+		else
+		{
+			for (int index = 0; index < request.fields_size(); index++)
+			{
+				const std::string& field = request.fields(index);
+				this->mSqlCommandStream << field;
+				if (index != request.fields_size() - 1)
+				{
+					this->mSqlCommandStream << ",";
+				}
+			}
+		}
+		std::vector<const char*> keys;
+		this->mSqlCommandStream << " FROM " << request.table();
+		if (document.GetKeys(keys) <= 0)
+		{
+			sql = this->mSqlCommandStream.str();
+			return true;
+		}
+		size_t index = 0;
+		if (!keys.empty())
+		{
+			this->mSqlCommandStream << " WHERE ";
+			std::unique_ptr<json::r::Value> value;
+			for (const char* key: keys)
+			{
+				index++;
+				if (document.Get(key, value))
+				{
+					this->mSqlCommandStream << key << "=";
+					if (!this->WriterToStream(this->mSqlCommandStream, *value))
+					{
+						return false;
+					}
+					if (index + 1 < keys.size())
+					{
+						this->mSqlCommandStream << " AND ";
+					}
+				}
+			}
+		}
+		int offset = (request.page() - 1) * request.limit();
+		this->mSqlCommandStream << " LIMIT " << offset << "," << request.limit();
+		sql = this->mSqlCommandStream.str();
 		return true;
 	}
 
@@ -438,15 +505,17 @@ namespace acs
 		return true;
 	}
 
-	bool SqlHelper::CreateIndex(const std::string& table, const std::string& field, bool unique, std::string & sql)
+	bool SqlHelper::CreateIndex(const db::sql::index & request, std::string & sql)
 	{
+		const std::string & table = request.tab();
+		const std::string & field = request.name();
 		if(table.empty() || field.empty())
 		{
 			return false;
 		}
 		this->mSqlCommandStream.str("");
 		this->mSqlCommandStream << "CREATE ";
-		if(unique)
+		if(request.unique())
 		{
 			this->mSqlCommandStream << "UNIQUE ";
 		}

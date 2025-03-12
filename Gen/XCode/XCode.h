@@ -82,4 +82,8 @@ namespace XCode
 	 constexpr int OrderAlreadyRefund = 78;//订单已经退款
 	 constexpr int RequestWxApiError = 79;//请求微信api错误
 	 constexpr int PermissionDenied = 80;//权限不足
+	 constexpr int ConnectDatabaseFail = 81;//连接数据库失败
+	 constexpr int CreateDatabaseFail = 82;//创建数据库失败
+	 constexpr int AuthPluginNonsupport = 83;//验证方式不支持
+	 constexpr int PasswordAuthFail = 84;//密码验证失败
 };

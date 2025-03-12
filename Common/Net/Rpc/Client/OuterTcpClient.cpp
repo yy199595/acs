@@ -108,10 +108,10 @@ namespace rpc
 		{
 			case rpc::Type::Ping:
 			{
-				rpc::Message * pongMessage = new rpc::Message();
+				std::unique_ptr<rpc::Message> pongMessage = std::make_unique<rpc::Message>();
 				{
 					pongMessage->SetType(rpc::Type::Pong);
-					this->AddToSendQueue(pongMessage);
+					this->AddToSendQueue(pongMessage.release());
 				}
 				break;
 			}

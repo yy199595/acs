@@ -4,19 +4,18 @@
 
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
-#include<string>
-#include<unordered_set>
+#include "Yyjson/Object/JsonObject.h"
 namespace http
 {
-	struct Config
+	struct Config : public json::Object<Config>
 	{
-		bool Auth;
-		bool RpcDebug;
-		std::string Root;
-		std::string Index;
-		std::string Upload;
-		std::string Domain;
-        std::unordered_set<std::string> WhiteList;
+		bool auth;
+		std::string root;
+		std::string index;
+		std::string upload;
+		std::string domain;
+        std::vector<std::string> whiteList;
+		std::unordered_map<std::string, std::string> header;
 	};
 }
 #endif //APP_CONFIG_H

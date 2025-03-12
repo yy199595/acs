@@ -1,76 +1,54 @@
 {
     "/table_mgr/find": {
-        "Type": "POST",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 100,
-        "Desc": "分页查找Mongo表",
-        "Bind": "Collection.FindPage",
-        "ContentType": "application/json",
-        "Request": {
+        "type": "POST",
+        "async": true,
+        "auth": true,
+        "permission": 100,
+        "desc": "分页查找Mongo表",
+        "bind": "Collection.FindPage",
+        "content-type": "application/json",
+        "request": {
             "tab": "xxx",
             "page": 1,
             "filter" : { }
         }
     },
     "/table_mgr/delete": {
-        "Type": "GET",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 100,
-        "Desc": "删除集合",
+        "type": "GET",
+        "async": true,
+        "auth": true,
+        "permission": 100,
+        "desc": "删除集合",
         "Record" : true,
-        "Bind": "Collection.Delete",
-        "Request": {
+        "bind": "Collection.Delete",
+        "request": {
             "tab": "xxx"
         }
     },
     "/table_mgr/list": {
-        "Type": "GET",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 100,
-        "Desc": "查看所有集合",
-        "Bind": "Collection.List"
+        "type": "GET",
+        "async": true,
+        "auth": true,
+        "permission": 100,
+        "desc": "查看所有集合",
+        "bind": "Collection.List"
     },
     "/table_mgr/tables": {
-        "Type": "GET",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 100,
-        "Desc": "查看所有库和表",
-        "Bind": "Collection.Tables"
+        "type": "GET",
+        "async": true,
+        "auth": true,
+        "permission": 100,
+        "desc": "查看所有库和表",
+        "bind": "Collection.Tables"
     },
     "/table_mgr/export": {
-        "Type": "GET",
-        "Async": true,
-        "Auth": false,
-        "Desc": "导出一个表",
-        "Bind": "MongoMgr.Export",
-        "Request" : {
+        "type": "GET",
+        "async": true,
+        "auth": false,
+        "desc": "导出一个表",
+        "bind": "MongoMgr.Export",
+        "request" : {
             "tab" : "xx.xx"
-        }
-    },
-    "/table_mgr/backup": {
-        "Type": "GET",
-        "Async": true,
-        "Auth": false,
-        "Desc": "备份一个表的数据",
-        "Bind": "MongoMgr.Backup",
-        "Request" : {
-            "tab" : "表名",
-            "name" : "文件夹"
-        }
-    },
-    "/table_mgr/recover": {
-        "Type": "GET",
-        "Async": true,
-        "Auth": false,
-        "Desc": "恢复文件夹数据到一个库",
-        "Bind": "MongoMgr.Recover",
-        "Request" : {
-            "db" : "库名",
-            "name" : "文件夹"
         }
     }
 }

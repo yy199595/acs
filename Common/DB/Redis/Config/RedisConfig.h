@@ -11,15 +11,14 @@ namespace redis
 	struct Config final : public json::Object<Config>
     {
     public:
-		int Id;
-		int Ping;
-		int Count;
-        int Index;
-		bool Debug;
-        std::string Name;
-        std::string Script;
-		std::string Address;
-		std::string Password;
+		int id;
+		int ping;
+		int count;
+		bool debug;
+        std::string name;
+        std::string script;
+		std::string address;
+		std::string password;
     };
 }
 

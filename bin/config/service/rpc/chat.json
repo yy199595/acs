@@ -1,29 +1,29 @@
 {
     "ChatSystem.Ping": {
-        "Async": false,
-        "IsClient": true
+        "async": false,
+        "client": true
     },
     "ChatSystem.OnPing": {
-        "Async": true,
-        "IsClient": true
+        "async": true,
+        "client": true
     },
     "ChatSystem.Request" : {
-        "Async" : false,
-        "IsClient": true,
-        "Request" : "google.protobuf.Struct"
+        "async" : false,
+        "client": true,
+        "request" : "google.protobuf.Struct"
     },
     "ChatSystem.OnChat": {
-        "Proto" : "json",
-        "Async": true,
-        "IsClient": true,
-        "Request": "c2s.chat.request"
+        "proto" : "json",
+        "async": true,
+        "client": true,
+        "request": "c2s.chat.request"
     },
     "ChatSystem.OnSleep": {
-        "Proto" : "json",
-        "Async": true
+        "proto" : "json",
+        "async": true
     },
     "ChatComponent.OnChat" : {
-        "SendToClient" : true,
-        "Request": "c2s.chat.request"
+        "to_client" : true,
+        "request": "c2s.chat.request"
     }
 }

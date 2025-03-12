@@ -12,12 +12,15 @@ namespace help
         return EmptyStr;
     }
 
-    std::string Str::Tolower(const std::string &str)
+    void Str::Tolower(std::string &str)
     {
-		std::string result(str);
-        std::transform(result.begin(), result.end(), result.begin(), ::tolower);
-		return result;
+        std::transform(str.begin(), str.end(), str.begin(), ::tolower);
     }
+
+	void Str::Toupper(std::string &str)
+	{
+		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+	}
 
 	size_t Str::Hash(const std::string& str)
 	{
@@ -25,12 +28,7 @@ namespace help
 		return hash(str);
 	}
 
-    std::string Str::Toupper(const std::string &str)
-    {
-		std::string result(str);
-		std::transform(result.begin(), result.end(), result.begin(), ::toupper);
-		return result;
-    }
+
 
     size_t Str::Split(const std::string &targetString, char cc, std::vector<std::string>& ret)
     {
@@ -145,12 +143,12 @@ namespace help
     {
 		std::string result;
 		result.resize(size);
-		static const std::string STR_BUFFER("1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM");
+		static const std::string STR_BUFFER("123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM");
 		for(size_t index = 0; index < size; index++)
 		{
 			int max = (int)STR_BUFFER.size();
-			int num = help::Rand::Random<int>(0, max);
-			result[index] = STR_BUFFER[num];
+			int num = help::Rand::Random<int>(0, max - 1);
+			result[index] = (char)STR_BUFFER[num];
 		}
 		return result;
     }

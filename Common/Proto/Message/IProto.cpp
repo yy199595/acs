@@ -1,8 +1,9 @@
-#include"IProto.h"
-#include"Util/Tools/Math.h"
-#include"Util/Tools/TimeHelper.h"
-#include"Yyjson/Document/Document.h"
-#include"Lua/Engine/UserDataParameter.h"
+#include "IProto.h"
+#include "Util/Tools/Math.h"
+#include "Util/Tools/String.h"
+#include "Util/Tools/TimeHelper.h"
+#include "Yyjson/Document/Document.h"
+#include "Lua/Engine/UserDataParameter.h"
 
 namespace tcp
 {
@@ -33,7 +34,11 @@ namespace tcp
 	bool IHeader::Has(const std::string& k) const
 	{
 		auto iter = this->mHeader.find(k);
-		return iter != this->mHeader.end();
+		if(iter == this->mHeader.end())
+		{
+			return false;
+		}
+		return true;
 	}
 
 	bool IHeader::Get(const std::string& k, long long& v) const
@@ -49,7 +54,7 @@ namespace tcp
 	bool IHeader::Get(const std::string& k, std::string& v) const
 	{
 		auto iter = this->mHeader.find(k);
-		if(iter == this->mHeader.end())
+		if (iter == this->mHeader.end())
 		{
 			return false;
 		}
@@ -107,12 +112,6 @@ namespace tcp
 		if (!head->Get(key, value))
 		{
 			return 0;
-		}
-		long long number = 0;
-		if (help::Math::ToNumber(value, number))
-		{
-			lua_pushinteger(L, number);
-			return 1;
 		}
 		lua_pushlstring(L, value.c_str(), value.size());
 		return 1;

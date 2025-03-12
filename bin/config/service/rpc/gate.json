@@ -1,25 +1,25 @@
 {
     "GateSystem.Ping": {
-        "Async": false,
-        "IsOpen": true,
-        "IsClient": true
+        "async": false,
+        "open": true,
+        "client": true
     },
     "GateSystem.Login": {
-        "Async": true,
+        "async": true,
         "Auth": false,
-        "IsClient": true
+        "client": true
     },
     "GateSystem.Logout": {
-        "Async": true,
-        "IsClient": true
+        "async": true,
+        "client": true
     },
     "GateSystem.Create": {
-        "Async": true,
-        "IsClient": false,
-        "Request" : "s2s.login.create"
+        "async": true,
+        "client": false,
+        "request" : "s2s.login.create"
     },
     "GateSystem.OnPlayerLogin": {
-        "Async": true,
-        "IsClient": false
+        "async": true,
+        "client": false
     }
 }

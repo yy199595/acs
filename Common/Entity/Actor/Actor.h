@@ -34,8 +34,8 @@ namespace acs
 		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::unique_ptr<rpc::Message> &) const;
 	 public:
 		virtual bool OnInit() = 0;
-		virtual void EncodeToJson(std::string * json) = 0;
-		virtual bool DecodeFromJson(const std::string & json) { return true;}
+		virtual void Encode(json::w::Value & document) = 0;
+		virtual bool Decode(json::r::Value & document) { return true;}
 	protected:
 		virtual bool GetAddress(const rpc::Message & request, int & id) const = 0;
 		virtual int Make(const std::string & func, std::unique_ptr<rpc::Message> & request) const = 0;
@@ -44,6 +44,7 @@ namespace acs
 	private:
 		const std::string mName;
 		class ProtoComponent * mProto;
+		std::unordered_map<std::string, std::string> mAddress;
 	};
 }
 

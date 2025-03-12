@@ -4,7 +4,11 @@
 
 #include "MysqlProto.h"
 #include "Util/Crypt/sha1.h"
-
+#include "XCode/XCode.h"
+#include "Util/Tools/String.h"
+#ifdef __ENABLE_OPEN_SSL__
+#include "openssl/sha.h"
+#endif
 #include <utility>
 #ifdef __OS_WIN__
 #include <WinSock2.h>
@@ -13,8 +17,8 @@
 #endif
 namespace mysql
 {
-	Request::Request(std::string sql)
-			: mMessage(std::move(sql)), mCmd(mysql::cmd::QUERY)
+	Request::Request(const std::string & sql)
+			: mMessage(sql), mCmd(mysql::cmd::QUERY)
 	{
 		this->mRpcId = 0;
 		this->mIndex = 0;
@@ -32,6 +36,18 @@ namespace mysql
 	{
 		this->mRpcId = 0;
 		this->mIndex = 0;
+	}
+
+	bool Request::GetCommand(std::string& cmd) const
+	{
+		size_t pos = this->mMessage.find(' ');
+		if(pos == std::string::npos)
+		{
+			return false;
+		}
+		cmd = this->mMessage.substr(0, pos);
+		help::Str::Toupper(cmd);
+		return true;
 	}
 
 	int Request::OnSendMessage(std::ostream& os)
@@ -54,92 +70,125 @@ namespace mysql
 
 namespace mysql
 {
-	inline std::string mysql_native_password(const std::string & password, const std::string & salt)
+	namespace plugin
 	{
-		std::string password_hash = help::Sha1::GetHash(password);
-		std::string stage1 = help::Sha1::GetHash(password_hash);
-		std::string salt_stage1 = salt + stage1;
-		std::string challenge_response = help::Sha1::GetHash(salt_stage1);
+		std::string native_password(const std::string& password, const std::string& salt)
+		{
+			std::string password_hash = help::Sha1::GetHash(password);
+			std::string stage1 = help::Sha1::GetHash(password_hash);
+			std::string salt_stage1 = salt + stage1;
+			std::string challenge_response = help::Sha1::GetHash(salt_stage1);
 
-		for (size_t i = 0; i < password_hash.size(); ++i) {
-			challenge_response[i] ^= password_hash[i];
+			for (size_t i = 0; i < password_hash.size(); ++i)
+			{
+				challenge_response[i] ^= password_hash[i];
+			}
+
+			return challenge_response;
 		}
+#ifdef __ENABLE_OPEN_SSL__
+		std::string caching_sha2_password(const std::string & password, const std::string & salt)
+		{
+			unsigned char buf1[32];
+			unsigned char buf2[52];
+			int i;
 
-		return challenge_response;
+			// SHA256( password ) ^ SHA256( SHA256( SHA256( password ) ) + seed)
+			SHA256((unsigned char *)password.c_str(), password.size(), buf1);
+			SHA256(buf1, 32, buf2);
+			memcpy(buf2 + 32, salt.c_str(), salt.size());
+			SHA256(buf2, 52, buf2);
+			for (i = 0; i < 32; i++)
+				buf1[i] ^= buf2[i];
+
+			return std::string((const char *)buf1, 32);
+		}
+#endif
 	}
 }
 
 namespace mysql
 {
-	LoginRequest::LoginRequest()
+	int LoginRequest::Encode(std::vector<uint8_t>& packet) const
 	{
-		this->mCharset = 255;
+		  uint32_t client_capabilities =
+            mysql::client_flag::CLIENT_LONG_PASSWORD |
+            mysql::client_flag::CLIENT_LONG_FLAG |
+            mysql::client_flag::CLIENT_FOUND_ROWS |
+            mysql::client_flag::CLIENT_PROTOCOL_41 |
+            mysql::client_flag::CLIENT_MULTI_RESULTS |
+            mysql::client_flag::CLIENT_LOCAL_FILES |
+            mysql::client_flag::CLIENT_MULTI_STATEMENTS |
+            mysql::client_flag::CLIENT_SECURE_CONNECTION |
+            mysql::client_flag::CLIENT_TRANSACTIONS |
+            mysql::client_flag::CLIENT_PS_MULTI_RESULTS;
+
+        std::string encrypted_password;
+        if (!this->password.empty())
+        {
+            if (this->authPlugin == mysql::plugin::MYSQL_CLEAR_PASSWORD)
+            {
+                encrypted_password = this->password;
+                encrypted_password.push_back('\0');
+            }
+            else if (this->authPlugin == mysql::plugin::MYSQL_NATIVE_PASSWORD)
+            {
+                encrypted_password = mysql::plugin::native_password(this->password, this->salt);
+            }
+            //#ifdef __ENABLE_OPEN_SSL__
+            //			else if (request.authPlugin == mysql::plugin::CACHING_SHA2_PASSWORD)
+            //			{
+            //				client_capabilities |= mysql::client_flag::CLIENT_SSL;
+            //				client_capabilities |= mysql::client_flag::CLIENT_PLUGIN_AUTH;
+            //				encrypted_password = mysql::plugin::caching_sha2_password(request.password, request.salt);
+            //			}
+            //#endif
+            else
+            {
+                return XCode::AuthPluginNonsupport;
+            }
+        }
+
+        if (!this->database.empty())
+        {
+            client_capabilities |= mysql::client_flag::CLIENT_CONNECT_WITH_DB;
+        }
+
+        uint32_t capabilities_le = htonl(client_capabilities);
+        packet.insert(packet.end(), reinterpret_cast<uint8_t*>(&capabilities_le),
+                      reinterpret_cast<uint8_t*>(&capabilities_le) + 4);
+
+
+        uint32_t max_packet_size = mysql::config::PACKAGE_MAX_SIZE;
+        packet.insert(packet.end(), reinterpret_cast<uint8_t*>(&max_packet_size),
+                      reinterpret_cast<uint8_t*>(&max_packet_size) + 4);
+
+        packet.emplace_back(this->charset);
+
+        packet.insert(packet.end(), 23, 0);
+        packet.insert(packet.end(), this->user.begin(), this->user.end());
+        packet.emplace_back(0); // 用户名以 null 结尾
+        if (!encrypted_password.empty())
+        {
+            packet.emplace_back(encrypted_password.size()); // 插入密码长度
+            packet.insert(packet.end(), encrypted_password.begin(), encrypted_password.end());
+        }
+        else
+        {
+            packet.emplace_back(0); // 空密码情况
+        }
+
+        if (!this->database.empty())
+        {
+            packet.insert(packet.end(), this->database.begin(), this->database.end());
+            packet.emplace_back(0); // 以 null 结尾
+        }
+
+        packet.insert(packet.end(), this->authPlugin.begin(), this->authPlugin.end());
+        packet.emplace_back(0); // 以 null 结尾
+		return  XCode::Ok;
 	}
 
-	int LoginRequest::OnSendMessage(std::ostream& os)
-	{
-
-		std::string encrypted_password = mysql::mysql_native_password(this->mPassword, this->mSalt);
-
-		std::vector<uint8_t> packet;
-
-		uint32_t client_capabilities =
-				0x00000001 |  // CLIENT_LONG_PASSWORD
-				0x00000002 |  // CLIENT_FOUND_ROWS
-				0x00000004 |  // CLIENT_LONG_FLAG
-				0x00000200 |  // CLIENT_PROTOCOL_41（支持 4.1 及以上版本协议）
-				0x00000800 |  // CLIENT_SECURE_CONNECTION
-				0x00020000 |  // CLIENT_PLUGIN_AUTH
-				0x00040000;   // CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA
-		if(!this->mDatabase.empty())
-		{
-			client_capabilities |= 0x00000008;
-		}
-
-		uint32_t capabilities_le = htonl(client_capabilities);
-		packet.insert(packet.end(), reinterpret_cast<uint8_t*>(&capabilities_le),
-				reinterpret_cast<uint8_t*>(&capabilities_le) + 4);
-
-
-		uint32_t max_packet_size = mysql::config::PACKAGE_MAX_SIZE;
-		packet.insert(packet.end(), reinterpret_cast<uint8_t*>(&max_packet_size),
-				reinterpret_cast<uint8_t*>(&max_packet_size) + 4);
-
-		packet.emplace_back(this->mCharset);
-
-		packet.insert(packet.end(), 23, 0);
-		packet.insert(packet.end(), this->mUser.begin(), this->mUser.end());
-		packet.emplace_back(0);  // 用户名以 null 结尾
-		if (!encrypted_password.empty()) {
-			packet.emplace_back(encrypted_password.size());  // 插入密码长度
-			packet.insert(packet.end(), encrypted_password.begin(), encrypted_password.end());
-		} else {
-			packet.emplace_back(0);  // 空密码情况
-		}
-
-		if (!this->mDatabase.empty()) {
-			packet.insert(packet.end(), this->mDatabase.begin(), this->mDatabase.end());
-			packet.emplace_back(0);  // 以 null 结尾
-		}
-
-		packet.insert(packet.end(), this->mAuthPlugin.begin(), this->mAuthPlugin.end());
-		packet.emplace_back(0);  // 以 null 结尾
-
-
-		uint32_t packet_length = packet.size();
-		uint8_t sequence_id = 1; // 登录包的 sequence_id 必须是 1
-
-		std::vector<uint8_t> final_packet;
-		final_packet.emplace_back(packet_length & 0xFF);
-		final_packet.emplace_back((packet_length >> 8) & 0xFF);
-		final_packet.emplace_back((packet_length >> 16) & 0xFF);
-		final_packet.emplace_back(sequence_id);
-
-		final_packet.insert(final_packet.end(), packet.begin(), packet.end());
-
-		os.write((const char *)final_packet.data(), final_packet.size());
-		return 0;
-	}
 }
 
 namespace mysql
@@ -251,6 +300,17 @@ namespace mysql
 		return result;
 	}
 
+	bool Response::GetFirstResult(std::string& result) const
+	{
+		if(this->mResult.contents.empty())
+		{
+			return false;
+		}
+		result = this->mResult.contents.front();
+		return true;
+	}
+
+
 	unsigned short Response::ReadShort(unsigned int& pos)
 	{
 		unsigned short result = 0;
@@ -270,13 +330,18 @@ namespace mysql
 		{
 			case mysql::PACKAGE_OK:
 			{
-				if (this->mMessage.size() >= 7)
+				if(size >= 7)
 				{
-					this->mOkResult.mAffectedRows = (unsigned int)this->mMessage[offset++];
-					this->mOkResult.mLastInsertId = (unsigned int)this->mMessage[offset++];
-					tcp::Data::Read(this->mMessage.c_str() + 2, this->mOkResult.mServerStatus, offset, false);
-					offset +=2;
-					tcp::Data::Read(this->mMessage.c_str() + 4, this->mOkResult.mWarningCount, offset, false);
+					this->mOkResult.mAffectedRows = (unsigned int)buffer[offset++];
+					this->mOkResult.mLastInsertId = (unsigned int)buffer[offset++];
+					tcp::Data::Read(buffer + 2, this->mOkResult.mServerStatus, offset, false);
+					offset += 2;
+					tcp::Data::Read(buffer + 4, this->mOkResult.mWarningCount, offset, false);
+					offset += 2;
+					if(offset < size)
+					{
+						this->mMessage.assign(buffer + offset, size - offset);
+					}
 				}
 				return tcp::ReadDone;
 			}

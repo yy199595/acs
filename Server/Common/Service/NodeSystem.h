@@ -22,12 +22,12 @@ namespace acs
 		int Ping(long long id);
 		int Find(com::type::json & response);
 		int Add(const com::type::json & request); //新服务器加入
-        int Del(const com::type::int64 & request); //服务器退出
+        int Del(const com::type::int32 & request); //服务器退出
         int RunInfo(com::type::json & response); // 获取运行信息
 	private:
 		bool OnInit() final;
 	private:
-		class ActorComponent * mActComponent;
+		class ActorComponent * mActor;
     };
 }
 

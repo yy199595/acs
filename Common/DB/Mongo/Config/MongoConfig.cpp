@@ -11,15 +11,15 @@ namespace mongo
 		{
 			return false;
 		}
-		this->DB = matches[6];
-		this->User = matches[2];
-		this->Password = matches[3];
+		this->db = matches[6];
+		this->user = matches[2];
+		this->password = matches[3];
 		const std::string ip = matches[4];
 		const std::string port = matches[5];
-		this->Address = fmt::format("{}:{}", ip, port);
-		if (this->User.empty())
+		this->address = fmt::format("{}:{}", ip, port);
+		if (this->user.empty())
 		{
-			this->Password.clear();
+			this->password.clear();
 		}
 		return true;
 	}

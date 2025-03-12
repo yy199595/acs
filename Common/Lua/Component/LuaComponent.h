@@ -21,14 +21,13 @@ namespace acs
 
 	class LuaComponent final : public Component,
 							   public IStart, public IComplete, public IHotfix,
-							   public IServerRecord, public IDestroy
+							   public IServerRecord, public IDestroy, public ISecondUpdate
 	{
 	public:
 		LuaComponent();
 		~LuaComponent() final = default;
 	public:
 		double GetMemorySize();
-		double CollectGarbage();
 		Lua::LuaModule * LoadModule(const std::string & name);
 	protected:
 		bool Awake() final;
@@ -37,6 +36,7 @@ namespace acs
 		void OnDestroy() final;
 		void OnComplete() final;
 		bool OnHotFix() final;
+		void OnSecondUpdate(int tick) noexcept final;
 		void OnRecord(json::w::Document &document) final;
 	private:
 		void LoadAllLib();

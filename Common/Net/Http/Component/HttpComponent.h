@@ -3,9 +3,10 @@
 #ifdef __ENABLE_OPEN_SSL__
 #include"asio/ssl.hpp"
 #endif
-#include"Core/Map/HashMap.h"
-#include"Core/Pool/ArrayPool.h"
-#include"Rpc/Component/RpcComponent.h"
+#include "Core/Map/HashMap.h"
+#include "Core/Pool/ArrayPool.h"
+
+#include "Rpc/Component/RpcComponent.h"
 namespace http
 {
 	class Content;
@@ -13,14 +14,25 @@ namespace http
 	class Response;
 	class Client;
 }
+#ifdef __ENABLE_OPEN_SSL__
+#include "Yyjson/Object/JsonObject.h"
+namespace ssl
+{
+	struct Config : public json::Object<Config>
+	{
+		std::string pem;
+	};
+}
+#endif
+
 namespace acs
 {
 	class HttpComponent final : public RpcComponent<http::Response>,
-	                             public IRpc<http::Request, http::Response>
+								public IRpc<http::Request, http::Response>
 	{
-	 public:
+	public:
 		HttpComponent();
-	 public:
+	public:
 		std::unique_ptr<http::Response> Get(const std::string& url, int second = 15);
 		std::unique_ptr<http::Response> Post(const std::string& url, const std::string& data, int second = 15);
 		std::unique_ptr<http::Response> Post(const std::string& url, const json::w::Document & json, int second = 15);
@@ -32,15 +44,15 @@ namespace acs
 		int Send(std::unique_ptr<http::Request> request, std::unique_ptr<http::Response> response, int & taskId); // 异步发送
 	private:
 		bool Awake() final;
-        bool LateAwake() final;
+		bool LateAwake() final;
 		void OnDelTask(int key) final;
 		std::shared_ptr<http::Client> CreateClient(http::Request * request);
 		void OnMessage(http::Request *request, http::Response *response) noexcept final;
 	private:
-        class ThreadComponent * mNetComponent;
+		class ThreadComponent * mNetComponent;
 #ifdef __ENABLE_OPEN_SSL__
-		std::string mPemPath;
-		std::unordered_map<std::string, std::unique_ptr<asio::ssl::context>> mSslContexts;
+		asio::ssl::context mSslContext;
+		std::unordered_map<std::string, asio::ssl::context *> mSslContexts;
 #endif
 		custom::HashMap<int, std::shared_ptr<http::Client>> mUseClients;
 	};

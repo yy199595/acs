@@ -66,7 +66,7 @@ namespace acs
 		{
 			Asio::Context& context = this->GetComponent<ThreadComponent>()->GetContext();
 			{
-				int port = listen.Port;
+				unsigned short port = listen.port;
 				Asio::Context & main = this->mApp->GetContext();
 				this->mUdpServer = std::make_unique<udp::Server>(context, this, port, main);
 			}

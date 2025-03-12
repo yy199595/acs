@@ -1,13 +1,42 @@
 {
     "log": [
         {
+            "open" : false,
+            "name" : "mysql",
+            "level" : "none",
+            "console" : true,
+            "path" : "${WORK_DIR}/explain/mysql"
+        },
+        {
+            "open" : false,
+            "name" : "pgsql",
+            "level" : "none",
+            "console" : true,
+            "path" : "${WORK_DIR}/explain/pgsql"
+        },
+        {
+            "open" : false,
+            "name" : "mongo",
+            "level" : "none",
+            "console" : true,
+            "path" : "${WORK_DIR}/explain/mongo"
+        },
+        {
             "open" : true,
+            "name" : "all",
+            "level" : "all",
+            "console" : true,
+            "path": "${WORK_DIR}/log"
+
+        },
+        {
+            "open" : false,
             "name" : "debug",
             "level" : "debug",
             "console" : true
         },
         {
-            "open" : true,
+            "open" : false,
             "name" : "info",
             "level" : "info",
             "max_line": 10240,
@@ -16,7 +45,7 @@
             "path": "${WORK_DIR}/log"
         },
         {
-            "open" : true,
+            "open" : false,
             "console" : true,
             "name" : "warn",
             "level" : "warn",
@@ -25,7 +54,7 @@
             "path": "${WORK_DIR}/log"
         },
         {
-            "open" : true,
+            "open" : false,
             "console" : true,
             "name" : "error",
             "level" : "error",
@@ -37,7 +66,7 @@
             "ding" : ""
         },
         {
-            "open" : true,
+            "open" : false,
             "console" : true,
             "name" : "fatal",
             "level" : "fatal",

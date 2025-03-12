@@ -2,7 +2,7 @@
 
 #include"Util/Tools/Guid.h"
 #include"Core/Queue/Queue.h"
-#include"Redis/Client/Client.h"
+#include"Redis/Client/RedisClient.h"
 #include"Redis/Config/RedisConfig.h"
 #include"Rpc/Component/RpcComponent.h"
 
@@ -20,7 +20,7 @@ namespace acs
 	class ThreadComponent;
 
 	class RedisComponent final : public RpcComponent<redis::Response>,
-		 public IRpc<redis::Request, redis::Response>, public IDestroy, public IServerRecord
+								 public IRpc<redis::Request, redis::Response>, public IDestroy, public IServerRecord, public ISecondUpdate
 	{
 	 public:
 		RedisComponent();
@@ -59,6 +59,7 @@ namespace acs
         bool Awake() final;
 		void OnDestroy() final;
         bool LateAwake() final;
+		void OnSecondUpdate(int tick) noexcept final;
 		void OnRecord(json::w::Document &document) final;
 	private:
 		redis::Config mConfig;

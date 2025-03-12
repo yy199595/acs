@@ -105,7 +105,8 @@ namespace acs
 		{
 			return true;
 		}
-		return this->mActor->AddServer(this);
+		LOG_CHECK_RET_FALSE(this->LateAwake())
+		return this->mActor->AddGroup(this->mConfig.Name(), this->GetId());
 	}
 
 	bool App::LoadLang() const

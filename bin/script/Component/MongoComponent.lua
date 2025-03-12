@@ -27,39 +27,29 @@ end
 function MongoComponent:InsertOnce(tab, data)
     local document = data
     if type(data) == "table" then
-        document = json.encode(data)
+        document = json_encode(data)
     end
     local session = self:GetActorId()
     return app:Call(session, "MongoDB.Insert", {
         tab = tab,
-        jsons = { document },
+        documents = { document },
     })
 end
 
 function MongoComponent:Insert(tab, documents)
-    local jsons = { }
+    local results = { }
     for _, document in ipairs(documents) do
-        table_insert(jsons, json_encode(document))
+        table_insert(results, json_encode(document))
     end
     local session = self:GetActorId()
     return app:Call(session, "MongoDB.Insert", {
         tab = tab,
-        jsons = jsons
+        documents = results
     })
 end
 
-function MongoComponent:Save(tab, select, data)
-    if tab == nil or data == nil then
-        log_error("tab=%s data=%s", tab, data)
-        return
-    end
-    local session = self:GetActorId()
-    return app:Call(session, "MongoDB.Save", {
-        tab = tab,
-        select = json_encode(select),
-        update = json_encode(data),
-        tag = "$set",
-    })
+function MongoComponent:Save(tab, filter, document)
+    return self:Update(tab, filter, document, "$set", true)
 end
 
 ---@param tab string
@@ -71,7 +61,7 @@ function MongoComponent:Delete(tab, data, limit)
     return app:Call(session, "MongoDB.Delete", {
         tab = tab,
         limit = limit or 1,
-        json = json_encode(data)
+        filter = json_encode(data)
     })
 end
 
@@ -80,31 +70,35 @@ end
 ---@return table
 function MongoComponent:FindOne(tab, filter, fields)
 
+    if tab == nil then
+        return XCode.CallArgsError
+    end
     local request = {
         tab = tab,
         limit = 1,
         fields = fields or { }
     }
+
     if type(filter) ~= "table" then
-        request.where = json_encode({ _id = filter })
+        request.filter = json_encode({ _id = filter })
     elseif filter and next(filter) then
-        request.where = json_encode(filter)
+        request.filter = json_encode(filter)
     end
     local session = self:GetActorId()
     local code, response = app:Call(session, "MongoDB.FindOne", request)
 
     if code ~= XCode.Ok then
-        log_error("query from [%s] where => %s code:%s", tab, json.encode(data), code)
+        log_error("query from [{}] filter => {} code:{}", tab, filter, code)
         return nil
     end
-    return json_decode(response.json)
+    return json_decode(response.document)
 end
 
 ---@param tab string
 ---@param select table
 ---@param page number
 ---@param count number
----@param files table
+---@param fields table
 ---@return table
 function MongoComponent:FindPage(tab, select, page, count, fields, sort)
     local request = {
@@ -122,34 +116,34 @@ function MongoComponent:FindPage(tab, select, page, count, fields, sort)
     end
 
     if select and type(select) == "table" then
-        request.where = json_encode(select)
+        request.filter = json_encode(select)
     end
 
     local session = self:GetActorId()
     local code, response = app:Call(session, "MongoDB.FindPage", request)
     if code ~= XCode.Ok then
-        log_error("query from %s where:%s code:%s", tab, request.where, code)
+        log_error("query from %s filter:%s code:%s", tab, request.filter, code)
         return nil
     end
     local result = { }
-    for _, str in ipairs(response.json) do
+    for _, str in ipairs(response.documents) do
         table_insert(result, json_decode(str))
     end
     return result
 end
 
 ---@param tab string
----@param where table
+---@param filter table
 ---@param limit number
 ---@return table
-function MongoComponent:Find(tab, where, fields, limit)
+function MongoComponent:Find(tab, filter, fields, limit)
 
     local request = {
         tab = tab,
         limit = limit or 0,
     }
-    if where then
-        request.json = json_encode(where)
+    if filter then
+        request.filter = json_encode(filter)
     end
     if fields and next(fields) then
         request.fields = fields
@@ -160,17 +154,17 @@ function MongoComponent:Find(tab, where, fields, limit)
         return nil
     end
     local responses = {}
-    for _, str in ipairs(response.jsons) do
+    for _, str in ipairs(response.documents) do
         table_insert(responses, json_decode(str))
     end
-    return responses
+    return responses, response.cursor
 end
 -- 同时查询多个 _id,参数是匹配的_id列表
 ---@param tab string
 ---@param wheres table
 ---@param fields table
 ---@return table
-function MongoComponent:FindWhere(tab, wheres, fields, field)
+function MongoComponent:FindIn(tab, wheres, fields, field)
     local count = #wheres
     assert(type(tab) == "string")
     assert(type(wheres) == "table" and count > 0)
@@ -183,7 +177,7 @@ function MongoComponent:FindWhere(tab, wheres, fields, field)
     local request = {
         tab = tab,
         limit = count,
-        json = json_encode(filter)
+        filter = json_encode(filter)
     }
     if fields and next(fields) then
         request.fields = fields
@@ -194,7 +188,7 @@ function MongoComponent:FindWhere(tab, wheres, fields, field)
         return nil
     end
     local responses = {}
-    for _, str in ipairs(response.jsons) do
+    for _, str in ipairs(response.documents) do
         table_insert(responses, json_decode(str))
     end
     return responses
@@ -221,15 +215,15 @@ end
 ---@param update table
 ---@param tag string
 ---@return number
-function MongoComponent:Update(tab, select, update, tag, upsert)
+function MongoComponent:Update(tab, select, update, cmd, upsert)
     if select == nil or update == nil then
         log_error("select=%s update=%s", select, update)
         return
     end
     local request = {
         tab = tab,
-        tag = tag or "$set",
         document = {
+            cmd = cmd or "$set",
             filter = json_encode(select),
             document = json_encode(update)
         },
@@ -242,7 +236,6 @@ end
 function MongoComponent:Updates(tab, documents, tag)
     local request = {
         tab = tab,
-        tag = tag or "$set",
         document = { }
     }
     for _, value in ipairs(documents) do
@@ -250,7 +243,8 @@ function MongoComponent:Updates(tab, documents, tag)
         local updater = json_encode(value.document)
         table_insert(request.document, {
             filter = filter,
-            document = updater
+            document = updater,
+            cmd = value.cmd or "$set"
         })
     end
     local session = self:GetActorId()
@@ -276,7 +270,7 @@ end
 ---@param tab string
 ---@return number
 function MongoComponent:Drop(tab)
-    local result = self:RunCommand(tab, "drop")
+    local result = self:Run(tab, "drop")
     return result == nil and XCode.Failure or XCode.Ok
 end
 
@@ -295,7 +289,7 @@ end
 function MongoComponent:Count(tab, select)
     local request = { tab = tab }
     if select ~= nil then
-        request.where = json_encode(select)
+        request.filter = json_encode(select)
     end
     local session = self:GetActorId()
     local code, response = app:Call(session, "MongoDB.Count", request)
@@ -308,17 +302,17 @@ end
 ---@param tab string
 ---@param document table
 ---@return number,table
-function MongoComponent:RunCommand(tab, cmd, document)
+function MongoComponent:Run(tab, cmd, document)
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Command", {
+    local code, response = app:Call(session, "MongoDB.Run", {
         tab = tab,
         cmd = cmd,
-        json = document and json_encode(document) or ""
+        document = document and json_encode(document) or ""
     })
     if code ~= XCode.Ok then
         return
     end
-    return json_decode(response.json)
+    return json_decode(response.document)
 end
 
 ---@param key string
@@ -401,58 +395,105 @@ function MongoComponent:FindAndModify(tab, query, update, fields)
     if code ~= XCode.Ok then
         return nil
     end
-    return json_decode(response.json)
+    return json_decode(response.document)
 end
 
-function MongoComponent:Sum(tab, filter, by, field)
+---@param tab string
+---@param cursor number
+---@param batchSize number
+function MongoComponent:GetMore(tab, cursor, batchSize)
+    local session = self:GetActorId()
+    local code, response = app:Call(session, "MongoDB.GetMore", {
+        tab = tab,
+        cursor = cursor,
+        batchSize = batchSize
+    })
+    if code ~= XCode.Ok then
+        return nil
+    end
+    local documents = { }
+    for _, str in ipairs(response.documents) do
+        table_insert(documents, json_decode(str))
+    end
+    return documents, response.cursor
+end
+
+function MongoComponent:Facet(tab, _id, filters, group, batchSize)
+    local request = {
+        tab = tab,
+        _id = _id,
+        match = { },
+        batchSize = batchSize
+    }
+    --if _id == nil then
+    --    return XCode.CallArgsError
+    --end
+    if group == nil or not next(group) then
+        return XCode.CallArgsError
+    end
+    if filters == nil or not next(filters) then
+        return XCode.CallArgsError
+    end
+    request.group = json_encode(group)
+    for _, filter in ipairs(filters) do
+        table_insert(request.match, json_encode(filter))
+    end
+    local session = self:GetActorId()
+    local code, response = app:Call(session, "MongoDB.Facet", request)
+    if code ~= XCode.Ok then
+        return nil
+    end
+    local responses = {}
+    for _, str in ipairs(response.documents) do
+        table_insert(responses, json_decode(str))
+    end
+    return responses, response.cursor
+end
+
+function MongoComponent:Aggregate(tab, cmd, field, filter, by, batchSize)
 
     local request = {
         by = by,
         tab = tab,
-        field = field
+        cmd = cmd,
+        field = field,
+        batchSize = batchSize
     }
     if filter and next(filter) then
         request.filter = json_encode(filter)
     end
 
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Sum", request)
+    local code, response = app:Call(session, "MongoDB.Aggregate", request)
     if code ~= XCode.Ok then
         return nil
     end
     local responses = {}
-    for _, str in ipairs(response.json) do
+    for _, str in ipairs(response.documents) do
         table_insert(responses, json_decode(str))
     end
-    return responses
+    return responses, response.cursor
 end
 
----@param tab string
----@param name string
-function MongoComponent:Backup(tab, name)
-    local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Backup", {
+function MongoComponent:Distinct(tab, key, filter)
+    local request = {
         tab = tab,
-        name = name
-    })
-    if code ~= XCode.Ok then
+        key = key
+    }
+    if filter and next(filter) then
+        request.filter = json_encode(filter)
+    end
+    local session = self:GetActorId()
+    local code, response = app:Call(session, "MongoDB.Distinct", request)
+    if code ~= XCode.Ok or not response then
         return nil
     end
-    return response.count
+    local result = json_decode(response.document)
+    if not result then
+        return nil
+    end
+    return result.values
 end
 
----@param db string
----@param name string
-function MongoComponent:Recover(db, name)
-    local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Recover", {
-        db = db,
-        name = name
-    })
-    if code ~= XCode.Ok then
-        return nil
-    end
-    return response.count
-end
 
 return MongoComponent

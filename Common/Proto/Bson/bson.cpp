@@ -294,7 +294,7 @@ namespace _bson {
         }
 
         if (includeFieldName && type() != EOO)
-            s << fieldName() << ": ";
+            s << "\"" << fieldName() << "\"" << ": ";
         switch (type()) {
         case EOO:
             //  ??

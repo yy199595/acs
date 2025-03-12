@@ -127,7 +127,6 @@ namespace acs
 
 	bool LaunchComponent::LoadListenConfig()
 	{
-		std::vector<const char*> keys;
 		std::unique_ptr<json::r::Value> jsonObj;
 		ServerConfig & config = this->mApp->GetConfig();
 		{
@@ -137,10 +136,11 @@ namespace acs
 
 		std::unordered_map<std::string, int> ProtocolTypeMap = {
 				{ "tcp", proto_type::tcp },
-				{ "udp", proto_type::udp }
+				{ "udp", proto_type::udp },
+				{ "http", proto_type::tcp },
+				{ "https", proto_type::tcp }
 		};
-		jsonObj->GetKeys(keys);
-		for (const char* key: keys)
+		for (const char* key: jsonObj->GetAllKey())
 		{
 			std::string value;
 			std::unique_ptr<json::r::Value> jsonData;
@@ -150,42 +150,36 @@ namespace acs
 			}
 			ListenConfig listenConfig;
 			{
-				listenConfig.Port = 0;
-				listenConfig.Name = key;
-				listenConfig.MaxConn = 0;
+				listenConfig.port = 0;
+				listenConfig.name = key;
 			}
-			if (jsonData->Get("address", listenConfig.Addr))
+			if (jsonData->Get("address", listenConfig.address))
 			{
-				std::string ip;
-				unsigned short port = 0;
-				if (help::Str::SplitAddr(listenConfig.Addr, ip, port))
-				{
-					listenConfig.ip = ip;
-					listenConfig.Port = port;
-				}
+				listenConfig.port = 0;
+				help::Str::SplitAddr(listenConfig.address, listenConfig.proto_name, listenConfig.ip, listenConfig.port);
 			}
 
-			jsonData->Get("max_conn", listenConfig.MaxConn);
-			jsonData->Get("protocol", listenConfig.ProtoName);
-			jsonData->Get("component", listenConfig.Component);
+			jsonData->Get("max_conn", listenConfig.max_conn);
+			jsonData->Get("component", listenConfig.component);
 #ifdef __ENABLE_OPEN_SSL__
-			jsonData->Get("key", listenConfig.Key);
-			jsonData->Get("cert", listenConfig.Cert);
+			jsonData->Get("key", listenConfig.key);
+			jsonData->Get("cert", listenConfig.cert);
 #endif
-			auto iter = ProtocolTypeMap.find(listenConfig.ProtoName);
-			if (iter == ProtocolTypeMap.end())
+			if (listenConfig.port > 0 && !listenConfig.component.empty())
 			{
-				LOG_ERROR("not find proto:{}", listenConfig.ProtoName)
-				return false;
-			}
-			listenConfig.ProtoType = iter->second;
-			if (listenConfig.Port > 0 && !listenConfig.Component.empty())
-			{
-				this->mApp->AddComponent(listenConfig.Component);
-				if (listenConfig.ProtoType == proto_type::tcp)
+				auto iter = ProtocolTypeMap.find(listenConfig.proto_name);
+				if (iter == ProtocolTypeMap.end())
+				{
+					LOG_ERROR("({}) not find proto:{}", listenConfig.name, listenConfig.proto_name)
+					return false;
+				}
+				listenConfig.proto = iter->second;
+
+				this->mApp->AddComponent(listenConfig.component);
+				if (listenConfig.proto == proto_type::tcp)
 				{
 					auto listenerComponent = std::make_unique<ListenerComponent>();
-					std::string name = fmt::format("{}:ListenComponent", listenConfig.Name);
+					std::string name = fmt::format("{}:ListenComponent", listenConfig.name);
 					if (!this->mApp->AddComponent(name, std::move(listenerComponent)))
 					{
 						return false;
@@ -202,27 +196,27 @@ namespace acs
 		for (const ListenConfig& listenConfig: this->mTcpListens)
 		{
 			INetListen* tcpListen = nullptr;
-			switch(listenConfig.ProtoType)
+			switch(listenConfig.proto)
 			{
 				case proto_type::tcp:
 				{
-					std::string name = fmt::format("{}:ListenComponent", listenConfig.Name);
+					std::string name = fmt::format("{}:ListenComponent", listenConfig.name);
 					tcpListen = this->GetComponent<INetListen>(name);
 					break;
 				}
 				case proto_type::udp:
 				{
-					tcpListen = this->GetComponent<INetListen>(listenConfig.Component);
+					tcpListen = this->GetComponent<INetListen>(listenConfig.component);
 					break;
 				}
 			}
 			if (tcpListen == nullptr || !tcpListen->StartListen(listenConfig))
 			{
-				LOG_ERROR("({}) listen [{}://{}] fail", listenConfig.ProtoName, listenConfig.Name, listenConfig.Addr);
+				LOG_ERROR("({}) listen [{}] fail", listenConfig.name, listenConfig.address);
 				return false;
 			}
-			this->mApp->AddListen(listenConfig.Name, listenConfig.Addr);
-			LOG_INFO("({}) listen [{}://{}] ok", listenConfig.ProtoName, listenConfig.Name, listenConfig.Addr);
+			this->mApp->AddListen(listenConfig.name, listenConfig.address);
+			LOG_INFO("({:<6}) listen [{}] ok", listenConfig.name, listenConfig.address);
 		}
 		return true;
 	}
@@ -232,26 +226,26 @@ namespace acs
 		for (const ListenConfig& listenConfig: this->mTcpListens)
 		{
 			INetListen* tcpListen = nullptr;
-			switch(listenConfig.ProtoType)
+			switch(listenConfig.proto)
 			{
 				case proto_type::tcp:
 				{
-					std::string name = fmt::format("{}:ListenComponent", listenConfig.Name);
+					std::string name = fmt::format("{}:ListenComponent", listenConfig.name);
 					tcpListen = this->GetComponent<INetListen>(name);
 					break;
 				}
 				case proto_type::udp:
 				{
-					tcpListen = this->GetComponent<INetListen>(listenConfig.Component);
+					tcpListen = this->GetComponent<INetListen>(listenConfig.component);
 					break;
 				}
 			}
 			if(!tcpListen->StopListen())
 			{
-				LOG_ERROR("({}) close [{}] fail", listenConfig.ProtoName, listenConfig.Addr);
+				LOG_ERROR("({}) close [{}] fail", listenConfig.name, listenConfig.address);
 				continue;
 			}
-			LOG_INFO("({}) close [{}] ok", listenConfig.ProtoName, listenConfig.Addr);
+			LOG_INFO("({}) close [{}] ok", listenConfig.name, listenConfig.address);
 		}
 	}
 }

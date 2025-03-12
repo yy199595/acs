@@ -6,6 +6,7 @@
 #include"Util/Tools/Math.h"
 #include"Proto/Message/IProto.h"
 #include"Yyjson/Document/Document.h"
+#include "Util/Tools/String.h"
 
 namespace http
 {
@@ -17,14 +18,11 @@ namespace http
 
 	bool Head::GetContentType(std::string& type) const
 	{
-		if (!this->Get(http::Header::ContentType, type))
+		if (!this->Get("content-type", type))
 		{
-			if (!this->Get("content-type", type))
-			{
-				return false;
-			}
+			return false;
 		}
-		size_t pos = type.find(";");
+		size_t pos = type.find(';');
 		if (pos != std::string::npos)
 		{
 			type = type.substr(0, pos);
@@ -34,12 +32,9 @@ namespace http
 
 	bool Head::GetContentLength(long long& length) const
 	{
-		if (!this->Get(http::Header::ContentLength, length))
+		if (!this->Get("content-length", length))
 		{
-			if (!this->Get("content-length", length))
-			{
-				return false;
-			}
+			return false;
 		}
 		return true;
 	}
@@ -83,7 +78,7 @@ namespace http
 					pos++;
 				}
 				value.clear();
-				//help::Str::Tolower(key);
+				help::Str::Tolower(key);
 				if(lineData.size() > pos + 1)
 				{
 					value.assign(lineData.c_str() + pos + 1);

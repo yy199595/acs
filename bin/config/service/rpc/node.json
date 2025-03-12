@@ -1,12 +1,12 @@
 {
     "NodeSystem.Add": {
-        "Request": "com.type.json"
+        "request": "com.type.json"
     },
     "NodeSystem.Del": {
-        "Request": "com.type.json"
+        "request": "com.type.json"
     },
     "NodeSystem.Find": {
-        "Response": "com.type.json"
+        "response": "com.type.json"
     },
     "NodeSystem.Ping": {
 
@@ -15,13 +15,14 @@
 
     },
     "NodeSystem.SetLogLevel" : {
-        "Request" : "com.type.int32"
+        "request" : "com.type.int32"
     },
     "NodeSystem.RunInfo": {
-        "Response": "com.type.json"
+        "async":true,
+        "response": "com.type.json"
     },
     "NodeSystem.Shutdown": {
-        "Async":true
+        "async":true
     },
     "NodeSystem.LoadConfig": {
 

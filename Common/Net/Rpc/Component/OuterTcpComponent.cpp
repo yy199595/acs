@@ -9,14 +9,13 @@
 #include"Entity/Actor/App.h"
 #include"Core/Event/IEvent.h"
 #include "Core/System/System.h"
-#include "Gate/Component/GateComponent.h"
 
 namespace acs
 {
 	OuterTcpComponent::OuterTcpComponent()
 	{
-		this->mGate = nullptr;
 		this->mWaitCount = 0;
+		this->mOuter = nullptr;
 		this->mMaxConnectCount = 500;
 	}
 
@@ -29,7 +28,7 @@ namespace acs
 		}
 		help::PlayerLoginEvent::Add(this, &OuterTcpComponent::OnPlayerLogin);
 		help::PlayerLogoutEvent::Add(this, &OuterTcpComponent::OnPlayerLogout);
-		LOG_CHECK_RET_FALSE(this->mGate = this->GetComponent<GateComponent>());
+		LOG_CHECK_RET_FALSE(this->mOuter = this->mApp->GetComponent<rpc::IOuterMessage>());
 		return true;
 	}
 
@@ -59,7 +58,7 @@ namespace acs
 
 	void OuterTcpComponent::OnMessage(rpc::Message * message, rpc::Message *) noexcept
 	{
-		int code = this->mGate->OnMessage(message);
+		int code = this->mOuter->OnMessage(message);
 		if(code != XCode::Ok)
 		{
 			int sockId = message->SockId();

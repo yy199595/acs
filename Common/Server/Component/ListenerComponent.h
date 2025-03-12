@@ -22,6 +22,7 @@ namespace acs
 		bool StartListen(const ListenConfig & config) final;
 	private:
 		void Accept();
+		tcp::Socket* CreateSocket();
 		void OnAcceptSocket(tcp::Socket* sock);
 	private:
 		ListenConfig mConfig;

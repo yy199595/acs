@@ -13,7 +13,6 @@ namespace acs
 		extern int Send(lua_State * l);
 		extern int Call(lua_State * l);
 		extern int Publish(lua_State * l);
-		extern int Random(lua_State * l);
 		extern int NewGuid(lua_State * l);
 		extern int NewUuid(lua_State * l);
 		extern int GetPath(lua_State * l);
@@ -25,11 +24,6 @@ namespace acs
 		extern int MakeServer(lua_State * l);
 		extern int LuaPushCode(lua_State * l, int code);
 	};
-
-	namespace LuaPlayer
-	{
-		extern int AddAddr(lua_State * l);
-	}
 }
 
 

@@ -16,10 +16,10 @@ namespace help
 		extern size_t Hash(const std::string & str);
 
         //转大写
-        extern std::string Toupper(const std::string & str);
+        extern void Toupper(std::string & str);
 
         //转小写
-        extern std::string Tolower(const std::string & str);
+        extern void Tolower(std::string & str);
 
         extern void ClearBlank(std::string &input);
 

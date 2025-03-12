@@ -32,7 +32,7 @@ namespace acs
 
 	void RecordComponent::OnRequestDone(const HttpMethodConfig & config, const http::Request & request, const http::Response & response)
 	{
-		if(!config.IsRecord)
+		if(!config.record)
 		{
 			return;
 		}
@@ -40,9 +40,9 @@ namespace acs
 		long long id = help::ID::Create();
 		long long nowTime = help::Time::NowSec();
 		{
-			document.Add("url", config.Path);
-			document.Add("desc", config.Desc);
-			document.Add("method", config.Type);
+			document.Add("url", config.path);
+			document.Add("desc", config.desc);
+			document.Add("method", config.type);
 			document.Add("time", nowTime);
 			document.Add("_id", std::to_string(id));
 		}

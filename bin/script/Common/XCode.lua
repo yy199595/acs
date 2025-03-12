@@ -81,4 +81,8 @@ XCode =
 	OrderAlreadyRefund = 78,--订单已经退款
 	RequestWxApiError = 79,--请求微信api错误
 	PermissionDenied = 80,--权限不足
+	ConnectDatabaseFail = 81,--连接数据库失败
+	CreateDatabaseFail = 82,--创建数据库失败
+	AuthPluginNonsupport = 83,--验证方式不支持
+	PasswordAuthFail = 84,--密码验证失败
 }

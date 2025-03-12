@@ -1,75 +1,75 @@
 {
-    "/account_mgr/list": {
-        "Type": "POST",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 20,
-        "Desc": "分页查看账号",
-        "Bind": "AccountManager.List",
-        "ContentType": "application/json",
-        "Request": {
-            "page": 1
-        }
-    },
-    "/account_mgr/find": {
-        "Type": "GET",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 20,
-        "Desc": "查看用户数据",
-        "Bind": "AccountManager.Find",
-        "Request": {
-            "id": 1122
-        }
-    },
-    "/account_mgr/change": {
-        "Type": "POST",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 100,
-        "Desc": "修改用户数据",
-        "Bind": "AccountManager.Change",
-        "ContentType": "application/json",
-        "Request": {
-            "sex": 1,
-            "nick": "",
-            "permission": 1,
-            "user_id": 1122
-        }
-    },
-    "/account_mgr/del": {
-        "Type": "GET",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 20,
-        "Desc": "删除账号",
-        "Record" : true,
-        "Bind": "AccountManager.Delete",
-        "Request": {
-            "open_id": "xxxx"
-        }
-    },
-    "user_mgr/find": {
-        "Type": "GET",
-        "Async": true,
-        "Auth": true,
-        "Permiss": 20,
-        "Desc": "后台查找用户数据",
-        "Bind": "UserManager.Find",
-        "Request": {
-            "open_id": "xxxx"
-        }
-    },
-    "/account/login": {
-        "Type": "POST",
-        "Async": true,
-        "Auth": false,
-        "Desc": "账号密码登录",
-        "Bind": "Account.Login",
-        "ContentType": "application/json",
-        "Request": {
-            "account" : "",
-            "password" : ""
-        }
-    }
+	"/account_mgr/list": {
+		"type": "POST",
+		"async": true,
+		"auth": true,
+		"permission": 20,
+		"desc": "分页查看账号",
+		"bind": "AccountManager.List",
+		"content-type": "application/json",
+		"request": {
+			"page": 1
+		}
+	},
+	"/account_mgr/find": {
+		"type": "GET",
+		"async": true,
+		"auth": true,
+		"permission": 20,
+		"desc": "查看用户数据",
+		"bind": "AccountManager.Find",
+		"request": {
+			"id": 1122
+		}
+	},
+	"/account_mgr/change": {
+		"type": "POST",
+		"async": true,
+		"auth": true,
+		"permission": 100,
+		"desc": "修改用户数据",
+		"bind": "AccountManager.Change",
+		"content-type": "application/json",
+		"request": {
+			"sex": 1,
+			"nick": "",
+			"permission": 1,
+			"user_id": 1122
+		}
+	},
+	"/account_mgr/del": {
+		"type": "GET",
+		"async": true,
+		"auth": true,
+		"permission": 20,
+		"desc": "删除账号",
+		"Record": true,
+		"bind": "AccountManager.Delete",
+		"request": {
+			"open_id": "xxxx"
+		}
+	},
+	"user_mgr/find": {
+		"type": "GET",
+		"async": true,
+		"auth": true,
+		"permission": 20,
+		"desc": "后台查找用户数据",
+		"bind": "UserManager.Find",
+		"request": {
+			"open_id": "xxxx"
+		}
+	},
+	"/account/login": {
+		"type": "POST",
+		"async": true,
+		"auth": false,
+		"desc": "账号密码登录",
+		"bind": "Account.Login",
+		"content-type": "application/json",
+		"request": {
+			"account": "",
+			"password": ""
+		}
+	}
 }

@@ -25,19 +25,19 @@ namespace acs
 	struct ListenConfig
 	{
 	public:
-		int Port;            //监听
-		int MaxConn;        //最大连接数
+		unsigned short port = 0;            //监听
+		int max_conn = 0;
 		std::string ip;
-		int ProtoType = proto_type::tcp;
+		int proto = proto_type::tcp;
 #ifdef __ENABLE_OPEN_SSL__
-		std::string Key;    //私钥
-		std::string Cert;    //证书地址
-		std::string Verify;
+		std::string key;    //私钥
+		std::string cert;    //证书地址
+		std::string verify;
 #endif
-		std::string Name;    //名字
-		std::string Addr;  //地址 xxx://xxx:xxx
-		std::string Component; //处理消息的component
-		std::string ProtoName;
+		std::string name;    //名字
+		std::string address;  //地址 xxx://xxx:xxx
+		std::string component; //处理消息的component
+		std::string proto_name;
 	};
 
 	class INetListen

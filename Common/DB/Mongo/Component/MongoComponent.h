@@ -31,7 +31,7 @@ namespace mongo
 			{
 				jsonArray->Push(value);
 			}
-			filter.Encode(this->mRequest->mutable_json());
+			filter.Encode(this->mRequest->mutable_filter());
 			return this;
 		}
 		inline Batch * AddField(const char * field)
@@ -59,7 +59,6 @@ namespace acs
 		int Inc(const char * tab, const json::w::Document& filter, const char * field, int value = 1);
 	public:
 		int Insert(const char * tab, const pb::Message & message);
-		int Remove(const char * tab, const std::string & select, int limit);
 		int Remove(const char * tab, const json::w::Document & select, int limit);
 		int SetIndex(const char * tab, const std::string & field, int sort = 1, bool unique = false);
 	public:
@@ -81,10 +80,9 @@ namespace acs
 	public:
 		std::unique_ptr<db::mongo::find::response> Batch(mongo::Batch & batch);
 		int Query(const db::mongo::find::request & request, json::w::Value * response);
-		int Query(const char * tab, const std::string & select, pb::Message * response);
-		int Query(const char * tab, const json::w::Document&, json::w::Value * response);
+		int Query(const char * tab, const json::w::Document& filter, json::w::Value * response);
 		int Query(const db::mongo::find::request & request, db::mongo::find::response * response);
-		int FindPage(const db::mongo::find_page::request & request, db::mongo::find_page::response * response);
+		int FindPage(const db::mongo::find::page & request, db::mongo::find::response * response);
 	public:
 		int Count(const char * tab, const json::w::Document &);
 		int FindOne(const char * tab, const json::w::Document& , std::string * response);
@@ -107,7 +105,7 @@ namespace acs
 		std::string mRpc;
 		std::string mTmp;
 		std::string mServer;
-		class ActorComponent * mActComponent;
+		class ActorComponent * mActor;
 	};
 
 	template<typename T>

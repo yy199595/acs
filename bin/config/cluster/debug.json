@@ -3,16 +3,23 @@
     },
     "server": {
         "rpc": [
+            "MongoDB",
+            "MysqlDB",
+            "PgsqlDB",
             "NodeSystem",
+            "GateSystem",
             "EventSystem",
+            "ChatSystem",
             "LoginSystem",
             "ChatComponent",
-            "Example"
+            "Example",
+            "TelnetSystem"
         ],
         "http" : [
             "Admin",
             "Watch",
             "LogMgr",
+            "MongoBackup",
             "QuickSDK",
             "FileUpload",
             "ResourceMgr",
@@ -20,6 +27,7 @@
             "Demo"
         ],
         "component": [
+            "GateComponent",
             "LoggerComponent",
             "ConfigComponent",
             "ActorComponent",
@@ -30,8 +38,13 @@
             "KcpComponent",
             "UdpComponent",
             "WsClientComponent",
+            "RedisComponent",
+            "MongoComponent",
+            "MysqlDBComponent",
             "OssComponent",
-            "SqliteComponent"
+            "SqliteComponent",
+            "PgsqlDBComponent",
+            "TelnetComponent"
         ]
     }
 }

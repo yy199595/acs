@@ -1,9 +1,9 @@
 {
 	"/demo/ping": {
-		"Type": "GET",
-		"Async": true,
-		"Auth": false,
-		"Bind": "Demo.Ping",
-		"Desc": "http服务测试"
+		"type": "GET",
+		"async": true,
+		"auth": false,
+		"bind": "Demo.Ping",
+		"desc": "http服务测试"
 	}
 }

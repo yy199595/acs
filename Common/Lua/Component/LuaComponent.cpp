@@ -24,7 +24,6 @@
 
 #include "Util/Ssl/rsa.h"
 #include "Util/Ssl/LuaRsa.h"
-#include "Lua/Socket/LuaTcpSocket.h"
 #endif
 
 
@@ -48,6 +47,7 @@ namespace acs
 		{
 			luaL_openlibs(this->mLuaEnv);
 			this->RegisterLuaClass();
+			lua_pushglobalfunction(this->mLuaEnv, "print", lua::lfmt::lprint);
 		}
 		return true;
 	}
@@ -196,10 +196,8 @@ namespace acs
 			return nullptr;
 		}
 		lua_settop(this->mLuaEnv, 0);
-		lua_getglobal(this->mLuaEnv, "require");
-		assert(lua_isfunction(this->mLuaEnv, -1));
-		lua_pushstring(this->mLuaEnv, iter1->second->FullName.c_str());
-		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
+		const std::string & path = iter1->second->FullPath;
+		if(luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
 		{
 			LOG_ERROR("{}", lua_tostring(this->mLuaEnv, -1));
 			lua_pop(this->mLuaEnv, 1);
@@ -267,8 +265,10 @@ namespace acs
 						return false;
 					}
 					std::string fullName = filePath.substr(path.size() + 1);
-					help::Str::ReplaceString(fullName, ".lua", "");
-					help::Str::ReplaceString(fullName, "/", ".");
+					{
+						help::Str::ReplaceString(fullName, ".lua", "");
+						help::Str::ReplaceString(fullName, "/", ".");
+					}
 					std::unique_ptr<ModuleInfo> moduleInfo = std::make_unique<ModuleInfo>();
 					{
 						moduleInfo->Name = moduleName;
@@ -305,12 +305,19 @@ namespace acs
 		{
 			this->CheckModuleHotfix(iter->first);
 		}
-		this->CollectGarbage();
 		for(auto iter = this->mLuaModules.begin(); iter != this->mLuaModules.end(); iter++)
 		{
 			iter->second->Await("OnHotFix");
 		}
 		return true;
+	}
+
+	void LuaComponent::OnSecondUpdate(int tick) noexcept
+	{
+		for(auto iter = this->mLuaModules.begin(); iter != this->mLuaModules.end(); iter++)
+		{
+			iter->second->Call("OnUpdate", tick);
+		}
 	}
 
 	void LuaComponent::CheckModuleHotfix(const std::string& module)
@@ -364,22 +371,6 @@ namespace acs
 		}
 	}
 
-	double LuaComponent::CollectGarbage()
-	{
-		lua_settop(this->mLuaEnv, 0);
-		double start = this->GetMemorySize();
-		lua_getglobal(this->mLuaEnv, "collectgarbage");
-
-		lua_pushstring(this->mLuaEnv, "collect");
-		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
-		{
-			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-			lua_pop(this->mLuaEnv, 1);
-			return 0;
-		}
-		return start - this->GetMemorySize();
-	}
-
 	double LuaComponent::GetMemorySize()
 	{
 		lua_settop(this->mLuaEnv, 0);
@@ -399,9 +390,9 @@ namespace acs
 	{
 		std::unique_ptr<json::w::Value> jsonObject = document.AddObject("lua");
 		{
-			document.Add("lua", this->GetMemorySize());
-			document.Add("free", this->CollectGarbage());
-			document.Add("module", this->mModulePaths.size());
+			double memory = this->GetMemorySize();
+			jsonObject->Add("module", this->mModulePaths.size());
+			jsonObject->Add("memory", fmt::format("{:.2f}KB", memory));
 		}
 	}
 }

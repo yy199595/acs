@@ -4,7 +4,7 @@
 
 #ifndef APP_REDISSUBCOMPONENT_H
 #define APP_REDISSUBCOMPONENT_H
-#include"Redis/Client/Client.h"
+#include"Redis/Client/RedisClient.h"
 #include"Redis/Config/RedisConfig.h"
 #include"Entity/Component/Component.h"
 

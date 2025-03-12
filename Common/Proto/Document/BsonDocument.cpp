@@ -8,41 +8,6 @@ namespace bson
 {
 	namespace Writer
 	{
-		void Array::Add(int value)
-		{
-			this->append(std::to_string(this->mIndex++), value);
-		}
-
-		void Array::Add(bool value)
-		{
-			this->append(std::to_string(this->mIndex++), value);
-		}
-
-		void Array::Add(long long value)
-		{
-			this->append(std::to_string(this->mIndex++), value);
-		}
-
-		void Array::Add(const std::string &value)
-		{
-			this->append(std::to_string(this->mIndex++), value);
-		}
-
-		void Array::Add(const char *str, size_t size)
-		{
-			this->append(std::to_string(this->mIndex++), str, size + 1);
-		}
-
-		void Array::Add(unsigned int value)
-		{
-			this->append(std::to_string(this->mIndex++), value);
-		}
-
-		void Array::Add(double value)
-		{
-			this->append(std::to_string(this->mIndex++), value);
-		}
-
 		void Array::Add(Array &document)
 		{
 			_bson::bsonobjbuilder &build = (_bson::bsonobjbuilder &)document;
@@ -71,11 +36,6 @@ namespace bson
 {
 	namespace Reader
 	{
-		Document::Document(const char *bson)
-			: mObject(bson)
-		{
-		}
-
 		Document::Document(const _bson::bsonobj& object)
 			: mObject(object)
 		{
@@ -181,25 +141,12 @@ namespace bson
 	}
 	namespace Writer
 	{
-
-		void Document::WriterToJson(std::string &json)
-		{
-			bson::Reader::Document obj(this->obj());
-			obj.WriterToJson(&json);
-		}
-
-		std::string Document::ToJson()
+		std::string Document::ToString()
 		{
 			std::string json;
 			bson::Reader::Document obj(this->obj());
 			obj.WriterToJson(&json);
 			return json;
-		}
-
-		std::string Document::ToString()
-		{
-			_bson::bsonobj obj = this->obj();
-			return obj.toString();
 		}
 
 		bool Document::FromByJson(const json::r::Document& document)
@@ -416,26 +363,6 @@ namespace bson
 			return false;
 		}
 
-		void Document::Encode(std::ostream &os)
-		{
-			const char *str = this->_done();
-			const int size = this->len();
-			os.write(str, size);
-		}
-
-		void Document::Encode(std::string * data)
-		{
-			const char *str = this->_done();
-			const int size = this->len();
-			data->append(str, size);
-		}
-
-		int Document::GetStreamLength()
-		{
-			this->_done();
-			return this->len();
-		}
-
 		const char *Document::Serialize(int &length)
 		{
 			char *bson = this->_done();
@@ -447,11 +374,11 @@ namespace bson
 		{
 			_bson::bsonobjbuilder &build = (_bson::bsonobjbuilder &)document;
 
-			_b.appendNum((char)_bson::Array);
-			_b.appendStr(key);
+			this->bb().appendNum((char)_bson::Array);
+			this->bb().appendStr(key);
 
 			const char * str = build._done();
-			_b.appendBuf(str, build.len());
+			this->bb().appendBuf(str, build.len());
 		}
 		
 
@@ -464,10 +391,10 @@ namespace bson
 		{
 			_bson::bsonobjbuilder &build = (_bson::bsonobjbuilder &)document;
 
-			_b.appendNum((char)_bson::Object);
-			_b.appendStr(key);
+			this->bb().appendNum((char)_bson::Object);
+			this->bb().appendStr(key);
 			const char * str = build._done();
-			_b.appendBuf(str, build.len());
+			this->bb().appendBuf(str, build.len());
 		}
 	}
 }
@@ -542,14 +469,15 @@ namespace bson
         bool Document::WriterToJson(std::string * jsonStr)
         {
             json::w::Document jsonWriter;
-            _bson::bsonobjiterator bsonobjiterator(this->mObject);
-			while(bsonobjiterator.more())
+            _bson::bsonobjiterator bsonIterator(this->mObject);
+			while(bsonIterator.more())
 			{
-				_bson::bsonelement bsonelement = bsonobjiterator.next();
-				this->WriterToJson(bsonelement, jsonWriter);
+				_bson::bsonelement bsonElement = bsonIterator.next();
+				this->WriterToJson(bsonElement, jsonWriter);
 			}
             return jsonWriter.Encode(jsonStr);
         }
+
 
         void Document::WriterToJson(const _bson::bsonelement &element, json::w::Value &json)
         {

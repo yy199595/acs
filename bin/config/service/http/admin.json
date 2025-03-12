@@ -1,154 +1,154 @@
 {
 	"/admin/ping": {
-		"Type": "GET",
-		"Async": true,
-		"Auth": false,
-		"Permiss": 100,
-		"Bind": "Admin.Ping",
-		"Desc": "Ping某个服务器进程",
-		"Request": {
+		"type": "GET",
+		"async": true,
+		"auth": false,
+		"permission": 100,
+		"bind": "Admin.Ping",
+		"desc": "Ping某个服务器进程",
+		"request": {
 			"id": 1
 		}
 	},
 	"/admin/stop": {
-		"Type": "GET",
-		"Async": true,
-		"Permiss": 100,
-		"Bind": "Admin.Stop",
-		"Desc": "停止某个服务器进程",
-		"Request": {
+		"type": "GET",
+		"async": true,
+		"permission": 100,
+		"bind": "Admin.Stop",
+		"desc": "停止某个服务器进程",
+		"request": {
 			"id": 1
 		}
 	},
 	"/admin/all_info": {
-		"Type": "GET",
-		"Async": true,
-		"Auth": false,
-		"Permiss": 20,
-		"Bind": "Admin.AllInfo",
-		"Desc": "查看所有服务器进程信息"
+		"type": "GET",
+		"async": true,
+		"auth": false,
+		"permission": 20,
+		"bind": "Admin.AllInfo",
+		"desc": "查看所有服务器进程信息"
 	},
 	"/admin/info": {
-		"Type": "GET",
-		"Auth": true,
-		"Async": true,
-		"Permiss": 20,
-		"Bind": "Admin.Info",
-		"Desc": "查看当前服务器进程信息"
+		"type": "GET",
+		"auth": false,
+		"async": true,
+		"permission": 20,
+		"bind": "Admin.Info",
+		"desc": "查看当前服务器进程信息"
 	},
-	"/admin/hello": {
-		"Type": "GET",
-		"Async": false,
-		"Auth": false,
-		"Bind": "Admin.Hello",
-		"Desc": "测试服务器hello"
+	"/hello": {
+		"type": "GET",
+		"async": false,
+		"auth": false,
+		"bind": "Admin.Hello",
+		"desc": "测试服务器hello"
 	},
 	"/admin/hotfix": {
-		"Type": "GET",
-		"Async": true,
-		"Permiss": 100,
+		"type": "GET",
+		"async": true,
+		"permission": 100,
 		"Record": true,
-		"Bind": "Admin.Hotfix",
-		"Desc": "热更服务器",
-		"Request": {
+		"bind": "Admin.Hotfix",
+		"desc": "热更服务器",
+		"request": {
 			"id": 1
 		}
 	},
 	"/admin/login": {
-		"Type": "GET",
-		"Async": true,
-		"Auth": false,
-		"Bind": "Admin.Login",
-		"Desc": "web后台登录",
-		"Request": {
+		"type": "GET",
+		"async": true,
+		"auth": false,
+		"bind": "Admin.Login",
+		"desc": "web后台登录",
+		"request": {
 			"account": "yjz",
 			"passwd": "199595yjz."
 		}
 	},
 	"/admin/logout": {
-		"Type": "GET",
-		"Async": true,
-		"Bind": "Admin.Logout",
-		"Desc": "web后台退出账号"
+		"type": "GET",
+		"async": true,
+		"bind": "Admin.Logout",
+		"desc": "web后台退出账号"
 	},
 	"/admin/remove": {
-		"Type": "GET",
-		"Async": true,
-		"Permiss": 100,
+		"type": "GET",
+		"async": true,
+		"permission": 100,
 		"Record": true,
-		"Bind": "Admin.Remove",
-		"Desc": "删除后台账号",
-		"Request" : {
+		"bind": "Admin.Remove",
+		"desc": "删除后台账号",
+		"request" : {
 			"user_id" : 0
 		}
 	},
 	"/admin/register": {
-		"Type": "POST",
-		"Async": true,
-		"Permiss": 100,
+		"type": "POST",
+		"async": true,
+		"permission": 100,
 		"Record": true,
-		"Bind": "Admin.Register",
-		"ContentType": "application/json",
-		"Desc": "web账号注册",
-		"Request": {
+		"bind": "Admin.Register",
+		"content-type": "application/json",
+		"desc": "web账号注册",
+		"request": {
 			"name": "",
 			"account": "",
 			"passwd": "",
-			"permiss" : 0
+			"permission" : 0
 		}
 	},
 	"/admin/update": {
-		"Type": "POST",
-		"Async": true,
-		"Permiss": 20,
-		"Bind": "Admin.Update",
-		"ContentType": "application/json",
-		"Desc": "修改账号信息",
-		"Request": {
+		"type": "POST",
+		"async": true,
+		"permission": 20,
+		"bind": "Admin.Update",
+		"content-type": "application/json",
+		"desc": "修改账号信息",
+		"request": {
 			"name": "",
 			"passwd": ""
 		}
 	},
 	"/admin/list": {
-		"Type": "GET",
-		"Permiss": 20,
-		"Async": true,
-		"Bind": "Admin.List",
-		"Desc": "分页查看后台账号",
-		"Request": {
+		"type": "GET",
+		"permission": 20,
+		"async": true,
+		"bind": "Admin.List",
+		"desc": "分页查看后台账号",
+		"request": {
 			"page": 1
 		}
 	},
 	"/admin/rpc": {
-		"Type": "GET",
-		"Permiss": 100,
-		"Bind": "Admin.RpcInterface",
-		"Desc": "分页查看rpc接口"
+		"type": "GET",
+		"permission": 100,
+		"bind": "Admin.RpcInterface",
+		"desc": "分页查看rpc接口"
 	},
 	"/admin/http": {
-		"Type": "GET",
-		"Permiss": 20,
-		"Bind": "Admin.HttpInterface",
-		"Desc": "分页查看http接口"
+		"type": "GET",
+		"permission": 20,
+		"bind": "Admin.HttpInterface",
+		"desc": "分页查看http接口"
 	},
 	"/admin/menu": {
-		"Type": "GET",
-		"Permiss": 20,
-		"Bind": "Admin.Menu",
-		"Desc": "获取web菜单"
+		"type": "GET",
+		"permission": 20,
+		"bind": "Admin.Menu",
+		"desc": "获取web菜单"
 	},
 	"/oss/request": {
-		"Type": "GET",
-		"Permiss": 10,
+		"type": "GET",
+		"permission": 10,
 		"Record": true,
-		"Bind": "Oss.Request",
-		"Desc": "申请oss信息"
+		"bind": "Oss.request",
+		"desc": "申请oss信息"
 	},
 	"/oss/video" : {
-		"Type": "GET",
-		"Auth": true,
-		"Async" : true,
-		"Bind": "Oss.Video",
-		"Desc": "获取视频链接"
+		"type": "GET",
+		"auth": true,
+		"async" : true,
+		"bind": "Oss.Video",
+		"desc": "获取视频链接"
 	}
 }

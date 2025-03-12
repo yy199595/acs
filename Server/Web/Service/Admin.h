@@ -14,7 +14,6 @@ namespace acs
         Admin();
         ~Admin() final = default;
     private:
-		bool Awake() final;
         bool OnInit() final;
     private:
 		int Hello(http::Response & response);
@@ -29,7 +28,7 @@ namespace acs
 		void AddRpcData(json::w::Value & response, const RpcMethodConfig * config);
 	private:
 		class ProtoComponent * mProto;
-		class ActorComponent * mActorComponent;
+		class ActorComponent * mActor;
 	};
 }
 

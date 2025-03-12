@@ -2,7 +2,7 @@
 // Created by 64658 on 2025/1/2.
 //
 
-#ifndef APP_SESSION_H
+#ifndef APP_HTTPSESSION_H
 #define APP_SESSION_H
 #include "Network/Tcp/Client.h"
 #include "Entity/Component/IComponent.h"
@@ -60,4 +60,4 @@ namespace ws
 
 
 
-#endif //APP_SESSION_H
+#endif //APP_HTTPSESSION_H

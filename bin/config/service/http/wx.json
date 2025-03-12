@@ -1,18 +1,18 @@
 {
     "/wx/event": {
-        "Type": "",
-        "Async": true,
-        "Auth": false,
-        "Bind": "WeChat.Event",
-        "Desc": "微信公众号事件"
+        "type": "",
+        "async": true,
+        "auth": false,
+        "bind": "WeChat.Event",
+        "desc": "微信公众号事件"
     },
     "/wx/phone": {
-        "Type": "GET",
-        "Async": true,
-        "Auth": true,
-        "Bind": "WeChat.PhoneNum",
-        "Desc": "根据用户code获取手机号",
-        "Request" : {
+        "type": "GET",
+        "async": true,
+        "auth": true,
+        "bind": "WeChat.PhoneNum",
+        "desc": "根据用户code获取手机号",
+        "request" : {
             "code" : ""
         }
     }

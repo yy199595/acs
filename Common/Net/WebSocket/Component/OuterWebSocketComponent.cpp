@@ -5,7 +5,6 @@
 #include "XCode/XCode.h"
 #include "Entity/Actor/App.h"
 #include "OuterWebSocketComponent.h"
-#include "Gate/Component/GateComponent.h"
 #include "WebSocket/Common/WebSocketMessage.h"
 #include "WebSocket/Client/Client.h"
 #include "WebSocket/Client/Session.h"
@@ -16,8 +15,8 @@ namespace acs
 	OuterWebSocketComponent::OuterWebSocketComponent()
 			: mClientPool(SERVER_MAX_COUNT)
 	{
-		this->mGate = nullptr;
 		this->mSumCount = 0;
+		this->mOuter = nullptr;
 	}
 
 	bool OuterWebSocketComponent::OnListen(tcp::Socket* socket) noexcept
@@ -38,14 +37,14 @@ namespace acs
 	{
 		help::PlayerLoginEvent::Add(this, &OuterWebSocketComponent::OnPlayerLogin);
 		help::PlayerLogoutEvent::Add(this, &OuterWebSocketComponent::OnPlayerLogout);
-		LOG_CHECK_RET_FALSE(this->mGate = this->GetComponent<GateComponent>())
+		LOG_CHECK_RET_FALSE(this->mOuter = this->mApp->GetComponent<rpc::IOuterMessage>())
 		return true;
 	}
 
 	void OuterWebSocketComponent::OnMessage(int id, rpc::Message* request, rpc::Message* response) noexcept
 	{
 		++this->mSumCount;
-		int code = this->mGate->OnMessage(request);
+		int code = this->mOuter->OnMessage(request);
 		if(code != XCode::Ok)
 		{
 			auto iter = this->mSessions.find(id);

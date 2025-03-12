@@ -4,8 +4,8 @@
 #include "Rpc/Lua/LuaServiceTaskSource.h"
 #include"Yyjson/Lua/ljson.h"
 #include "Proto/Lua/Message.h"
-
-#include"Core/System/System.h"
+#include "Lua/Lib/Lib.h"
+#include "Core/System/System.h"
 
 namespace acs
 {
@@ -57,11 +57,11 @@ namespace acs
 
 	int RpcService::Invoke(const RpcMethodConfig* methodConfig, rpc::Message* message) noexcept
 	{
-		const std::string& method = methodConfig->Method;
+		const std::string& method = methodConfig->method;
 		if (this->mLuaModule != nullptr && this->mLuaModule->HasFunction(method))
 		{
-			message->TempHead().Add("pb", methodConfig->Response);
-			if (!methodConfig->IsAsync)
+			message->TempHead().Add("pb", methodConfig->response);
+			if (!methodConfig->async)
 			{
 				return this->CallLua(methodConfig, *message);
 			}
@@ -75,7 +75,7 @@ namespace acs
 	{
 		const rpc::Head& head = message.ConstHead();
 		lua_State* lua = this->mLuaModule->GetLuaEnv();
-		lua_pushlstring(lua, config->Method.c_str(), config->Method.size());
+		lua_pushlstring(lua, config->method.c_str(), config->method.size());
 		lua_createtable(lua, 0, 4);
 		{
 			tcp::IHeader::WriteLua(lua, head);
@@ -93,9 +93,18 @@ namespace acs
 				case rpc::Porto::Json:
 				{
 					const std::string& data = message.GetBody();
-					if (!lua::yyjson::write(lua, data.c_str(), data.size()))
+					if (!data.empty() && !lua::yyjson::write(lua, data.c_str(), data.size()))
 					{
 						return XCode::ParseJsonFailure;
+					}
+					break;
+				}
+				case rpc::Porto::Lua:
+				{
+					const std::string& str = message.GetBody();
+					if(lua::lfmt::deserialize(lua, str) != LUA_OK)
+					{
+						return XCode::Failure;
 					}
 					break;
 				}
@@ -107,9 +116,9 @@ namespace acs
 				}
 				case rpc::Porto::Protobuf:
 				{
-					if (!config->Request.empty())
+					if (!config->request.empty())
 					{
-						pb::Message* request = this->mProto->Temp(config->Request);
+						pb::Message* request = this->mProto->Temp(config->request);
 						{
 							if (request == nullptr)
 							{
@@ -147,13 +156,13 @@ namespace acs
 			std::string err;
 			this->mLuaModule->SplitError(err);
 			message.GetHead().Add("error", err);
-			LOG_ERROR("{} {}", config->FullName, err);
+			LOG_ERROR("{} {}", config->fullname, err);
 			return XCode::CallLuaFunctionFail;
 		}
 		message.SetProto(rpc::Porto::None);
 		if (!lua_isinteger(lua, -2))
 		{
-			LOG_ERROR("invoke ({}) return code unknown", config->FullName);
+			LOG_ERROR("invoke ({}) return code unknown", config->fullname);
 			return XCode::Failure;
 		}
 		switch (lua_type(lua, -1))
@@ -212,7 +221,7 @@ namespace acs
 		{
 			std::string err;
 			this->mLuaModule->SplitError(err);
-			LOG_ERROR("{} {}", config->FullName, err);
+			LOG_ERROR("{} {}", config->fullname, err);
 			return XCode::CallLuaFunctionFail;
 		}
 		return luaTaskSource->Await();

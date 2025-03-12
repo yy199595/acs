@@ -5,7 +5,6 @@
 #include "LoggerComponent.h"
 #include "Entity/Actor/App.h"
 #include "Core/System/System.h"
-#include "Util/Tools/TimeHelper.h"
 #include "Log/Output/FileOutput.h"
 #ifdef __CONSOLE_LOG__
 #include "Log/Output/ConsoleOutput.h"
@@ -25,7 +24,7 @@ namespace acs
 {
 	LoggerComponent::LoggerComponent()
 	{
-		this->mConsole = 1;
+		this->mConsole = 0;
 		this->mThread = nullptr;
 		custom::LogConfig::RegisterField("wx", &custom::LogConfig::wx);
 		custom::LogConfig::RegisterField("pem", &custom::LogConfig::pem);
@@ -56,6 +55,7 @@ namespace acs
 		os::System::GetEnv("console", this->mConsole);
 		this->mThread = this->GetComponent<ThreadComponent>();
 		std::unordered_map<std::string, custom::LogLevel> logLevelMap = {
+				{"all", custom::LogLevel::All, },
 				{"none", custom::LogLevel::None, },
 				{ "debug", custom::LogLevel::Debug, },
 				{ "info",  custom::LogLevel::Info, },
@@ -131,6 +131,10 @@ namespace acs
 			Debug::Console(*log);
 		}
 		custom::Logger* logger = this->GetLogger(log->Level);
+		if(logger == nullptr)
+		{
+			logger = this->GetLogger(custom::LogLevel::All);
+		}
 		if (logger != nullptr)
 		{
 			logger->Push(std::move(log));

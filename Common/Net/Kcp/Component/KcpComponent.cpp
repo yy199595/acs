@@ -68,7 +68,7 @@ namespace acs
 		{
 			Asio::Context& context = this->GetComponent<ThreadComponent>()->GetContext();
 			{
-				int port = listen.Port;
+				unsigned int port = listen.port;
 				Asio::Context& io = this->mApp->GetContext();
 				this->mKcpServer = std::make_unique<kcp::Server>(context, this, port, io);
 			}
@@ -172,6 +172,7 @@ namespace acs
 		}
 
 		std::string address;
+
 		if(!this->mActor->GetListen(id, "kcp", address))
 		{
 			return nullptr;

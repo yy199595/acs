@@ -22,7 +22,8 @@ namespace acs
 		bool AddListen(const std::string & name, const std::string & addr);
 	public:
 		bool OnInit() final;
-		void EncodeToJson(std::string *json) final;
+		void Encode(json::w::Value & document) final;
+		bool Decode(json::r::Value & document) final;
 		int GetSrvId() const { return (int)this->GetId(); }
 		const std::string & Address() const { return this->mRpcAddress; }
 		int Make(const std::string &func, std::unique_ptr<rpc::Message> &request) const final ;

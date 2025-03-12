@@ -56,38 +56,38 @@ namespace mongo
 	public:
         int flag;
 		Head header;
-		std::string tab;
+		//std::string tab;
 		std::string cmd;
 		int numberToSkip;
 		int numberToReturn;
 		std::string dataBase;
-		std::string collectionName;
 		bson::Writer::Document document;
 	};
 
-	class Response final : public tcp::IProto
+	class Response final
 #ifdef __SHARE_PTR_COUNTER__
 			, public memory::Object<Response>
 #endif
     {
     public:
-		Response();
-		Response(int id) { this->mHead.responseTo = id; }
+		Response(const std::string & cmd);
+		Response(int id, const std::string & cmd);
     public:
 		int GetCode() const { return this->mCode; }
 		void SetCode(int code) { this->mCode = code; }
 		const Head & GetHead() const { return this->mHead;}
 		inline int RpcId() const { return this->mHead.responseTo; }
 		inline void SetRpcId(int id) { this->mHead.responseTo = id; }
-		bson::Reader::Document * Document() const { return this->mDocument.get(); }
+		inline long long GetCursor() const { return this->cursorID; }
+		const bson::Reader::Document & Document() const { return this->mDocument; }
 	public:
-		void Clear() final;
-		std::string ToString() final;
-#ifdef __DEBUG__
-		const std::string& ToJson() const { return this->mJson; }
-#endif
-		int OnSendMessage(std::ostream &os) final { return 0; }
-		int OnRecvMessage(std::istream &os, size_t size) final;
+		std::string ToString();
+		bool Encode(std::string * json);
+		int OnRecvMessage(std::istream &os, size_t size);
+		inline bool IsEmpty() const { return this->mResult.empty(); }
+		const std::vector<std::string> & GetResults() const { return this->mResult; }
+	private:
+		bool DecodeQuery();
 	private:
 		int mCode;
         Head mHead;
@@ -96,12 +96,10 @@ namespace mongo
         long long cursorID;       // cursor id if client needs to do get more's
         int startingFrom;   // where in the cursor this reply is starting
         int numberReturned; // number of documents in the reply
-		std::string mBuffer;
-#ifdef __DEBUG__
-		std::string mJson;
-#endif
-		std::unique_ptr<bson::Reader::Document> mDocument;
-		//std::vector<Bson::Reader::Document *> mElements;
+		const std::string cmd;
+		std::unique_ptr<char[]> mBuffer;
+		bson::Reader::Document mDocument;
+		std::vector<std::string> mResult;
     };
 }
 

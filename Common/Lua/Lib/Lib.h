@@ -6,6 +6,7 @@
 #define APP_LIB_H
 #include "Core/Event/IEvent.h"
 #include "Lua/Engine/ModuleClass.h"
+
 namespace lua
 {
 
@@ -20,9 +21,12 @@ namespace lua
 
 	namespace lfmt
 	{
+		extern int lprint(lua_State * L);
 		extern int format(lua_State * L);
 		extern int serialize(lua_State * L);
 		extern int deserialize(lua_State * L);
+		extern int deserialize(lua_State * L, const std::string & lua);
+		extern int serialize(lua_State* L, int index, std::string& result);
 	}
 
 	namespace lib
@@ -46,11 +50,13 @@ namespace lua
 #endif
 		extern int luaopen_ljwt(lua_State* L);
 		extern int luaopen_lsha1(lua_State * L);
+		extern int luaopen_lsha256(lua_State * L);
 
 		extern int luaopen_lproto(lua_State* L);
 		extern int luaopen_lbase64(lua_State* L);
 		extern int luaopen_ltimer(lua_State* L);
 
+		extern int luaopen_lpgsqldb(lua_State* L);
 		extern int luaopen_lmysqldb(lua_State* L);
 		extern int luaopen_lredisdb(lua_State* L);
 		extern int luaopen_lmonogodb(lua_State* L);

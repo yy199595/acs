@@ -125,14 +125,14 @@ namespace acs
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		Lua::LuaModule * luaModule = this->mLuaComponent->LoadModule(methodConfig->Service);
+		Lua::LuaModule * luaModule = this->mLuaComponent->LoadModule(methodConfig->service);
 		if(luaModule == nullptr)
 		{
-			LOG_ERROR("not find lua client module : {}", methodConfig->Service);
+			LOG_ERROR("not find lua client module : {}", methodConfig->service);
 			return XCode::CallServiceNotFound;
 		}
 		lua_State * lua = luaModule->GetLuaEnv();
-		luaModule->GetFunction(methodConfig->Method);
+		luaModule->GetFunction(methodConfig->method);
 		const std::string & body = message->GetBody();
 
 		int count = 1;
@@ -148,7 +148,7 @@ namespace acs
 				break;
 			case rpc::Porto::Protobuf:
 			{
-				pb::Message * request = this->mProto->Temp(methodConfig->Request);
+				pb::Message * request = this->mProto->Temp(methodConfig->request);
 				if(request != nullptr)
 				{
 					count++;

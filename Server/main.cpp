@@ -20,7 +20,6 @@
 #include "Gate/Service/GateSystem.h"
 #include "Common/Service/NodeSystem.h"
 #include "Common/Service/LoginSystem.h"
-#include "Master/Component/MasterComponent.h"
 #include "Gate/Component/GateComponent.h"
 
 #include "Mongo/Service/MongoDB.h"
@@ -55,15 +54,13 @@
 
 #include "Mysql/Service/MysqlDB.h"
 #include "Mysql/Component/MysqlDBComponent.h"
-#include "Mysql/Component/MysqlHelperComponent.h"
+#include "Mysql/Component/MysqlComponent.h"
 
 
 #include "Core/System/System.h"
 #include "Redis/Component/RedisComponent.h"
 #include "Sqlite/Component/SqliteComponent.h"
 #include "Log/Component/LoggerComponent.h"
-
-#include "Master/Service/Master.h"
 
 #include "Server/Config/ServerConfig.h"
 #include "Router/Component/RouterComponent.h"
@@ -78,13 +75,15 @@
 
 #include "Quick/Service/QuickSDK.h"
 
-#include "Web/Service/MongoMgr.h"
-
 #include "Event/Service/EventSystem.h"
 
 #include "Client/Component/WsClientComponent.h"
 #include "Web/Service/Admin.h"
+#include "Pgsql/Component/PgsqlDBComponent.h"
+#include "Pgsql/Service/PgsqlDB.h"
 
+#include "Mongo/Service/MongoBackup.h"
+#include "Telnet/Component/TelnetComponent.h"
 using namespace acs;
 
 void RegisterComponent()
@@ -98,7 +97,6 @@ void RegisterComponent()
 	REGISTER_COMPONENT(LaunchComponent);
 	REGISTER_COMPONENT(RouterComponent);
 	REGISTER_COMPONENT(InnerTcpComponent);
-	REGISTER_COMPONENT(MasterComponent);
 	REGISTER_COMPONENT(DispatchComponent);
 	REGISTER_COMPONENT(ConfigComponent);
 
@@ -112,7 +110,7 @@ void RegisterComponent()
 	REGISTER_COMPONENT(MongoDBComponent);
 
 	REGISTER_COMPONENT(MysqlDBComponent);
-	REGISTER_COMPONENT(MysqlHelperComponent);
+	REGISTER_COMPONENT(MysqlComponent);
 
 	REGISTER_COMPONENT(LuaComponent);
 	REGISTER_COMPONENT(HttpComponent);
@@ -140,6 +138,10 @@ void RegisterComponent()
 	REGISTER_COMPONENT(WXComplaintComponent);
 #endif
 	REGISTER_COMPONENT(OssComponent);
+
+	REGISTER_COMPONENT(PgsqlDBComponent);
+
+	REGISTER_COMPONENT(TelnetComponent);
 }
 
 void RegisterAll()
@@ -152,9 +154,11 @@ void RegisterAll()
 	REGISTER_COMPONENT(NodeSystem);
 	REGISTER_COMPONENT(LoginSystem);
 
-	REGISTER_COMPONENT(Master);
 	REGISTER_COMPONENT(MongoDB);
 	REGISTER_COMPONENT(MysqlDB);
+	REGISTER_COMPONENT(PgsqlDB);
+
+	REGISTER_COMPONENT(MongoBackup);
 
 #ifdef __ENABLE_OPEN_SSL__
 	REGISTER_COMPONENT(WeChat);
@@ -168,11 +172,13 @@ void RegisterAll()
 	REGISTER_COMPONENT(QuickSDK);
 
 	REGISTER_COMPONENT(Watch);
-	REGISTER_COMPONENT(MongoMgr);
 	REGISTER_COMPONENT(EventSystem);
 }
+
 int main(int argc, char** argv)
 {
+	long long newId = help::ID::Create(1, 8);
+
 	int id = 0;
 	RegisterAll();
 	std::string path;

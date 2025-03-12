@@ -87,8 +87,6 @@ import {format_permiss, format_time} from "../api/format";
 
 import {httpRequest} from "../utils/httpRequest"
 import {ElMessage, ElMessageBox} from "element-plus";
-import {useRouter} from "vue-router";
-import {remove_token} from "../api/token";
 
 export default {
     name: "admin",

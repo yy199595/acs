@@ -27,7 +27,7 @@ namespace acs
 				this->mNetThreads.emplace(std::move(t));
 			}
 		}
-		LOG_INFO("thread count = {}", threadCount)
+		printf("thread count = %d\n", threadCount);
 		return true;
 	}
 

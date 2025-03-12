@@ -5,7 +5,6 @@
 #include"Url.h"
 #include<regex>
 #include"sstream"
-#include"Util/Tools/String.h"
 #include"Log/Common/CommonLogDef.h"
 namespace http
 {
@@ -44,37 +43,30 @@ namespace http
 
 	int Url::OnRecvMessage(std::istream& os, size_t size)
 	{
-		if(this->mReadCount >= 3 || size == 0)
-		{
-			LOG_ERROR("read:{} size:{}", this->mReadCount, size);
-			return tcp::ReadDecodeError;
-		}
 		this->mReadCount++;
-		std::unique_ptr<char[]> buffer(new char[size]);
-		size_t count = os.readsome(buffer.get(), size);
-		if(count != size)
+		if(this->mReadCount >= 3 || size <= 2)
 		{
-			CONSOLE_LOG_ERROR("read:{} size:{} count:{}", count, size, this->mReadCount);
 			return tcp::ReadDecodeError;
 		}
-		std::string lineData(buffer.get(), size - 2);
 
-		std::vector<std::string> results;
-		results.reserve(3);
-		if(help::Str::Split(lineData, ' ', results) != 3)
+		if(!std::getline(os, this->mMethod, ' '))
 		{
 			return tcp::ReadDecodeError;
 		}
-		this->mUrl = results[1];
-		this->mMethod = results[0];
-		this->mVersion = results[2];
-		if(this->mVersion != http::Version)
+		if(!std::getline(os, this->mUrl, ' '))
 		{
 			return tcp::ReadDecodeError;
+		}
+		if(!std::getline(os, this->mVersion))
+		{
+			return tcp::ReadDecodeError;
+		}
+		if(this->mVersion.back() == '\r')
+		{
+			this->mVersion.pop_back();
 		}
 		if(this->mMethod.empty() || this->mUrl.empty() || this->mVersion.empty())
 		{
-			CONSOLE_LOG_ERROR("line data : {}", lineData);
 			return tcp::ReadDecodeError;
 		}
 		size_t pos = this->mUrl.find('?');

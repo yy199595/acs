@@ -1,10 +1,10 @@
 {
     "LoginSystem.Login": {
-        "Async":true,
-        "Request": "s2s.login.request"
+        "async":true,
+        "request": "s2s.login.request"
     },
     "LoginSystem.Logout": {
-        "Async":true,
-        "Request": "s2s.logout.request"
+        "async":true,
+        "request": "s2s.logout.request"
     }
 }

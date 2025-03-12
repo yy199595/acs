@@ -46,21 +46,24 @@ namespace mysql
 		this->capability_flags = (capability_flags_high << 16) | capability_flags_low;
 
 		// 解析认证插件数据长度
-		uint8_t auth_plugin_data_len = packet[offset];
-		offset += 1;
+		uint8_t auth_plugin_data_len = packet[offset++];
 
 		// 跳过保留字段（10 字节）
 		offset += 10;
 
 		// 解析盐值第二部分（12 字节）
-		std::string salt_part2(packet.begin() + offset, packet.begin() + offset + 12);
-		offset += 12;
+		std::string salt_part2;
+		if(this->capability_flags & mysql::client_flag::CLIENT_SECURE_CONNECTION)
+		{
+			salt_part2.assign(packet.begin() + offset, packet.begin() + offset + 12);
+			offset += 12;
+		}
 
-		// 组合完整盐值
 		this->salt = salt_part1 + salt_part2;
-
-		// 解析认证插件名称（null 结尾字符串）
-		this->auth_plugin_name = std::string(packet.c_str() + offset + 1, auth_plugin_data_len);
+		if(auth_plugin_data_len > 0 && (this->capability_flags & mysql::client_flag::CLIENT_PLUGIN_AUTH))
+		{
+			this->auth_plugin_name = std::string(packet.c_str() + offset + 1, auth_plugin_data_len);
+		}
 		return true;
 	}
 }

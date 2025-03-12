@@ -2,14 +2,13 @@
 // Created by zmhy0073 on 2022/10/8.
 //
 
-#include"NodeSystem.h"
-#include"Entity/Actor/App.h"
-#include"Core/System/System.h"
-#include"Yyjson/Document/Document.h"
-#include"Lua/Component/LuaComponent.h"
-#include"Log/Component/LoggerComponent.h"
-#include"Server/Component/ConfigComponent.h"
-
+#include "NodeSystem.h"
+#include "Entity/Actor/App.h"
+#include "Core/System/System.h"
+#include "Util/Tools/TimeHelper.h"
+#include "Yyjson/Document/Document.h"
+#include "Lua/Component/LuaComponent.h"
+#include "Server/Component/ConfigComponent.h"
 
 #ifdef __SHARE_PTR_COUNTER__
 
@@ -27,7 +26,7 @@
 
 namespace acs
 {
-	NodeSystem::NodeSystem() : mActComponent(nullptr)
+	NodeSystem::NodeSystem() : mActor(nullptr)
 	{
 
 	}
@@ -42,7 +41,7 @@ namespace acs
 		BIND_SERVER_RPC_METHOD(NodeSystem::RunInfo);
 		BIND_SERVER_RPC_METHOD(NodeSystem::Shutdown);
 		BIND_SERVER_RPC_METHOD(NodeSystem::LoadConfig);
-		this->mActComponent = this->GetComponent<ActorComponent>();
+		this->mActor = this->GetComponent<ActorComponent>();
 		return true;
     }
 
@@ -59,23 +58,27 @@ namespace acs
 			return XCode::ParseJsonFailure;
 		}
 		int id = 0;
-		document.Get("id", id);
-		if(this->mActComponent->HasServer(id))
+		std::string name;
+		LOG_ERROR_CHECK_ARGS(document.Get("id", id))
+		LOG_ERROR_CHECK_ARGS(document.Get("name", name))
+		std::unique_ptr<Server> server = std::make_unique<Server>(id, name);
 		{
-			this->mActComponent->UpdateServer(document);
-			return XCode::Ok;
+			this->mActor->DelActor(id);
+			if(!server->Decode(document))
+			{
+				return false;
+			}
+			help::AddServerEvent::Trigger(name, id);
+			this->mActor->AddActor(std::move(server), true);
 		}
-		Server * newServer = this->mActComponent->MakeServer(document);
-		LOG_ERROR_RETURN_CODE(newServer != nullptr, XCode::CallArgsError);
-		LOG_DEBUG("add new server : {}", newServer->Name());
-		this->mActComponent->AddServer(newServer);
 		return XCode::Ok;
 	}
 
-    int NodeSystem::Del(const com::type::int64 &request)
+    int NodeSystem::Del(const com::type::int32 &request)
 	{
-		long long actorId = request.value();
-		this->mActComponent->DelActor(actorId);
+		int actorId = request.value();
+		this->mActor->DelActor(actorId);
+		help::DelServerEvent::Trigger(actorId);
 		return XCode::Ok;
 	}
 
@@ -87,7 +90,9 @@ namespace acs
 
 	int NodeSystem::Find(com::type::json& response)
 	{
-		this->mApp->EncodeToJson(response.mutable_json());
+		json::w::Document document;
+		this->mApp->Encode(document);
+		document.Encode(response.mutable_json());
 		return XCode::Ok;
 	}
 
@@ -110,11 +115,14 @@ namespace acs
 			document.Add("name", this->mApp->Name());
 			document.Add("id", this->mApp->GetSrvId());
 			document.Add("fps", this->mApp->GetFps());
-			document.Add("time", this->mApp->StartTime());
+			long long start = this->mApp->StartTime() / 1000;
+			document.Add("start_time", help::Time::GetDateString(start));
 
-			document.Add("cpu", systemInfo.cpu);
-			document.Add("use_memory", systemInfo.use_memory);
-			document.Add("max_memory", systemInfo.max_memory);
+			document.Add("cpu", fmt::format("{:.3f}%", systemInfo.cpu * 100));
+			constexpr double MB = 1024 * 1024.0f;
+
+			document.Add("use_memory", fmt::format("{:.3f}MB", systemInfo.use_memory / MB));
+			document.Add("max_memory", fmt::format("{:.3f}GB", systemInfo.max_memory / (MB * 1024)));
 
 #ifdef __SHARE_PTR_COUNTER__
 			size_t count1 = rpc::Message::GetObjectCount();

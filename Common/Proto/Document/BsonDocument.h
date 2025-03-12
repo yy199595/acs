@@ -13,30 +13,21 @@ namespace bson
 	namespace Writer
 	{
 		class Document;
-		class Array : public _bson::bsonobjbuilder
+		class Array : protected _bson::bsonobjbuilder
 		{
 		public:
 			Array() : mIndex(0) { }
             explicit Array(Document & document) : mIndex(0) { this->Add(document); }
 		public:
-			void Add(int value);
-
-			void Add(bool value);
-
-			void Add(double value);
-
-			void Add(long long value);
-
-			void Add(unsigned int value);
+			template<typename T>
+			inline void Add(const T & value) {
+				int index = this->mIndex++;
+				this->append(std::to_string(index), value);
+			}
 
 			void Add(Array& document);
 
 			void Add(Document& document);
-
-			void Add(const std::string& value);
-
-			void Add(const char* str, size_t size);
-
 		private:
 			int mIndex;
 		};
@@ -44,14 +35,13 @@ namespace bson
 
 	namespace Writer
 	{
-		class Document : public _bson::bsonobjbuilder
+		class Document : protected _bson::bsonobjbuilder
 		{
 		public:
 			Document() = default;
 			~Document() = default;
 		public:
 			std::string ToString();
-			void WriterToJson(std::string & json);
             bool FromByJson(const std::string& json);
 			bool FromByJson(const json::r::Document & json);
 		public:
@@ -71,14 +61,10 @@ namespace bson
 			{
 				this->append(key, str, size + 1);
 			}
-		public:
-			void Encode(std::ostream& os);
-			void Encode(std::string * str);
-		public:
-			int GetStreamLength();
-			std::string ToJson();
+		private:
 			bool WriterToBson(Array& document, const json::r::Value& jsonValue);
 			bool WriterToBson(const char* key, Document& document, const json::r::Value& jsonValue);
+		private:
 		};
 	}
 
@@ -87,9 +73,11 @@ namespace bson
 		class Document
 		{
 		public:
-			explicit Document(const char* bson);
+			explicit Document() = default;
 			explicit Document(const _bson::bsonobj& object);
 		public:
+
+
 			bool WriterToJson(std::string * json);
 
 			_bson::BSONType Type(const char* key) const;
@@ -106,8 +94,6 @@ namespace bson
 
 			bool Get(const char* key, std::string& value) const;
 
-			int Length() const { return this->mObject.objsize(); }
-
 			bool Get(const char * key, std::unique_ptr<Document> & document) const;
 
 			bool Get(const char * key, std::vector<std::unique_ptr<Document>> & document) const;
@@ -116,9 +102,14 @@ namespace bson
 
 			bool Get(const char * key, std::vector<_bson::bsonelement> & document) const;
 
-			int GetLength() const { return this->mObject.objsize(); }
-
-			std::string ToString() const { return this->mObject.toString(); }
+			inline std::string ToString()
+			{
+				std::string result;
+				this->WriterToJson(&result);
+				return result;
+			}
+			inline void Init(const char * bson) { this->mObject.init(bson); }
+			inline std::string ToBson() const { return this->mObject.toString(); }
 		private:
 			void WriterToJson(const _bson::bsonelement& bsonelement, json::w::Value& json);
 		private:

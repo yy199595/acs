@@ -11,7 +11,7 @@ if [ ! -n "$1" ] ;then
   echo "*                                                         *"
   echo "*           debug        build server type=debug          *"
   echo "*           release      build server type=release        *"
-  echo "*           lib          build protobuf and jemalloc      *"
+  echo "*           lib          build protobuf and lua           *"
   echo "*           jemalloc     download jemalloc and build      *"
   echo "*           openssl      download openssl and build       *"
   echo "*                                                         *"
@@ -57,6 +57,8 @@ for arg in $cmd; do
         cd "$current_path" || exit
         make protoc
         make libprotobuf
+        make lua-share
+        make lua-static
     fi
 
     if [[ $arg == "debug" ]]; then

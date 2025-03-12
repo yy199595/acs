@@ -1,6 +1,7 @@
 //
 // Created by mac on 2022/5/18.
 //
+#include "fmt.h"
 #include"MongoProto.h"
 #include"Proto/Bson/bsonobj.h"
 
@@ -35,8 +36,11 @@ namespace mongo
 
 	int Request::OnSendMessage(std::ostream& os)
 	{
-		int len = sizeof(this->flag) + this->collectionName.size()
-			   + 1 + sizeof(int) * 2 + this->document.GetStreamLength();
+		int length = 0;
+		std::string cmd = fmt::format("{}.$cmd", this->dataBase);
+		const char * bson = this->document.Serialize(length);
+		int len = sizeof(this->flag) + cmd.size()
+			   + 1 + sizeof(int) * 2 + length;
 
 		len  += sizeof(Head);
 		tcp::Data::Write(os, len);
@@ -45,26 +49,27 @@ namespace mongo
 		tcp::Data::Write(os, this->header.opCode);
 
 		tcp::Data::Write(os, this->flag);
-		tcp::Data::Write(os, this->collectionName);
+		tcp::Data::Write(os, cmd);
 		tcp::Data::Write(os, '\0');
 		tcp::Data::Write(os, this->numberToSkip);
 		tcp::Data::Write(os, this->numberToReturn);
-		this->document.Encode(os);
+		os.write(bson, length);
 
 		return 0;
 	}
 
 	Request& Request::GetCollection(const char* cmd, const std::string& tab)
 	{
-		this->tab = tab;
 		this->cmd = cmd;
-		std::string table(tab);
 		size_t  pos = tab.find('.');
 		if(pos != std::string::npos)
 		{
-			table = tab.substr(pos + 1);
+			this->dataBase = tab.substr(0, pos);
+			std::string collection = tab.substr(pos + 1);
+			this->document.Add(cmd, collection);
+			return *this;
 		}
-		this->document.Add(cmd, table);
+		this->document.Add(cmd, tab);
 		return *this;
 	}
 }
@@ -120,59 +125,91 @@ namespace mongo
 
 namespace mongo
 {
-	Response::Response()
+	Response::Response(const std::string & cmd)
+			: cmd(cmd)
 	{
 		this->mCode = 0;
 		this->mDecodeState = tcp::Decode::None;
 	}
 
-	void Response::Clear()
+	Response::Response(int id, const std::string& cmd)
+		: cmd(cmd)
 	{
-		this->mCode = 0;
-		this->mBuffer.clear();
-		this->mDecodeState = tcp::Decode::None;
+		this->mHead.responseTo = id;
 	}
 
 	std::string Response::ToString()
 	{
-		if(this->mDocument == nullptr)
+		return this->mDocument.ToString();
+	}
+
+	bool Response::Encode(std::string* json)
+	{
+		return this->mDocument.WriterToJson(json);
+	}
+
+	bool Response::DecodeQuery()
+	{
+		std::unique_ptr<bson::Reader::Document> document1;
+		if(!this->mDocument.Get("cursor", document1))
 		{
-			return "";
+			std::string str = this->mDocument.ToString();
+			return false;
 		}
-		return this->mDocument->ToString();
+
+		std::vector<std::unique_ptr<bson::Reader::Document>> results;
+		if(!document1->Get("firstBatch", results))
+		{
+			if(!document1->Get("nextBatch", results))
+			{
+				return false;
+			}
+		}
+		std::string json;
+		document1->Get("id", this->cursorID);
+		for(std::unique_ptr<bson::Reader::Document> & document : results)
+		{
+			json.clear();
+			if(document->WriterToJson(&json))
+			{
+				this->mResult.emplace_back(json);
+			}
+		}
+		return true;
 	}
 
 	int Response::OnRecvMessage(std::istream& os, size_t size)
 	{
-		if(this->mDecodeState == tcp::Decode::None)
+		if (this->mDecodeState == tcp::Decode::None)
 		{
 			tcp::Data::Read(os, this->mHead);
 			this->mDecodeState = tcp::Decode::MessageHead;
 			return this->mHead.messageLength - (int)sizeof(this->mHead);
 		}
-		if(this->mDecodeState == tcp::Decode::MessageHead)
+
+		size_t offset = 0;
 		{
-			this->mBuffer.clear();
 			tcp::Data::Read(os, this->responseFlags);
+			offset += sizeof(this->responseFlags);
+
 			tcp::Data::Read(os, this->cursorID);
+			offset += sizeof(this->cursorID);
+
 			tcp::Data::Read(os, this->startingFrom);
+			offset += sizeof(this->startingFrom);
+
 			tcp::Data::Read(os, this->numberReturned);
-			this->mDecodeState = tcp::Decode::MessageBody;
+			offset += sizeof(this->numberReturned);
 		}
-		if(this->mDecodeState == tcp::Decode::MessageBody)
+		size_t len = size - offset;
+		this->mBuffer = std::make_unique<char[]>(len);
 		{
-			char buffer[256] = { 0 };
-			size_t count = os.readsome(buffer, sizeof(buffer));
-			while(count > 0)
+			os.readsome(this->mBuffer.get(), len);
+			this->mDocument.Init(this->mBuffer.get());
+			if(this->cmd == "find" || this->cmd == "aggregate" || this->cmd == "getMore")
 			{
-				this->mBuffer.append(buffer, count);
-				count = os.readsome(buffer, sizeof(buffer));
+				this->DecodeQuery();
 			}
-			const char * bson = this->mBuffer.c_str();
-			this->mDocument = std::make_unique<bson::Reader::Document>(bson);
-#ifdef __DEBUG__
-			this->mDocument->WriterToJson(&this->mJson);
-#endif
 		}
 		return 0;
 	}

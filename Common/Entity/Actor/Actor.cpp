@@ -1,16 +1,17 @@
 //
 // Created by yjz on 2023/5/17.
 //
-#include"App.h"
-#include"Actor.h"
-#include"XCode/XCode.h"
-#include"Util/Tools/TimeHelper.h"
-#include"Proto/Include/Message.h"
-#include"Rpc/Config/ServiceConfig.h"
-#include"Yyjson/Lua/ljson.h"
-#include"Proto/Component/ProtoComponent.h"
-#include"Router/Component/RouterComponent.h"
+#include "App.h"
+#include "Actor.h"
+#include "XCode/XCode.h"
 #include "Message/s2s/s2s.pb.h"
+#include "Util/Tools/TimeHelper.h"
+#include "Proto/Include/Message.h"
+#include "Rpc/Config/ServiceConfig.h"
+#include "Yyjson/Lua/ljson.h"
+#include "Proto/Component/ProtoComponent.h"
+#include "Router/Component/RouterComponent.h"
+#include "Lua/Lib/Lib.h"
 namespace acs
 {
 	Actor::Actor(long long id, std::string  name)
@@ -164,9 +165,9 @@ namespace acs
 		{
 			return code;
 		}
-		if (!methodConfig->Response.empty())
+		if (!methodConfig->response.empty())
 		{
-			message->TempHead().Add("res", methodConfig->Response);
+			message->TempHead().Add("res", methodConfig->response);
 		}
 		switch (lua_type(lua, idx))
 		{
@@ -185,9 +186,9 @@ namespace acs
 			}
 			case LUA_TTABLE:
 			{
-				if (!methodConfig->Request.empty())
+				if (!methodConfig->request.empty())
 				{
-					const std::string& name = methodConfig->Request;
+					const std::string& name = methodConfig->request;
 					pb::Message* request = this->mProto->Read(lua, name, idx);
 					if (request == nullptr)
 					{
@@ -198,6 +199,15 @@ namespace acs
 					{
 						return XCode::SerializationFailure;
 					}
+					return XCode::Ok;
+				}
+				if(methodConfig->proto == rpc::Porto::Lua)
+				{
+					if(lua::lfmt::serialize(lua, idx, *message->Body()) != LUA_OK)
+					{
+						return XCode::Failure;
+					}
+					message->SetProto(rpc::Porto::Lua);
 					return XCode::Ok;
 				}
 				message->SetProto(rpc::Porto::Json);

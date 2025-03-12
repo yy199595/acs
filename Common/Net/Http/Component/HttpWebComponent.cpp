@@ -5,7 +5,7 @@
 #include"HttpWebComponent.h"
 #include"Entity/Actor/App.h"
 #include"Core/System/System.h"
-#include"Http/Client/Session.h"
+#include"Http/Client/HttpSession.h"
 #include"Http/Service/HttpService.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
@@ -19,9 +19,15 @@ namespace acs
 	HttpWebComponent::HttpWebComponent()
 	{
 		this->mRecord = nullptr;
-		this->mConfig.Auth = true;
-		this->mConfig.RpcDebug = false;
-		this->mDispatch = nullptr;
+		this->mConfig.index = "index.html";
+		REGISTER_JSON_CLASS_FIELD(http::Config, auth);
+		REGISTER_JSON_CLASS_FIELD(http::Config, root);
+		REGISTER_JSON_CLASS_FIELD(http::Config, index);
+		REGISTER_JSON_CLASS_FIELD(http::Config, upload);
+		REGISTER_JSON_CLASS_FIELD(http::Config, domain);
+		REGISTER_JSON_CLASS_FIELD(http::Config, whiteList);
+
+
 		this->mCoroutine = nullptr;
 		this->mFactory.Add<http::FromContent>(http::Header::FORM);
 		this->mFactory.Add<http::JsonContent>(http::Header::JSON);
@@ -52,9 +58,18 @@ namespace acs
 		}
 
 		this->mCoroutine = App::Coroutine();
-		this->mDispatch = this->GetComponent<DispatchComponent>();
-		this->mRecord = this->mApp->GetComponent<IRequest<HttpMethodConfig, http::Request, http::Response>>();
-		return this->ReadHttpConfig();
+		ServerConfig * config = ServerConfig::Inst();
+		LOG_CHECK_RET_FALSE(config->Get("http", this->mConfig));
+		if (!this->mConfig.root.empty())
+		{
+			this->AddRootDirector(this->mConfig.root);
+			if(!this->mConfig.index.empty())
+			{
+				this->mPath = fmt::format("{}/{}", this->mConfig.root, this->mConfig.index);
+			}
+		}
+		this->mRecord = this->mApp->GetComponent<IHttpRecordComponent>();
+		return true;
 	}
 
 	bool HttpWebComponent::AddRootDirector(const std::string& dir)
@@ -69,58 +84,19 @@ namespace acs
 		return true;
 	}
 
-	bool HttpWebComponent::ReadHttpConfig()
-	{
-		std::unique_ptr<json::r::Value> jsonObject;
-		if (!this->mApp->Config().Get("http", jsonObject))
-		{
-			return false;
-		}
-		this->mDefaultHeader.clear();
-		std::unique_ptr<json::r::Value> jsonHeader;
-		if (jsonObject->Get("header", jsonHeader))
-		{
-			std::vector<const char*> keys;
-			if (jsonHeader->GetKeys(keys) > 0)
-			{
-				std::unique_ptr<json::r::Value> value;
-				for (const char* key: keys)
-				{
-					if (jsonHeader->Get(key, value))
-					{
-						this->mDefaultHeader.emplace(key, value->ToString());
-					}
-				}
-			}
-		}
-		std::string root;
-		if (jsonObject->Get("root", root))
-		{
-			this->AddRootDirector(root);
-		}
-		std::string token;
-		jsonObject->Get("auth", this->mConfig.Auth);
-		jsonObject->Get("index", this->mConfig.Index);
-		jsonObject->Get("upload", this->mConfig.Upload);
-		jsonObject->Get("domain", this->mConfig.Domain);
-		this->mConfig.Index = fmt::format("{}/{}", root, this->mConfig.Index);
-		return true;
-	}
-
-
 	void HttpWebComponent::OnReadHead(http::Request* request, http::Response* response) noexcept
 	{
 		int sockId = request->GetSockId();
 		HttpStatus httpStatus = HttpStatus::OK;
-		auto iter = this->mDefaultHeader.begin();
-		for (; iter != this->mDefaultHeader.end(); iter++)
+		auto iter = this->mConfig.header.begin();
+		for (; iter != this->mConfig.header.end(); iter++)
 		{
 			const std::string& key = iter->first;
 			response->Header().Add(key, iter->second);
 		}
 		do
 		{
-			if (request->ConstHeader().Has("Upgrade"))
+			if (request->ConstHeader().Has("upgrade"))
 			{
 				httpStatus = HttpStatus::UPGRADE_REQUIRED;
 				break;
@@ -129,31 +105,25 @@ namespace acs
 			const HttpMethodConfig* httpConfig = HttpConfig::Inst()->GetMethodConfig(path);
 			if (httpConfig == nullptr)
 			{
-				httpStatus = this->OnNotFound(request, response);
-				if (httpStatus == HttpStatus::OK)
-				{
-					break;
-				}
-				if(this->mDispatch == nullptr)
+				if (this->OnNotFound(request, response) != HttpStatus::OK)
 				{
 					httpStatus = HttpStatus::NOT_FOUND;
 					break;
 				}
-				this->ReadMessageBody(sockId, std::make_unique<http::TextContent>());
 				return;
 			}
 
-			if (!httpConfig->Open)
+			if (!httpConfig->open)
 			{
 				httpStatus = HttpStatus::NOT_FOUND;
 				break;
 			}
-			if (!request->IsMethod(httpConfig->Type))
+			if (!request->IsMethod(httpConfig->type))
 			{
 				if (request->IsMethod("OPTIONS"))
 				{
-					response->Header().Add("Access-Control-Allow-Methods", httpConfig->Type);
-					response->Header().Add("Access-Control-Allow-Headers", httpConfig->Headers);
+					response->Header().Add("Access-Control-Allow-Methods", httpConfig->type);
+					response->Header().Add("Access-Control-Allow-Headers", httpConfig->headers);
 					break;
 				}
 				httpStatus = HttpStatus::METHOD_NOT_ALLOWED;
@@ -168,7 +138,7 @@ namespace acs
 				}
 			}
 
-			if (this->mConfig.Auth && httpConfig->Auth)
+			if (this->mConfig.auth && httpConfig->auth)
 			{
 				if (this->AuthToken(httpConfig, request) != HttpStatus::OK)
 				{
@@ -205,19 +175,19 @@ namespace acs
 		{
 			return HttpStatus::BAD_REQUEST;
 		}
-		if (!httpConfig->Content.empty())
+		if (!httpConfig->content.empty())
 		{
-			if (httpConfig->Content.find(cont_type) == std::string::npos)
+			if (httpConfig->content.find(cont_type) == std::string::npos)
 			{
 				const http::Url& url = request->GetUrl();
-				LOG_ERROR("[{}]({}) {}:{}", url.Method(), url.Path(), cont_type, httpConfig->Content);
+				LOG_ERROR("[{}]({}) {}:{}", url.Method(), url.Path(), cont_type, httpConfig->content);
 				return HttpStatus::BAD_REQUEST;
 			}
 		}
 		std::unique_ptr<http::Content> body;
 		if (!this->mFactory.New(cont_type, body))
 		{
-			if(!httpConfig->Content.empty())
+			if(!httpConfig->content.empty())
 			{
 				return HttpStatus::UNSUPPORTED_MEDIA_TYPE;
 			}
@@ -228,23 +198,23 @@ namespace acs
 		{
 			return HttpStatus::LENGTH_REQUIRED;
 		}
-		if (httpConfig->Limit > 0 && contentLength >= httpConfig->Limit)
+		if (httpConfig->limit > 0 && contentLength >= httpConfig->limit)
 		{
 			return HttpStatus::BAD_REQUEST;
 		}
 		if (body->GetContentType() == http::ContentType::MULTIPAR)
 		{
-			if (this->mConfig.Upload.empty())
+			if (this->mConfig.upload.empty())
 			{
 				return HttpStatus::BAD_REQUEST;
 			}
-			const int limit = httpConfig->Limit;
-			const std::string& path = this->mConfig.Upload;
+			const int limit = httpConfig->limit;
+			const std::string& path = this->mConfig.upload;
 			body->Cast<http::MultipartFromContent>()->Init(path, limit);
 		}
 		else if (body->GetContentType() == http::ContentType::FILE)
 		{
-			if (this->mConfig.Upload.empty())
+			if (this->mConfig.upload.empty())
 			{
 				return HttpStatus::BAD_REQUEST;
 			}
@@ -255,7 +225,7 @@ namespace acs
 			}
 			long long guid = this->mApp->MakeGuid();
 			std::string type = cont_type.substr(pos + 1);
-			const std::string& upload = this->mConfig.Upload;
+			const std::string& upload = this->mConfig.upload;
 			const std::string path = fmt::format("{}/{}.{}", upload, guid, type);
 			if (!body->Cast<http::FileContent>()->MakeFile(path))
 			{
@@ -269,9 +239,9 @@ namespace acs
 	HttpStatus HttpWebComponent::OnNotFound(http::Request* request, http::Response* response) noexcept
 	{
 		const std::string& path = request->GetUrl().Path();
-		if (path == "/" && !this->mConfig.Index.empty())
+		if (path == "/" && !this->mPath.empty())
 		{
-			response->File(http::Header::HTML, this->mConfig.Index);
+			response->File(http::Header::HTML, this->mPath);
 			return HttpStatus::OK;
 		}
 		for (const std::string& dir: this->mRoots)
@@ -297,7 +267,6 @@ namespace acs
 	void HttpWebComponent::OnMessage(http::Request* request, http::Response* response) noexcept
 	{
 		const std::string& path = request->GetUrl().Path();
-		//LOG_INFO("[{}] {}", path, request->GetBody()->ToStr())
 		const HttpMethodConfig* httpConfig = HttpConfig::Inst()->GetMethodConfig(path);
 		if (httpConfig != nullptr)
 		{
@@ -313,7 +282,7 @@ namespace acs
 	void HttpWebComponent::OnApi(const acs::HttpMethodConfig* httpConfig,
 			http::Request* request, http::Response* response) noexcept
 	{
-		if (!httpConfig->IsAsync)
+		if (!httpConfig->async)
 		{
 			this->Invoke(httpConfig, request, response);
 			return;
@@ -325,15 +294,12 @@ namespace acs
 	{
 		std::string token;
 		http::Head& head = request->Header();
-		if (!head.Get(http::Header::Auth, token))
+		const static std::string AUTH("authorization");
+		if (!head.Get(AUTH, token))
 		{
-			if (!head.Get("authorization", token))
-			{
-				LOG_WARN("not token field")
-				return HttpStatus::UNAUTHORIZED;
-			}
+			return HttpStatus::UNAUTHORIZED;
 		}
-		if (!config->Token.empty() && token == config->Token)
+		if (!config->token.empty() && token == config->token)
 		{
 			return HttpStatus::OK;
 		}
@@ -349,10 +315,10 @@ namespace acs
 		document.Get("c", httpToken.ClubId);
 		document.Get("t", httpToken.ExpTime);
 		document.Get("p", httpToken.Permission);
-		if (httpToken.Permission < config->Permission)
+		if (httpToken.Permission < config->permission)
 		{
-			LOG_ERROR("[{}] user_id:{} permission:{}/{}", config->Path,
-					httpToken.UserId, httpToken.Permission, config->Permission);
+			LOG_ERROR("[{}] user_id:{} permission:{}/{}", config->path,
+					httpToken.UserId, httpToken.Permission, config->permission);
 			return HttpStatus::NOT_FOUND;
 		}
 		long long nowTime = help::Time::NowSec();
@@ -377,7 +343,7 @@ namespace acs
 		do
 		{
 			http::Head& head = request->Header();
-			if (this->mConfig.Auth && config->Auth)
+			if (this->mConfig.auth && config->auth)
 			{
 				code = this->AuthToken(config, request);
 				if (code != HttpStatus::OK)
@@ -385,7 +351,7 @@ namespace acs
 					break;
 				}
 			}
-			HttpService* httpService = this->mHttpServices.Find(config->Service);
+			HttpService* httpService = this->mHttpServices.Find(config->service);
 			if (httpService == nullptr)
 			{
 				std::string ip;
@@ -416,7 +382,7 @@ namespace acs
 			}
 #endif
 		} while (false);
-		if(config->IsRecord && this->mRecord != nullptr)
+		if(config->record && this->mRecord != nullptr)
 		{
 			this->mRecord->OnRequestDone(*config, *request, *response);
 		}

@@ -1,7 +1,6 @@
 #pragma once
 #include<string>
 #include<vector>
-#include"RedisAny.h"
 #include"Lua/Engine/Define.h"
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Proto/Message/IProto.h"
@@ -11,18 +10,7 @@
 #endif
 namespace redis
 {
-	enum class Type
-	{
-		REDIS_NONE,
-		REDIS_STRING,
-		REDIS_ERROR,
-		REDIS_NUMBER,
-		REDIS_ARRAY,
-		REDIS_BIN_STRING,
-
-	};
-
-	namespace Flag
+	namespace type
 	{
 		constexpr char String = '+';
 		constexpr char Error = '-';
@@ -95,6 +83,18 @@ namespace redis
 		Request::Encode(self, std::forward<Args>(args)...);
 	}
 
+
+	struct Element
+	{
+		char type = 0;
+		std::string message;
+		long long number = 0;
+		std::vector<Element> list;
+	public:
+		inline bool IsString() const { return this->type == redis::type::String || this->type == redis::type::BinString; }
+	};
+
+
 	class Response final : public ILuaWrite
 #ifdef __SHARE_PTR_COUNTER__
 			, public memory::Object<Response>
@@ -105,45 +105,16 @@ namespace redis
 		~Response()  { this->Clear(); }
 
 	public:
-		bool IsOk();
 		void Clear();
 		int WriteToLua(lua_State* lua) const final;
-	private:
-		int OnDecodeArray(std::istream& os, size_t);
-		int OnReceiveFirstLine(std::istream& os, size_t);
+		int WriteElementLua(const Element & element, lua_State* lua) const;
+		inline bool IsOk() const { return this->element.message == "OK"; }
+		inline bool HasError() const { return this->element.type == redis::type::Error || this->element.type == 0; }
 	public:
 		std::string ToString();
-		void SetError(const std::string& err);
-		int OnRecvLine(std::istream& os, size_t size);
-		int OnRecvMessage(std::istream& os, size_t size);
-		bool GetArray(std::vector<const String *> & list);
-		bool IsString() const { return this->mType == Type::REDIS_STRING || this->mType == Type::REDIS_BIN_STRING; }
 	public:
-		bool HasError();
-		template<typename T>
-		const T* Cast(size_t index);
-		const Any* Get(size_t index);
-		bool GetValue(size_t index, std::string & value);
-		inline Type GetType() const { return this->mType; }
-		long long GetNumber() const { return this->mNumber; }
-		inline size_t GetArraySize() { return this->mArray.size(); }
-		const std::string& GetString() const { return this->mString; }
-	private:
-		Type mType;
-		int mIgnore;
-		int mDataSize;
-		int mDataCount;
-		long long mNumber;
-		std::string mString;
-		std::vector<Any*> mArray;
+		Element element;
 	};
-
-	template<typename T>
-	const T* Response::Cast(size_t index)
-	{
-		const Any* any = this->Get(index);
-		return dynamic_cast<const T*>(any);
-	}
 }
 
 namespace acs

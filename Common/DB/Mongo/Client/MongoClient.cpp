@@ -3,89 +3,105 @@
 //
 
 
-#include"MongoClient.h"
-#include"XCode/XCode.h"
-#include <utility>
+#include "MongoClient.h"
+#include "XCode/XCode.h"
 #include "Util/Crypt/sha1.h"
+#include "Util/Tools/TimeHelper.h"
 #include "Util/Crypt/MD5Helper.h"
-#include"Proto/Bson/base64.h"
-#include"Util/Tools/String.h"
-#include"Mongo/Config/MongoConfig.h"
-#include"Core/Thread/ThreadSync.h"
-#include"Mongo/Client/MongoFactory.h"
+#include "Proto/Bson/base64.h"
+#include "Util/Tools/String.h"
+#include "Mongo/Config/MongoConfig.h"
+#include "Core/Thread/ThreadSync.h"
+#include "Mongo/Client/MongoFactory.h"
+
+#ifdef __ENABLE_OPEN_SSL__
+
+#include <openssl/sha.h>
+
+#endif
 
 namespace mongo
 {
 
-	std::string SumHex(const std::string& key)
+	inline std::string SumHex(const std::string& key)
 	{
 		std::string result;
 		std::regex regex1(".");
 		std::string target = help::md5::GetMd5(key);
 		auto begin = std::sregex_iterator(target.begin(), target.end(), regex1);
-		for(auto iter = begin; iter != std::sregex_iterator(); iter++)
+		for (auto iter = begin; iter != std::sregex_iterator(); iter++)
 		{
-			char temp[10] = {0};
+			char temp[10] = { 0 };
 			unsigned char cc = iter->str()[0];
 			result.append(temp, sprintf(temp, "%02x", (int)cc));
 		}
 		return result;
 	}
 
-    std::string SaltPassword(std::string & pwd, std::string salt, int iterations)
-    {
-        salt = salt + '\0' + '\0' + '\0' + '\1';
+	inline std::string SaltPasswordBySha1(const std::string& pwd, std::string salt, int iterations)
+	{
+		salt = salt + '\0' + '\0' + '\0' + '\1';
 
 		std::string output = help::Sha1::GetHMacHash(pwd, salt);
 		std::string inter(output);
-		for(int index = 2; index <= iterations; index++)
+		for (int index = 2; index <= iterations; index++)
 		{
 			inter = help::Sha1::GetHMacHash(pwd, inter);
 			output = help::Sha1::XorString(output, inter);
 		}
-        return output;
-    }
+		return output;
+	}
 
-    void Client::Stop()
-    {
-        //TODO
-    }
+#ifdef __ENABLE_OPEN_SSL__
 
-	bool Client::Start(bool async)
+	inline std::string SaltPasswordBySha256(const std::string& pwd, std::string salt, int iterations)
+	{
+		std::string salted(SHA256_DIGEST_LENGTH, '\0');
+		PKCS5_PBKDF2_HMAC(pwd.c_str(), pwd.size(),
+				(const unsigned char*)salt.c_str(), salt.size(),
+				iterations, EVP_sha256(), SHA256_DIGEST_LENGTH,
+				(unsigned char*)salted.data());
+
+		return salted;
+	}
+
+#endif
+
+	void Client::Stop()
+	{
+		//TODO
+	}
+
+	bool Client::Start()
 	{
 #ifdef ONLY_MAIN_THREAD
 		return this->StartAuthBySha1();
 #else
-		if (!async)
-		{
-			return this->StartAuthBySha1();
-		}
 		custom::ThreadSync<bool> threadSync;
-		Asio::Context & context = this->mSocket->GetContext();
+		Asio::Context& context = this->mSocket->GetContext();
 		asio::post(context, [this, &threadSync]
+		{
+			if (this->Auth(true))
 			{
-				if (this->StartAuthBySha1())
-				{
-					threadSync.SetResult(true);
-					this->StartUpdate(this->mConfig.Ping);
-					return;
-				}
-				threadSync.SetResult(false);
-			});
+				threadSync.SetResult(true);
+				return;
+			}
+			threadSync.SetResult(false);
+		});
 		return threadSync.Wait();
 #endif
 	}
 
-    Client::Client(tcp::Socket * socket, Component * component,
-			MongoConfig config, Asio::Context & io)
-		: tcp::Client(socket, 0), mComponent(component), mConfig(std::move(config)), mMainContext(io)
+	Client::Client(tcp::Socket* socket, Component* component,
+			MongoConfig config, Asio::Context& io)
+			: tcp::Client(socket, 0), mComponent(component), mConfig(std::move(config)), mMainContext(io)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;
 	}
 
-	Client::Client(tcp::Socket * socket, MongoConfig  config, Asio::Context & io)
-		: tcp::Client(socket, 0), mComponent(nullptr), mConfig(std::move(config)), mMainContext(io)
+	Client::Client(tcp::Socket* socket, MongoConfig config, Asio::Context& io)
+			: tcp::Client(socket, 0), mComponent(nullptr), mConfig(std::move(config)), mMainContext(io)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;
@@ -94,65 +110,57 @@ namespace mongo
 	void Client::OnSendMessage(size_t size)
 	{
 		this->ReadLength(sizeof(Head));
-//		if(this->mSendMessages.Size() >= 10)
-//		{
-//			LOG_WARN("mongo cmd count:{}", this->mSendMessages.Size());
-//		}
 	}
 
-	void Client::OnSendMessage(const Asio::Code & code)
+	void Client::OnSendMessage(const Asio::Code& code)
 	{
 		this->Connect();
 	}
 
-    bool Client::Auth(const std::string &user, const std::string &db, const std::string &pwd)
-    {
-        if(pwd.empty())
-        {
-            return true;
-        }
-        std::string nonce = _bson::base64::encode(help::Str::RandomString(8));
-        std::string firstBare = fmt::format("n={0},r={1}", this->mConfig.User, nonce);
+	bool Client::AuthBySha1(const std::string& user, const std::string& db, const std::string& pwd)
+	{
+		std::string nonce = _bson::base64::encode(help::Str::RandomString(8));
+		std::string firstBare = fmt::format("n={0},r={1}", this->mConfig.user, nonce);
 		std::unique_ptr<mongo::Request> request1 = std::make_unique<mongo::Request>();
 
 		std::string payload = _bson::base64::encode(fmt::format("n,,{0}", firstBare));
 
-        request1->header.requestID = 1;
-        request1->collectionName = db + ".$cmd";
-        request1->document.Add("saslStart", 1);
-        request1->document.Add("autoAuthorize", 1);
+		request1->dataBase = db;
+		request1->header.requestID = 1;
+		request1->document.Add("saslStart", 1);
+		request1->document.Add("autoAuthorize", 1);
 
-		request1->document.Add("mechanism", "SCRAM-SHA-1");
+		request1->document.Add("mechanism", mongo::auth::SCRAM_SHA1);
 
-        request1->document.Add("payload", payload);
+		request1->document.Add("payload", payload);
 
-        std::unique_ptr<Response> response1 = this->SyncSendMongoCommand(request1);
-		if(response1 == nullptr || response1->Document() == nullptr)
+		std::unique_ptr<Response> response1 = this->SyncSendMongoCommand(request1);
+		if (response1 == nullptr)
 		{
 			return false;
 		}
 
-        int conversationId = 0;
-        std::string server_first;
-        bson::Reader::Document* document1 = response1->Document();
-        if(!document1->Get("payload", server_first) || !document1->Get("conversationId", conversationId))
-        {
-            return false;
-        }
+		int conversationId = 0;
+		std::string server_first;
+		const bson::Reader::Document & document1 = response1->Document();
+		if (!document1.Get("payload", server_first) || !document1.Get("conversationId", conversationId))
+		{
+			return false;
+		}
 
-        std::string parsedSource = _bson::base64::decode(server_first);
+		std::string parsedSource = _bson::base64::decode(server_first);
 
-        std::vector<std::string> ret;
-        help::Str::Split(parsedSource, ',', ret);
+		std::vector<std::string> ret;
+		help::Str::Split(parsedSource, ',', ret);
 
-        std::string salt(ret[1].c_str() + 2, ret[1].size() - 2);
-        std::string rnonce(ret[0].c_str() + 2, ret[0].size() - 2);
-        int iterations = std::stoi(std::string(ret[2].c_str() + 2, ret[2].size() - 2));
+		std::string salt(ret[1].c_str() + 2, ret[1].size() - 2);
+		std::string rnonce(ret[0].c_str() + 2, ret[0].size() - 2);
+		int iterations = std::stoi(std::string(ret[2].c_str() + 2, ret[2].size() - 2));
 
-        std::string without_proof = "c=biws,r=" + rnonce;
-        std::string pbkdf2_key = SumHex(fmt::format("{0}:mongo:{1}", user, pwd));
-        std::string salted_pass = SaltPassword(pbkdf2_key,
-                                               _bson::base64::decode(salt), iterations);
+		std::string without_proof = "c=biws,r=" + rnonce;
+		std::string pbkdf2_key = SumHex(fmt::format("{0}:mongo:{1}", user, pwd));
+		std::string salted_pass = SaltPasswordBySha1(pbkdf2_key,
+				_bson::base64::decode(salt), iterations);
 
 
 		std::string client_key = help::Sha1::GetHMacHash(salted_pass, "Client Key");
@@ -166,70 +174,207 @@ namespace mongo
 		std::string server_key = help::Sha1::GetHMacHash(salted_pass, "Server Key");
 		std::string server_sig = _bson::base64::encode(help::Sha1::GetHMacHash(server_key, auth_msg));
 
-        std::unique_ptr<mongo::Request> request2 = std::make_unique<mongo::Request>();
+		std::unique_ptr<mongo::Request> request2 = std::make_unique<mongo::Request>();
 		{
+			request2->dataBase = db;
 			request2->header.requestID = 1;
-			request2->collectionName = db + ".$cmd";
-
 			request2->document.Add("saslContinue", 1);
 			request2->document.Add("conversationId", conversationId);
 			request2->document.Add("payload", client_final);
 		}
-        std::unique_ptr<Response> response2 = this->SyncSendMongoCommand(request2);
-        if(response2 == nullptr || response2->Document() == nullptr)
+		std::unique_ptr<Response> response2 = this->SyncSendMongoCommand(request2);
+		if (response2 == nullptr)
 		{
 			return false;
 		}
-        parsedSource.clear();
-        bson::Reader::Document * document2 = response2->Document();
-        if(!document2->Get("payload", parsedSource))
-        {
-#ifdef __DEBUG__
-			CONSOLE_LOG_ERROR("{}", response2->ToJson());
-#endif
-            return false;
-        }
-        bool done = false;
-        if(document2->Get("done", done) && done)
-        {
-            return true;
-        }
-        std::unique_ptr<Request> request3 = std::make_unique<Request>();
+		parsedSource.clear();
+		const bson::Reader::Document & document2 = response2->Document();
+		if (!document2.Get("payload", parsedSource))
 		{
+#ifdef __DEBUG__
+			CONSOLE_LOG_ERROR("{}", response2->ToString());
+#endif
+			return false;
+		}
+		bool done = false;
+		if (document2.Get("done", done) && done)
+		{
+			return true;
+		}
+		std::unique_ptr<Request> request3 = std::make_unique<Request>();
+		{
+			request3->dataBase = db;
 			request3->header.requestID = 1;
-			request3->collectionName = db + ".$cmd";
 			request3->document.Add("saslContinue", 1);
 			request3->document.Add("conversationId", conversationId);
 			request3->document.Add("payload", "");
 		}
 
-        std::unique_ptr<Response> response3 = this->SyncSendMongoCommand(request3);
+		std::unique_ptr<Response> response3 = this->SyncSendMongoCommand(request3);
 
-		if(response3 == nullptr || response3->Document() == nullptr)
+		if (response3 == nullptr)
 		{
 			return false;
 		}
 
-        bson::Reader::Document * document3 = response3->Document();
-        if(document3->IsOk() && document3->Get("done", done) && done)
+		const bson::Reader::Document & document3 = response3->Document();
+		if (document3.IsOk() && document3.Get("done", done) && done)
 		{
 			return true;
 		}
 		return false;
-    }
+	}
+
+#ifdef __ENABLE_OPEN_SSL__
+
+	bool Client::AuthBySha256(const std::string& user, const std::string& db, const std::string& pwd)
+	{
+		std::string nonce = _bson::base64::encode(help::Str::RandomString(16));
+		std::string firstBare = fmt::format("n={0},r={1}", user, nonce);
+		std::unique_ptr<mongo::Request> request1 = std::make_unique<mongo::Request>();
+
+		std::string payload = _bson::base64::encode(fmt::format("n,,{0}", firstBare));
+
+		request1->dataBase = db;
+		request1->header.requestID = 1;
+		request1->document.Add("saslStart", 1);
+		request1->document.Add("autoAuthorize", 1);
+		request1->document.Add("mechanism", "SCRAM-SHA-256");
+		request1->document.Add("payload", payload);
+
+		std::unique_ptr<Response> response1 = this->SyncSendMongoCommand(request1);
+		if (response1 == nullptr)
+		{
+			CONSOLE_LOG_ERROR("saslStart failed: response is null");
+			return false;
+		}
+
+		int conversationId = 0;
+		std::string server_first;
+		const bson::Reader::Document & document1 = response1->Document();
+		if (!document1.Get("payload", server_first) || !document1.Get("conversationId", conversationId))
+		{
+			CONSOLE_LOG_ERROR("{}", response1->ToString());
+			return false;
+		}
+
+		std::string parsedSource = _bson::base64::decode(server_first);
+		std::vector<std::string> ret;
+		help::Str::Split(parsedSource, ',', ret);
+		if (ret.size() < 3)
+		{
+			CONSOLE_LOG_ERROR("{}", parsedSource);
+			return false;
+		}
+
+		std::string salt(ret[1].c_str() + 2, ret[1].size() - 2);
+		std::string rnonce(ret[0].c_str() + 2, ret[0].size() - 2);
+		int iterations = std::stoi(std::string(ret[2].c_str() + 2, ret[2].size() - 2));
+
+		if (rnonce.find(nonce) != 0)
+		{
+			CONSOLE_LOG_ERROR("Server nonce {} does not start with client nonce {}", rnonce, nonce);
+			return false;
+		}
+
+		std::string without_proof = "c=biws,r=" + rnonce; // biws = base64("n,,")
+		std::string salted_pass = SaltPasswordBySha256(pwd, _bson::base64::decode(salt), iterations);
+
+		std::string auth_msg = firstBare + ',' + parsedSource + ',' + without_proof;
+
+		unsigned char client_key[SHA256_DIGEST_LENGTH];
+		HMAC(EVP_sha256(), salted_pass.c_str(), salted_pass.size(),
+				(const unsigned char*)"Client Key", strlen("Client Key"), client_key, nullptr);
+
+		unsigned char server_key[SHA256_DIGEST_LENGTH];
+		HMAC(EVP_sha256(), salted_pass.c_str(), salted_pass.size(),
+				(const unsigned char*)"Server Key", strlen("Server Key"), server_key, nullptr);
+
+		std::string stored_key(SHA256_DIGEST_LENGTH, '\0');
+		SHA256(client_key, SHA256_DIGEST_LENGTH, (unsigned char*)stored_key.data());
+
+		std::string client_sig(SHA256_DIGEST_LENGTH, '\0');
+		HMAC(EVP_sha256(), stored_key.c_str(), stored_key.size(),
+				(const unsigned char*)auth_msg.c_str(), auth_msg.size(),
+				(unsigned char*)client_sig.data(), nullptr);
+
+		std::string client_key_xor_sig = help::Sha1::XorString(std::string((char*)client_key, SHA256_DIGEST_LENGTH),
+				client_sig);
+		std::string client_proof = "p=" + _bson::base64::encode(client_key_xor_sig);
+		std::string client_final = _bson::base64::encode(without_proof + "," + client_proof);
+
+		std::unique_ptr<mongo::Request> request2 = std::make_unique<mongo::Request>();
+		{
+			request2->dataBase = db;
+			request2->header.requestID = 1;
+			request2->document.Add("saslContinue", 1);
+			request2->document.Add("conversationId", conversationId);
+			request2->document.Add("payload", client_final);
+		}
+
+		std::unique_ptr<Response> response2 = this->SyncSendMongoCommand(request2);
+		if (response2 == nullptr)
+		{
+			CONSOLE_LOG_ERROR("saslContinue failed: response is null");
+			return false;
+		}
+
+		std::string parsedSource2;
+		const bson::Reader::Document & document2 = response2->Document();
+		if (!document2.Get("payload", parsedSource2))
+		{
+#ifdef __DEBUG__
+			CONSOLE_LOG_ERROR("saslContinue response: {}", response2->ToString());
+#endif
+			return false;
+		}
+
+		bool done = false;
+		if (document2.Get("done", done) && done)
+		{
+			return true;
+		}
+
+		std::unique_ptr<Request> request3 = std::make_unique<Request>();
+		{
+			request3->dataBase = db;
+			request3->header.requestID = 1;
+			request3->document.Add("saslContinue", 1);
+			request3->document.Add("conversationId", conversationId);
+			request3->document.Add("payload", "");
+		}
+
+		std::unique_ptr<Response> response3 = this->SyncSendMongoCommand(request3);
+		if (response3 == nullptr)
+		{
+			CONSOLE_LOG_ERROR("Final saslContinue failed: response is null");
+			return false;
+		}
+
+		const bson::Reader::Document & document3 = response3->Document();
+		if (document3.IsOk() && document3.Get("done", done) && done)
+		{
+			return true;
+		}
+#ifdef __DEBUG__
+		CONSOLE_LOG_ERROR("Final response: {}", response3->ToString());
+#endif
+		return false;
+	}
+
+#endif
 
 	void Client::OnReadError(const Asio::Code& code)
 	{
 		this->Connect(3);
 	}
 
-    void Client::OnReceiveMessage(std::istream & is, size_t size, const Asio::Code &)
+	void Client::OnReceiveMessage(std::istream& is, size_t size, const Asio::Code&)
 	{
 		if (this->mResponse == nullptr)
 		{
-			this->mResponse = std::make_unique<mongo::Response>();
+			this->mResponse = std::make_unique<mongo::Response>(this->mRequest->cmd);
 		}
-
 		int length = this->mResponse->OnRecvMessage(is, size);
 		if (length > 0)
 		{
@@ -246,7 +391,7 @@ namespace mongo
 		if (this->mRequest != nullptr)
 		{
 			int id = this->mRequest->header.requestID;
-			this->mResponse = std::make_unique<mongo::Response>(id);
+			this->mResponse = std::make_unique<mongo::Response>(id, this->mRequest->cmd);
 			this->OnResponse(code, std::move(this->mRequest), std::move(this->mResponse));
 		}
 	}
@@ -255,31 +400,22 @@ namespace mongo
 	{
 		this->StopTimer();
 		this->ClearBuffer();
-		if (this->mComponent == nullptr || request->header.requestID == 0)
+		if (this->mComponent == nullptr)
 		{
 			this->mRequest.reset();
 			this->mResponse.reset();
 			return;
 		}
-		if(response->Document() != nullptr)
-		{
-			std::string error;
-			response->SetCode(code);
-			if(response->Document()->Get("errmsg", error))
-			{
-				response->SetCode(XCode::UnKnowPacket);
-			}
-		}
-		if(code != XCode::Ok && request->GetRpcId() != response->RpcId())
+		if (code != XCode::Ok && request->GetRpcId() != response->RpcId())
 		{
 			response->SetRpcId(request->GetRpcId());
 		}
-		int id = this->mConfig.Index;
+		int id = this->mConfig.index;
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(id, request.release(), response.release());
 #else
-		mongo::Request * req = request.release();
-		mongo::Response * resp = response.release();
+		mongo::Request* req = request.release();
+		mongo::Response* resp = response.release();
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
 		asio::post(this->mMainContext, [this, self, req, id, resp]
 		{
@@ -295,7 +431,7 @@ namespace mongo
 		this->mRequest = std::move(request);
 		this->Write(*this->mRequest);
 #else
-		Asio::Context & context = this->mSocket->GetContext();
+		Asio::Context& context = this->mSocket->GetContext();
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
 		asio::post(context, [this, self, data = request.release()]
 		{
@@ -307,12 +443,12 @@ namespace mongo
 
 	bool Client::SyncSend(const std::unique_ptr<Request>& request, mongo::Response& response)
 	{
-		if(!this->SendSync(*request))
+		if (!this->SendSync(*request))
 		{
 			return false;
 		}
 		size_t readSize = 0;
-		if(!this->RecvSync(sizeof(Head), readSize))
+		if (!this->RecvSync(sizeof(Head), readSize))
 		{
 			return false;
 		}
@@ -332,8 +468,8 @@ namespace mongo
 	{
 		custom::ThreadSync<bool> threadSync;
 		std::unique_ptr<mongo::Response> response;
-		Asio::Socket & sock = this->mSocket->Get();
-		const Asio::Executor & executor = sock.get_executor();
+		Asio::Socket& sock = this->mSocket->Get();
+		const Asio::Executor& executor = sock.get_executor();
 		asio::post(executor, [this, &request, &response, &threadSync]
 		{
 			response = this->SyncSendMongoCommand(request);
@@ -345,22 +481,22 @@ namespace mongo
 
 	std::unique_ptr<Response> Client::SyncSendMongoCommand(const std::unique_ptr<Request>& request)
 	{
-		if(!this->SendSync(*request))
+		if (!this->SendSync(*request))
 		{
 			return nullptr;
 		}
-		return this->ReadResponse();
+		return this->ReadResponse(request->cmd);
 	}
 
-	std::unique_ptr<Response> Client::ReadResponse()
+	std::unique_ptr<Response> Client::ReadResponse(const std::string & cmd)
 	{
 		size_t readSize = 0;
-		if(!this->RecvSync(sizeof(Head), readSize))
+		if (!this->RecvSync(sizeof(Head), readSize))
 		{
 			return nullptr;
 		}
 		std::istream readStream1(&this->mRecvBuffer);
-		std::unique_ptr<Response> response = std::make_unique<Response>();
+		std::unique_ptr<Response> response = std::make_unique<Response>(cmd);
 		{
 			int count = response->OnRecvMessage(readStream1, readSize);
 			if (!this->RecvSync(count, readSize))
@@ -372,48 +508,60 @@ namespace mongo
 		return response;
 	}
 
-	void Client::OnConnect(const Asio::Code & code, int count)
+	void Client::OnConnect(const Asio::Code& code, int count)
 	{
-		if(code.value() != Asio::OK)
+		if (code.value() != Asio::OK)
 		{
 			this->OnResponse(XCode::NetConnectFailure);
 			return;
 		}
-		this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
-		this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
-		if(!this->Auth(this->mConfig.User, this->mConfig.DB, this->mConfig.Password))
+		if(!this->Auth(false))
 		{
-			if(!this->Auth(this->mConfig.User, "admin", this->mConfig.Password))
-			{
-				this->OnResponse(XCode::NetWorkError);
-				return;
-			}
+			return;
 		}
 
 		this->ClearSendStream();
 		this->ClearRecvStream();
-		if(this->mRequest != nullptr)
+		if (this->mRequest != nullptr)
 		{
 			this->Write(*this->mRequest);
 		}
 	}
 
-	bool Client::StartAuthBySha1()
+	bool Client::Auth(bool connect)
 	{
-		Asio::Code code;
-		if (!this->ConnectSync(code))
+		if(connect)
 		{
-			const std::string& addr = this->mConfig.Address;
-			CONSOLE_LOG_ERROR("connect mongo server {} fail {}", addr, code.message());
-			return false;
+			Asio::Code code;
+			if (!this->ConnectSync(code))
+			{
+				const std::string& addr = this->mConfig.address;
+				CONSOLE_LOG_ERROR("connect mongo server {} fail {}", addr, code.message());
+				return false;
+			}
 		}
-		this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
-		this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
-		if(!this->Auth(this->mConfig.User, this->mConfig.DB, this->mConfig.Password))
+		this->SetNoDelayAndKeepAlive();
+		if (this->mConfig.password.empty())
 		{
-			return this->Auth(this->mConfig.User, "admin", this->mConfig.Password);
+			return true;
 		}
-		return true;
+		if (this->mConfig.mechanism == mongo::auth::SCRAM_SHA1)
+		{
+			if (!this->AuthBySha1(this->mConfig.user, this->mConfig.db, this->mConfig.password))
+			{
+				return this->AuthBySha1(this->mConfig.user, "admin", this->mConfig.password);
+			}
+		}
+#ifdef __ENABLE_OPEN_SSL__
+		else if (this->mConfig.mechanism == mongo::auth::SCRAM_SHA256)
+		{
+			if (!this->AuthBySha256(this->mConfig.user, this->mConfig.db, this->mConfig.password))
+			{
+				return this->AuthBySha256(this->mConfig.user, "admin", this->mConfig.password);
+			}
+		}
+#endif
+		return false;
 	}
 
 }

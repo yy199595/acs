@@ -6,6 +6,8 @@
 #include"Util/Tools/TimeHelper.h"
 #include"Gate/Service/GateSystem.h"
 #include "Entity/Component/ActorComponent.h"
+#include "Common/Entity/Player.h"
+
 constexpr int CHAT_TYPE_WORLD = 1;
 constexpr int CHAT_TYPE_PRIVATE = 2;
 constexpr int CHAT_TYPE_GUILD = 3;
@@ -96,7 +98,7 @@ namespace acs
 	int ChatSystem::OnChat(long long playerId, const c2s::chat::request& request)
 	{
 		long long lastTime = 0;
-		Player * player = this->mActor->GetPlayer(playerId);
+		Player * player = this->mActor->GetActor<Player>(playerId);
 		if(player == nullptr)
 		{
 			return XCode::NotFindUser;
@@ -122,7 +124,7 @@ namespace acs
 			case CHAT_TYPE_PRIVATE:
 			{
 				long long targetId = request.user_id();
-				Player * targetPlayer = this->mActor->GetPlayer(targetId);
+				Player * targetPlayer = this->mActor->GetActor<Player>(targetId);
 				if(targetPlayer != nullptr)
 				{
 					targetPlayer->Send(func, message);

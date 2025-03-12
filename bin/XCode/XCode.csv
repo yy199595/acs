@@ -80,3 +80,7 @@ CreateOrderFrequently,创建订单太过于频繁
 OrderAlreadyRefund,订单已经退款
 RequestWxApiError,请求微信api错误
 PermissionDenied,权限不足
+ConnectDatabaseFail,连接数据库失败
+CreateDatabaseFail,创建数据库失败
+AuthPluginNonsupport,验证方式不支持
+PasswordAuthFail,密码验证失败

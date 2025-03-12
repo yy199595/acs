@@ -2,15 +2,14 @@
     "sub": {
         "ping": 0,
         "debug": false,
-        "passwd": "199595yjz.",
+        "password": "199595yjz.",
         "address": "${db}:6379"
     },
     "redis": {
         "ping": 15,
-        "index": 0,
         "count": 1,
         "debug": false,
-        "passwd": "199595yjz.",
+        "password": "199595yjz.",
         "address": "${db}:6379",
         "script": "${WORK_DIR}/config/db/redis"
     },
@@ -18,20 +17,55 @@
         "ping": 30,
         "count": 1,
         "db": "yjz",
-        "address": "127.0.0.1:3306",
+        "debug" : true,
+        "address": "${db}:3306",
         "user": "debian-sys-maint",
-        "passwd": "13oc5QKIaY3nFagc",
-        "script": "${WORK_DIR}/sql/mysql.sql"
+        "password": "13oc5QKIaY3nFagc",
+        "script": "${WORK_DIR}/sql/mysql.sql",
+        "explain" : {
+            "open" : false,
+            "command" : [
+                "SELECT",
+                "DELETE"
+            ]
+        }
     },
+    "pgsql": {
+        "ping": 30,
+        "count": 1,
+        "db": "yy",
+        "debug" : true,
+        "user": "postgres",
+        "address": "${db}:5432",
+        "password": "199595yjz.",
+        "explain" : {
+            "open" : false,
+            "command" : [
+                "SELECT",
+                "DELETE"
+            ]
+        }
+    },
+
     "mongo": {
         "ping": 15,
         "count": 1,
-        "debug": false,
+        "debug": true,
         "db": "yjz",
         "user": "root",
-        "passwd": "",
+        "password": "",
         "address": "${db}:27017",
-        "log": "${WORK_DIR}/mongo"
+        "log": "${WORK_DIR}/mongo",
+        "mechanism" : "SCRAM-SHA-1",
+        "explain" : {
+            "open" : false,
+            "command" : [
+                "find",
+                "count",
+                "update",
+                "delete"
+            ]
+        }
     },
     "sqlite": {
         "db": "yy",

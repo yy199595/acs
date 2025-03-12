@@ -26,6 +26,13 @@ function SqlHelper.InsertSql(name, tab)
     return string_format("INSERT INTO %s (%s) VALUES (%s);", name, str1, str2)
 end
 
+function SqlHelper.SetIndex(tab, field, unique)
+    if not unique then
+        return string_format("CREATE INDEX %s ON %s (%s);", field, tab, field)
+    end
+    return string_format("CREATE UNIQUE INDEX %s ON %s (%s);", field, tab, field)
+end
+
 function SqlHelper.ReplaceSql(name, tab)
     assert(type(name) == "string")
     assert(type(tab) == "table")
@@ -62,14 +69,14 @@ function SqlHelper.AddFieldSql(name, key, val)
 end
 
 function SqlHelper.AddAutoKey(name, key)
-   return "ALTER TABLE `%s` AUTO_increment PRIMARY KEY;"
+   return  string_format("ALTER TABLE `%s` AUTO_increment PRIMARY KEY;", name, key)
 end
 
 function SqlHelper.AddPrimaryKeySql(name, key)
     return string_format("ALTER TABLE %s ADD PRIMARY key (`%s`)", name, key)
 end
 
-function SqlHelper.UpdateSql(name, update, where)
+function SqlHelper.UpdateSql(name, update, where, limit)
     assert(type(name) == "string")
     assert(type(where) == "table")
     assert(type(update) == "table")
@@ -91,7 +98,10 @@ function SqlHelper.UpdateSql(name, update, where)
         end
     end
     local whereString = table_concat(wheres, ",")
-    return string_format("UPDATE %s SET %s %s;", name, updateString, whereString)
+    if not limit or limit <= 0 then
+        return string_format("UPDATE %s SET %s %s;", name, updateString, whereString)
+    end
+    return string_format("UPDATE %s SET %s %s LIMIT %s;", name, updateString, whereString, limit)
 end
 
 function SqlHelper.QuerySql(name, fields, where, limit)

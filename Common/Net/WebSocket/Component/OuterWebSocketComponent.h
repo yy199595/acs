@@ -36,7 +36,7 @@ namespace acs
 		void OnPlayerLogout(long long userId, int sockId);
 	private:
 		unsigned int mSumCount;
-		class GateComponent * mGate;
+		rpc::IOuterMessage * mOuter;
 		math::NumberPool<int> mClientPool;
 		std::unordered_map<int, std::shared_ptr<ws::Session>> mSessions;
 	};

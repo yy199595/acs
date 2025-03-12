@@ -9,55 +9,48 @@
         "rpc" : "InnerTcpComponent",
         "gate" : "OuterTcpComponent",
         "master" : "HttpWebComponent",
-        "ws" : "InnerWebSocketComponent"
+        "ws" : "InnerWebSocketComponent",
+        "telnet" : "TelnetComponent"
     },
     "listen" : {
         "rpc" : {
-            "max_conn" : 512,
-            "protocol" : "tcp",
-            "address": "127.0.0.1:${rpc}",
-            "component" : "InnerTcpComponent"
+            "component" : "InnerTcpComponent",
+            "address": "tcp://127.0.0.1:${rpc}"
         },
         "gate" : {
-            "max_conn" : 1024,
-            "protocol" : "tcp",
-            "address": "127.0.0.1:${gate}",
-            "component" : "OuterTcpComponent"
+            "component" : "OuterTcpComponent",
+            "address": "tcp://127.0.0.1:${gate}"
         },
         "http" : {
-            "max_conn" : 256,
-            "protocol" : "tcp",
-            "address": "127.0.0.1:${http}",
-            "component" : "HttpWebComponent"
+            "component" : "HttpWebComponent",
+            "address": "tcp://127.0.0.1:${http}"
         },
         "https" : {
-            "max_conn" : 256,
-            "protocol" : "tcp",
-            "address": "127.0.0.1:${https}",
             "component" : "HttpWebComponent",
+            "address": "https://127.0.0.1:${https}",
             "key": "${WORK_DIR}/ssl/www.huanhu999.com.key",
             "cert": "${WORK_DIR}/ssl/www.huanhu999.com.pem"
         },
         "master" : {
-            "max_conn" : 128,
-            "protocol" : "tcp",
-            "address": "127.0.0.1:${master}",
-            "component" : "HttpWebComponent"
+            "component" : "HttpWebComponent",
+            "address": "tcp://127.0.0.1:${master}"
         },
         "udp" : {
-            "protocol" : "udp",
-            "address": "127.0.0.1:${udp}",
-            "component" : "UdpComponent"
+            "component" : "UdpComponent",
+            "address": "udp://127.0.0.1:${udp}"
         },
         "kcp" : {
-            "protocol" : "udp",
-            "port": "127.0.0.1:${kcp}",
+            "port": "udp://127.0.0.1:${kcp}",
             "component" : "KcpComponent"
         },
         "ws" : {
-            "protocol" : "tcp",
-            "port": "127.0.0.1:${ws}",
+            "port": "tcp://127.0.0.1:${ws}",
             "component" : "InnerWebSocketComponent"
+        },
+        "telnet" : {
+            "max_conn" : 10,
+            "component" : "TelnetComponent",
+            "address": "tcp://127.0.0.1:${telnet}"
         }
     },
     "connect": {
@@ -115,8 +108,10 @@
         "main" : "${lua}"
     },
     "ssl": {
-        "client": {
-            "pem": "${WORK_DIR}/ssl/ca.pem"
+        "https": {
+            "ca": "${WORK_DIR}/ssl/ca.pem",
+            "client.pem" : "",
+            "client.key" : ""
         }
     },
     "whcbqhn": {
@@ -126,8 +121,5 @@
     "quick" : {
         "md5_key" : "",
         "callback_key": ""
-    },
-    "deepseek" : {
-        "api-key" : "sk-db47efd147ec4a3bb8538ae5ba76e323"
     }
 }

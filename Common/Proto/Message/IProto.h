@@ -143,42 +143,33 @@ namespace tcp
 			value = 0;
 
 			// 判断当前机器的字节序
-			bool isLittle = IsLittleEndian();
 			if (endian) { // 数据是大端字节序
 				for (size_t i = 0; i < size; ++i) {
 					value |= (static_cast<T>(static_cast<unsigned char>(buffer[i])) << ((size - 1 - i) * 8));
 				}
 
-				// 如果当前机器是小端字节序，则需要将数据转换为小端
-				if (isLittle) {
-					T swappedValue = 0;
-					for (size_t i = 0; i < size; ++i) {
-						swappedValue |= ((value >> (i * 8)) & 0xFF) << ((size - 1 - i) * 8);
-					}
-					value = swappedValue;
-				}
 			} else { // 数据是小端字节序
 				for (size_t i = 0; i < size; ++i) {
 					value |= (static_cast<T>(static_cast<unsigned char>(buffer[i])) << (i * 8));
-				}
-
-				// 如果当前机器是大端字节序，则需要将数据转换为大端
-				if (!isLittle) {
-					T swappedValue = 0;
-					for (size_t i = 0; i < size; ++i) {
-						swappedValue |= ((value >> (i * 8)) & 0xFF) << ((size - 1 - i) * 8);
-					}
-					value = swappedValue;
 				}
 			}
 		}
 
 		template<typename T>
-		inline void Write(char * buffer, const T&value)
+		inline void Write(char * buffer, const T&value, bool endian = true)
 		{
 			size_t size = sizeof(T); // 获取类型 T 的字节大小
-			for (size_t i = 0; i < size; ++i) {
-				buffer[i] = static_cast<char>((value >> ((size - 1 - i) * 8)) & 0xFF);
+			if(endian)
+			{
+				for (size_t i = 0; i < size; ++i) {
+					buffer[i] = static_cast<char>((value >> ((size - 1 - i) * 8)) & 0xFF);
+				}
+			}
+			else
+			{
+				for (size_t i = 0; i < size; ++i) {
+					buffer[i] = static_cast<char>((value >> (i * 8)) & 0xFF);
+				}
 			}
 		}
 

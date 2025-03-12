@@ -25,17 +25,15 @@ namespace acs
 		long long nowTime = help::Time::NowSec();
 		const std::string name = fmt::format("delay_queue:{}", key);
 		std::unique_ptr<redis::Response> response = this->mRedis->Run("ZRANGEBYSCORE", name, 0, nowTime);
-		if(response == nullptr || response->HasError())
+		if(response == nullptr || response->element.type != redis::type::Array)
 		{
 			return std::vector<std::string>();
 		}
-		size_t index = 0;
-		std::string value;
 		std::vector<std::string> result;
-		while(response->GetValue(index, value))
+		result.reserve(response->element.list.size());
+		for(const redis::Element & element : response->element.list)
 		{
-			index++;
-			result.emplace_back(value);
+			result.emplace_back(element.message);
 		}
 		return result;
 	}
@@ -48,7 +46,7 @@ namespace acs
 		{
 			return XCode::Failure;
 		}
-		return response->GetNumber() > 0;
+		return response->element.number > 0;
 	}
 
 	int DelayQueueComponent::Del(const std::string& key, const std::vector<std::string>& members)
@@ -72,7 +70,7 @@ namespace acs
 		{
 			return XCode::Failure;
 		}
-		return response->GetNumber() > 0 ? XCode::Ok : XCode::Failure;
+		return response->element.number > 0 ? XCode::Ok : XCode::Failure;
 	}
 
 	int DelayQueueComponent::Add(const std::string& key, const std::string& value, int second)
@@ -84,7 +82,7 @@ namespace acs
 		{
 			return XCode::Failure;
 		}
-		return response->GetNumber() > 0 ? XCode::Ok : XCode::Failure;
+		return response->element.number > 0 ? XCode::Ok : XCode::Failure;
 	}
 
 	int DelayQueueComponent::Add(const std::string& key, const std::vector<std::string>& value, int second)
@@ -110,7 +108,7 @@ namespace acs
 		{
 			return XCode::Failure;
 		}
-		return response->GetNumber() > 0 ? XCode::Ok : XCode::Failure;
+		return response->element.number > 0 ? XCode::Ok : XCode::Failure;
 	}
 
 }

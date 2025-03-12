@@ -1,41 +1,41 @@
 {
     "/upload/oss": {
-        "Type": "GET",
-        "Auth": true,
-        "Bind": "FileUpload.Oss",
-        "ContentType": "multipart/form-data",
-        "Desc": "获取一个30秒的oss上传凭证",
-        "Request": {
+        "type": "GET",
+        "auth": true,
+        "bind": "FileUpload.Oss",
+        "content-type": "multipart/form-data",
+        "desc": "获取一个30秒的oss上传凭证",
+        "request": {
             "type": 1
         }
     },
     "/upload/code": {
-        "Type": "POST",
-        "Auth": true,
-        "Bind": "FileUpload.Code",
-        "ContentType": "multipart/form-data",
-        "Desc": "上传微信二维码"
+        "type": "POST",
+        "auth": true,
+        "bind": "FileUpload.Code",
+        "content-type": "multipart/form-data",
+        "desc": "上传微信二维码"
     },
     "/upload/club": {
-        "Type": "POST",
-        "Auth": true,
-        "Bind": "FileUpload.Club",
-        "ContentType": "multipart/form-data",
-        "Desc": "上传俱乐部头像"
+        "type": "POST",
+        "auth": true,
+        "bind": "FileUpload.Club",
+        "content-type": "multipart/form-data",
+        "desc": "上传俱乐部头像"
     },
     "/upload/icon": {
-        "Type": "POST",
-        "Auth": true,
-        "Bind": "FileUpload.Icon",
-        "ContentType": "multipart/form-data",
-        "Desc": "上传用户头像"
+        "type": "POST",
+        "auth": true,
+        "bind": "FileUpload.Icon",
+        "content-type": "multipart/form-data",
+        "desc": "上传用户头像"
     },
     "/upload/file": {
-        "Type": "POST",
-        "Auth": false,
-        "Permiss": 5,
-        "Bind": "FileUpload.File",
-        "ContentType": "multipart/form-data",
-        "Desc": "上传活动图片资源等"
+        "type": "POST",
+        "auth": false,
+        "permission": 5,
+        "bind": "FileUpload.File",
+        "content-type": "multipart/form-data",
+        "desc": "上传活动图片资源等"
     }
 }

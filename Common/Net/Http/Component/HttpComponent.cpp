@@ -4,7 +4,7 @@
 #include"HttpComponent.h"
 #include"XCode/XCode.h"
 #include"Server/Component/ThreadComponent.h"
-#include"Http/Client/Client.h"
+#include"Http/Client/HttpClient.h"
 #include"Http/Task/HttpTask.h"
 #include"Entity/Actor/App.h"
 #include"Lua/Engine/ModuleClass.h"
@@ -16,8 +16,14 @@ namespace acs
 {
 
 	HttpComponent::HttpComponent()
+#ifdef __ENABLE_OPEN_SSL__
+			: mSslContext(asio::ssl::context::sslv23)
+#endif
 	{
 		this->mNetComponent = nullptr;
+#ifdef __ENABLE_OPEN_SSL__
+		REGISTER_JSON_CLASS_FIELD(ssl::Config, pem);
+#endif
 	}
 
 
@@ -27,29 +33,31 @@ namespace acs
 			ccModule.Open("net.http", lua::lib::luaopen_lhttp);
 		});
 #ifdef __ENABLE_OPEN_SSL__
-		std::unique_ptr<json::r::Value> jsonObj;
-		std::unique_ptr<json::r::Value> jsonValue;
-		if(!ServerConfig::Inst()->Get("ssl", jsonObj))
+		ssl::Config config;
+		asio::error_code code;
+		if(ServerConfig::Inst()->Get("ssl", config))
 		{
-			LOG_ERROR("not config ssl field");
+			if(this->mSslContext.load_verify_file(config.pem, code).value() != Asio::OK)
+			{
+				LOG_ERROR("load verify file => {}", code.message());
+				return false;
+			}
+			LOG_DEBUG("https use pem => {}", config.pem);
+			return true;
+		}
+		if(this->mSslContext.set_default_verify_paths(code).value() != Asio::OK)
+		{
+			LOG_ERROR("load default verify file => {}", code.message());
 			return false;
 		}
-		if(!jsonObj->Get("client", jsonValue))
-		{
-			LOG_ERROR("not config client ssl");
-			return false;
-		}
-		Asio::Code code;
-		jsonValue->Get("pem", this->mPemPath);
-		return code.value() == Asio::OK;
-#else
-		return true;
+		LOG_DEBUG("https use system default");
 #endif
+		return true;
 	}
 
 	bool HttpComponent::LateAwake()
 	{
-        this->mNetComponent = this->GetComponent<ThreadComponent>();
+		this->mNetComponent = this->GetComponent<ThreadComponent>();
 		return true;
 	}
 
@@ -59,30 +67,29 @@ namespace acs
 #ifdef __ENABLE_OPEN_SSL__
 		if(request->IsHttps())
 		{
+			asio::ssl::context * context = &this->mSslContext;
 			const std::string & path = request->GetVerifyFile();
-			const std::string & fullPath = path.empty() ? this->mPemPath : path;
-			auto iter = this->mSslContexts.find(fullPath);
-			if(iter == this->mSslContexts.end())
+			if(!path.empty())
 			{
-				Asio::Code code;
-				//context->set_options(asio::ssl::context::default_workarounds | asio::ssl::context::no_sslv2 |asio::ssl::context::single_dh_use);
+				auto iter = this->mSslContexts.find(path);
+				if(iter != this->mSslContexts.end())
 				{
-					std::unique_ptr<asio::ssl::context> context = std::make_unique<asio::ssl::context>(asio::ssl::context::sslv23);
-					//context->set_verify_mode(asio::ssl::verify_none);
-					context->load_verify_file(fullPath, code);
-					if(code.value() != Asio::OK)
+					context = iter->second;
+				}
+				else
+				{
+					Asio::Code code;
+					context = new asio::ssl::context(asio::ssl::context::sslv23);
+					if (context->load_verify_file(path, code).value() != Asio::OK)
 					{
-						LOG_ERROR("load ssh : {}", fullPath);
+						delete context;
+						LOG_ERROR("load ssh : {}", path);
 						return nullptr;
 					}
-					socketProxy = this->mNetComponent->CreateSocket(*context);
-					this->mSslContexts.emplace(fullPath, std::move(context));
+					this->mSslContexts.emplace(path, context);
 				}
 			}
-			else
-			{
-				socketProxy = this->mNetComponent->CreateSocket(*iter->second);
-			}
+			socketProxy = this->mNetComponent->CreateSocket(*context);
 		}
 		else
 		{
@@ -92,11 +99,7 @@ namespace acs
 		socketProxy = this->mNetComponent->CreateSocket();
 #endif
 		Asio::Context & main = this->mApp->GetContext();
-		std::shared_ptr<http::Client> httpClient = std::make_shared<http::Client>(this, main);
-		{
-			httpClient->SetSocket(socketProxy);
-		}
-		return httpClient;
+		return std::make_shared<http::Client>(this, socketProxy, main);
 	}
 
 	std::unique_ptr<http::Response> HttpComponent::Get(const std::string& url, int second)
@@ -134,15 +137,16 @@ namespace acs
 #endif
 		int rpcId = this->BuildRpcId();
 		request->Header().SetKeepAlive(false);
-		const http::Url & url = request->GetUrl();
+		const http::Url& url = request->GetUrl();
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 		std::shared_ptr<http::Client> httpAsyncClient = this->CreateClient(request.get());
-		//LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
+		if (httpAsyncClient == nullptr)
 		{
-			this->mUseClients.Add(rpcId, httpAsyncClient);
-			this->AddTask(new HttpCallbackTask(rpcId, cb));
-			httpAsyncClient->Do(std::move(request), std::move(response), rpcId);
+			return XCode::Failure;
 		}
+		this->mUseClients.Add(rpcId, httpAsyncClient);
+		this->AddTask(new HttpCallbackTask(rpcId, cb));
+		httpAsyncClient->Do(std::move(request), std::move(response), rpcId);
 		return XCode::Ok;
 	}
 
@@ -159,11 +163,12 @@ namespace acs
 		rpcId = this->BuildRpcId();
 		request->Header().SetKeepAlive(false);
 		std::shared_ptr<http::Client> httpAsyncClient = this->CreateClient(request.get());
-		//LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
+		if (httpAsyncClient == nullptr)
 		{
-			this->mUseClients.Add(rpcId, httpAsyncClient);
-			httpAsyncClient->Do(std::move(request), std::move(response), rpcId);
+			return XCode::Failure;
 		}
+		this->mUseClients.Add(rpcId, httpAsyncClient);
+		httpAsyncClient->Do(std::move(request), std::move(response), rpcId);
 		return XCode::Ok;
 	}
 

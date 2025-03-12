@@ -44,7 +44,7 @@ namespace acs
 	private:
 		int mWaitCount;
 		int mMaxConnectCount;
-		class GateComponent * mGate;
+		rpc::IOuterMessage * mOuter;
 		math::NumberPool<int> mSocketPool;
 		custom::Queue<rpc::Message *> mBroadCastMessages; //广播消息
 		std::unordered_map<int, std::shared_ptr<rpc::OuterTcpClient>> mGateClientMap;

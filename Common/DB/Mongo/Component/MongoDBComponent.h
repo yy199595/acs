@@ -51,32 +51,35 @@ namespace acs
 		int mRef;
 		lua_State * mLua;
 	};
+
 }
 
 namespace acs
 {
-	class MongoDBComponent final : public RpcComponent<mongo::Response>,
+	class MongoDBComponent final : public RpcComponent<mongo::Response>, public ISecondUpdate,
 			public IRpc<mongo::Request, mongo::Response>, public IDestroy, public IServerRecord
 	{
 	public:
 		MongoDBComponent();
 		~MongoDBComponent() final = default;
 	public:
-		void LuaSend(std::unique_ptr<mongo::Request> request, int & taskId);
+		void Send(std::unique_ptr<mongo::Request> request, int & taskId);
 		std::unique_ptr<mongo::Response> Run(std::unique_ptr<mongo::Request> request);
 		std::unique_ptr<mongo::Response> Run(const std::string & db, std::unique_ptr<mongo::Request> request);
 	private:
 		bool Awake() final;
 		bool LateAwake() final;
 		void OnDestroy() final;
+		void OnSecondUpdate(int tick) noexcept final;
 		void OnRecord(json::w::Document &document) final;
+		void OnExplain(std::unique_ptr<mongo::Request> request, long long ms) noexcept;
 		void OnMessage(int id, mongo::Request * request, mongo::Response * message) noexcept final;
 	private:
 		void Send(std::unique_ptr<mongo::Request> request);
 		void Send(int id, std::unique_ptr<mongo::Request> request);
 	private:
-		std::string mCommand;
 		mongo::MongoConfig mConfig;
+		class LoggerComponent * mLogger;
 		custom::Queue<int> mFreeClients;
 		std::queue<std::unique_ptr<mongo::Request>> mRequests;
 		std::unordered_map<int, std::shared_ptr<mongo::Client>> mMongoClients;

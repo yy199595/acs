@@ -1,6 +1,6 @@
 {
     "Record.PushData": {
-        "Async": false,
-        "Request": "record.data"
+        "async": false,
+        "request": "record.data"
     }
 }

@@ -16,14 +16,8 @@
 		]
 	},
 	"listen": {
-		"ws": {
-			"address": "127.0.0.1:${ws}"
-		},
-		"http": {
-			"address": "127.0.0.1:${http}"
-		},
 		"gate": {
-			"address": "127.0.0.1:${gate}",
+			"address": "tcp://127.0.0.1:${gate}",
 			"component" : "OuterWebSocketComponent"
 		}
 	},

@@ -17,6 +17,7 @@ namespace custom
 		Error = LOG_LEVEL_ERROR,
 		Fatal = LOG_LEVEL_FATAL,
 		OFF = LOG_LEVEL_OFF,
+		All = 128,
 	};
 
 	struct LogInfo

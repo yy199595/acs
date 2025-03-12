@@ -3,7 +3,6 @@
 //
 
 #include "LuaSqlite.h"
-#include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
 #include"Yyjson/Lua/ljson.h"
 #include"Sqlite/Component/SqliteComponent.h"
@@ -73,7 +72,7 @@ namespace lua
 	{
 		SqliteComponent * sqliteComponent = GetComponent();
 		const char * sql = luaL_checkstring(lua, 1);
-		lua_pushinteger(lua, sqliteComponent->Exec(sql));
+		lua_pushboolean(lua, sqliteComponent->Exec(sql));
 		return 1;
 	}
 
@@ -83,22 +82,18 @@ namespace lua
 
 		std::vector<std::string> result;
 		const char * sql = luaL_checkstring(lua, 1);
-		int code = sqliteComponent->Query(sql, result);
-		if(code != XCode::Ok)
+		if(!sqliteComponent->Query(sql, result))
 		{
-			lua_pushinteger(lua, code);
-			return 1;
+			return 0;
 		}
 		int index = 0;
-		int size = (int)result.size();
-		lua_pushinteger(lua, code);
-		lua_createtable(lua, 0, size);
+		lua_createtable(lua, 0, (int)result.size());
 		for(const std::string & json : result)
 		{
 			lua_pushinteger(lua, ++index);
 			lua::yyjson::write(lua, json.c_str(), json.size());
 			lua_settable(lua, -3);
 		}
-		return 2;
+		return 1;
 	}
 }

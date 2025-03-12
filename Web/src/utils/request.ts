@@ -2,7 +2,7 @@ import axios, {AxiosInstance, AxiosError, AxiosResponse, AxiosRequestConfig} fro
 import {app} from "../api/token";
 
 const service: AxiosInstance = axios.create({
-    baseURL: "http://127.0.0.1:8088",
+    //baseURL: "http://127.0.0.1:8088",
     timeout: 5000
 });
 

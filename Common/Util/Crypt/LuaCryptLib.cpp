@@ -3,12 +3,21 @@
 //
 
 
-#include"LuaCryptLib.h"
+#include "LuaCryptLib.h"
 #include "Util/Crypt/sha1.h"
-#include"Proto/Bson/base64.h"
+#include "Proto/Bson/base64.h"
 #include "Util/Crypt/MD5Helper.h"
 namespace lua
 {
+	int md5::Hex(lua_State* L)
+	{
+		size_t size = 0;
+		const char * str = luaL_checklstring(L, 1, &size);
+		std::string output = help::md5::GetHex(str, size);
+		lua_pushlstring(L, output.c_str(), output.size());
+		return 1;
+	}
+
     int md5::ToString(lua_State * L)
     {
 		size_t size = 0;

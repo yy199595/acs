@@ -79,7 +79,7 @@ namespace acs
 			int count = 0;
 			mongoRequest->GetCollection("count", tab);
 			std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
-			if (mongoResponse && mongoResponse->Document() && mongoResponse->Document()->Get("n", count))
+			if (mongoResponse != nullptr && mongoResponse->Document().Get("n", count))
 			{
 				return count;
 			}
@@ -96,12 +96,7 @@ namespace acs
 		{
 			help::dir::MakeDir(dir);
 		}
-		int sumCount = 0;
-		int doneCount = 0;
-		for(const std::string & tab : this->mConfig.collections)
-		{
-			sumCount += this->GetTableCount(tab);
-		}
+		unsigned int doneCount = 0;
 		long long t1 = help::Time::NowMil();
 		std::unique_ptr<json::w::Value> jsonValue = response.AddObject("data");
 		for(const std::string & tab : this->mConfig.collections)
@@ -113,42 +108,36 @@ namespace acs
 			{
 				return XCode::Failure;
 			}
-			int skip = 0;
-			int page = 0;
-			const int limit = 200;
 			unsigned int count = 0;
 			std::string jsonString;
 			std::unique_ptr<bson::Reader::Document> document1;
 			std::vector<std::unique_ptr<bson::Reader::Document>> results;
-			do
+
+			results.clear();
+			std::unique_ptr<mongo::Request> mongoRequest = std::make_unique<mongo::Request>();
 			{
-				page++;
-				results.clear();
-				std::unique_ptr<mongo::Request> mongoRequest = std::make_unique<mongo::Request>();
+				bson::Writer::Document document;
+				mongoRequest->GetCollection("find", tab);
+			}
+			std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
+			while(mongoResponse != nullptr && !mongoResponse->IsEmpty())
+			{
+				for (const std::string& json: mongoResponse->GetResults())
 				{
-					bson::Writer::Document document;
-					mongoRequest->GetCollection("find", tab).Skip(skip).Limit(limit);
+					count++;
+					doneCount++;
+					ofs.write(json.c_str(), (int)json.size()) << "\n";
 				}
-				std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
-				if (mongoResponse == nullptr || mongoResponse->Document() == nullptr)
+				if (mongoResponse->GetCursor() == 0)
 				{
 					break;
 				}
-
-				if (mongoResponse->Document()->Get("cursor", document1) && document1->Get("firstBatch", results))
-				{
-					for (std::unique_ptr<bson::Reader::Document>& document: results)
-					{
-						++count;
-						++doneCount;
-						document->WriterToJson(&jsonString);
-						ofs.write(jsonString.c_str(), (int)jsonString.size()) << "\n";
-					}
-					skip += results.size();
-					double process = (doneCount / (double)sumCount) * 100;
-					LOG_DEBUG("({}) [{:.2f}%] {}/{}", tab, process, doneCount, sumCount);
-				}
-			} while (results.size() > 0);
+				mongoRequest = std::make_unique<mongo::Request>();
+				mongoRequest->document.Add("getMore", mongoResponse->GetCursor());
+				mongoRequest->document.Add("collection", tab);
+				mongoRequest->cmd = "getMore";
+				mongoResponse = this->mMongo->Run(std::move(mongoRequest));
+			}
 			jsonValue->Add(tab.c_str(), count);
 			ofs.close();
 		}
@@ -216,10 +205,10 @@ namespace acs
 						mongoRequest->GetCollection("insert", targetTable).Insert(documents);
 					}
 					std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
-					if (mongoResponse && mongoResponse->Document() != nullptr)
+					if (mongoResponse)
 					{
 						int count = 0;
-						if (mongoResponse->Document()->Get("n", count))
+						if (mongoResponse->Document().Get("n", count))
 						{
 							sumCount += count;
 						}

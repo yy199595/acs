@@ -36,18 +36,21 @@ namespace tcp
 		void Connect(int timeout = 0);
 		void ReadLine(int timeout = 0);
 		void ReadSome(int timeout = 0);
-		void ReadLength(int size, int timeout = 0);
+		void ReadLength(size_t size, int timeout = 0);
 		void Connect(const std::string & host, const std::string & port, int timeout = 0);
 	protected:
 		void ClearBuffer();
+		void SetNoDelayAndKeepAlive();
 		bool SendSync(tcp::IProto & message); //同步发送
+		bool SendSync(const char * message, size_t size); //同步发送
 		void Write(tcp::IProto & message, int timeout = 0);
 	protected:
 		void ClearSendStream();
 		void ClearRecvStream();
 		bool ConnectSync(Asio::Code & code);
 		bool RecvLineSync(size_t & size); //同步读一行
-		bool RecvSync(int read, size_t & size); //同步读取数据
+		bool RecvSomeSync(size_t & size); //同步读取数据
+		bool RecvSync(size_t read, size_t & size); //同步读取数据
 		bool ConnectSync(const std::string & host, const std::string & port);
 
 	protected:

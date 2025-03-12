@@ -83,7 +83,6 @@ namespace rpc
 			this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
 			this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
 			this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
-			//CONSOLE_LOG_INFO("connect server [{}] ok", this->GetAddress());
 			return;
 		}
 		this->CloseSocket(XCode::NetConnectFailure);
@@ -159,10 +158,6 @@ namespace rpc
 	{
 		if (code != asio::error::operation_aborted)
 		{
-//#ifdef __DEBUG__
-//			const std::string& address = this->mSocket->GetAddress();
-//			CONSOLE_LOG_ERROR("receive {} inner message error : {}", address, code.message());
-//#endif
 			this->CloseSocket(XCode::NetReadFailure);
 		}
 	}

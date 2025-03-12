@@ -21,6 +21,15 @@ function table.find(tab, value)
     return nil
 end
 
+function table.is_array(t)
+
+    local count = 0
+    for _, v in pairs(t) do
+        count = count + 1
+    end
+    return count == #t;
+end
+
 function table.tostring(t)
     local buffer = { }
     local print_r_cache = {}
@@ -32,13 +41,13 @@ function table.tostring(t)
             if (type(t) == "table") then
                 for pos, val in pairs(t) do
                     if (type(val) == "table") then
-                        table_insert(buffer, indent .. "[" .. pos .. "] => " .. tostring(t) .. " {")
+                        table_insert(buffer, indent .. "[" .. pos .. "] = " .. tostring(t) .. " {")
                         sub_print_r(val, indent .. string.rep(" ", string.len(pos) + 8))
                         table_insert(buffer, indent .. string.rep(" ", string.len(pos) + 6) .. "}")
                     elseif (type(val) == "string") then
-                        table_insert(buffer,indent .. "[" .. pos .. '] => "' .. val .. '"')
+                        table_insert(buffer,indent .. "[" .. pos .. '] = "' .. val .. '"')
                     else
-                        table_insert(buffer,indent .. "[" .. pos .. "] => " .. tostring(val))
+                        table_insert(buffer,indent .. "[" .. pos .. "] = " .. tostring(val))
                     end
                 end
             else
@@ -54,15 +63,6 @@ function table.tostring(t)
         sub_print_r(t, "  ")
     end
     return table.concat(buffer, "\n")
-end
-
-function table.is_array(t)
-
-    local count = 0
-    for _, v in pairs(t) do
-        count = count + 1
-    end
-    return count == #t;
 end
 
 --function table.serialize(t)

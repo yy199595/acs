@@ -146,8 +146,8 @@ namespace os
 	bool System::GetEnv(const std::string& k, std::string& v)
 	{
 		std::string str = fmt::format("APP_{}", k);
-		const std::string key = help::Str::Toupper(str);
-		const char * val = getenv(key.c_str());
+		help::Str::Toupper(str);
+		const char * val = getenv(str.c_str());
 		if(val == nullptr)
 		{
 			return false;
@@ -182,11 +182,11 @@ namespace os
 	void System::SetEnv(const std::string& k, const std::string& v)
 	{
 		std::string str = fmt::format("APP_{}", k);
-		const std::string key = help::Str::Toupper(str);
+		help::Str::Toupper(str);
 #if WIN32
-		_putenv_s(key.c_str(), v.c_str());
+		_putenv_s(str.c_str(), v.c_str());
 #else
-		setenv(key.c_str(), v.c_str(), 1);
+		setenv(str.c_str(), v.c_str(), 1);
 #endif
 		System::AddValue(k, v);
 	}

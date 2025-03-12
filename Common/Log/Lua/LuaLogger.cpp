@@ -47,7 +47,7 @@ namespace lua
 		std::unique_ptr<custom::LogInfo> logInfo = std::make_unique<custom::LogInfo>();
 		if(lua_getstack(lua, 2, &luaDebug) > 0)
 		{
-			lua_getinfo(lua, "nSlu", &luaDebug); // 获取当前函数名和行号等信息
+			lua_getinfo(lua, "Sl", &luaDebug); // 获取当前函数名和行号等信息
 			logInfo->File = FormatFileLine(luaDebug.short_src, luaDebug.currentline);
 		}
 		size_t size = 0;

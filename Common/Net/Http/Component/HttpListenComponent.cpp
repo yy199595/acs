@@ -8,7 +8,7 @@
 #include"Entity/Actor/App.h"
 #include"Server/Config/CodeConfig.h"
 #include"Http/Common/HttpResponse.h"
-#include"Http/Client/Session.h"
+#include"Http/Client/HttpSession.h"
 #include"Server/Component/ThreadComponent.h"
 
 #include "Core/System/System.h"
@@ -68,7 +68,6 @@ namespace acs
 
 	void HttpListenComponent::OnClientError(int id, int code)
 	{
-		//LOG_WARN("close sock id => {}", id);
 		auto iter = this->mHttpClients.find(id);
 		if (iter != this->mHttpClients.end())
 		{

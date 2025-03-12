@@ -1,7 +1,7 @@
 {
 	"Example.Ping": {
-		"Async": false,
-		"IsClient": false,
-		"Proto" : "json"
+		"async": false,
+		"client": false,
+		"proto" : "lua"
 	}
 }

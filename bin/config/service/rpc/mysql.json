@@ -1,47 +1,47 @@
 {
     "MysqlDB.Insert": {
-        "Async": true,
-        "Request": "db.mysql.insert",
-        "Response": "db.mysql.response"
+        "async": true,
+        "request": "db.sql.insert",
+        "response": "db.sql.response"
     },
     "MysqlDB.Save": {
-        "Async": true,
-        "Request": "db.mysql.save",
-        "Response": "db.mysql.response"
+        "async": true,
+        "request": "db.sql.save",
+        "response": "db.sql.response"
     },
     "MysqlDB.Exec": {
-        "Async": true,
-        "Request": "db.mysql.exec",
-        "Response": "db.mysql.query.response"
+        "async": true,
+        "request": "db.sql.exec",
+        "response": "db.sql.query.response"
     },
     "MysqlDB.Query": {
-        "Async": true,
-        "Request": "db.mysql.query.request",
-        "Response": "db.mysql.query.response"
+        "async": true,
+        "request": "db.sql.query.request",
+        "response": "db.sql.query.response"
     },
     "MysqlDB.Update": {
-        "Async": true,
-        "Request": "db.mysql.update",
-        "Response": "db.mysql.response"
+        "async": true,
+        "request": "db.sql.update",
+        "response": "db.sql.response"
     },
     "MysqlDB.Create": {
-        "Async": true,
-        "Request": "db.mysql.create"
+        "async": true,
+        "request": "db.sql.create"
     },
     "MysqlDB.Delete": {
-        "Async": true,
-        "Type": "Server",
-        "Request": "db.mysql.del",
-        "Response": "db.mysql.response"
+        "async": true,
+        "type": "Server",
+        "request": "db.sql.del",
+        "response": "db.sql.response"
     },
     "MysqlDB.Index": {
-        "Async": true,
-        "Request": "db.mysql.index",
-        "Desc" : "创建一个索引"
+        "async": true,
+        "request": "db.sql.index",
+        "desc" : "创建一个索引"
     },
     "MysqlDB.FindPage": {
-        "Async": true,
-        "Request": "db.mysql.query.page",
-        "Response": "db.mysql.query.response"
+        "async": true,
+        "request": "db.sql.query.page",
+        "response": "db.sql.query.response"
     }
 }

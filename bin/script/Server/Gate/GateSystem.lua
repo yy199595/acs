@@ -9,7 +9,7 @@ local GateSystem = RpcService()
 
 
 function GateSystem:OnAwake()
-   redis:Sub("GateSystem.OnPlayerLogin")
+   --redis:Sub("GateSystem.OnPlayerLogin")
 end
 
 function GateSystem:OnComplete()

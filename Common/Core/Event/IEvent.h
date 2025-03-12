@@ -13,6 +13,8 @@ namespace help
 	DEFINE_STATIC_EVENT(InnerLogoutEvent, int);
 	DEFINE_STATIC_EVENT(PlayerLoginEvent, long long, int);
 	DEFINE_STATIC_EVENT(PlayerLogoutEvent, long long, int);
+	DEFINE_STATIC_EVENT(AddServerEvent, const std::string &, int);
+	DEFINE_STATIC_EVENT(DelServerEvent, int);
 }
 
 

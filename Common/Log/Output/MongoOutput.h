@@ -16,7 +16,6 @@ namespace custom
 		bool Start(Asio::Context &io) final;
 		void Push(Asio::Context &io, const std::string &name, const custom::LogInfo &logInfo) final;
 	private:
-		std::string mCommand;
 		mongo::MongoConfig mConfig;
 		std::shared_ptr<mongo::Client> mMonClient;
 	};

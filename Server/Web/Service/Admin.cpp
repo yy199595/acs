@@ -17,13 +17,7 @@ namespace acs
 	Admin::Admin()
 	{
 		this->mProto = nullptr;
-		this->mActorComponent = nullptr;
-	}
-
-	bool Admin::Awake()
-	{
-		//this->mApp->AddComponent<AdminComponent>();
-		return true;
+		this->mActor = nullptr;
 	}
 
     bool Admin::OnInit()
@@ -38,7 +32,7 @@ namespace acs
 		BIND_COMMON_HTTP_METHOD(Admin::HttpInterface);
 
 		this->mProto = this->GetComponent<ProtoComponent>();
-		this->mActorComponent = this->GetComponent<ActorComponent>();
+		this->mActor = this->GetComponent<ActorComponent>();
 		return true;
 	}
 
@@ -49,7 +43,7 @@ namespace acs
 		{
 			return XCode::CallArgsError;
 		}
-		Server* server = this->mActorComponent->GetServer(id);
+		Actor* server = this->mActor->GetActor(id);
 		if(server == nullptr)
 		{
 			return XCode::NotFoundActor;
@@ -73,35 +67,35 @@ namespace acs
 		pb_json::JsonOptions options;
 		options.add_whitespace = true;
 		options.always_print_primitive_fields = true;
-		response.Add("name", methodConfig->FullName.c_str());
-		response.Add("service", methodConfig->Service.c_str());
+		response.Add("name", methodConfig->fullname.c_str());
+		response.Add("service", methodConfig->service.c_str());
 
-		if(!methodConfig->Request.empty())
+		if(!methodConfig->request.empty())
 		{
 			std::string json;
-			pb::Message * request = this->mProto->Temp(methodConfig->Request);
+			pb::Message * request = this->mProto->Temp(methodConfig->request);
 			if(request && pb_json::MessageToJsonString(*request, &json, options).ok())
 			{
 				response.Add("req", json.c_str(), json.size());
 			}
-			response.Add("request", methodConfig->Request.c_str());
+			response.Add("request", methodConfig->request.c_str());
 		}
 
-		if(!methodConfig->Response.empty())
+		if(!methodConfig->response.empty())
 		{
 			std::string json;
-			pb::Message * request = this->mProto->Temp(methodConfig->Response);
+			pb::Message * request = this->mProto->Temp(methodConfig->response);
 			if(request && pb_json::MessageToJsonString(*request, &json, options).ok())
 			{
 				response.Add("res", json.c_str(), json.size());
 			}
-			response.Add("response", methodConfig->Response.c_str());
+			response.Add("response", methodConfig->response.c_str());
 		}
 
-		response.Add("client", methodConfig->IsClient);
-		response.Add("open", methodConfig->IsOpen);
-		response.Add("forward", methodConfig->Forward);
-		response.Add("async", methodConfig->IsAsync);
+		response.Add("open", methodConfig->open);
+		response.Add("async", methodConfig->async);
+		response.Add("client", methodConfig->client);
+		response.Add("forward", methodConfig->forward);
 	}
 
 	int Admin::RpcInterface(const http::FromContent & request, json::w::Document & response)
@@ -167,14 +161,14 @@ namespace acs
 			{
 				std::unique_ptr<json::w::Value> obj = list->AddObject();
 				{
-					obj->Add("url", methodConfig->Path);
-					obj->Add("desc", methodConfig->Desc);
-					obj->Add("method", methodConfig->Type);
-					obj->Add("async", methodConfig->IsAsync);
-					obj->Add("content", methodConfig->Content);
-					obj->Add("request", methodConfig->Request);
-					obj->Add("permiss", methodConfig->Permission);
-					obj->Add("bind", fmt::format("{}.{}", methodConfig->Service, methodConfig->Method));
+					obj->Add("url", methodConfig->path);
+					obj->Add("desc", methodConfig->desc);
+					obj->Add("method", methodConfig->type);
+					obj->Add("async", methodConfig->async);
+					obj->Add("content", methodConfig->content);
+					obj->Add("request", methodConfig->request);
+					obj->Add("permission", methodConfig->permission);
+					obj->Add("bind", fmt::format("{}.{}", methodConfig->service, methodConfig->method));
 				}
 			}
 		}
@@ -189,7 +183,7 @@ namespace acs
 		{
 			return XCode::CallArgsError;
 		}
-		Server* server = this->mActorComponent->GetServer(id);
+		Actor* server = this->mActor->GetActor(id);
 		if(server == nullptr)
 		{
 			return XCode::NotFoundActor;
@@ -205,7 +199,7 @@ namespace acs
 			response.Add("error", "not field:id");
 			return XCode::CallArgsError;
 		}
-		Server* server = this->mActorComponent->GetServer(id);
+		Actor* server = this->mActor->GetActor(id);
 		if(server == nullptr)
 		{
 			response.Add("error", "not find server");
@@ -233,16 +227,13 @@ namespace acs
 		{
 			serverActors.emplace_back(id);
 		}
-		else
-		{
-			this->mActorComponent->GetServers(serverActors);
-		}
+
 		std::unique_ptr<json::w::Value> document = response.AddArray("list");
 		std::unique_ptr<com::type::json> result = std::make_unique<com::type::json>();
 		for(const int serverId : serverActors)
 		{
 			result->Clear();
-			if(Server * server = this->mActorComponent->GetServer(serverId))
+			if(Actor * server = this->mActor->GetActor(serverId))
 			{
 				if (server->Call("NodeSystem.RunInfo", result.get()) == XCode::Ok)
 				{

@@ -82,7 +82,7 @@ namespace help
 			}
 
 			inline void Pop() { this->stringBuffer.pop_back(); }
-
+			inline char Back() { return this->stringBuffer.back(); }
 		private:
 			std::string stringBuffer;
 		};

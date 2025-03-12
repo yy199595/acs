@@ -8,7 +8,7 @@
 #ifdef __ENABLE_OPEN_SSL__
 #include<asio/ssl/context.hpp>
 #endif
-#include"Http/Client/Client.h"
+#include"Http/Client/HttpClient.h"
 namespace custom
 {
 	class WeChatOutput : public IOutput

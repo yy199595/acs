@@ -35,7 +35,6 @@ local async = function(class, func, task, ...)
 end
 
 function RpcService:Await(name, taskSource, ...)
-
 	local func = self[name]
 	if func == nil then
 		return false

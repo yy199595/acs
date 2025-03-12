@@ -20,21 +20,25 @@ namespace mongo
 		Client(tcp::Socket * socket, Component * component, MongoConfig  config, Asio::Context & io);
 	public:
         void Stop();
-		bool Start(bool async = true);
+		bool Start();
 		void SendMongoCommand(std::unique_ptr<Request> request);
 		bool SyncSend(const std::unique_ptr<Request>& request, mongo::Response & response);
 		std::unique_ptr<mongo::Response> SyncMongoCommand(std::unique_ptr<Request> request);
 	private:
-		bool StartAuthBySha1();
+		bool Auth(bool connect);
 		void OnResponse(int code);
-		std::unique_ptr<Response> ReadResponse();
-		void OnReadError(const Asio::Code &code) final;
+		std::unique_ptr<Response> ReadResponse(const std::string & cmd);
 		void OnReceiveMessage(std::istream & is, size_t, const Asio::Code &) final;
 		std::unique_ptr<Response> SyncSendMongoCommand(const std::unique_ptr<Request>& request);
-        bool Auth(const std::string & user, const std::string & db, const std::string & pwd);
 		void OnResponse(int code, std::unique_ptr<Request> request, std::unique_ptr<Response> response);
 	private:
+		bool AuthBySha1(const std::string & user, const std::string & db, const std::string & pwd);
+#ifdef __ENABLE_OPEN_SSL__
+		bool AuthBySha256(const std::string & user, const std::string & db, const std::string & pwd);
+#endif
+	private:
 		void OnSendMessage(size_t size) final;
+		void OnReadError(const Asio::Code &code) final;
 		void OnConnect(const Asio::Code &, int count) final;
 		void OnSendMessage(const asio::error_code &code) final;
 	private:

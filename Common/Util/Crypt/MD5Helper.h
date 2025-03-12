@@ -11,8 +11,9 @@ namespace help
 	namespace md5
 	{
 		extern std::string GetMd5(const std::string & input);
+		extern std::string GetHex(const std::string & input);
 		extern std::string GetMd5(const char * input, size_t size);
-
+		extern std::string GetHex(const char * input, size_t size);
 	}
 }
 

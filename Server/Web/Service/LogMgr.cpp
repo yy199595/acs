@@ -233,7 +233,7 @@ namespace acs
 		int level = 0;
 		LOG_ERROR_CHECK_ARGS(request.Get("id", id));
 		LOG_ERROR_CHECK_ARGS(request.Get("level", level));
-		Server * targetServer = App::ActorMgr()->GetServer(id);
+		Actor * targetServer = App::ActorMgr()->GetActor(id);
 		if(targetServer == nullptr)
 		{
 			return XCode::NotFoundActor;

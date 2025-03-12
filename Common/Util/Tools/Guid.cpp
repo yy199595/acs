@@ -3,78 +3,51 @@
 //
 
 #include "Guid.h"
-#include"Util/Tools/TimeHelper.h"
+#include <sstream>
+#include <iomanip>
+#include <chrono>
+#include <random>
+#include "Util/Tools/TimeHelper.h"
+
 namespace help
 {
-    int ID::mIndex1 = 0;
-    short ID::mIndex2 = 0;
-    long long ID::mLastTime = 0;
-
-    long long ThreadGuid::mLastTime = 0;
-    std::atomic_int ThreadGuid::mIndex1;
-    std::atomic_int16_t ThreadGuid::mIndex2;
+	int ID::mIndex1 = 0;
+	short ID::mIndex2 = 0;
+	long long ID::mLastTime = 0;
 }
 namespace help
 {
 
-    long long ID::Create()
-    {
-        long long nowTime = Time::NowSec();
-        if (nowTime != mLastTime)
-        {
-            mIndex1 = 0;
-            mLastTime = nowTime;
-        }
-        return (mLastTime << 31 | (++mIndex1));
-    }
-
-    long long ID::Create(short type)
-    {
-        long long nowTime = Time::NowSec();
-        if (nowTime != mLastTime)
-        {
-            mIndex2 = 0;
-            mLastTime = nowTime;
-        }
-        return mLastTime << 31 | (int) type << 16 | (++mIndex2);
-    }
-
-	int ID::New(long long startTime, int id)
+	long long ID::Create()
 	{
-		static int counter = 0;
-		static long long lastTime = 0;
 		long long nowTime = Time::NowSec();
-		long long timeDiff = nowTime - startTime;
-		if(lastTime != nowTime)
+		if (nowTime != mLastTime)
 		{
-			counter = 0;
-			lastTime = nowTime;
+			mIndex1 = 0;
+			mLastTime = nowTime;
 		}
-		return (timeDiff % 100000000) * 100 + id * 10 + counter++;
+		return (mLastTime << 31 | (++mIndex1));
 	}
-}
 
-namespace help
-{
-    long long ThreadGuid::Create()
-    {
-        long long nowTime = Time::NowSec();
-        if (nowTime != mLastTime)
-        {
-            mIndex1 = 0;
-            mLastTime = nowTime;
-        }
-        return mLastTime << 31 | (++mIndex1);
-    }
+	long long ID::Create(int id)
+	{
+		long long nowTime = Time::NowSec();
+		if (nowTime != mLastTime)
+		{
+			mIndex2 = 0;
+			mLastTime = nowTime;
+		}
+		return mLastTime << 31 | (int)id << 16 | (++mIndex2);
+	}
 
-    long long ThreadGuid::Create(short type)
-    {
-        long long nowTime = Time::NowSec();
-        if (nowTime != mLastTime)
-        {
-            mIndex2 = 0;
-            mLastTime = nowTime;
-        }
-        return mLastTime << 32 | (int) type << 16 | (++mIndex2);
-    }
+	long long ID::Create(int id, int count)
+	{
+		int num = 1;
+		for (int index = 0; index < count; index++)
+		{
+			num *= 10;
+		}
+		long long guid = ID::Create(id);
+		return guid % num;
+	}
 }

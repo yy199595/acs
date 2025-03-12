@@ -30,6 +30,7 @@ namespace http
 namespace acs
 {
     class HttpMethodConfig;
+	using IHttpRecordComponent = IRequest<HttpMethodConfig, http::Request, http::Response>;
 	class HttpWebComponent final : public HttpListenComponent, public IServerRecord
     {
     public:
@@ -38,7 +39,6 @@ namespace acs
 		bool LateAwake() final;
 		void OnRecord(json::w::Document& document) final;
 	private:
-		bool ReadHttpConfig();
 		void OnReadHead(http::Request *request, http::Response *response) noexcept final;
 		void OnMessage(http::Request * request, http::Response * response) noexcept final;
 		void OnApi(const HttpMethodConfig* config, http::Request * request, http::Response * response) noexcept;
@@ -50,14 +50,13 @@ namespace acs
 	public:
 		bool AddRootDirector(const std::string & dir);
 	private:
+		std::string mPath;
 		http::Config mConfig;
 		http::ContentFactory mFactory;
+		IHttpRecordComponent * mRecord;
 		std::vector<std::string> mRoots;
-		class DispatchComponent * mDispatch;
 		class CoroutineComponent * mCoroutine;
-		std::unordered_map<std::string, std::string> mDefaultHeader;
 		custom::HashMap<std::string, class HttpService *> mHttpServices;
-		class IRequest<HttpMethodConfig, http::Request, http::Response> * mRecord;
 	};
 }
 

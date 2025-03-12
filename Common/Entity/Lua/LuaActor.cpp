@@ -58,15 +58,20 @@ namespace acs
 				return 0;
 			}
 		}
-		ActorComponent * actMgr = App::ActorMgr();
-		Server * server = actMgr->MakeServer(document);
-		if(server == nullptr)
+		int id = 0;
+		std::string name;
+		if(!document.Get("id", id) || !document.Get("name", name))
 		{
-			luaL_error(l, "create server fail");
+			luaL_error(l, "not id or name");
 			return 0;
 		}
-		bool res = actMgr->AddServer(server);
-		lua_pushboolean(l, res);
+
+		ActorComponent * actMgr = App::ActorMgr();
+		std::unique_ptr<Server> server = std::make_unique<Server>(id, name);
+		{
+			server->Decode(document);
+			lua_pushboolean(l, actMgr->AddActor(std::move(server)));
+		}
 		return 1;
 	}
 
@@ -216,63 +221,28 @@ namespace acs
 			return 0;
 		}
 
-		std::vector<int> servers;
 		std::string name(luaL_checkstring(lua, 1));
-		actComponent->GetServers(name, servers);
-		if (servers.empty())
+		actor::Group * actorGroup = actComponent->GetGroup(name);
+		if (actorGroup == nullptr)
 		{
 			std::string serverName;
-			if (ClusterConfig::Inst()->GetServerName(name, serverName))
+			if (!ClusterConfig::Inst()->GetServerName(name, serverName))
 			{
-				actComponent->GetServers(serverName, servers);
+				return 0;
+			}
+			actorGroup = actComponent->GetGroup(serverName);
+			if(actorGroup == nullptr)
+			{
+				return 0;
 			}
 		}
-		lua_createtable(lua, 0, (int)servers.size());
-		for (int index = 0; index < servers.size(); index++)
+		const std::vector<long long> & items = actorGroup->GetItems();
+		lua_createtable(lua, 0, (int)items.size());
+		for (int index = 0; index < items.size(); index++)
 		{
-			lua_pushinteger(lua, servers[index]);
+			lua_pushinteger(lua, items[index]);
 			lua_seti(lua, -2, index + 1);
 		}
-		return 1;
-	}
-
-	int LuaActor::Random(lua_State* lua)
-	{
-		if (lua_isnil(lua, 1))
-		{
-			lua_pushinteger(lua, App::Inst()->GetSrvId());
-			return 1;
-		}
-
-		std::string server;
-		std::string name(luaL_checkstring(lua, 1));
-		if (!ClusterConfig::Inst()->GetServerName(name, server))
-		{
-			LOG_ERROR("not find server by service : {}", name);
-			return 0;
-		}
-		Server* targetServer = nullptr;
-		ActorComponent* actorComponent = App::ActorMgr();
-
-		if (lua_isinteger(lua, 2))
-		{
-			long long id = lua_tointeger(lua, 2);
-			targetServer = actorComponent->Hash(name, id);
-		}
-		else
-		{
-			targetServer = actorComponent->Random(server);
-			if (targetServer == nullptr && App::Inst()->HasComponent(name))
-			{
-				targetServer = App::Inst();
-			}
-		}
-		if (targetServer == nullptr)
-		{
-			luaL_error(lua, "allocator %s fail", name.c_str());
-			return 0;
-		}
-		lua_pushinteger(lua, targetServer->GetSrvId());
 		return 1;
 	}
 
@@ -282,7 +252,7 @@ namespace acs
 		if (lua_isnumber(lua, 1))
 		{
 			int id = (int)luaL_checkinteger(lua, 1);
-			server = App::ActorMgr()->GetServer(id);
+			server = dynamic_cast<Server*>(App::ActorMgr()->GetActor(id));
 			if (server == nullptr)
 			{
 				luaL_error(lua, "not find server:%d", id);
@@ -302,7 +272,7 @@ namespace acs
 		if(lua_isinteger(lua, 1))
 		{
 			long long id = luaL_checkinteger(lua, 1);
-			server = App::ActorMgr()->GetServer(id);
+			server = dynamic_cast<Server*>(App::ActorMgr()->GetActor(id));
 		}
 		if (server == nullptr)
 		{
@@ -315,20 +285,5 @@ namespace acs
 		}
 		lua_pushlstring(lua, address.c_str(), address.size());
 		return 1;
-	}
-
-	int LuaPlayer::AddAddr(lua_State* lua)
-	{
-		long long playerId = luaL_checkinteger(lua, 1);
-		Player* player = App::ActorMgr()->GetPlayer(playerId);
-		if (player == nullptr)
-		{
-			luaL_error(lua, "not find player:{}", playerId);
-			return 0;
-		}
-		std::string sever = luaL_checkstring(lua, 2);
-		long long serverId = luaL_checkinteger(lua, 3);
-		player->AddAddr(sever, (int)serverId);
-		return LuaActor::LuaPushCode(lua, XCode::Ok);
 	}
 }

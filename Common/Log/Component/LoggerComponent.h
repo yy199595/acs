@@ -5,10 +5,10 @@
 #ifndef APP_LOGGERCOMPONENT_H
 #define APP_LOGGERCOMPONENT_H
 
-#include<mutex>
-#include"Core/Map/HashMap.h"
-#include"Log/Common/Logger.h"
-#include"Entity/Component/Component.h"
+#include <mutex>
+#include <unordered_map>
+#include "Log/Common/Logger.h"
+#include "Entity/Component/Component.h"
 
 namespace acs
 {

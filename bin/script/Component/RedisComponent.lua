@@ -1,4 +1,5 @@
 local type = _G.type
+
 local tab_pack = table.pack
 local tab_insert = table.insert
 local str_format = string.format
@@ -11,19 +12,13 @@ local RedisComponent = Component()
 ---@param cmd string
 function RedisComponent:Run(cmd, ...)
     local parameter = tab_pack(...)
-    return redis.Run(cmd, parameter)
+    return redis.run(cmd, parameter)
 end
 
 ---@param cmd string
 function RedisComponent:Send(cmd, ...)
     local parameter = tab_pack(...)
-    return redis.Send(cmd, parameter)
-end
-
----@param cmd string
-function RedisComponent:SyncRun(cmd, ...)
-    local parameter = tab_pack(...)
-    return redis.Sync(cmd, parameter)
+    return redis.sedn(cmd, parameter)
 end
 
 ---@param key string
@@ -47,7 +42,7 @@ end
 ---@param req table
 ---@param async boolean
 function RedisComponent:Call(name, req, async)
-    local response = redis.Call(name, req, async)
+    local response = redis.call(name, req, async)
     if response and #response > 0 then
         return json.decode(response)
     end
@@ -55,7 +50,7 @@ function RedisComponent:Call(name, req, async)
 end
 
 function RedisComponent:Lock(key, time)
-    local response = redis.Call("lock.lock", {
+    local response = redis.call("lock.lock", {
         key = key, time = time
     })
     return json.decode(response).res
@@ -118,7 +113,7 @@ function RedisComponent:HashSet(tab, id, value)
         tab_insert(items, k)
         tab_insert(items, v)
     end
-    return redis.Run("HMSET", items)
+    return redis.run("HMSET", items)
 end
 
 ---@param tab string
@@ -127,7 +122,7 @@ end
 ---@param value number
 function RedisComponent:HashInc(tab, id, field, value)
     local key = str_format("%s:%s", tab, id)
-    return redis.Run("HINCRBY", tab_pack(key, field, value or 1))
+    return redis.run("HINCRBY", tab_pack(key, field, value or 1))
 end
 
 ---@param tab string
@@ -139,14 +134,14 @@ function RedisComponent:HashUpdate(tab, id, field, value)
         return
     end
     local key = str_format("%s:%s", tab, id)
-    return redis.Run("HSET", tab_pack(key, field, value))
+    return redis.run("HSET", tab_pack(key, field, value))
 end
 
 ---@param tab string
 ---@param message any
 function RedisComponent:ListPush(tab, id, message)
     local key = str_format("%s:%s", tab, id)
-    return redis.Run("RPUSH", tab_pack(key, message))
+    return redis.run("RPUSH", tab_pack(key, message))
 end
 
 ---@param tab string
@@ -155,12 +150,12 @@ end
 ---@param stop number
 function RedisComponent:ListRange(tab, id, start, stop)
     local key = str_format("%s:%s", tab, id)
-    return redis.Run("LRANGE", tab_pack(key, start, stop))
+    return redis.run("LRANGE", tab_pack(key, start, stop))
 end
 
 function RedisComponent:ListLen(tab, id)
     local key = str_format("%s:%s", tab, id)
-    return redis.Run("LLEN", tab_pack(key))
+    return redis.run("LLEN", tab_pack(key))
 end
 
 function RedisComponent:For(start, pattern)
@@ -185,12 +180,12 @@ end
 ---@param channel string
 ---@return boolean
 function RedisComponent:Sub(channel)
-    return redis.Sub(channel)
+    return redis.sub(channel)
 end
 
 ---@param channel string
 function RedisComponent:UnSub(channel)
-    return redis.UnSub(channel)
+    return redis.unsub(channel)
 end
 
 return RedisComponent

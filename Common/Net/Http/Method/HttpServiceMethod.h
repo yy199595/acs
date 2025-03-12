@@ -372,7 +372,11 @@ namespace acs
 				const http::FromContent & fromData = request.GetUrl().GetQuery();
 				return (this->mObj->*mFunction)(fromData, response);
 			}
-			const http::FromContent * fromData = (const http::FromContent*) body;
+			const http::FromContent * fromData = body->To<const http::FromContent>();
+			if(fromData == nullptr)
+			{
+				return XCode::CallArgsError;
+			}
 			return (this->mObj->*mFunction)(*fromData, response);
 		}
 

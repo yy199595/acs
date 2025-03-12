@@ -1,66 +1,66 @@
 {
     "/log": {
-        "Type": "GET",
-        "Auth": false,
-        "Bind": "LogMgr.List",
-        "Desc": "查看服务器日志目录"
+        "type": "GET",
+        "auth": false,
+        "bind": "LogMgr.List",
+        "desc": "查看服务器日志目录"
     },
     "log/look": {
-        "Type": "GET",
-        "Auth": false,
-        "Bind": "LogMgr.Look",
-        "Desc": "查看某个日志信息"
+        "type": "GET",
+        "auth": false,
+        "bind": "LogMgr.Look",
+        "desc": "查看某个日志信息"
     },
     "log/html": {
-        "Type": "GET",
-        "Auth": false,
-        "Bind": "LogMgr.Html",
-        "Desc": "查看某个日志信息"
+        "type": "GET",
+        "auth": false,
+        "bind": "LogMgr.Html",
+        "desc": "查看某个日志信息"
     },
     "/log/delete": {
-        "Type": "DELETE",
-        "Bind": "LogMgr.Delete",
-        "Desc": "删除某个日志文件"
+        "type": "DELETE",
+        "bind": "LogMgr.Delete",
+        "desc": "删除某个日志文件"
     },
     "/log/set_level": {
-        "Type": "GET",
-        "Bind": "LogMgr.SetLevel",
-        "Desc": "设置日志等级"
+        "type": "GET",
+        "bind": "LogMgr.SetLevel",
+        "desc": "设置日志等级"
     },
     "res/upload": {
-        "Type": "POST",
-        "Auth": true,
+        "type": "POST",
+        "auth": true,
         "Limit": 0,
-        "Permiss": 5,
-        "Bind": "ResourceMgr.Upload",
-        "ContentType": "multipart/form-data",
-        "Desc": "上传文件"
+        "permission": 5,
+        "bind": "ResourceMgr.Upload",
+        "content-type": "multipart/form-data",
+        "desc": "上传文件"
     },
     "/res/look": {
-        "Type": "GET",
-        "Async": false,
-        "Auth": false,
-        "Bind": "ResourceMgr.Look",
-        "Desc": "查看资源详情"
+        "type": "GET",
+        "async": false,
+        "auth": false,
+        "bind": "ResourceMgr.Look",
+        "desc": "查看资源详情"
     },
     "/res/list": {
-        "Type": "GET",
-        "Async": false,
-        "Auth": false,
-        "Bind": "ResourceMgr.List",
-        "Desc": "查看资源列表"
+        "type": "GET",
+        "async": false,
+        "auth": false,
+        "bind": "ResourceMgr.List",
+        "desc": "查看资源列表"
     },
     "/res/download": {
-        "Type": "GET",
-        "Async": false,
-        "Bind": "ResourceMgr.Download",
-        "Desc": "下载某个资源"
+        "type": "GET",
+        "async": false,
+        "bind": "ResourceMgr.Download",
+        "desc": "下载某个资源"
     },
     "/res/video": {
-        "Type": "GET",
-        "Async": true,
-        "Auth" : false,
-        "Bind": "ResourceMgr.Video",
-        "Desc": "获取视频链接"
+        "type": "GET",
+        "async": true,
+        "auth" : false,
+        "bind": "ResourceMgr.Video",
+        "desc": "获取视频链接"
     }
 }

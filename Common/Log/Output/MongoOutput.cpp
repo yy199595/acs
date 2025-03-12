@@ -18,11 +18,10 @@ namespace custom
 	{
 		std::unique_ptr<tcp::Socket> socket = std::make_unique<tcp::Socket>(io);
 		{
-			socket->Init(this->mConfig.Address);
-			this->mCommand = fmt::format("{}.$cmd", this->mConfig.DB);
+			socket->Init(this->mConfig.address);
 			this->mMonClient = std::make_shared<mongo::Client>(socket.release(), this->mConfig, io);
 		}
-		return this->mMonClient->Start(false);
+		return this->mMonClient->Start();
 	}
 
 	void MongoOutput::Push(Asio::Context &io, const std::string& name, const custom::LogInfo& logInfo)
@@ -66,10 +65,9 @@ namespace custom
 		std::string table = help::Time::GetYearMonthDayString();
 		std::unique_ptr<mongo::Request> request = mongo::MongoFactory::Insert(table, document);
 		{
-			request->dataBase = this->mConfig.DB;
-			request->collectionName = this->mCommand;
+			request->dataBase = this->mConfig.db;
 		}
-		mongo::Response response;
+		mongo::Response response("insert");
 		this->mMonClient->SyncSend(request, response);
 	}
 }

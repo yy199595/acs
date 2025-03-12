@@ -89,14 +89,14 @@ function MysqlComponent:Find(tab, filter, fields, limit)
     end
     local actorId = self:GetActorId()
     local code, response = app:Call(actorId, MYSQL_QUERY, request)
-    if code ~= XCode.Ok or #response.jsons == 0 then
+    if code ~= XCode.Ok or #response.documents == 0 then
         return nil
     end
-    local jsons = { }
-    for _, str in ipairs(response.jsons) do
-        table_insert(jsons, json_decode(str))
+    local documents = { }
+    for _, str in ipairs(response.documents) do
+        table_insert(documents, json_decode(str))
     end
-    return jsons
+    return documents
 end
 
 ---@param tab string
@@ -144,14 +144,14 @@ function MysqlComponent:FindPage(tab, filter, fields, page, count)
     end
     local actorId = self:GetActorId()
     local code, response = app:Call(actorId, MYSQL_FIND_PAGE, request)
-    if code ~= XCode.Ok or #response.jsons == 0 then
+    if code ~= XCode.Ok or #response.documents == 0 then
         return nil
     end
-    local jsons = { }
-    for _, str in ipairs(response.jsons) do
-        table_insert(jsons, json_decode(str))
+    local documents = { }
+    for _, str in ipairs(response.documents) do
+        table_insert(documents, json_decode(str))
     end
-    return jsons
+    return documents
 end
 
 function MysqlComponent:Count(tab, filter)
@@ -164,14 +164,14 @@ function MysqlComponent:Exec(sql)
     local code, response = app:Call(actorId, MYSQL_Exec, {
         sql = sql
     })
-    if code ~= XCode.Ok or #response.jsons == 0 then
+    if code ~= XCode.Ok or #response.documents == 0 then
         return nil
     end
-    local jsons = { }
-    for _, str in ipairs(response.jsons) do
+    local documents = { }
+    for _, str in ipairs(response.documents) do
         table_insert(jsons, json_decode(str))
     end
-    return jsons
+    return documents
 end
 
 return MysqlComponent

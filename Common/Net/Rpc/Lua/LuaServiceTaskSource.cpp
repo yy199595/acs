@@ -33,6 +33,7 @@ namespace acs
 
 	void LuaServiceTaskSource::WriteRpcResponse(lua_State* lua) noexcept
 	{
+		this->mRpcData->Body()->clear();
 		this->mRpcData->SetProto(rpc::Porto::None);
 		this->mCode = (int)luaL_checkinteger(lua, 2);
 		if (this->mCode != XCode::Ok)

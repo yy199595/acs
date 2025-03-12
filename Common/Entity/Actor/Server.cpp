@@ -54,7 +54,7 @@ namespace acs
 		{
 			if(!help::Str::SplitAddr(addr, net, ip, port))
 			{
-				LOG_ERROR("add {} {} {} faul", this->Name(), name, addr);
+				LOG_ERROR("add {} {} {} fail", this->Name(), name, addr);
 				return false;
 			}
 		}
@@ -85,9 +85,8 @@ namespace acs
 		return this->mRouter->Send(this->GetSrvId(), std::move(message));
 	}
 
-	void Server::EncodeToJson(std::string * json)
+	void Server::Encode(json::w::Value & jsonWriter)
 	{
-		json::w::Document jsonWriter;
 		jsonWriter.Add("name", this->Name());
 		jsonWriter.Add("id", this->GetSrvId());
 		std::unique_ptr<json::w::Value> data = jsonWriter.AddObject("listen");
@@ -95,7 +94,30 @@ namespace acs
 		{
 			data->Add(iter->first.c_str(), iter->second);
 		}
-		jsonWriter.Encode(json);
+	}
+
+	bool Server::Decode(json::r::Value& document)
+	{
+		long long id = 0;
+		if(!document.Get("id", id) || !this->Equal(id))
+		{
+			return false;
+		}
+		std::unique_ptr<json::r::Value> jsonValue;
+		if(!document.Get("listen", jsonValue))
+		{
+			return false;
+		}
+		for(const char * key : jsonValue->GetAllKey())
+		{
+			std::string value;
+			if(!jsonValue->Get(key, value))
+			{
+				return false;
+			}
+			this->mListens[key] = value;
+		}
+		return true;
 	}
 
 	int Server::Make(const std::string& func, std::unique_ptr<rpc::Message>& message) const
@@ -108,14 +130,14 @@ namespace acs
 		}
 		message = std::make_unique<rpc::Message>();
 		{
-			message->SetNet(methodConfig->Net);
+			message->SetNet(methodConfig->net);
 			message->SetType(rpc::Type::Request);
-			message->SetProto(methodConfig->Proto);
+			message->SetProto(methodConfig->proto);
 			message->GetHead().Add(rpc::Header::func, func);
 			message->GetHead().Add(rpc::Header::app_id, this->mAppId);
 		}
 		message->SetSockId(this->GetSrvId());
-		message->SetTimeout(methodConfig->Timeout);
+		message->SetTimeout(methodConfig->timeout);
 		return XCode::Ok;
 	}
 }

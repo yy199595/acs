@@ -7,6 +7,7 @@
 
 #include<string>
 #include<memory>
+#include <unordered_map>
 #include<vector>
 #include"Yyjson/Src/yyjson.h"
 
@@ -228,8 +229,10 @@ namespace json
 		public:
 			bool Get(const char* k, bool& v) const;
 			bool Get(const char* k, std::string& v) const;
+			bool GetValues(std::vector<std::unique_ptr<Value>> & value) const;
 			bool Get(const char* key, std::unique_ptr<Value>& value) const;
 			bool Get(const char* key, std::vector<std::string>& value) const;
+			bool Get(const char * key, std::unordered_map<std::string, std::string> & value) const;
 
 			template<typename T>
 			inline std::enable_if_t<std::is_base_of<IObject, T>::value, bool> Get(const char * key, T & value)

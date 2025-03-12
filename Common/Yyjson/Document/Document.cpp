@@ -395,6 +395,30 @@ namespace json
 			return true;
 		}
 
+		bool Value::Get(const char* key, std::unordered_map<std::string, std::string>& value) const
+		{
+			yyjson_val * object = yyjson_obj_get(this->mValue, key);
+			if(object == nullptr || yyjson_get_type(object) != YYJSON_TYPE_OBJ)
+			{
+				return false;
+			}
+			yyjson_obj_iter iter;
+			yyjson_obj_iter_init(object, &iter);
+			while (yyjson_val* k = yyjson_obj_iter_next(&iter))
+			{
+				yyjson_val * val = yyjson_obj_iter_get_val(k);
+				if(val == nullptr || yyjson_get_type(object) != YYJSON_TYPE_STR)
+				{
+					return false;
+				}
+				std::string key1(yyjson_get_str(k));
+				std::string val1(yyjson_get_str(val));
+				value.emplace(key1, val1);
+			}
+			return true;
+		}
+
+
 		bool Value::Get(const char* k, std::vector<std::string>& value) const
 		{
 			yyjson_val* jsonArr = yyjson_obj_get(this->mValue, k);
@@ -539,6 +563,29 @@ namespace json
 				}
 			}
 			return keys;
+		}
+
+		bool Value::GetValues(std::vector<std::unique_ptr<Value>>& value) const
+		{
+			if(yyjson_is_obj(this->mValue))
+			{
+				yyjson_obj_iter iter;
+				yyjson_obj_iter_init(this->mValue, &iter);
+				while (yyjson_val* k = yyjson_obj_iter_next(&iter))
+				{
+					value.emplace_back(std::make_unique<Value>(yyjson_obj_iter_get_val(k)));
+				}
+			}
+			else
+			{
+				yyjson_arr_iter iter;
+				yyjson_arr_iter_init(this->mValue, &iter);
+				while (yyjson_val* val = yyjson_arr_iter_next(&iter))
+				{
+					value.emplace_back(std::make_unique<Value>(val));
+				}
+			}
+			return !value.empty();
 		}
 
 		size_t Value::GetKeys(std::vector<const char*>& keys) const
