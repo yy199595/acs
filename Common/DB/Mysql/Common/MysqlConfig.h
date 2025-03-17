@@ -4,7 +4,7 @@
 
 #ifndef APP_MYSQLCONFIG_H
 #define APP_MYSQLCONFIG_H
-
+#include "DB/Common/Url.h"
 #include "DB/Common/Explain.h"
 
 namespace mysql
@@ -13,25 +13,35 @@ namespace mysql
 	{
 	public:
 		unsigned int id;
-		std::string name;
-		std::string user;
 		std::string file;
 		unsigned int pos;
-		std::string password;
 	};
 
-	class Config : public json::Object<Config>
+	class Cluster : public json::Object<Cluster>
 	{
 	public:
-		int ping;
-		int count;
-		bool debug;
+		int ping = 15;
+		int count = 1;
+		int conn_count = 3; //重试次数
+		bool debug = false;
+		std::string script;
+		std::string binlog;
+		db::Explain explain;
+		std::vector<std::string> address;
+	public:
+	};
+
+	class Config : public db::Url
+	{
+	public:
+		Config() : db::Url("mysql") { }
+	public:
 		std::string db;
 		std::string user;
+		int conn_count = 3;
 		std::string script;
 		std::string address;
 		std::string password;
-		db::Explain explain;
 	};
 
 	class Explain : public json::Object<Explain>

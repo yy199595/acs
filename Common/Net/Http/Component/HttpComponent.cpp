@@ -35,7 +35,7 @@ namespace acs
 #ifdef __ENABLE_OPEN_SSL__
 		ssl::Config config;
 		asio::error_code code;
-		if(ServerConfig::Inst()->Get("ssl", config))
+		if(ServerConfig::Inst()->Get("ssl", config) && !config.pem.empty())
 		{
 			if(this->mSslContext.load_verify_file(config.pem, code).value() != Asio::OK)
 			{

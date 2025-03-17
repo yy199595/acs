@@ -8,26 +8,32 @@
 namespace acs
 {
 
+	ThreadComponent::ThreadComponent()
+		: mThreadCount(0)
+	{
+
+	}
+
     bool ThreadComponent::Awake()
 	{
-		int threadCount = 1;
+		this->mThreadCount = 1;
 #ifdef __OS_LINUX__
 		std::unique_ptr<json::r::Value> jsonObject;
-		threadCount = std::thread::hardware_concurrency();
+		this->mThreadCount = std::thread::hardware_concurrency();
 		if(ServerConfig::Inst()->Get("core", jsonObject))
 		{
 			jsonObject->Get("thread", threadCount);
 		}
 #endif
-		for (int index = 0; index < threadCount; index++)
+		for (int index = 0; index < this->mThreadCount; index++)
 		{
-			std::unique_ptr<custom::AsioThread> t = std::make_unique<custom::AsioThread>();
+			std::shared_ptr<custom::AsioThread> netThread = std::make_shared<custom::AsioThread>();
 			{
-				t->Start(index + 1, "net");
-				this->mNetThreads.emplace(std::move(t));
+				netThread->Start(index + 1, "net");
+				this->mNetThreads.emplace(netThread);
 			}
 		}
-		printf("thread count = %d\n", threadCount);
+		printf("thread count = %d\n", this->mThreadCount);
 		return true;
 	}
 
@@ -36,13 +42,18 @@ namespace acs
 #ifndef ONLY_MAIN_THREAD
 		while(!this->mNetThreads.empty())
 		{
-			std::unique_ptr<custom::AsioThread> & t = this->mNetThreads.front();
+			std::shared_ptr<custom::AsioThread> netThread = this->mNetThreads.front();
 			{
-				t->Stop();
+				netThread->Stop();
 				this->mNetThreads.pop();
 			}
 		}
 #endif
+	}
+
+	void ThreadComponent::OnRecord(json::w::Document& document)
+	{
+		document.AddObject("thread")->Add("count", this->mThreadCount);
 	}
 
     Asio::Context& ThreadComponent::GetContext()
@@ -50,13 +61,11 @@ namespace acs
 #ifdef ONLY_MAIN_THREAD
 		return this->mApp->GetContext();
 #else
-		custom::AsioThread * asioThread = nullptr;
-		std::unique_ptr<custom::AsioThread> t = std::move(this->mNetThreads.front());
+		std::shared_ptr<custom::AsioThread> netThread = this->mNetThreads.front();
 		{
-			asioThread = t.get();
 			this->mNetThreads.pop();
-			this->mNetThreads.emplace(std::move(t));
-			return asioThread->Context();
+			this->mNetThreads.emplace(netThread);
+			return netThread->Context();
 		}
 #endif
 	}

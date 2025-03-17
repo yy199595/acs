@@ -11,12 +11,12 @@ namespace custom
 	class MongoOutput : public IOutput
 	{
 	public:
-		explicit MongoOutput(mongo::MongoConfig config);
+		explicit MongoOutput(mongo::Config config);
 	private:
 		bool Start(Asio::Context &io) final;
 		void Push(Asio::Context &io, const std::string &name, const custom::LogInfo &logInfo) final;
 	private:
-		mongo::MongoConfig mConfig;
+		mongo::Config mConfig;
 		std::shared_ptr<mongo::Client> mMonClient;
 	};
 }

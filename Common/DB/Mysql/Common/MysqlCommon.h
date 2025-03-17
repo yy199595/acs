@@ -6,7 +6,6 @@
 #define APP_MYSQLCOMMON_H
 
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace mysql
@@ -48,7 +47,7 @@ namespace mysql
 	}
 
 	constexpr uint32_t CLIENT_FLAG = 17037263; //1 0000 0011 1111 0111 1100 1111
-
+	constexpr unsigned int SERVER_MORE_RESULTS_EXISTS = 8;
 }
 
 namespace mysql
@@ -255,6 +254,8 @@ namespace mysql
 	constexpr unsigned char PACKAGE_OK = 0x00;
 	constexpr unsigned char PACKAGE_ERR = 0xFF;
 	constexpr unsigned char PACKAGE_EOF = 0xFE;
+	constexpr unsigned char PACKAGE_MORE = 0x01;
+
 }
 
 namespace mysql
@@ -281,6 +282,12 @@ namespace mysql
 		unsigned int mLastInsertId = 0;
 		unsigned int mServerStatus = 0;
 		unsigned int mWarningCount = 0;
+	};
+
+	struct EofResponse
+	{
+		unsigned short warn_count = 0;
+		unsigned short status_flags = 0;
 	};
 }
 

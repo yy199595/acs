@@ -3,21 +3,23 @@
 //
 
 #include "AsioThread.h"
-
+#include "Util/Tools/TimeHelper.h"
 namespace custom
 {
 	AsioThread::AsioThread(int update)
-		:mContext(1), mTime(update)
+		:mContext(1), mUpdate(update), mTimer(mContext)
 	{
 
 	}
 
 	void AsioThread::Stop()
 	{
+		Asio::Code code;
 		this->mContext.stop();
 		if(this->mThread.joinable())
 		{
 			this->mThread.join();
+			this->mTimer.cancel(code);
 		}
 	}
 
@@ -26,18 +28,26 @@ namespace custom
 		this->mId = id;
 		this->mName = name;
 		std::thread(&AsioThread::Run, this).swap(this->mThread);
-		//std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+
+	void AsioThread::StartTimer()
+	{
+		this->mTimer.expires_after(std::chrono::seconds(this->mUpdate));
+		this->mTimer.async_wait([self = this->shared_from_this()](const asio::error_code& code)
+		{
+			self->StartTimer();
+			self->mLastTime = help::Time::NowSec();
+		});
 	}
 
 	void AsioThread::Run()
 	{
 		asio::error_code code;
 		Asio::ContextWork work(this->mContext);
+		while (!this->mContext.stopped())
 		{
-			while(!this->mContext.stopped())
-			{
-				this->mContext.run(code);
-			}
+			this->StartTimer();
+			this->mContext.run(code);
 		}
 //		while(!this->mContext.stopped())
 //		{

@@ -27,7 +27,6 @@ namespace acs
 		this->mConsole = 0;
 		this->mThread = nullptr;
 		custom::LogConfig::RegisterField("wx", &custom::LogConfig::wx);
-		custom::LogConfig::RegisterField("pem", &custom::LogConfig::pem);
 		custom::LogConfig::RegisterField("open", &custom::LogConfig::open);
 		custom::LogConfig::RegisterField("ding", &custom::LogConfig::ding);
 		custom::LogConfig::RegisterField("name", &custom::LogConfig::name);
@@ -145,10 +144,12 @@ namespace acs
 	{
 		std::lock_guard<std::mutex> lock(this->mMutex);
 		auto iter = this->mLoggers.find(name);
-		if(iter != this->mLoggers.end())
+		if(iter == this->mLoggers.end())
 		{
-			iter->second->Push(std::move(logInfo));
+			LOG_ERROR("not open log:{}", name)
+			return;
 		}
+		iter->second->Push(std::move(logInfo));
 	}
 
 	custom::Logger *LoggerComponent::GetLogger(const std::string &name)
@@ -180,15 +181,33 @@ namespace acs
 				fileConfig.Root = fmt::format("{}/{}",config.path, server) ;
 				logger->AddOutput<custom::FileOutput>(fileConfig);
 			}
-			if (!config.wx.empty() && !config.pem.empty())
+			if (!config.wx.empty())
 			{
 				//微信通知组件
-				logger->AddOutput<custom::WeChatOutput>(config.wx, config.pem);
+				http::Url url;
+				if(!url.Decode(config.wx))
+				{
+					return false;
+				}
+				logger->AddOutput<custom::WeChatOutput>(config.wx);
 			}
-			mongo::MongoConfig mongoConfig;
-			if (!config.mongo.empty() && mongoConfig.FromString(config.mongo))
+			mongo::Config mongoConfig;
+			if (!config.mongo.empty() && mongoConfig.Decode(config.mongo))
 			{
-				// mongodb组件
+				mongoConfig.Get("db", mongoConfig.db);
+				mongoConfig.Get("user", mongoConfig.user);
+				mongoConfig.Get("address", mongoConfig.address);
+				mongoConfig.Get("password", mongoConfig.password);
+				if(!mongoConfig.Get("mechanism", mongoConfig.mechanism))
+				{
+					mongoConfig.mechanism = mongo::auth::SCRAM_SHA1;
+				}
+#ifdef __ENABLE_OPEN_SSL__
+				return mongoConfig.mechanism == mongo::auth::SCRAM_SHA1
+					   || mongoConfig.mechanism == mongo::auth::SCRAM_SHA256;
+#else
+				return config.mechanism == mongo::auth::SCRAM_SHA1;
+#endif
 				logger->AddOutput<custom::MongoOutput>(mongoConfig);
 			}
 		}

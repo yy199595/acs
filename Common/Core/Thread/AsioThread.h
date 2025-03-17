@@ -9,7 +9,7 @@
 
 namespace custom
 {
-	class AsioThread
+	class AsioThread : public std::enable_shared_from_this<AsioThread>
 	{
 	public:
 		AsioThread(int update = 10);
@@ -24,13 +24,15 @@ namespace custom
 		inline long long GetLastTime() const { return this->mLastTime; }
 	private:
 		void Run();
+		void StartTimer();
 	private:
 		int mId;
-		int mTime;
+		int mUpdate;
 		std::string mName;
 		std::thread mThread;
 		long long mLastTime;
 		Asio::Context mContext;
+		asio::system_timer mTimer;
 	};
 }
 

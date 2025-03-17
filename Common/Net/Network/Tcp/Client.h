@@ -9,13 +9,11 @@
 #include "Rpc/Common/Message.h"
 namespace tcp
 {
-	enum TimeoutFlag
+	enum class timeout
 	{
-		ReadLine = 1,
-		ReadSome = 2,
-		ReadCount = 3,
-		Connect = 4,
-		Write = 5
+		read = 1,
+		send = 2,
+		connect = 3,
 	};
 }
 
@@ -40,7 +38,6 @@ namespace tcp
 		void Connect(const std::string & host, const std::string & port, int timeout = 0);
 	protected:
 		void ClearBuffer();
-		void SetNoDelayAndKeepAlive();
 		bool SendSync(tcp::IProto & message); //同步发送
 		bool SendSync(const char * message, size_t size); //同步发送
 		void Write(tcp::IProto & message, int timeout = 0);
@@ -57,7 +54,7 @@ namespace tcp
 		void StopTimer();
 		void StopUpdate();
 		void StartUpdate(int timeout);
-		void StartTimer(int timeout, TimeoutFlag flag);
+		void StartTimer(int timeout, tcp::timeout flag);
 	protected:
 		virtual void OnUpdate() { }
 		virtual void OnReadError(const Asio::Code & code) = 0;
@@ -68,12 +65,13 @@ namespace tcp
 		virtual void OnSendMessage(size_t size) { }
 		virtual void OnSendMessage(const Asio::Code & code) {  };
 	protected:
+		int mConnectCount;
 		const size_t mMaxCount;
 		asio::streambuf mSendBuffer;
         asio::streambuf mRecvBuffer;
 		std::unique_ptr<tcp::Socket> mSocket;
 	private:
-		int mConnectCount;
+		bool mIsConnected;
 		std::unique_ptr<asio::steady_timer> mTimer;
 		std::unique_ptr<asio::steady_timer> mUpdateTimer;
 	};

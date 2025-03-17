@@ -185,7 +185,7 @@ namespace ws
 		if(this->mHttpResponse != nullptr)
 		{
 			flag = this->mHttpResponse->OnRecvMessage(readStream, size);
-			if(flag == tcp::ReadDone)
+			if(flag == tcp::read::done)
 			{
 				if(this->mHttpResponse->Code() != HttpStatus::SWITCHING_PROTOCOLS)
 				{
@@ -212,19 +212,19 @@ namespace ws
 		}
 		switch(flag)
 		{
-			case tcp::ReadOneLine:
+			case tcp::read::line:
 				this->ReadLine();
 				break;
-			case tcp::ReadSome:
+			case tcp::read::some:
 				this->ReadSome();
 				break;
-			case tcp::ReadError:
+			case tcp::read::error:
 				this->Close(XCode::UnKnowPacket);
 				break;
-			case tcp::PacketLong:
+			case tcp::read::big_long:
 				this->Close(XCode::NetBigDataShutdown);
 				break;
-			case tcp::ReadDone:
+			case tcp::read::done:
 			{
 				auto self = this->shared_from_this();
 				const std::string & message = this->mMessage->GetMessageBody();

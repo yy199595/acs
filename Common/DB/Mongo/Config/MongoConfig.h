@@ -5,30 +5,38 @@
 #ifndef APP_MONGOCONFIG_H
 #define APP_MONGOCONFIG_H
 
+#include "DB/Common/Url.h"
 #include "DB/Common/Explain.h"
 
 namespace mongo
 {
-    class MongoConfig : public json::Object<MongoConfig>
+    class Cluster : public json::Object<Cluster>
     {
     public:
-        MongoConfig(): count(1), index(0), ping(0), debug(false) { }
+		Cluster(): count(1), debug(false) { }
     public:
-        int ping;
-		int index;
-		bool debug;
-		int count;
-        std::string db;
+        int ping = 15;
+		bool debug = false;
+		int count = 1;
 		std::string log;
 		std::string auth;
-        std::string user;
+		db::Explain explain;
+		int conn_count = 3; //重连次数
+		std::vector<std::string> address;
+    };
+
+	class Config : public db::Url
+	{
+	public:
+		Config() : db::Url("mongodb") { }
+	public:
+		int conn_count = 3;
+		std::string db;
+		std::string user;
 		std::string address;
 		std::string password;
 		std::string mechanism; //验证方式 SCRAM-SHA-1 or SCRAM-SHA-256
-		db::Explain explain;
-	public:
-		bool FromString(const std::string & url);
-    };
+	};
 
 	namespace auth
 	{

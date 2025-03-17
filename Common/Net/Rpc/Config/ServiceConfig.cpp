@@ -1,7 +1,7 @@
 ﻿#include "ServiceConfig.h"
-#include"Rpc/Common/Message.h"
-#include"Util/Tools/String.h"
-#include"Cluster/Config/ClusterConfig.h"
+#include "Rpc/Common/Message.h"
+#include "Util/Tools/String.h"
+#include "Cluster/Config/ClusterConfig.h"
 #include "Util/File/FileHelper.h"
 
 namespace acs
@@ -345,11 +345,30 @@ namespace acs
 		auto iter = this->mMethodConfigs.find(path);
 		if (iter == this->mMethodConfigs.end())
 		{
-			std::unique_ptr<HttpMethodConfig> config = std::make_unique<HttpMethodConfig>();
+			if(url.find('*') != std::string::npos) //正则表达式
 			{
-				config->path = path;
-				methodConfig = config.get();
-				this->mMethodConfigs.emplace(path, std::move(config));
+				for(std::unique_ptr<HttpMethodConfig> & config : this->mRegexConfigs)
+				{
+					if(config->path == path)
+					{
+						return config.get();
+					}
+				}
+				std::unique_ptr<HttpMethodConfig> config = std::make_unique<HttpMethodConfig>();
+				{
+					config->path = path;
+					methodConfig = config.get();
+					this->mRegexConfigs.emplace_back(std::move(config));
+				}
+			}
+			else
+			{
+				std::unique_ptr<HttpMethodConfig> config = std::make_unique<HttpMethodConfig>();
+				{
+					config->path = path;
+					methodConfig = config.get();
+					this->mMethodConfigs.emplace(path, std::move(config));
+				}
 			}
 		}
 		else
@@ -367,7 +386,19 @@ namespace acs
 	const HttpMethodConfig* HttpConfig::GetMethodConfig(const std::string& path) const
 	{
 		auto iter = this->mMethodConfigs.find(path);
-		return iter != this->mMethodConfigs.end() ? iter->second.get() : nullptr;
+		if(iter != this->mMethodConfigs.end())
+		{
+			return iter->second.get();
+		}
+		for(const std::unique_ptr<HttpMethodConfig> & config : this->mRegexConfigs)
+		{
+			std::regex re(config->path);
+			if(std::regex_match(path, re))
+			{
+				return config.get();
+			}
+		}
+		return nullptr;
 	}
 
 	void HttpConfig::GetMethodList(std::vector<const HttpMethodConfig*>& configs, const std::string& url) const

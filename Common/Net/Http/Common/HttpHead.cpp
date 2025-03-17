@@ -63,7 +63,7 @@ namespace http
 			this->mCounter = 0;
 			if(lineData == "\r")
             {
-				return tcp::ReadDone;
+				return tcp::read::done;
             }
 			if(lineData.back() == '\r')
 			{
@@ -85,14 +85,14 @@ namespace http
 				}
 				this->Add(key, value);
             }
-			return tcp::ReadOneLine;
+			return tcp::read::line;
 		}
 		this->mCounter++;
 		if(this->mCounter >= 20)
 		{
-			return tcp::ReadError;
+			return tcp::read::error;
 		}
-		return tcp::ReadOneLine;
+		return tcp::read::line;
     }
 
     int Head::OnSendMessage(std::ostream& buffer)

@@ -25,7 +25,7 @@ namespace acs
 		void OnConnectOK(int id) final;
 		void OnMessage(int, redis::Request *request, redis::Response *response) noexcept final;
 	private:
-		redis::Config mConfig;
+		redis::Cluster mConfig;
 		class DispatchComponent * mDispatch;
 		std::shared_ptr<redis::Client> mClient;
 		std::unordered_set<std::string> mChannels;

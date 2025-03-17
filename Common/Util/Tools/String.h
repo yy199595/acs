@@ -15,6 +15,8 @@ namespace help
 
 		extern size_t Hash(const std::string & str);
 
+		extern bool IsRegex(const std::string & pattern);
+
         //转大写
         extern void Toupper(std::string & str);
 

@@ -28,7 +28,7 @@ namespace http
 			{
 				this->mBody->OnDecode();
 			}
-			return tcp::ReadDone;
+			return tcp::read::done;
 		}
 		if (this->mParseState == tcp::Decode::None)
 		{
@@ -44,11 +44,11 @@ namespace http
 		{
 			switch (this->mHead.OnRecvMessage(buffer, size))
 			{
-				case tcp::ReadOneLine:
-					return tcp::ReadOneLine;
-				case tcp::ReadError:
-					return tcp::ReadError;
-				case tcp::ReadDone:
+				case tcp::read::line:
+					return tcp::read::line;
+				case tcp::read::error:
+					return tcp::read::error;
+				case tcp::read::done:
 					this->mParseState = tcp::Decode::MessageBody;
 					break;
 			}
@@ -78,13 +78,13 @@ namespace http
 			{
 				if(this->mHead.Has(http::Header::TransferEncoding))
 				{
-					return tcp::ReadOneLine;
+					return tcp::read::line;
 				}
-				return tcp::ReadDecodeError;
+				return tcp::read::decode_error;
 			}
 			else if(this->mContSize == 0)
 			{
-				return tcp::ReadDone;
+				return tcp::read::done;
 			}
 		}
 		if (this->mParseState == tcp::Decode::MessageBody)
@@ -96,17 +96,17 @@ namespace http
 					std::string line;
 					if (!std::getline(buffer, line))
 					{
-						return tcp::ReadDecodeError;
+						return tcp::read::decode_error;
 					}
 					line.pop_back();
 					if(line.empty())
 					{
-						return tcp::ReadDone;
+						return tcp::read::done;
 					}
 					this->mContSize = std::stoi(line, nullptr, 16);
 					if(this->mContSize == 0)
 					{
-						return tcp::ReadDone;
+						return tcp::read::done;
 					}
 					if (this->mContSize > 0)
 					{
@@ -116,17 +116,17 @@ namespace http
 				this->mBody->OnRecvMessage(buffer, size);
 				{
 					this->mContSize = 0;
-					return tcp::ReadOneLine;
+					return tcp::read::line;
 				}
 			}
 			int flag = this->mBody->OnRecvMessage(buffer, size);
 			if(this->mContSize > 0 && this->mBody->ContentLength() >= this->mContSize)
 			{
-				flag = tcp::ReadDone;
+				flag = tcp::read::done;
 			}
 			return flag;
 		}
-		return tcp::ReadError;
+		return tcp::read::error;
 	}
 
 	void Response::Json(const std::string& json)

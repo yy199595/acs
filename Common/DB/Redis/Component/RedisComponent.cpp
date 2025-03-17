@@ -1,23 +1,22 @@
-﻿#include"RedisComponent.h"
-#include"Timer/Timer/ElapsedTimer.h"
+﻿#include "RedisComponent.h"
 #include "Lua/Lib/Lib.h"
-#include"Server/Component/ThreadComponent.h"
-#include"Entity/Actor/App.h"
+#include "Entity/Actor/App.h"
+#include "Util/File/FileHelper.h"
+#include "Util/File/DirectoryHelper.h"
+#include "Timer/Timer/ElapsedTimer.h"
+#include "Server/Component/ThreadComponent.h"
 
-
-#include"Util/File/FileHelper.h"
-#include"Util/File/DirectoryHelper.h"
 
 namespace acs
 {
 	RedisComponent::RedisComponent()
 	{
-		REGISTER_JSON_CLASS_FIELD(redis::Config, ping);
-		REGISTER_JSON_CLASS_FIELD(redis::Config, count);
-		REGISTER_JSON_CLASS_FIELD(redis::Config, debug);
-		REGISTER_JSON_CLASS_FIELD(redis::Config, script);
-		REGISTER_JSON_CLASS_FIELD(redis::Config, password);
-		REGISTER_JSON_CLASS_MUST_FIELD(redis::Config, address);
+		this->mThread = nullptr;
+		REGISTER_JSON_CLASS_FIELD(redis::Cluster, ping);
+		REGISTER_JSON_CLASS_FIELD(redis::Cluster, count);
+		REGISTER_JSON_CLASS_FIELD(redis::Cluster, debug);
+		REGISTER_JSON_CLASS_FIELD(redis::Cluster, script);
+		REGISTER_JSON_CLASS_MUST_FIELD(redis::Cluster, address);
 	}
 
     bool RedisComponent::Awake()
@@ -27,6 +26,14 @@ namespace acs
 		});
 		return ServerConfig::Inst()->Get("redis", this->mConfig);
     }
+
+	void RedisComponent::OnStart()
+	{
+		if(!this->LoadRedisScript(this->mConfig.script))
+		{
+			LOG_ERROR("load lua script fail => {}", this->mConfig.script)
+		}
+	}
 
 	void RedisComponent::OnRecord(json::w::Document& document)
 	{
@@ -44,35 +51,81 @@ namespace acs
 
     bool RedisComponent::LateAwake()
 	{
-		const std::string & address = this->mConfig.address;
-		ThreadComponent* component = this->GetComponent<ThreadComponent>();
+		LOG_CHECK_RET_FALSE(!this->mConfig.address.empty())
+		this->mThread = this->GetComponent<ThreadComponent>();
+
+		for (int x = 0; x < this->mConfig.address.size(); x++)
 		{
+			const std::string & address = this->mConfig.address[x];
 			for (int index = 0; index < this->mConfig.count; index++)
 			{
-				timer::ElapsedTimer timer1;
-				redis::Config config = this->mConfig;
-				config.id = index + 1;
-				Asio::Context & io = this->mApp->GetContext();
-				tcp::Socket * sock = component->CreateSocket(address);
-				std::shared_ptr<redis::Client> redisCommandClient = std::make_shared<redis::Client>(sock, config, this, io);
+				redis::Config config;
+				if (!RedisComponent::DecodeUrl(address, config))
 				{
-					if(!redisCommandClient->Start())
+					return false;
+				}
+				timer::ElapsedTimer timer1;
+				int id = (x + 1) * 100 + index + 1;
+				config.conn_count = this->mConfig.conn_count;
+				Asio::Context& io = this->mApp->GetContext();
+				tcp::Socket* sock = this->mThread->CreateSocket(address);
+				std::shared_ptr<redis::Client> redisCommandClient = std::make_shared<redis::Client>(id, config,
+						this, io);
+				{
+					if (!redisCommandClient->Start(sock))
 					{
-						LOG_ERROR("connect redis [{}] fail count:{}", address, config.id);
+						LOG_ERROR("connect redis {} fail", address);
 						return false;
 					}
-					this->mFreeClients.Push(config.id);
-					this->mClients.emplace(config.id, redisCommandClient);
-					LOG_INFO("[{}ms] connect redis [{}] ok", timer1.GetMs(), address);
+					this->mClients.emplace(id, redisCommandClient);
+					LOG_INFO("[{}ms] connect {} ok", timer1.GetMs(), address);
 				}
 			}
 		}
-		return this->LoadRedisScript(this->mConfig.script);
+		return true;
+	}
+
+	bool RedisComponent::DecodeUrl(const std::string& url, redis::Config& config)
+	{
+		if(!config.Decode(url))
+		{
+			return false;
+		}
+		config.Get("password", config.password);
+		LOG_CHECK_RET_FALSE(config.Get("address", config.address))
+		return true;
+	}
+
+	void RedisComponent::OnConnectOK(int id)
+	{
+		if(this->mClients.find(id) != this->mClients.end())
+		{
+			this->mFreeClients.Push(id);
+			LOG_DEBUG("redis client:{} login ok", id);
+		}
+	}
+
+	void RedisComponent::OnClientError(int id, int code)
+	{
+		auto iter = this->mClients.find(id);
+		if (iter == this->mClients.end())
+		{
+			return;
+		}
+		this->mRetryClients.emplace(id);
+		std::string address = iter->second->GetAddress();
+		LOG_WARN("redis client ({}) login fail", address)
+	}
+
+	void RedisComponent::OnSendFailure(int id, redis::Request* message)
+	{
+		this->Send(std::unique_ptr<redis::Request>(message));
+		LOG_WARN("redis client:{} resend => {}", id, message->ToString())
 	}
 
 	void RedisComponent::OnSecondUpdate(int tick) noexcept
 	{
-		if(tick % this->mConfig.ping == 0)
+		if(this->mConfig.ping > 0 && tick % this->mConfig.ping == 0)
 		{
 			int id = 0;
 			while(this->mFreeClients.Pop(id))
@@ -83,6 +136,16 @@ namespace acs
 					this->Send(id, std::move(request));
 				}
 			}
+			for(const int id : this->mRetryClients)
+			{
+				auto iter = this->mClients.find(id);
+				if(iter != this->mClients.end())
+				{
+					iter->second->Start(nullptr);
+				}
+				LOG_WARN("redis client:{} try login", id);
+			}
+			this->mRetryClients.clear();
 		}
 	}
 
@@ -130,15 +193,6 @@ namespace acs
 		return this->BuildRpcTask<RedisTask>(taskId)->Await();
     }
 
-	std::unique_ptr<redis::Response> RedisComponent::SyncRun(std::unique_ptr<redis::Request> request) noexcept
-	{
-		for(auto iter = this->mClients.begin(); iter != this->mClients.end(); iter++)
-		{
-			return iter->second->Sync(std::move(request));
-		}
-		return nullptr;
-	}
-
 	void RedisComponent::Send(std::unique_ptr<redis::Request> request)
 	{
 		int id = 0;
@@ -168,7 +222,7 @@ namespace acs
 				return false;
 			}
 			timer::ElapsedTimer timer1;
-			std::unique_ptr<redis::Response> response = this->SyncRun("SCRIPT", "LOAD", content);
+			std::unique_ptr<redis::Response> response = this->Run("SCRIPT", "LOAD", content);
 			{
 				LOG_CHECK_RET_FALSE(response != nullptr && response->element.IsString());
 				if(!this->OnLoadScript(name, response->element.message))

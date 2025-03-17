@@ -72,10 +72,20 @@ namespace mongo
 		//TODO
 	}
 
-	bool Client::Start()
+	bool Client::Start(tcp::Socket * socket)
 	{
+		if(socket == nullptr)
+		{
+			Asio::Context& context = this->mSocket->GetContext();
+			asio::post(context, [this, self = this->shared_from_this()]() {
+				this->mConnectCount = 0;
+				this->Connect(5);
+			});
+			return true;
+		}
+		this->SetSocket(socket);
 #ifdef ONLY_MAIN_THREAD
-		return this->StartAuthBySha1();
+		return this->Auth(true);
 #else
 		custom::ThreadSync<bool> threadSync;
 		Asio::Context& context = this->mSocket->GetContext();
@@ -92,16 +102,15 @@ namespace mongo
 #endif
 	}
 
-	Client::Client(tcp::Socket* socket, Component* component,
-			MongoConfig config, Asio::Context& io)
-			: tcp::Client(socket, 0), mComponent(component), mConfig(std::move(config)), mMainContext(io)
+	Client::Client(int id, Component* component, mongo::Config config, Asio::Context& io)
+			: tcp::Client(0), mClientId(id), mComponent(component), mConfig(std::move(config)), mMainContext(io)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;
 	}
 
-	Client::Client(tcp::Socket* socket, MongoConfig config, Asio::Context& io)
-			: tcp::Client(socket, 0), mComponent(nullptr), mConfig(std::move(config)), mMainContext(io)
+	Client::Client(int id, mongo::Config config, Asio::Context& io)
+			: tcp::Client(0), mClientId(id), mComponent(nullptr), mConfig(std::move(config)), mMainContext(io)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;
@@ -410,14 +419,13 @@ namespace mongo
 		{
 			response->SetRpcId(request->GetRpcId());
 		}
-		int id = this->mConfig.index;
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(id, request.release(), response.release());
 #else
 		mongo::Request* req = request.release();
 		mongo::Response* resp = response.release();
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
-		asio::post(this->mMainContext, [this, self, req, id, resp]
+		asio::post(this->mMainContext, [this, self, req, id = this->mClientId, resp]
 		{
 			this->mComponent->OnMessage(id, req, resp);
 			delete req;
@@ -435,6 +443,10 @@ namespace mongo
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
 		asio::post(context, [this, self, data = request.release()]
 		{
+			if(data->dataBase.empty())
+			{
+				data->dataBase = this->mConfig.db;
+			}
 			this->mRequest.reset(data);
 			this->Write(*data);
 		});
@@ -512,25 +524,38 @@ namespace mongo
 	{
 		if (code.value() != Asio::OK)
 		{
-			this->OnResponse(XCode::NetConnectFailure);
+			if (count < this->mConfig.conn_count)
+			{
+				this->Connect(5);
+				return;
+			}
+		}
+		else if (this->Auth(false))
+		{
+			if (this->mRequest != nullptr)
+			{
+				this->Write(*this->mRequest);
+				CONSOLE_LOG_DEBUG("resend => {}", this->mRequest->ToString())
+			}
 			return;
 		}
-		if(!this->Auth(false))
+		if (this->mComponent != nullptr)
 		{
-			return;
-		}
-
-		this->ClearSendStream();
-		this->ClearRecvStream();
-		if (this->mRequest != nullptr)
-		{
-			this->Write(*this->mRequest);
+			int id = this->mClientId;
+			asio::post(this->mMainContext, [this, self = this->shared_from_this(), id]
+			{
+				this->mComponent->OnClientError(id, XCode::NetConnectFailure);
+				if (this->mRequest != nullptr)
+				{
+					this->mComponent->OnSendFailure(id, this->mRequest.release());
+				}
+			});
 		}
 	}
 
 	bool Client::Auth(bool connect)
 	{
-		if(connect)
+		if (connect)
 		{
 			Asio::Code code;
 			if (!this->ConnectSync(code))
@@ -540,28 +565,40 @@ namespace mongo
 				return false;
 			}
 		}
-		this->SetNoDelayAndKeepAlive();
-		if (this->mConfig.password.empty())
+		bool result = true;
+		if (!this->mConfig.password.empty())
 		{
-			return true;
-		}
-		if (this->mConfig.mechanism == mongo::auth::SCRAM_SHA1)
-		{
-			if (!this->AuthBySha1(this->mConfig.user, this->mConfig.db, this->mConfig.password))
+			if (this->mConfig.mechanism == mongo::auth::SCRAM_SHA1)
 			{
-				return this->AuthBySha1(this->mConfig.user, "admin", this->mConfig.password);
+				if (!this->AuthBySha1(this->mConfig.user, this->mConfig.db, this->mConfig.password))
+				{
+					result = this->AuthBySha1(this->mConfig.user, "admin", this->mConfig.password);
+				}
 			}
-		}
 #ifdef __ENABLE_OPEN_SSL__
-		else if (this->mConfig.mechanism == mongo::auth::SCRAM_SHA256)
-		{
-			if (!this->AuthBySha256(this->mConfig.user, this->mConfig.db, this->mConfig.password))
+			else if (this->mConfig.mechanism == mongo::auth::SCRAM_SHA256)
 			{
-				return this->AuthBySha256(this->mConfig.user, "admin", this->mConfig.password);
+				if (!this->AuthBySha256(this->mConfig.user, this->mConfig.db, this->mConfig.password))
+				{
+					result = this->AuthBySha256(this->mConfig.user, "admin", this->mConfig.password);
+				}
+			}
+#endif
+			else
+			{
+				result = false;
 			}
 		}
-#endif
-		return false;
+
+		if (result && this->mRequest == nullptr && this->mComponent != nullptr)
+		{
+			std::shared_ptr<tcp::Client> self = this->shared_from_this();
+			asio::post(this->mMainContext, [self, this, id = this->mClientId]()
+			{
+				this->mComponent->OnConnectOK(id);
+			});
+		}
+		return result;
 	}
 
 }

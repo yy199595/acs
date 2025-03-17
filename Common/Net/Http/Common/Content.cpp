@@ -210,7 +210,7 @@ namespace http
 			}
 		}
 		while(count > 0);
-		return tcp::ReadSomeMessage;
+		return tcp::read::some;
 	}
 
 	std::string FromContent::Serialize() const
@@ -244,7 +244,7 @@ namespace http
 				this->mJson.append(buffer, count);
 			}
 		} while (count > 0);
-		return tcp::ReadSomeMessage;
+		return tcp::read::some;
 	}
 
 	void JsonContent::OnWriteHead(std::ostream& os)
@@ -289,7 +289,7 @@ namespace http
 				this->mXml.append(buffer, count);
 			}
 		} while (count > 0);
-		return tcp::ReadSomeMessage;
+		return tcp::read::some;
 	}
 
 	void XMLContent::OnWriteHead(std::ostream& os)
@@ -352,11 +352,11 @@ namespace http
 			this->mContent.append(buffer, count);
 			if (this->mContent.size() >= this->mMaxSize)
 			{
-				return tcp::PacketLong;
+				return tcp::read::big_long;
 			}
 			count = is.readsome(buffer, sizeof(buffer));
 		}
-		return tcp::ReadSomeMessage;
+		return tcp::read::some;
 	}
 
 	void TextContent::SetContent(const std::string& type, const std::string& content)
@@ -431,7 +431,7 @@ namespace http
 			this->mFile.write(buff.get(), count);
 			this->mFile.flush();
 		}
-		return tcp::ReadSomeMessage;
+		return tcp::read::some;
 	}
 
 	bool FileContent::MakeFile(const std::string& path)
@@ -516,11 +516,11 @@ namespace http
 			std::string lineData;
 			if (!std::getline(buffer, lineData))
 			{
-				return tcp::ReadDecodeError;
+				return tcp::read::decode_error;
 			}
 			if (lineData.empty())
 			{
-				return tcp::ReadOneLine;
+				return tcp::read::line;
 			}
 			if (!lineData.empty() && lineData.back() == '\r')
 			{
@@ -529,7 +529,7 @@ namespace http
 			this->mContSize = std::stoul(lineData, nullptr, 16);
 			if (this->mContSize == 0)
 			{
-				return tcp::ReadDone;
+				return tcp::read::done;
 			}
 			return this->mContSize + 2;
 		}
@@ -543,7 +543,7 @@ namespace http
 			}
 			buffer.ignore(2);
 			this->mContSize = 0;
-			return tcp::ReadOneLine;
+			return tcp::read::line;
 		}
 	}
 
@@ -704,20 +704,20 @@ namespace http
 		this->mReadCount += size;
 		if (this->mMaxCount > 0 && this->mReadCount >= this->mMaxCount)
 		{
-			return tcp::ReadDecodeError;
+			return tcp::read::decode_error;
 		}
 		if (this->mBoundary.empty())
 		{
 			if (!std::getline(buffer, this->mBoundary))
 			{
-				return tcp::ReadOneLine;
+				return tcp::read::line;
 			}
 			this->mReadCount += this->mBoundary.size() + 1;
 			if (this->mBoundary.back() == '\r')
 			{
 				this->mBoundary.pop_back();
 			}
-			return tcp::ReadOneLine;
+			return tcp::read::line;
 		}
 
 		if (this->mFile.is_open())
@@ -729,12 +729,12 @@ namespace http
 				if (strstr(buff.get(), this->mBoundary.c_str()) != NULL)
 				{
 					this->mFile.close();
-					return tcp::ReadOneLine;
+					return tcp::read::line;
 				}
 				this->mFile.write(buff.get(), count);
 				this->mFile.flush();
 			}
-			return tcp::ReadOneLine;
+			return tcp::read::line;
 		}
 
 		std::string line;
@@ -747,11 +747,11 @@ namespace http
 
 			if (line == this->mBoundary)
 			{
-				return tcp::ReadOneLine;
+				return tcp::read::line;
 			}
 			else if (line.empty())
 			{
-				return tcp::ReadOneLine;
+				return tcp::read::line;
 			}
 			else if (line.find("Content-Disposition:") != std::string::npos)
 			{
@@ -768,7 +768,7 @@ namespace http
 					size_t filename_end = line.find("\"", filename_pos + 10);
 					this->mFileName = line.substr(filename_pos + 10, filename_end - filename_pos - 10);
 				}
-				return tcp::ReadOneLine;
+				return tcp::read::line;
 			}
 
 			if (!this->mFileName.empty())
@@ -784,7 +784,7 @@ namespace http
 				this->mFile.open(this->mPath, std::ios::out | std::ios::binary);
 				if (!this->mFile.is_open())
 				{
-					return tcp::ReadDecodeError;
+					return tcp::read::decode_error;
 				}
 				std::getline(buffer, line);
 				//this->mFileName.clear();
@@ -802,7 +802,7 @@ namespace http
 				//std::cout << this->mFieldName << ": " << line << std::endl;
 			}
 		}
-		return tcp::ReadOneLine;
+		return tcp::read::line;
 	}
 
 	BinContent::BinContent()
@@ -835,7 +835,7 @@ namespace http
 		{
 			this->mBody.append(buffer.get(), count);
 		}
-		return tcp::ReadSomeMessage;
+		return tcp::read::some;
 	}
 
 }

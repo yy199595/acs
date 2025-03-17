@@ -206,9 +206,7 @@ namespace acs
 		{
 			jsonObject->Get("fps", fps);
 		}
-#ifndef __OS_WIN__
 		std::chrono::milliseconds sleepTime(1);
-#endif
 		long long logicUpdateInterval = 1000 / fps;
 
 		while (!this->mContext.stopped())
@@ -274,9 +272,7 @@ namespace acs
 				}
 
 			}
-#ifndef __OS_WIN__
 			std::this_thread::sleep_for(sleepTime);
-#endif
 		}
 #ifdef __OS_WIN__
 		return std::getchar();
@@ -386,21 +382,6 @@ namespace acs
 			component->OnDestroy();
 
 		}
-#ifndef __DEBUG__
-		long long t = help::Time::NowMil() - t1;
-		NotifyComponent* groupNotifyComponent = this->GetComponent<NotifyComponent>();
-		if(groupNotifyComponent != nullptr)
-		{
-			notify::TemplateCard cardInfo;
-			cardInfo.Jump.url = "https://huwai.pro";
-			cardInfo.title = LangConfig::Text("server_stop_notify");
-			cardInfo.data.emplace_back(LangConfig::Text("cost_time"), fmt::format("{:.2f}s", t / 1000.f));
-			cardInfo.data.emplace_back(LangConfig::Text("process"), fmt::format("{}:{}", this->mConfig.Name(), this->GetSrvId()));
-			cardInfo.data.emplace_back(LangConfig::Text("time"), help::Time::GetDateString());
-
-			groupNotifyComponent->SendToWeChat(cardInfo, true);
-		}
-#endif
 		this->mContext.stop();
 	}
 
@@ -447,21 +428,6 @@ namespace acs
 		completeComponents.clear();
 		this->mStatus = ServerStatus::Ready;
 		long long t = help::Time::NowMil() - this->mStartTime;
-#ifndef __DEBUG__
-		NotifyComponent* groupNotifyComponent = this->GetComponent<NotifyComponent>();
-		if(groupNotifyComponent != nullptr)
-		{
-			notify::TemplateCard cardInfo;
-			cardInfo.Jump.url = "https://huwai.pro";
-			cardInfo.title = LangConfig::Text("server_start_notify");
-			cardInfo.data.emplace_back(LangConfig::Text("cost_time"), fmt::format("{:.2f}s", t / 1000.f));
-			cardInfo.data.emplace_back(LangConfig::Text("process"), fmt::format("{}:{}", this->mConfig.Name(), this->GetSrvId()));
-			cardInfo.data.emplace_back(LangConfig::Text("config"), this->mConfig.Path());
-			cardInfo.data.emplace_back(LangConfig::Text("time"), help::Time::GetDateString());
-
-			groupNotifyComponent->SendToWeChat(cardInfo);
-		}
-#endif
 		LOG_INFO("  ===== start {} ok [{:.3f}s] =======", this->Name(), t / 1000.0f);
 	}
 }

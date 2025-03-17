@@ -42,7 +42,7 @@ namespace udp
 			{
 				return;
 			}
-			if (rpcPacket->OnRecvMessage(is, len) != tcp::ReadDone)
+			if (rpcPacket->OnRecvMessage(is, len) != tcp::read::done)
 			{
 				return;
 			}

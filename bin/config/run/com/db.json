@@ -1,26 +1,21 @@
 {
-    "sub": {
-        "ping": 0,
-        "debug": false,
-        "password": "199595yjz.",
-        "address": "${db}:6379"
-    },
     "redis": {
         "ping": 15,
         "count": 1,
         "debug": false,
-        "password": "199595yjz.",
-        "address": "${db}:6379",
-        "script": "${WORK_DIR}/config/db/redis"
+        "address": [
+            "redis://${db}:6379/?password=199595yjz."
+        ],
+        "script": "${WORK_DIR}/config/db/redis",
+        "sub" : "redis://${db}:6379/?password=199595yjz."
     },
     "mysql": {
         "ping": 30,
         "count": 1,
-        "db": "yjz",
-        "debug" : true,
-        "address": "${db}:3306",
-        "user": "debian-sys-maint",
-        "password": "13oc5QKIaY3nFagc",
+        "debug" : false,
+        "address" : [
+            "mysql://${db}:3306/yjz?user=root&password=199595yjz."
+        ],
         "script": "${WORK_DIR}/sql/mysql.sql",
         "explain" : {
             "open" : false,
@@ -33,11 +28,11 @@
     "pgsql": {
         "ping": 30,
         "count": 1,
-        "db": "yy",
-        "debug" : true,
-        "user": "postgres",
-        "address": "${db}:5432",
-        "password": "199595yjz.",
+        "debug" : false,
+        "address" : [
+            "pgsql://${db}:5432/yjz?user=postgres&password=199595yjz."
+        ],
+        "script": "${WORK_DIR}/sql/pgsql.sql",
         "explain" : {
             "open" : false,
             "command" : [
@@ -51,12 +46,10 @@
         "ping": 15,
         "count": 1,
         "debug": true,
-        "db": "yjz",
-        "user": "root",
-        "password": "",
-        "address": "${db}:27017",
+        "address" : [
+            "mongodb://${db}:27017/yjz?mechanism=SCRAM-SHA-1"
+        ],
         "log": "${WORK_DIR}/mongo",
-        "mechanism" : "SCRAM-SHA-1",
         "explain" : {
             "open" : false,
             "command" : [

@@ -11,30 +11,27 @@
 #include "Message/s2s/registry.pb.h"
 #include "Lua/Lib/Lib.h"
 #include "XCode/XCode.h"
+#include "Util/Tools/String.h"
 #include "Server/Config/CodeConfig.h"
-
+#include "Util/File/FileHelper.h"
+#include "Util/Tools/Math.h"
 namespace acs
 {
 	MysqlDBComponent::MysqlDBComponent()
 	{
-		this->mLogger = nullptr;
-
+		this->mCount = 0;
+		this->mThread = nullptr;
 		REGISTER_JSON_CLASS_FIELD(db::Explain, open);
 		REGISTER_JSON_CLASS_FIELD(db::Explain, command);
 
-		REGISTER_JSON_CLASS_MUST_FIELD(mysql::Binlog, id);
-		REGISTER_JSON_CLASS_MUST_FIELD(mysql::Binlog, name);
-		REGISTER_JSON_CLASS_MUST_FIELD(mysql::Binlog, user);
-		REGISTER_JSON_CLASS_MUST_FIELD(mysql::Binlog, password);
-
-		REGISTER_JSON_CLASS_FIELD(mysql::Config, db);
-		REGISTER_JSON_CLASS_FIELD(mysql::Config, user);
-		REGISTER_JSON_CLASS_FIELD(mysql::Config, ping);
-		REGISTER_JSON_CLASS_FIELD(mysql::Config, count);
-		REGISTER_JSON_CLASS_FIELD(mysql::Config, script);
-		REGISTER_JSON_CLASS_FIELD(mysql::Config, debug);
-		REGISTER_JSON_CLASS_FIELD(mysql::Config, password);
-		REGISTER_JSON_CLASS_MUST_FIELD(mysql::Config, address);
+		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, ping);
+		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, count);
+		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, script);
+		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, debug);
+		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, explain);
+		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, binlog);
+		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, conn_count);
+		REGISTER_JSON_CLASS_MUST_FIELD(mysql::Cluster, address);
 
 		REGISTER_JSON_CLASS_FIELD(mysql::Explain, id);
 		REGISTER_JSON_CLASS_FIELD(mysql::Explain, ref);
@@ -62,70 +59,80 @@ namespace acs
 
 	bool MysqlDBComponent::LateAwake()
 	{
-		for(int index = 0; index < this->mConfig.count; index++)
+		LOG_CHECK_RET_FALSE(!this->mConfig.address.empty())
+		this->mThread = this->GetComponent<ThreadComponent>();
+		for(int x = 0; x < this->mConfig.address.size(); x++)
 		{
-			int id = index + 1;
-			timer::ElapsedTimer timer1;
-			Asio::Context & main = this->mApp->GetContext();
-			tcp::Socket * tcpSocket = this->GetComponent<ThreadComponent>()->CreateSocket(this->mConfig.address);
-			std::shared_ptr<mysql::Client> mysqlClient = std::make_shared<mysql::Client>(id, tcpSocket, this, this->mConfig, main);
+			const std::string & address = this->mConfig.address.at(x);
+			for (int index = 0; index < this->mConfig.count; index++)
 			{
-				int code = mysqlClient->Start();
-				if(code != XCode::Ok)
+				mysql::Config config;
+				timer::ElapsedTimer timer1;
+				if(!MysqlDBComponent::DecodeUrl(address, config))
 				{
-					std::string desc = CodeConfig::Inst()->GetDesc(code);
-					LOG_ERROR("mysql [{}] {} ", this->mConfig.address, desc);
 					return false;
 				}
-				this->mFreeClients.Push(id);
-				this->mClients.emplace(id, mysqlClient);
-				LOG_INFO("[{}ms] connect mysql [{}] ok ", timer1.GetMs(), this->mConfig.address);
+				int id = (x + 1) * 100 + index + 1;
+				config.script = this->mConfig.script;
+				config.conn_count = this->mConfig.conn_count;
+				Asio::Context& main = this->mApp->GetContext();
+				tcp::Socket* tcpSocket = this->mThread->CreateSocket(config.address);
+				std::shared_ptr<mysql::Client> mysqlClient = std::make_shared<mysql::Client>(id, this, config, main);
+				{
+					int code = mysqlClient->Start(tcpSocket);
+					if (code != XCode::Ok)
+					{
+						LOG_ERROR("connect {} {} ", address, CodeConfig::Inst()->GetDesc(code));
+						return false;
+					}
+					this->mClients.emplace(id, mysqlClient);
+					LOG_INFO("[{}ms] connect {} ok ", timer1.GetMs(), address);
+				}
 			}
 		}
-		this->mLogger = this->GetComponent<LoggerComponent>();
 		return true;
+	}
+
+	bool MysqlDBComponent::DecodeUrl(const std::string& address, mysql::Config& config)
+	{
+		if(!config.Decode(address))
+		{
+			return false;
+		}
+		std::string ip, port;
+		config.Get("db", config.db);
+		config.Get("password", config.password);
+		LOG_CHECK_RET_FALSE(config.Get("user", config.user))
+		LOG_CHECK_RET_FALSE(config.Get("address", config.address))
+		return true;
+	}
+
+	void MysqlDBComponent::OnRecord(json::w::Document& document)
+	{
+		timer::ElapsedTimer timer1;
+		this->Run(std::make_unique<mysql::Request>(mysql::cmd::PING));
+		std::unique_ptr<json::w::Value> jsonObject = document.AddObject("mysql");
+		{
+			jsonObject->Add("sum", this->mCount);
+			jsonObject->Add("client", this->mClients.size());
+			jsonObject->Add("free", this->mFreeClients.Size());
+			jsonObject->Add("retry", this->mRetryClients.size());
+			jsonObject->Add("ping", fmt::format("{}ms", timer1.GetMs()));
+		}
+	}
+
+	void MysqlDBComponent::OnConnectOK(int id)
+	{
+		if(this->mClients.find(id) != this->mClients.end())
+		{
+			this->mFreeClients.Push(id);
+			LOG_DEBUG("mysql client:{} login ok", id);
+		}
 	}
 
 	void MysqlDBComponent::OnDestroy()
 	{
 
-	}
-
-	void MysqlDBComponent::OnStart()
-	{
-		// if(!this->mConfig.binlog.user.empty() && !this->mConfig.binlog.password.empty())
-		// {
-		// 	json::r::Document document;
-		//
-		// 	std::unique_ptr<mysql::Response> response = this->Run(std::make_unique<mysql::Request>("SHOW MASTER STATUS"));
-		// 	if(response->IsOk() && document.Decode(response->GetFirstResult()))
-		// 	{
-		// 		std::string binLogFile;
-		// 		uint32_t binLogPosition = 4;
-		// 		LOG_CHECK_RET(document.Get("File", binLogFile))
-		// 		LOG_CHECK_RET(document.Get("Position", binLogPosition))
-		//
-		// 		mysql::Config config;
-		// 		config.user = this->mConfig.binlog.user;
-		// 		config.passwd = this->mConfig.binlog.password;
-		// 		Asio::Context & main = this->mApp->GetContext();
-		// 		ThreadComponent * threadCom = this->GetComponent<ThreadComponent>();
-		// 		tcp::Socket * tcpSocket = threadCom->CreateSocket(this->mConfig.address);
-		// 		this->mBinLogClient = std::make_shared<mysql::Client>(0, tcpSocket, this, config, main);
-		// 		if(this->mBinLogClient->Start() != XCode::Ok)
-		// 		{
-		// 			LOG_ERROR("binlog mysql client [{}] {} ", this->mConfig.address);
-		// 			return;
-		// 		}
-		// 		if(!this->mBinLogClient->SubBinLog(binLogFile, binLogPosition))
-		// 		{
-		// 			LOG_ERROR("sub binlog {} fail", binLogFile);
-		// 			return;
-		// 		}
-		// 		LOG_INFO("sub binlog {} ok", binLogFile)
-		// 		this->mBinLogClient->StartReceive();
-		// 	}
-		// }
 	}
 
 	void MysqlDBComponent::OnMessage(int id, mysql::Request* request, mysql::Response* response) noexcept
@@ -136,7 +143,7 @@ namespace acs
 			this->mBinLogClient->StartReceive();
 			return;
 		}
-
+		this->mCount++;
 		if(this->mMessages.empty())
 		{
 			this->mFreeClients.Push(id);
@@ -149,10 +156,10 @@ namespace acs
 			}
 			this->mMessages.pop();
 		}
-		if(!response->IsOk())
+		if(response->HasError())
 		{
 			LOG_ERROR("{}", request->ToString());
-			LOG_ERROR("{}", response->GetBuffer());
+			LOG_ERROR("{}", response->ToString());
 		}
 		else
 		{
@@ -172,7 +179,7 @@ namespace acs
 			if(this->mConfig.debug)
 			{
 				CONSOLE_LOG_DEBUG("request=>{}", request->ToString());
-				CONSOLE_LOG_DEBUG("[{}ms] response=>{}", request->GetCostTime(), response->GetBuffer());
+				CONSOLE_LOG_DEBUG("[{}ms] response=>{}", request->GetCostTime(), response->ToString());
 			}
 		}
 		int rpcId = request->GetRpcId();
@@ -183,6 +190,7 @@ namespace acs
 	{
 		const std::string newSql = fmt::format("EXPLAIN {}", sql);
 		std::unique_ptr<mysql::Response> response1 = this->Run(newSql);
+		LoggerComponent * logger = this->GetComponent<LoggerComponent>();
 		{
 			std::string result;
 			if(response1->GetFirstResult(result))
@@ -193,17 +201,61 @@ namespace acs
 					sqlLog->Content = fmt::format("[{}ms] {}\n", ms, sql);
 					{
 						sqlLog->Content.append(result);
-						this->mLogger->PushLog("mysql", std::move(sqlLog));
+						logger->PushLog("mysql", std::move(sqlLog));
 					}
 				}
 			}
 		}
 	}
 
-
 	void MysqlDBComponent::OnBinLog(mysql::Response* response) noexcept
 	{
-		LOG_DEBUG("{}", response->GetErrorCode());
+		if(response->HasError())
+		{
+			LOG_ERROR("{}", response->ToString())
+			return;
+		}
+		LOG_DEBUG("binlog => {}", response->ToString());
+	}
+
+	void MysqlDBComponent::OnSendFailure(int id, mysql::Request* message)
+	{
+		// 重新找一个mysql client执行
+		this->Send(std::unique_ptr<mysql::Request>(message));
+		LOG_WARN("redis client:{} resend => {}", id, message->ToString())
+	}
+
+	void MysqlDBComponent::OnClientError(int id, int code)
+	{
+		auto iter = this->mClients.find(id);
+		if(iter == this->mClients.end())
+		{
+			return;
+		}
+		this->mRetryClients.emplace(id);
+		std::string address = iter->second->GetAddress();
+		LOG_WARN("mysql client ({}) login fail", address)
+	}
+
+	void MysqlDBComponent::OnSecondUpdate(int tick) noexcept
+	{
+		if(this->mConfig.ping > 0 && tick % this->mConfig.ping == 0)
+		{
+			int id = 0;
+			while(this->mFreeClients.Pop(id))
+			{
+				this->Send(id, std::make_unique<mysql::Request>(mysql::cmd::PING));
+			}
+			for(const int id : this->mRetryClients)
+			{
+				auto iter = this->mClients.find(id);
+				if(iter != this->mClients.end())
+				{
+					iter->second->Start(nullptr);
+				}
+			}
+			this->mRetryClients.clear();
+		}
 	}
 
 
@@ -241,7 +293,6 @@ namespace acs
 	{
 		return this->Run(std::make_unique<mysql::Request>(sql));
 	}
-
 
 	std::unique_ptr<mysql::Response> MysqlDBComponent::Run(std::unique_ptr<mysql::Request> request)
 	{

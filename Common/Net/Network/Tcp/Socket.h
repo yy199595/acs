@@ -42,17 +42,16 @@ namespace tcp
 		 void operator delete (void * ptr);
 #endif
 	 public:
-        void Init();
+		bool Init();
 		void MakeNewSocket();
 		bool CanRecvCount(size_t & count);
-		void Init(const std::string & address);
-		void Init(const std::string & ip, unsigned short port);
+		bool Init(const std::string & address);
+		bool Init(const std::string & ip, unsigned short port);
 		inline Asio::Socket & Get() { return *this->mSocket; }
-		inline bool IsOpen() const { return this->mSocket && this->mSocket->is_open(); }
 	public:
 		bool SetOption(OptionType type, bool val);
-		inline bool IsOpenSsl() const { return this->mIsOpenSsl; }
 		inline Asio::Context & GetContext() { return this->mContext; }
+		inline bool IsOpenSsl() const { return this->mSslSocket != nullptr; }
 #ifdef __ENABLE_OPEN_SSL__
 		inline Asio::ssl::Socket & SslSocket() { return *this->mSslSocket; }
 #endif
@@ -67,14 +66,13 @@ namespace tcp
 	private:
 		bool mIsClient;
 		std::string mIp;
-		bool mIsOpenSsl;
 		unsigned short mPort;
 		std::string mAddress;
 		Asio::Context & mContext;
+		std::unique_ptr<Asio::Socket> mSocket;
 #ifdef __ENABLE_OPEN_SSL__
 		std::unique_ptr<Asio::ssl::Socket> mSslSocket;
 #endif
-		std::unique_ptr<Asio::Socket> mSocket;
 #ifdef __MEMORY_POOL_OPERATOR__
 	private:
 		static std::mutex sMutex;

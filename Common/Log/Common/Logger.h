@@ -28,7 +28,6 @@ namespace custom
 		bool open = true;
 		std::string path;
 		std::string name;
-		std::string pem;
 		std::string wx;
 		std::string ding;
 		std::string mongo;

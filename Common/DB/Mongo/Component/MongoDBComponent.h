@@ -70,19 +70,23 @@ namespace acs
 		bool Awake() final;
 		bool LateAwake() final;
 		void OnDestroy() final;
+		void OnConnectOK(int id) final;
+		void OnClientError(int id, int code) final;
 		void OnSecondUpdate(int tick) noexcept final;
 		void OnRecord(json::w::Document &document) final;
+		void OnSendFailure(int id, mongo::Request *message) final;
 		void OnExplain(std::unique_ptr<mongo::Request> request, long long ms) noexcept;
 		void OnMessage(int id, mongo::Request * request, mongo::Response * message) noexcept final;
 	private:
 		void Send(std::unique_ptr<mongo::Request> request);
 		void Send(int id, std::unique_ptr<mongo::Request> request);
+		static bool DecodeUrl(const std::string & url, mongo::Config & config);
 	private:
-		mongo::MongoConfig mConfig;
-		class LoggerComponent * mLogger;
+		mongo::Cluster mConfig;
 		custom::Queue<int> mFreeClients;
+		std::unordered_set<int> mRetryClients; //断开了 重试的客户端
 		std::queue<std::unique_ptr<mongo::Request>> mRequests;
-		std::unordered_map<int, std::shared_ptr<mongo::Client>> mMongoClients;
+		std::unordered_map<int, std::shared_ptr<mongo::Client>> mClients;
 	};
 }
 

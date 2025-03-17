@@ -5,7 +5,7 @@ namespace tcp
 
 
 	Socket::Socket(asio::io_service& thread)
-		: mContext(thread), mIsOpenSsl(false), mIsClient(false)
+		: mContext(thread), mIsClient(false)
 	{
 		this->mPort = 0;
 		this->mIsClient = false;
@@ -13,31 +13,30 @@ namespace tcp
 	}
 #ifdef __ENABLE_OPEN_SSL__
 	Socket::Socket(Asio::Context& io, asio::ssl::context& ssl)
-		: mContext(io), mIsOpenSsl(true), mIsClient(false)
+		: mContext(io), mIsClient(false)
 	{
 		this->mPort = 0;
 		this->MakeNewSocket();
 #ifdef __ENABLE_OPEN_SSL__
-		if(this->mIsOpenSsl)
-		{
-			this->mSslSocket = std::make_unique<Asio::ssl::Socket>(*this->mSocket, ssl);
-		}
+		this->mSslSocket = std::make_unique<Asio::ssl::Socket>(*this->mSocket, ssl);
 #endif
 	}
 #endif
 
 
-    void Socket::Init()
+	bool Socket::Init()
     {
         asio::error_code code;
         const Asio::EndPoint endPoint = this->mSocket->remote_endpoint(code);
-        if (this->mSocket->is_open() && !code)
+        if (!this->mSocket->is_open() || code.value() != Asio::OK)
         {
-			this->mIsClient = false;
-            this->mPort = endPoint.port();
-            this->mIp = endPoint.address().to_string();
-            this->mAddress = fmt::format("{0}:{1}", this->mIp, this->mPort);
+			return true;
         }
+		this->mIsClient = false;
+		this->mPort = endPoint.port();
+		this->mIp = endPoint.address().to_string();
+		this->mAddress = fmt::format("{0}:{1}", this->mIp, this->mPort);
+		return true;
     }
 
 #ifdef __MEMORY_POOL_OPERATOR__
@@ -78,77 +77,86 @@ namespace tcp
 	{
 		if(this->mSocket && this->mSocket->is_open())
 		{
-			asio::error_code code;
-			{
-				this->mSocket->cancel(code);
-				this->mSocket->shutdown(asio::socket_base::shutdown_both, code);
-				this->mSocket->close(code);
-			}
+			this->Close();
 		}
 		this->mSocket = std::make_unique<Asio::Socket>(this->mContext);
-		this->SetOption(tcp::OptionType::NoDelay, true);
-		this->SetOption(tcp::OptionType::KeepAlive, true);
+		{
+			this->SetOption(tcp::OptionType::NoDelay, true);
+			this->SetOption(tcp::OptionType::KeepAlive, true);
+		}
 	}
 
-	void Socket::Init(const std::string& address)
+	bool Socket::Init(const std::string& address)
 	{
 		std::string ip;
 		unsigned short port = 0;
 		if(help::Str::SplitAddr(address, ip, port))
 		{
-			this->Init(ip, port);
+			return false;
 		}
+		return this->Init(ip, port);
 	}
 
-    void Socket::Init(const std::string &ip, unsigned short port)
+    bool Socket::Init(const std::string &ip, unsigned short port)
 	{
 		if (ip.empty() || port == 0)
 		{
-			CONSOLE_LOG_ERROR("Inti Socket Error Address Error")
-			return;
+			return false;
 		}
 		this->mIp = ip;
 		this->mPort = port;
 		this->mIsClient = true;
 		this->mAddress = fmt::format("{0}:{1}", ip, port);
+		return true;
 	}
 
 	bool Socket::SetOption(tcp::OptionType type, bool val)
 	{
-
-		asio::error_code code;
-		switch (type)
+		try
 		{
-			case tcp::OptionType::NoDelay:
-				this->mSocket->set_option(asio::ip::tcp::no_delay(val), code);
-				return true;
-			case tcp::OptionType::KeepAlive:
-				this->mSocket->set_option(asio::ip::tcp::socket::keep_alive(val), code); //保持连接
-				return true;
-			case tcp::OptionType::CloseLinger:
-				this->mSocket->set_option(asio::socket_base::linger(val, 0), code); //立即关闭
-				return true;
-			case tcp::OptionType::ReuseAddress:
-				this->mSocket->set_option(asio::ip::tcp::socket::reuse_address(val), code); //重用地址
-				return true;
+			switch (type)
+			{
+				case tcp::OptionType::NoDelay:
+					this->mSocket->set_option(asio::ip::tcp::no_delay(val));
+					return true;
+				case tcp::OptionType::KeepAlive:
+					this->mSocket->set_option(asio::ip::tcp::socket::keep_alive(val)); //保持连接
+					return true;
+				case tcp::OptionType::CloseLinger:
+					this->mSocket->set_option(asio::socket_base::linger(val, 0)); //立即关闭
+					return true;
+				case tcp::OptionType::ReuseAddress:
+					this->mSocket->set_option(asio::ip::tcp::socket::reuse_address(val)); //重用地址
+					return true;
+			}
+			return true;
 		}
-		return code.value() == Asio::OK;
+		catch(const std::system_error &)
+		{
+			return false;
+		}
 	}
 
 
 	void Socket::Close()
 	{
-		asio::error_code code;
-		this->mSocket->cancel(code);
-		this->mSocket->shutdown(asio::socket_base::shutdown_both, code);
-		this->mSocket->close(code);
+		try
+		{
+			this->mSocket->cancel();
+			this->mSocket->shutdown(asio::socket_base::shutdown_both);
+			this->mSocket->close();
 
 #ifdef __ENABLE_OPEN_SSL__
-		if (this->mIsOpenSsl && this->mSslSocket)
-		{
-			this->mSslSocket->shutdown(code);
-		}
+			if (this->mSslSocket != nullptr)
+			{
+				this->mSslSocket->shutdown();
+			}
 #endif
+		}
+		catch (const std::system_error & err)
+		{
+
+		}
 	}
 
 	void Socket::Destroy()

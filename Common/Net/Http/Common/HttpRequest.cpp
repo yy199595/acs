@@ -49,17 +49,17 @@ namespace http
 		if(this->mDecodeStatus == tcp::Decode::None)
 		{
 			int code = this->mUrl.OnRecvMessage(buffer, size);
-			if(code != tcp::ReadDone)
+			if(code != tcp::read::done)
 			{
 				return code;
 			}
 			this->mDecodeStatus = tcp::Decode::MessageHead;
-			return tcp::ReadOneLine;
+			return tcp::read::line;
 		}
 		if(this->mDecodeStatus == tcp::Decode::MessageHead)
 		{
 			int code = this->mHead.OnRecvMessage(buffer, size);
-			if(code != tcp::ReadDone)
+			if(code != tcp::read::done)
 			{
 				return code;
 			}
@@ -70,10 +70,10 @@ namespace http
 			{
 				if(this->mConeSize == 0)
 				{
-					return tcp::ReadDecodeError;
+					return tcp::read::decode_error;
 				}
 			}
-			return tcp::ReadPause;
+			return tcp::read::pause;
 		}
 		if(this->mDecodeStatus == tcp::Decode::MessageBody)
 		{
@@ -82,31 +82,31 @@ namespace http
 				if(this->mBody != nullptr && !this->mBody->OnDecode())
 				{
 					LOG_ERROR("parse http body fail : {}", this->mUrl.ToString());
-					return tcp::ReadDecodeError;
+					return tcp::read::decode_error;
 				}
-				return tcp::ReadDone;
+				return tcp::read::done;
 			}
 			int flag = this->mBody->OnRecvMessage(buffer, size);		
 			if(this->mConeSize > 0 && this->mBody->ContentLength() >= this->mConeSize)
 			{
-				flag = tcp::ReadDone;
+				flag = tcp::read::done;
 			}
 
-			if (flag == tcp::ReadContentLength)
+			if (flag == tcp::read::content_length)
 			{
 				if (this->mConeSize <= 0)
 				{
-					return tcp::ReadDecodeError;
+					return tcp::read::decode_error;
 				}
 				return this->mConeSize;
 			}
 			if(flag == 0 && !this->mBody->OnDecode())
 			{
-				return tcp::ReadDecodeError;
+				return tcp::read::decode_error;
 			}
 			return flag;
 		}
-		return tcp::ReadDone;
+		return tcp::read::done;
 	}
 
 	void Request::Clear()
@@ -145,11 +145,18 @@ namespace http
 
 	int Request::WriteToLua(lua_State* lua) const
 	{
-		lua_createtable(lua, 0, 3);
+		lua_createtable(lua, 0, 4);
 		{
 			lua_pushstring(lua, "head");
 			tcp::IHeader::WriteLua(lua, this->mHead);
 			lua_rawset(lua, -3);
+		}
+		{
+			lua_pushstring(lua, "url");
+			const std::string & url = this->mUrl.ToStr();
+			lua_pushlstring(lua, url.c_str(), url.size());
+			lua_rawset(lua, -3);
+
 		}
 		{
 			const http::FromContent& fromData = this->mUrl.GetQuery();

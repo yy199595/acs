@@ -16,15 +16,19 @@ struct lua_State;
 
 namespace tcp
 {
-	constexpr int ReadDone = 0;
-	constexpr int ReadOneLine = -1; //读一行
-	constexpr int ReadSomeMessage = -2; //读一些
-	constexpr int ReadError = -3;    //读取错误
-	constexpr int ReadDecodeError = -4; //解析错误
-    constexpr int ReadPause = -5; //暂停
-	constexpr int PacketLong = -6; //包体过长
-	constexpr int ReadAll = -7;
-	constexpr int ReadContentLength = -8;
+	namespace read
+	{
+		constexpr int done = 0;
+		constexpr int line = -1; //读一行
+		constexpr int some = -2; //读一些
+		constexpr int error = -3;    //读取错误
+		constexpr int decode_error = -4; //解析错误
+		constexpr int pause = -5; //暂停
+		constexpr int big_long = -6; //包体过长
+		constexpr int all = -7;
+		constexpr int content_length = -8;
+	}
+
 
 	namespace Decode
 	{

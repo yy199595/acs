@@ -16,11 +16,11 @@ namespace mongo
 	{
 	 public:
 		typedef acs::IRpc<Request, Response> Component;
-		Client(tcp::Socket * socket, MongoConfig  config, Asio::Context & io);
-		Client(tcp::Socket * socket, Component * component, MongoConfig  config, Asio::Context & io);
+		Client(int id, mongo::Config config, Asio::Context & io);
+		Client(int id, Component * component, mongo::Config config, Asio::Context & io);
 	public:
         void Stop();
-		bool Start();
+		bool Start(tcp::Socket * socket);
 		void SendMongoCommand(std::unique_ptr<Request> request);
 		bool SyncSend(const std::unique_ptr<Request>& request, mongo::Response & response);
 		std::unique_ptr<mongo::Response> SyncMongoCommand(std::unique_ptr<Request> request);
@@ -42,8 +42,9 @@ namespace mongo
 		void OnConnect(const Asio::Code &, int count) final;
 		void OnSendMessage(const asio::error_code &code) final;
 	private:
+		int mClientId;
 		Component * mComponent;
-		const MongoConfig mConfig;
+		const mongo::Config mConfig;
 		asio::streambuf streamBuffer;
 		Asio::Context & mMainContext;
 		std::unique_ptr<mongo::Request> mRequest;

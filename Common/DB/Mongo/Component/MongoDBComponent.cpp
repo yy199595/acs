@@ -70,25 +70,18 @@ namespace acs
 {
 	MongoDBComponent::MongoDBComponent()
 	{
-		this->mLogger = nullptr;
 
 		REGISTER_JSON_CLASS_FIELD(db::Explain, open);
 		REGISTER_JSON_CLASS_FIELD(db::Explain, command);
 
-		REGISTER_JSON_CLASS_FIELD(mongo::MongoConfig, db);
-		REGISTER_JSON_CLASS_FIELD(mongo::MongoConfig, db);
-		REGISTER_JSON_CLASS_FIELD(mongo::MongoConfig, log);
-		REGISTER_JSON_CLASS_FIELD(mongo::MongoConfig, auth);
-		REGISTER_JSON_CLASS_FIELD(mongo::MongoConfig, ping);
-		REGISTER_JSON_CLASS_FIELD(mongo::MongoConfig, user);
-		REGISTER_JSON_CLASS_FIELD(mongo::MongoConfig, debug);
-		REGISTER_JSON_CLASS_FIELD(mongo::MongoConfig, count);
-		REGISTER_JSON_CLASS_FIELD(mongo::MongoConfig, password);
-		REGISTER_JSON_CLASS_FIELD(mongo::MongoConfig, mechanism);
-		REGISTER_JSON_CLASS_FIELD(mongo::MongoConfig, explain);
+		REGISTER_JSON_CLASS_FIELD(mongo::Cluster, log);
+		REGISTER_JSON_CLASS_FIELD(mongo::Cluster, auth);
+		REGISTER_JSON_CLASS_FIELD(mongo::Cluster, ping);
+		REGISTER_JSON_CLASS_FIELD(mongo::Cluster, debug);
+		REGISTER_JSON_CLASS_FIELD(mongo::Cluster, count);
+		REGISTER_JSON_CLASS_FIELD(mongo::Cluster, explain);
 
-		REGISTER_JSON_CLASS_MUST_FIELD(mongo::MongoConfig, address);
-
+		REGISTER_JSON_CLASS_MUST_FIELD(mongo::Cluster, address);
 
 	}
 
@@ -97,11 +90,6 @@ namespace acs
 		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
 			ccModule.Open("db.mongo", lua::lib::luaopen_lmonogodb);
 		});
-#ifndef __ENABLE_OPEN_SSL__
-		this->mConfig.mechanism = mongo::auth::SCRAM_SHA1;
-#else
-		this->mConfig.mechanism = mongo::auth::SCRAM_SHA256;
-#endif
 		ServerConfig & config = this->mApp->GetConfig();
 		LOG_CHECK_RET_FALSE(config.Get("mongo", this->mConfig));
 		return true;
@@ -109,42 +97,96 @@ namespace acs
 
 	bool MongoDBComponent::LateAwake()
 	{
+		LOG_CHECK_RET_FALSE(!this->mConfig.address.empty())
 		ThreadComponent* threadComponent = this->GetComponent<ThreadComponent>();
-		for (int index = 0; index < this->mConfig.count && threadComponent; index++)
+		for (int x = 0; x < this->mConfig.address.size(); x++)
 		{
-			mongo::MongoConfig config = this->mConfig;
+			const std::string& address = this->mConfig.address[x];
+			for (int index = 0; index < this->mConfig.count && threadComponent; index++)
 			{
-				config.index = index + 1;
-				timer::ElapsedTimer timer1;
-				Asio::Context & io = this->mApp->GetContext();
-				tcp::Socket * socketProxy = threadComponent->CreateSocket(this->mConfig.address);
-				std::shared_ptr<mongo::Client> mongoClientContext = std::make_unique<mongo::Client>(socketProxy, this, config, io);
+				mongo::Config config;
+				if (!MongoDBComponent::DecodeUrl(address, config))
 				{
-					if(!mongoClientContext->Start())
+					return false;
+				}
+				timer::ElapsedTimer timer1;
+				int id = (x + 1) * 100 + index + 1;
+				config.conn_count = this->mConfig.conn_count;
+				Asio::Context& io = this->mApp->GetContext();
+				tcp::Socket* socketProxy = threadComponent->CreateSocket(config.address);
+				std::shared_ptr<mongo::Client> mongoClientContext = std::make_unique<mongo::Client>(id, this, config, io);
+				{
+					if (!mongoClientContext->Start(socketProxy))
 					{
-						const std::string & address = config.address;
-						LOG_ERROR("connect mongo [{}] fail index = {}", address, config.index);
+						LOG_ERROR("connect {} fail", address);
 						return false;
 					}
 				}
-				this->mFreeClients.Push(config.index);
-				const std::string & address = this->mConfig.address;
-				this->mMongoClients.emplace(config.index, mongoClientContext);
-				LOG_INFO("[{}ms] ({}) connect mongo [{}] ok", timer1.GetMs(), config.mechanism, address);
+				this->mClients.emplace(id, mongoClientContext);
+				LOG_INFO("[{}ms] connect {} ok", timer1.GetMs(), address);
+
 			}
 		}
-		this->mLogger = this->GetComponent<LoggerComponent>();
 		return true;
+	}
+
+	bool MongoDBComponent::DecodeUrl(const std::string& url, mongo::Config& config)
+	{
+		if(!config.Decode(url))
+		{
+			return false;
+		}
+		config.Get("user", config.user);
+		config.Get("address", config.address);
+		LOG_CHECK_RET_FALSE(config.Get("db", config.db))
+		LOG_CHECK_RET_FALSE(config.Get("address", config.address))
+		if(!config.Get("mechanism", config.mechanism))
+		{
+			config.mechanism = mongo::auth::SCRAM_SHA1;
+		}
+#ifdef __ENABLE_OPEN_SSL__
+		return config.mechanism == mongo::auth::SCRAM_SHA1
+			|| config.mechanism == mongo::auth::SCRAM_SHA256;
+#else
+		return config.mechanism == mongo::auth::SCRAM_SHA1;
+#endif
+	}
+
+	void MongoDBComponent::OnConnectOK(int id)
+	{
+		if(this->mClients.find(id) != this->mClients.end())
+		{
+			this->mFreeClients.Push(id);
+			LOG_DEBUG("mongo client:{} login ok", id);
+		}
+	}
+
+	void MongoDBComponent::OnClientError(int id, int code)
+	{
+		auto iter = this->mClients.find(id);
+		if(iter == this->mClients.end())
+		{
+			return;
+		}
+		this->mRetryClients.emplace(id);
+		std::string address = iter->second->GetAddress();
+		LOG_WARN("mongo client ({}) login fail", address)
+	}
+
+	void MongoDBComponent::OnSendFailure(int id, mongo::Request* message)
+	{
+		this->Send(std::unique_ptr<mongo::Request>(message));
+		LOG_WARN("mongo client:{} resend => {}", id, message->ToString())
 	}
 
 	void MongoDBComponent::OnDestroy()
 	{
-		auto iter = this->mMongoClients.begin();
-		for(; iter != this->mMongoClients.end(); iter++)
+		auto iter = this->mClients.begin();
+		for(; iter != this->mClients.end(); iter++)
 		{
 			iter->second->Stop();
 		}
-		this->mMongoClients.clear();
+		this->mClients.clear();
 	}
 
 	void MongoDBComponent::OnMessage(int id, mongo::Request * request, mongo::Response * response) noexcept
@@ -224,6 +266,15 @@ namespace acs
 				}
 				this->Send(id, std::move(request));
 			}
+			for(const int id : this->mRetryClients)
+			{
+				auto iter = this->mClients.find(id);
+				if(iter != this->mClients.end())
+				{
+					iter->second->Start(nullptr);
+				}
+			}
+			this->mRetryClients.clear();
 		}
 	}
 
@@ -243,12 +294,13 @@ namespace acs
 				}
 			}
 		}
+		LoggerComponent * logger = this->GetComponent<LoggerComponent>();
 		std::unique_ptr<mongo::Response> response = this->Run(std::move(request));
 		if (response != nullptr)
 		{
 			sqlLog->Level = custom::LogLevel::None;
 			sqlLog->Content.append(response->ToString());
-			this->mLogger->PushLog("mongo", std::move(sqlLog));
+			logger->PushLog("mongo", std::move(sqlLog));
 		}
 	}
 
@@ -290,12 +342,8 @@ namespace acs
 
 	void MongoDBComponent::Send(int id, std::unique_ptr<mongo::Request> request)
 	{
-		if(request->dataBase.empty())
-		{
-			request->dataBase = this->mConfig.db;
-		}
-		auto iter = this->mMongoClients.find(id);
-		if(iter == this->mMongoClients.end())
+		auto iter = this->mClients.find(id);
+		if(iter == this->mClients.end())
 		{
 			LOG_ERROR("mongo[{}] request:{}", id, request->ToString());
 			return;
@@ -317,7 +365,7 @@ namespace acs
 		{
 			data->Add("sum", this->CurrentRpcCount());
 			data->Add("free", this->mFreeClients.Size());
-			data->Add("client", this->mMongoClients.size());
+			data->Add("client", this->mClients.size());
 			data->Add("ping", fmt::format("{}ms", timer1.GetMs()));
 			data->Add("wait", this->AwaitCount() + this->mRequests.size());
 		}

@@ -19,7 +19,7 @@ namespace acs
 {
 	class ThreadComponent;
 
-	class RedisComponent final : public RpcComponent<redis::Response>,
+	class RedisComponent final : public RpcComponent<redis::Response>, public IStart,
 								 public IRpc<redis::Request, redis::Response>, public IDestroy, public IServerRecord, public ISecondUpdate
 	{
 	 public:
@@ -28,7 +28,6 @@ namespace acs
 		bool Ping();
 		void Send(std::unique_ptr<redis::Request> request);
 		void Send(std::unique_ptr<redis::Request> request, int & id);
-		inline const redis::Config & Config() const { return this->mConfig; }
 	public:
 		bool UnLock(const std::string & key);
 		bool Lock(const std::string & key, int timeout = 5);
@@ -37,8 +36,6 @@ namespace acs
         void Send(const std::string & cmd, Args&& ... args) noexcept;
         template<typename ... Args>
 		std::unique_ptr<redis::Response> Run(const std::string & cmd, Args&& ... args) noexcept;
-        template<typename ... Args> //同步命令
-        std::unique_ptr<redis::Response> SyncRun(const std::string& cmd, Args&& ... args) noexcept;
 	public:
 		bool Send(const RedisLuaData & data) noexcept;
 		bool Send(const RedisLuaData & data, int & taskId) noexcept;
@@ -46,25 +43,31 @@ namespace acs
 		std::unique_ptr<json::r::Document> Call(const RedisLuaData & data);
 	public:
 		bool Del(const std::string & key);
+		bool LoadRedisScript(const std::string & dir);
 		std::unique_ptr<redis::Response> Run(std::unique_ptr<redis::Request> request) noexcept;
-        std::unique_ptr<redis::Response> SyncRun(std::unique_ptr<redis::Request> request) noexcept;
 		bool MakeLuaRequest(const RedisLuaData & data, std::unique_ptr<redis::Request>& request);
 	private:
 		void Send(int id, std::unique_ptr<redis::Request> request) noexcept;
 		void OnMessage(int id, redis::Request * request, redis::Response * response) noexcept final;
 	private:
-		bool LoadRedisScript(const std::string & dir);
+		static bool DecodeUrl(const std::string & url, redis::Config & config);
 		bool OnLoadScript(const std::string & name, const std::string &md5);
 	private:
         bool Awake() final;
+		void OnStart() final;
 		void OnDestroy() final;
         bool LateAwake() final;
+		void OnConnectOK(int id) final;
+		void OnClientError(int id, int code) final;
 		void OnSecondUpdate(int tick) noexcept final;
 		void OnRecord(json::w::Document &document) final;
+		void OnSendFailure(int id, redis::Request *message) final;
 	private:
-		redis::Config mConfig;
+		redis::Cluster mConfig;
+		class ThreadComponent * mThread;
 		custom::Queue<int> mFreeClients; //空闲客户端
 		std::shared_ptr<redis::Client> mSubClient;
+		std::unordered_set<int> mRetryClients;
 		std::unordered_map<std::string, std::string> mLuaMap;
 		std::queue<std::unique_ptr<redis::Request>> mRequests;
 		std::unordered_map<int, std::shared_ptr<redis::Client>> mClients;
@@ -79,17 +82,6 @@ namespace acs
 			redis::Request::InitParameter(request.get(), std::forward<Args>(args)...);
 		}
         return this->Run(std::move(request));
-    }
-
-    template<typename ...Args>
-    inline std::unique_ptr<redis::Response> RedisComponent::SyncRun(const std::string& cmd, Args && ...args) noexcept
-    {
-        std::unique_ptr<redis::Request> request = std::make_unique<redis::Request>();
-		{
-			request->SetCommand(cmd);
-			redis::Request::InitParameter(request.get(), std::forward<Args>(args)...);
-		}
-        return this->SyncRun(std::move(request));
     }
 
     template<typename ... Args>

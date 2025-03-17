@@ -46,20 +46,20 @@ namespace http
 		this->mReadCount++;
 		if(this->mReadCount >= 3 || size <= 2)
 		{
-			return tcp::ReadDecodeError;
+			return tcp::read::decode_error;
 		}
 
 		if(!std::getline(os, this->mMethod, ' '))
 		{
-			return tcp::ReadDecodeError;
+			return tcp::read::decode_error;
 		}
 		if(!std::getline(os, this->mUrl, ' '))
 		{
-			return tcp::ReadDecodeError;
+			return tcp::read::decode_error;
 		}
 		if(!std::getline(os, this->mVersion))
 		{
-			return tcp::ReadDecodeError;
+			return tcp::read::decode_error;
 		}
 		if(this->mVersion.back() == '\r')
 		{
@@ -67,17 +67,17 @@ namespace http
 		}
 		if(this->mMethod.empty() || this->mUrl.empty() || this->mVersion.empty())
 		{
-			return tcp::ReadDecodeError;
+			return tcp::read::decode_error;
 		}
 		size_t pos = this->mUrl.find('?');
 		if(pos == std::string::npos)
 		{
 			this->mPath = this->mUrl;
-			return tcp::ReadDone;
+			return tcp::read::done;
 		}
 		this->mPath = this->mUrl.substr(0, pos);
 		std::string query = this->mUrl.substr(pos + 1);
-		return this->mQuery.Decode(query) ? tcp::ReadDone : tcp::ReadDecodeError;
+		return this->mQuery.Decode(query) ? tcp::read::done : tcp::read::decode_error;
 	}
 
 

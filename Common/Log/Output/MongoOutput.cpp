@@ -8,7 +8,7 @@
 
 namespace custom
 {
-	MongoOutput::MongoOutput(mongo::MongoConfig config)
+	MongoOutput::MongoOutput(mongo::Config config)
 		: mConfig(std::move(config))
 	{
 
@@ -19,9 +19,9 @@ namespace custom
 		std::unique_ptr<tcp::Socket> socket = std::make_unique<tcp::Socket>(io);
 		{
 			socket->Init(this->mConfig.address);
-			this->mMonClient = std::make_shared<mongo::Client>(socket.release(), this->mConfig, io);
+			this->mMonClient = std::make_shared<mongo::Client>(1, this->mConfig, io);
 		}
-		return this->mMonClient->Start();
+		return this->mMonClient->Start(socket.release());
 	}
 
 	void MongoOutput::Push(Asio::Context &io, const std::string& name, const custom::LogInfo& logInfo)

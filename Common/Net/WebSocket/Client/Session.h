@@ -30,7 +30,6 @@ namespace ws
 		void StartReceive(tcp::Socket * tcpSocket);
 		inline void BindPlayerID(long long id) { this->mPlayerId = id; }
 	private:
-		void OnUpdate() final;
 		void OnSendMessage(size_t size) final;
 		void OnReadError(const Asio::Code &code) final;
 		void OnSendMessage(const Asio::Code &code) final;

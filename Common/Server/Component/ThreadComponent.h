@@ -11,10 +11,10 @@
 
 namespace acs
 {
-	class ThreadComponent final : public Component
+	class ThreadComponent final : public Component, public IServerRecord
 	{
 	public:
-		ThreadComponent() = default;
+		ThreadComponent();
 		~ThreadComponent() final;
 	public:
 		Asio::Context& GetContext();
@@ -24,15 +24,18 @@ namespace acs
 #ifdef __ENABLE_OPEN_SSL__
 		tcp::Socket * CreateSocket(Asio::ssl::Context & ssl);
 #endif
+		inline int GetThreadCount() const { return this->mThreadCount; }
 	private:
 		bool Awake() final;
 		void CloseThread();
+		void OnRecord(json::w::Document &document) final;
 	private:
+		int mThreadCount;
 #ifdef ONLY_MAIN_THREAD
 		std::unique_ptr<Asio::Context> mContext;
 		std::unique_ptr<Asio::ContextWork> mWork;
 #else
-		std::queue<std::unique_ptr<custom::AsioThread>> mNetThreads;
+		std::queue<std::shared_ptr<custom::AsioThread>> mNetThreads;
 #endif
 	};
 

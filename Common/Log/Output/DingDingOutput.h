@@ -14,14 +14,13 @@ namespace custom
 	class DingDingOutput : public IOutput
 	{
 	public:
-		DingDingOutput(std::string  url, std::string  pem);
+		explicit DingDingOutput(std::string  url);
 	private:
 		bool Start(Asio::Context &io) final;
 		void Push(Asio::Context &io, const std::string &name, const custom::LogInfo &logInfo) final;
 	private:
 		std::string mUrl;
 #ifdef __ENABLE_OPEN_SSL__
-		std::string mPem;
 		asio::ssl::context mCtx;
 #endif
 		std::shared_ptr<http::Client> mClient;

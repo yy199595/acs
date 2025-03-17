@@ -36,9 +36,10 @@ namespace mysql
 	class Request : public tcp::IProto
 	{
 	public:
+		explicit Request(char cmd);
 		explicit Request(const std::string & message);
 		explicit Request(const char * sql, size_t size);
-		Request(char cmd, std::string message);
+		explicit Request(char cmd, std::string message);
 	public:
 		bool GetCommand(std::string & cmd) const;
 		void SetRpcId(int id) { this->mRpcId = id; }
@@ -99,6 +100,7 @@ namespace mysql
 		void Clear() ;
 		int OnRecvMessage(std::istream &os, size_t size);
 	public:
+		std::string ToString() const;
 		unsigned char ReadChar(unsigned int &pos);
 		std::string ReadString(unsigned int & pos);
 		unsigned short ReadShort(unsigned int & pos);
@@ -108,6 +110,7 @@ namespace mysql
 		const std::string & GetBuffer() const { return this->mMessage;}
 		unsigned char GetPackageCode() const { return this->mPackageCode; }
 		bool IsOk() const { return this->mPackageCode != mysql::PACKAGE_ERR; }
+		bool HasError() const { return this->mPackageCode == mysql::PACKAGE_ERR; }
 		const mysql::OKResponse & GetOKResponse() const { return this->mOkResult; }
 	public:
 		bool GetFirstResult(std::string & result) const;

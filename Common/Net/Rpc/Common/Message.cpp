@@ -218,28 +218,28 @@ namespace rpc
     {
 		if(size < this->mProtoHead.Len)
 		{
-			return tcp::ReadError;
+			return tcp::read::error;
 		}
 
         int len = this->mHead.OnRecvMessage(os, size);
         if (len == -1)
         {
-			return tcp::ReadError;
+			return tcp::read::error;
 		}
 		this->mBody.clear();
 		this->mProtoHead.Len -= len;
 		if (this->mProtoHead.Len == 0)
 		{
-			return tcp::ReadDone;
+			return tcp::read::done;
 		}
 		this->mBody.resize(this->mProtoHead.Len);
 		char * buffer = const_cast<char*>(this->mBody.c_str());
 		size_t count = os.readsome(buffer, this->mProtoHead.Len);
 		if(count != this->mProtoHead.Len)
 		{
-			return tcp::ReadDecodeError;
+			return tcp::read::decode_error;
 		}
-        return tcp::ReadDone;
+        return tcp::read::done;
     }
 
     int Message::GetCode(int code) const

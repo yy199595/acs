@@ -19,6 +19,8 @@ namespace acs
 	HttpWebComponent::HttpWebComponent()
 	{
 		this->mRecord = nullptr;
+		this->mSuccessCount = 0;
+		this->mFailureCount = 0;
 		this->mConfig.index = "index.html";
 		REGISTER_JSON_CLASS_FIELD(http::Config, auth);
 		REGISTER_JSON_CLASS_FIELD(http::Config, root);
@@ -399,5 +401,49 @@ namespace acs
 			data->Add("client", (int)this->mHttpClients.size());
 			data->Add("wait", this->mHttpClients.size());
 		}
+	}
+
+	void HttpWebComponent::StartClose(int id, int code)
+	{
+		auto iter = this->mHttpClients.find(id);
+		if(iter != this->mHttpClients.end())
+		{
+			iter->second->StartClose(code);
+			this->mHttpClients.erase(iter);
+		}
+	}
+
+	bool HttpWebComponent::OnListen(tcp::Socket* socket) noexcept
+	{
+		int sockId = this->mNumPool.BuildNumber();
+		Asio::Context & io = this->mApp->GetContext();
+		std::shared_ptr<http::Session> handlerClient = std::make_shared<http::Session>(this, io);
+		{
+			handlerClient->StartReceive(sockId, socket);
+			this->mHttpClients.emplace(sockId, handlerClient);
+		}
+		return true;
+	}
+
+	bool HttpWebComponent::SendResponse(int id, HttpStatus code)
+	{
+		auto iter = this->mHttpClients.find(id);
+		if(iter == this->mHttpClients.end())
+		{
+			LOG_ERROR("send message to {} fail", id);
+			return false;
+		}
+		return iter->second->StartWriter(code);
+	}
+
+	bool HttpWebComponent::ReadMessageBody(int id)
+	{
+		auto iter = this->mHttpClients.find(id);
+		if(iter == this->mHttpClients.end())
+		{
+			return false;
+		}
+		iter->second->StartReceiveBody();
+		return true;
 	}
 }

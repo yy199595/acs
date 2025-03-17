@@ -30,8 +30,8 @@ namespace acs
 
 namespace acs
 {
-	class MysqlDBComponent : public RpcComponent<mysql::Response>,
-							 public IRpc<mysql::Request, mysql::Response>, public IStart, public IDestroy
+	class MysqlDBComponent : public RpcComponent<mysql::Response>, public IServerRecord,
+							 public IRpc<mysql::Request, mysql::Response>, public IDestroy, public ISecondUpdate
 	{
 	public:
 		MysqlDBComponent();
@@ -43,18 +43,25 @@ namespace acs
 		std::unique_ptr<mysql::Response> Run(std::unique_ptr<mysql::Request> request);
 	private:
 		void Send(int id, std::unique_ptr<mysql::Request> request);
+		static bool DecodeUrl(const std::string & url, mysql::Config & config);
 	private:
 		bool Awake() final;
-		void OnStart() final;
 		bool LateAwake() final;
 		void OnDestroy() final;
+		void OnConnectOK(int id) final;
+		void OnClientError(int id, int code) final;
+		void OnSecondUpdate(int tick) noexcept final;
+		void OnRecord(json::w::Document &document) final;
 		void OnBinLog(mysql::Response *response) noexcept;
+		void OnSendFailure(int id, mysql::Request *message) final;
 		void OnExplain(const std::string & sql, long long ms) noexcept;
 		void OnMessage(int id, mysql::Request *request, mysql::Response *response) noexcept final;
 	private:
-		mysql::Config mConfig;
-		custom::Queue<int> mFreeClients;
-		class LoggerComponent * mLogger;
+		mysql::Cluster mConfig;
+		unsigned long long mCount; //总处理数量
+		class ThreadComponent * mThread;
+		custom::Queue<int> mFreeClients; //空闲的客户端
+		std::unordered_set<int> mRetryClients; //断开了 重试的客户端
 		std::shared_ptr<mysql::Client> mBinLogClient;
 		std::queue<std::unique_ptr<mysql::Request>> mMessages;
 		std::unordered_map<int, std::shared_ptr<mysql::Client>> mClients;

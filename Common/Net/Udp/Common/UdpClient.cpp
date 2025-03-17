@@ -62,7 +62,7 @@ namespace udp
 			tcp::Data::Read(is, rpcPacket->GetProtoHead());
 			if((size - rpc::RPC_PACK_HEAD_LEN) == rpcPacket->GetProtoHead().Len)
 			{
-				if (rpcPacket->OnRecvMessage(is, rpcPacket->GetProtoHead().Len) == tcp::ReadDone)
+				if (rpcPacket->OnRecvMessage(is, rpcPacket->GetProtoHead().Len) == tcp::read::done)
 				{
 					rpcPacket->SetNet(rpc::Net::Udp);
 					std::shared_ptr<Client> self = this->shared_from_this();

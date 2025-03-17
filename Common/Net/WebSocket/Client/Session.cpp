@@ -43,10 +43,12 @@ namespace ws
 
 	void Session::StartReceive(tcp::Socket* tcpSocket)
 	{
-		this->mSocket.reset(tcpSocket);
+		this->SetSocket(tcpSocket);
 		Asio::Context & context = tcpSocket->GetContext();
-		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(context, [self, this]() { this->ReadLine(); });
+		asio::post(context, [this, self = this->shared_from_this()]() {
+			this->ReadLine();
+			this->StartTimer(5, tcp::timeout::read);
+		});
 	}
 
 	void Session::Send(rpc::Message* message)
@@ -95,7 +97,7 @@ namespace ws
 		if(this->mIsHttp)
 		{
 			flag = this->mHttpRequest->OnRecvMessage(readStream, size);
-			if(flag == tcp::ReadDone || flag == tcp::ReadPause)
+			if(flag == tcp::read::done || flag == tcp::read::pause)
 			{
 				if (!this->DecodeByHttp())
 				{
@@ -107,8 +109,9 @@ namespace ws
 		}
 		else
 		{
+			this->StopTimer();
 			flag = this->mMessage->OnRecvMessage(readStream, size);
-			if(flag == tcp::ReadDone)
+			if(flag == tcp::read::done)
 			{
 				this->OnReadBody();
 				return;
@@ -116,16 +119,16 @@ namespace ws
 		}
 		switch(flag)
 		{
-			case tcp::ReadOneLine:
+			case tcp::read::line:
 				this->ReadLine();
 				break;
-			case tcp::ReadSomeMessage:
+			case tcp::read::some:
 				this->ReadSome();
 				break;
-			case tcp::ReadError:
+			case tcp::read::error:
 				this->Close(XCode::UnKnowPacket);
 				break;
-			case tcp::PacketLong:
+			case tcp::read::big_long:
 				this->Close(XCode::NetBigDataShutdown);
 				break;
 			default:
@@ -154,6 +157,7 @@ namespace ws
 				break;
 			case ws::OPCODE_PING:
 				this->OnPing();
+				this->StartReceiveWebSocket();
 				break;
 			default:
 				this->Close(XCode::UnKnowPacket);
@@ -271,7 +275,6 @@ namespace ws
 			}
 		}
 		this->mIsHttp = false;
-		this->StartUpdate(30);
 		this->StartReceiveWebSocket();
 		return true;
 	}
@@ -280,11 +283,6 @@ namespace ws
 	{
 		this->mMessage = std::make_unique<ws::Message>();
 		this->ReadSome();
-	}
-
-	void Session::OnUpdate()
-	{
-
 	}
 
 	void Session::OnSendMessage(size_t size)

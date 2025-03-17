@@ -22,15 +22,21 @@ namespace acs
 
 	bool RedisSubComponent::LateAwake()
 	{
-		const std::string & address = this->mConfig.address;
 		ThreadComponent* component = this->GetComponent<ThreadComponent>();
 		{
-			Asio::Context & context = this->mApp->GetContext();
-			tcp::Socket * sock = component->CreateSocket(address);
-			this->mClient = std::make_shared<redis::Client>(sock, this->mConfig, this, context);
-			if(!this->mClient->Start())
+			redis::Config redisConfig;
+			if(!redisConfig.Decode(this->mConfig.sub))
 			{
-				LOG_ERROR("start sub redis [{}] fail", address);
+				return false;
+			}
+			redisConfig.Get("password", redisConfig.password);
+			Asio::Context & context = this->mApp->GetContext();
+			LOG_CHECK_RET_FALSE(redisConfig.Get("address", redisConfig.address))
+			tcp::Socket * sock = component->CreateSocket(redisConfig.address);
+			this->mClient = std::make_shared<redis::Client>(1, redisConfig, this, context);
+			if(!this->mClient->Start(sock))
+			{
+				LOG_ERROR("start sub redis fail");
 				return false;
 			}
 		}
@@ -97,10 +103,14 @@ namespace acs
 	{
 		do
 		{
+			if(this->mConfig.debug)
+			{
+				CONSOLE_LOG_DEBUG("request => {}", request->ToString())
+				CONSOLE_LOG_DEBUG("response => {}", request->ToString())
+			}
 			const redis::Element & element = response->element;
 			if (element.type != redis::type::Array || element.list.size() != 3)
 			{
-				LOG_DEBUG("{}", response->ToString());
 				break;
 			}
 			const std::string& channel = element.list[1].message;

@@ -6,17 +6,24 @@
 #include "Util/Crypt/sha1.h"
 #include "XCode/XCode.h"
 #include "Util/Tools/String.h"
+#include "Yyjson/Document/Document.h"
 #ifdef __ENABLE_OPEN_SSL__
 #include "openssl/sha.h"
 #endif
 #include <utility>
 #ifdef __OS_WIN__
-#include <WinSock2.h>
 #else
 #include <arpa/inet.h>
 #endif
 namespace mysql
 {
+	Request::Request(char cmd)
+		: mCmd(cmd)
+	{
+		this->mRpcId = 0;
+		this->mIndex = 0;
+	}
+
 	Request::Request(const std::string & sql)
 			: mMessage(sql), mCmd(mysql::cmd::QUERY)
 	{
@@ -54,10 +61,10 @@ namespace mysql
 	{
 		uint32_t length = this->mMessage.size() + 1;
 		std::vector<uint8_t> length_bytes = mysql::encode(length);
-		os.write((char *)length_bytes.data(), length_bytes.size());
+		os.write((char *)length_bytes.data(), (int)length_bytes.size());
 		os << this->mIndex << this->mCmd;
 
-		os.write(this->mMessage.c_str(), this->mMessage.size());
+		os.write(this->mMessage.c_str(), (int)this->mMessage.size());
 		return 0;
 	}
 
@@ -121,42 +128,43 @@ namespace mysql
             mysql::client_flag::CLIENT_MULTI_STATEMENTS |
             mysql::client_flag::CLIENT_SECURE_CONNECTION |
             mysql::client_flag::CLIENT_TRANSACTIONS |
-            mysql::client_flag::CLIENT_PS_MULTI_RESULTS;
+            mysql::client_flag::CLIENT_PS_MULTI_RESULTS |
+			mysql::client_flag::CLIENT_DEPRECATE_EOF;
+
 
         std::string encrypted_password;
         if (!this->password.empty())
         {
-            if (this->authPlugin == mysql::plugin::MYSQL_CLEAR_PASSWORD)
-            {
-                encrypted_password = this->password;
-                encrypted_password.push_back('\0');
-            }
-            else if (this->authPlugin == mysql::plugin::MYSQL_NATIVE_PASSWORD)
-            {
-                encrypted_password = mysql::plugin::native_password(this->password, this->salt);
-            }
-            //#ifdef __ENABLE_OPEN_SSL__
-            //			else if (request.authPlugin == mysql::plugin::CACHING_SHA2_PASSWORD)
-            //			{
-            //				client_capabilities |= mysql::client_flag::CLIENT_SSL;
-            //				client_capabilities |= mysql::client_flag::CLIENT_PLUGIN_AUTH;
-            //				encrypted_password = mysql::plugin::caching_sha2_password(request.password, request.salt);
-            //			}
-            //#endif
-            else
-            {
-                return XCode::AuthPluginNonsupport;
-            }
+	        if (this->authPlugin == mysql::plugin::MYSQL_CLEAR_PASSWORD)
+	        {
+	        	encrypted_password = this->password;
+	        	encrypted_password.push_back('\0');
+	        }
+	        else if (this->authPlugin == mysql::plugin::MYSQL_NATIVE_PASSWORD)
+	        {
+	        	encrypted_password = mysql::plugin::native_password(this->password, this->salt);
+	        }
+#ifdef __ENABLE_OPEN_SSL__
+	        else if (this->authPlugin == mysql::plugin::CACHING_SHA2_PASSWORD)
+	        {
+	        	//client_capabilities |= mysql::client_flag::CLIENT_SSL;
+	        	client_capabilities |= mysql::client_flag::CLIENT_PLUGIN_AUTH;
+	        	encrypted_password = mysql::plugin::caching_sha2_password(this->password, this->salt);
+	        }
+#endif
+	        else
+	        {
+	        	return XCode::AuthPluginNonsupport;
+	        }
         }
 
         if (!this->database.empty())
         {
             client_capabilities |= mysql::client_flag::CLIENT_CONNECT_WITH_DB;
         }
-
-        uint32_t capabilities_le = htonl(client_capabilities);
-        packet.insert(packet.end(), reinterpret_cast<uint8_t*>(&capabilities_le),
-                      reinterpret_cast<uint8_t*>(&capabilities_le) + 4);
+		//client_capabilities = 260047;
+        packet.insert(packet.end(), reinterpret_cast<uint8_t*>(&client_capabilities),
+                      reinterpret_cast<uint8_t*>(&client_capabilities) + 4);
 
 
         uint32_t max_packet_size = mysql::config::PACKAGE_MAX_SIZE;
@@ -222,7 +230,10 @@ namespace mysql
 				}
 				this->mLength = 0;
 				char buffer[4] = { 0 };
-				os.readsome((char *)buffer, sizeof(buffer));
+				if(os.readsome((char *)buffer, sizeof(buffer)) != sizeof(buffer))
+				{
+					return tcp::read::decode_error;
+				}
 				this->mIndex = (unsigned char)buffer[3];
 				this->mDecodeStatus = tcp::Decode::MessageHead;
 				tcp::Data::Read((char *)buffer, this->mLength, 3, false);
@@ -243,9 +254,36 @@ namespace mysql
 				break;
 			}
 			default:
-				return tcp::ReadDecodeError;
+				return tcp::read::decode_error;
 		}
 		return 0;
+	}
+
+	std::string Response::ToString() const
+	{
+		json::w::Document document;
+		if(this->IsOk())
+		{
+			document.Add("code", "ok");
+			document.Add("affected_rows", this->mOkResult.mAffectedRows);
+			document.Add("server_status", this->mOkResult.mServerStatus);
+			document.Add("warning_count", this->mOkResult.mWarningCount);
+			document.Add("last_insert_id", this->mOkResult.mLastInsertId);
+			std::unique_ptr<json::w::Value> jsonValue = document.AddArray("result");
+			if(this->mResult.contents.empty())
+			{
+				for(const std::string & json : this->mResult.contents)
+				{
+					jsonValue->AddObject(json.c_str(), json.size());
+				}
+			}
+		}
+		else
+		{
+			document.Add("code", "error");
+			document.Add("error", this->mMessage);
+		}
+		return document.JsonString();
 	}
 
 	unsigned int Response::DecodeColumnCount(unsigned int &pos)
@@ -324,7 +362,7 @@ namespace mysql
 
 	int Response::OnMessage(const char * buffer, size_t size)
 	{
-		int offset = 0;
+		unsigned int offset = 0;
 		this->mPackageCode = buffer[offset++];
 		switch(this->mPackageCode)
 		{
@@ -334,16 +372,20 @@ namespace mysql
 				{
 					this->mOkResult.mAffectedRows = (unsigned int)buffer[offset++];
 					this->mOkResult.mLastInsertId = (unsigned int)buffer[offset++];
-					tcp::Data::Read(buffer + 2, this->mOkResult.mServerStatus, offset, false);
+					tcp::Data::Read(buffer + offset, this->mOkResult.mServerStatus, 2, false);
 					offset += 2;
-					tcp::Data::Read(buffer + 4, this->mOkResult.mWarningCount, offset, false);
+					tcp::Data::Read(buffer + offset, this->mOkResult.mWarningCount, 2, false);
 					offset += 2;
 					if(offset < size)
 					{
 						this->mMessage.assign(buffer + offset, size - offset);
 					}
+					if((this->mOkResult.mServerStatus & SERVER_MORE_RESULTS_EXISTS) != 0)
+					{
+						return tcp::read::pause;
+					}
 				}
-				return tcp::ReadDone;
+				return tcp::read::done;
 			}
 			case mysql::PACKAGE_ERR:
 			{
@@ -352,13 +394,20 @@ namespace mysql
 
 				offset += 6;
 				this->mMessage.assign(buffer + offset, size - offset);
-				return tcp::ReadDone;
+				return tcp::read::done;
 			}
 			case mysql::PACKAGE_EOF:
-				return tcp::ReadDone;
+			{
+				unsigned short warnCount = 0;
+				unsigned short statusFlags = 0;
+				tcp::Data::Read(buffer + offset, warnCount, 2, false);
+				offset += sizeof(warnCount);
+				tcp::Data::Read(buffer + offset, statusFlags, 2, false);
+				return tcp::read::done;
+			}
 			default:
 				this->mMessage.assign(buffer, size);
-				return tcp::ReadPause;
+				return tcp::read::pause;
 		}
 	}
 }

@@ -3,21 +3,22 @@
 #include<sstream>
 #include <codecvt>
 #include"Random.h"
+
 namespace help
 {
-    std::string Str::EmptyStr;
+	std::string Str::EmptyStr;
 
-    const std::string & Str::Empty()
-    {
-        return EmptyStr;
-    }
+	const std::string& Str::Empty()
+	{
+		return EmptyStr;
+	}
 
-    void Str::Tolower(std::string &str)
-    {
-        std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-    }
+	void Str::Tolower(std::string& str)
+	{
+		std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+	}
 
-	void Str::Toupper(std::string &str)
+	void Str::Toupper(std::string& str)
 	{
 		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 	}
@@ -28,18 +29,30 @@ namespace help
 		return hash(str);
 	}
 
+	bool Str::IsRegex(const std::string& pattern)
+	{
+		try
+		{
+			std::regex re(pattern, std::regex_constants::ECMAScript);
+			return true;
+		}
+		catch (const std::regex_error& e)
+		{
+			return false;
+		}
+	}
 
 
-    size_t Str::Split(const std::string &targetString, char cc, std::vector<std::string>& ret)
-    {
-        std::string item;
-        std::stringstream ss(targetString);
-        while (std::getline(ss, item, cc)) 
-        {
-            ret.emplace_back(item);
-        }
-        return ret.size();
-    }
+	size_t Str::Split(const std::string& targetString, char cc, std::vector<std::string>& ret)
+	{
+		std::string item;
+		std::stringstream ss(targetString);
+		while (std::getline(ss, item, cc))
+		{
+			ret.emplace_back(item);
+		}
+		return ret.size();
+	}
 
 	size_t Str::Split(const std::string& target, char cc, std::string& str1, std::string& str2)
 	{
@@ -50,115 +63,116 @@ namespace help
 		}
 		str2.clear();
 		str1.assign(target.c_str(), pos);
-		if(target.size() > pos + 1)
+		if (target.size() > pos + 1)
 		{
 			str2.assign(target.c_str() + pos + 1);
 		}
 		return 0;
 	}
 
-    void Str::ReplaceString(std::string &outstring, const std::string& str1, const std::string& str2)
-    {
+	void Str::ReplaceString(std::string& outstring, const std::string& str1, const std::string& str2)
+	{
 		int index = 0;
-        size_t pos = outstring.find(str1);
-        while (pos != std::string::npos && index < 100)
-        {
+		size_t pos = outstring.find(str1);
+		while (pos != std::string::npos && index < 100)
+		{
 			index++;
-            outstring.replace(pos, str1.length(), str2);
-            pos = outstring.find(str1);
-        }
-    }
+			outstring.replace(pos, str1.length(), str2);
+			pos = outstring.find(str1);
+		}
+	}
 
-    extern void Str::ClearBlank(std::string &input)
-    {
-        input.erase(std::remove(input.begin(), input.end(), ' '), input.end());
-    }
+	extern void Str::ClearBlank(std::string& input)
+	{
+		input.erase(std::remove(input.begin(), input.end(), ' '), input.end());
+	}
 
-    bool Str::GetFileName(const std::string &path, std::string & name)
-    {
+	bool Str::GetFileName(const std::string& path, std::string& name)
+	{
 		size_t pos = path.find_last_of('/');
-		if(pos != std::string::npos)
+		if (pos != std::string::npos)
 		{
 			name = path.substr(pos + 1, path.size());
 			return true;
 		}
 		pos = path.find_last_of('\\');
-        if (pos != std::string::npos)
-        {
-            name = path.substr(pos + 1, path.size());
+		if (pos != std::string::npos)
+		{
+			name = path.substr(pos + 1, path.size());
 			return true;
-        }
+		}
 
 		return false;
-    }
+	}
 
-    std::string Str::FormatJson(const std::string &json)
-    {
+	std::string Str::FormatJson(const std::string& json)
+	{
 		std::string format;
-        auto getLevelStr = [](int level, std::string &str) {
-            for (int i = 0; i < level; i++)
-            {
-                str += "    "; //这里可以\t换成你所需要缩进的空格数
-            }
-        };
+		auto getLevelStr = [](int level, std::string& str)
+		{
+			for (int i = 0; i < level; i++)
+			{
+				str += "    "; //这里可以\t换成你所需要缩进的空格数
+			}
+		};
 
-        int level = 0;
-        for (size_t index = 0; index < json.size(); index++)
-        {
-            char c = json[index];
+		int level = 0;
+		for (size_t index = 0; index < json.size(); index++)
+		{
+			char c = json[index];
 
-            if (level > 0 && '\n' == json[json.size() - 1])
-            {
-                getLevelStr(level, format);
-            }
+			if (level > 0 && '\n' == json[json.size() - 1])
+			{
+				getLevelStr(level, format);
+			}
 
-            switch (c)
-            {
-                case '{':
-                case '[':
-                    format = format + c + "\n";
-                    level++;
-                    getLevelStr(level, format);
-                    break;
-                case ',':
-                    format = format + c + "\n";
-                    getLevelStr(level, format);
-                    break;
-                case '}':
-                case ']':
-                    format += "\n";
-                    level--;
-                    getLevelStr(level, format);
-                    format += c;
-                    break;
-                default:
-                    format += c;
-                    break;
-            }
-        }
+			switch (c)
+			{
+				case '{':
+				case '[':
+					format = format + c + "\n";
+					level++;
+					getLevelStr(level, format);
+					break;
+				case ',':
+					format = format + c + "\n";
+					getLevelStr(level, format);
+					break;
+				case '}':
+				case ']':
+					format += "\n";
+					level--;
+					getLevelStr(level, format);
+					format += c;
+					break;
+				default:
+					format += c;
+					break;
+			}
+		}
 		return format;
-    }
+	}
 
-    std::string Str::RandomString(int size)
-    {
+	std::string Str::RandomString(int size)
+	{
 		std::string result;
 		result.resize(size);
 		static const std::string STR_BUFFER("123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM");
-		for(size_t index = 0; index < size; index++)
+		for (size_t index = 0; index < size; index++)
 		{
 			int max = (int)STR_BUFFER.size();
 			int num = help::Rand::Random<int>(0, max - 1);
 			result[index] = (char)STR_BUFFER[num];
 		}
 		return result;
-    }
+	}
 
 }
 
 namespace help
 {
-    bool Str::SplitAddr(const std::string& address, std::string & net, std::string& ip, unsigned short& port)
-    {
+	bool Str::SplitAddr(const std::string& address, std::string& net, std::string& ip, unsigned short& port)
+	{
 		std::smatch match;
 		std::regex pattern(R"((\w+)://(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+))");
 		if (!std::regex_search(address, match, pattern))
@@ -169,7 +183,7 @@ namespace help
 		ip = match[2].str();
 		port = (unsigned short)std::stoi(match[3].str());
 		return true;
-    }
+	}
 
 	bool Str::SplitAddr(const std::string& address, std::string& ip, unsigned short& port)
 	{
@@ -205,7 +219,7 @@ namespace help
 
 	bool Str::IsPhoneNumber(const std::string& phoneNumber)
 	{
-		if(phoneNumber.empty())
+		if (phoneNumber.empty())
 		{
 			return false;
 		}

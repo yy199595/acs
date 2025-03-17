@@ -56,6 +56,7 @@ namespace acs
     private:
 		std::unordered_set<std::string> mAllService;
 		std::unordered_map<std::string, long long> mFileTime;
+		std::vector<std::unique_ptr<HttpMethodConfig>> mRegexConfigs;
         std::unordered_map<std::string, std::unique_ptr<HttpMethodConfig>> mMethodConfigs;
     };
 }// namespace Sentry

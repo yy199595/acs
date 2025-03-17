@@ -108,7 +108,7 @@ namespace ws
 			this->mOffset = 2;
 			if (size < this->mOffset)
 			{
-				return tcp::ReadDecodeError;
+				return tcp::read::decode_error;
 			}
 			int value = os.get();
 			int value2 = os.get();
@@ -118,7 +118,7 @@ namespace ws
 			this->mHeader.mLength = value2 & 0x7F;
 			if (!this->mHeader.mFin) //只支持完整包
 			{
-				return tcp::ReadDecodeError;
+				return tcp::read::decode_error;
 			}
 			switch (this->mHeader.mLength)
 			{
@@ -127,12 +127,12 @@ namespace ws
 					this->mOffset += 2;
 					if (size < this->mOffset)
 					{
-						return tcp::ReadDecodeError;
+						return tcp::read::decode_error;
 					}
 					char buffer[2] = { 0 };
 					if(os.readsome(buffer, sizeof(buffer)) != 2)
 					{
-						return tcp::ReadDecodeError;
+						return tcp::read::decode_error;
 					}
 					unsigned short len = 0;
 					tcp::Data::Read(buffer, len);
@@ -144,7 +144,7 @@ namespace ws
 					this->mOffset += 8;
 					if (size < this->mOffset)
 					{
-						return tcp::ReadDecodeError;
+						return tcp::read::decode_error;
 					}
 					char buffer[8] = { 0 };
 					os.readsome(buffer, sizeof(buffer));
@@ -157,7 +157,7 @@ namespace ws
 
 			if (this->mHeader.mLength > ws::MESSAGE_MAX_COUNT)
 			{
-				return tcp::PacketLong;
+				return tcp::read::big_long;
 			}
 
 			if (this->mHeader.mMask)
@@ -165,7 +165,7 @@ namespace ws
 				this->mOffset += 4;
 				if (size < this->mOffset)
 				{
-					return tcp::ReadDecodeError;
+					return tcp::read::decode_error;
 				}
 				memset(this->mMaskingKey, 0, 4);
 				os.readsome(this->mMaskingKey, 4);
@@ -192,8 +192,8 @@ namespace ws
 					this->mMessage[i] ^= this->mMaskingKey[i % 4];
 				}
 			}
-			return tcp::ReadDone;
+			return tcp::read::done;
 		}
-		return tcp::ReadSomeMessage;
+		return tcp::read::some;
 	}
 }
