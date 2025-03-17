@@ -1,0 +1,312 @@
+//
+// Created by leyi on 2023/7/27.
+//
+
+#include"RedisClient.h"
+#include "Util/Tools/Math.h"
+#include "Entity/Actor/App.h"
+#include "Core/Thread/ThreadSync.h"
+#include "XCode/XCode.h"
+
+namespace redis
+{
+	Client::Client(int id, Config  config, Component* com, Asio::Context& io)
+			: tcp::Client(1024 * 1024), mClientId(id), mConfig(std::move(config)), mComponent(com), mMainContext(io)
+	{
+		this->mRequest = nullptr;
+		this->mResponse = nullptr;
+	}
+
+	void Client::StartReceive()
+	{
+#ifdef ONLY_MAIN_THREAD
+		this->ReadLine();
+#else
+		auto self = this->shared_from_this();
+		Asio::Context& context = this->mSocket->GetContext();
+		asio::post(context, [this, self]() { this->ReadLine(); });
+#endif
+	}
+
+	bool Client::Start(tcp::Socket * socket)
+	{
+#ifdef ONLY_MAIN_THREAD
+		Asio::Code code;
+		if(!this->ConnectSync(code))
+		{
+			return false;
+		}
+		return this->InitRedisClient(this->mConfig.Password);
+#else
+		std::shared_ptr<tcp::Client> self = this->shared_from_this();
+		if(socket == nullptr)
+		{
+			Asio::Context & context = this->mSocket->GetContext();
+			asio::post(context, [self, this]() {
+				this->mConnectCount = 0;
+				this->Connect(5);
+			});
+			return true;
+		}
+		this->SetSocket(socket);
+		custom::ThreadSync<bool> threadSync;
+		Asio::Socket& sock = this->mSocket->Get();
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [&threadSync, self, this, &sock]
+		{
+			if (this->Auth(true))
+			{
+				threadSync.SetResult(true);
+				return;
+			}
+			threadSync.SetResult(false);
+		});
+		return threadSync.Wait();
+#endif
+	}
+
+	void Client::OnConnect(const Asio::Code& code, int count)
+	{
+		if(code.value() != Asio::OK)
+		{
+			if(count < this->mConfig.conn_count)
+			{
+				this->Connect(5);
+				return;
+			}
+		}
+		else if(this->Auth(false))
+		{
+			if (this->mRequest != nullptr)
+			{
+				this->Write(*this->mRequest);
+				CONSOLE_LOG_DEBUG("resend => {}", this->mRequest->ToString())
+			}
+			return;
+		}
+		auto self = this->shared_from_this();
+		asio::post(this->mMainContext, [this, self, id = this->mClientId]
+		{
+			if(this->mRequest != nullptr)
+			{
+				this->mComponent->OnSendFailure(id, this->mRequest.release());
+			}
+			this->mComponent->OnClientError(id, XCode::NetConnectFailure);
+		});
+	}
+
+	bool Client::Auth(bool connect)
+	{
+		if (connect)
+		{
+			Asio::Code code;
+			if (!this->ConnectSync(code))
+			{
+				return false;
+			}
+		}
+		if (!this->mConfig.password.empty())  //验证密码
+		{
+			std::unique_ptr<redis::Request> authCommand = redis::Request::Make("AUTH", this->mConfig.password);
+			std::unique_ptr<redis::Response> response = this->ReadResponse(authCommand);
+			if (response == nullptr || !response->IsOk())
+			{
+				this->mSocket->Close();
+				CONSOLE_LOG_ERROR("auth redis user failure {}", response->ToString());
+				return false;
+			}
+		}
+		if(this->mRequest == nullptr)
+		{
+			std::shared_ptr<tcp::Client> self = this->shared_from_this();
+			asio::post(this->mMainContext, [self, this, id = this->mClientId]()
+			{
+				this->mComponent->OnConnectOK(id);
+			});
+		}
+		return true;
+	}
+
+	void Client::Send(std::unique_ptr<Request> command)
+	{
+#ifdef ONLY_MAIN_THREAD
+		this->mRequest = std::move(command);
+		this->Write(*this->mRequest);
+#else
+		Asio::Context& context = this->mSocket->GetContext();
+		std::shared_ptr<tcp::Client> self = this->shared_from_this();
+		asio::post(context, [this, request = command.release()]
+		{
+			this->Write(*request);
+			this->mRequest.reset(request);
+		});
+#endif
+
+	}
+
+	void Client::OnSendMessage(size_t size)
+	{
+		this->ReadLine();
+	}
+
+	void Client::OnSendMessage(const Asio::Code& code)
+	{
+		this->Connect(5);
+	}
+
+	void Client::OnReadError(const Asio::Code& code)
+	{
+		this->Connect(5);
+	}
+
+	bool Client::OnMessage(std::istream& readStream, size_t size, redis::Element& element)
+	{
+		if(size < 3)
+		{
+			return false;
+		}
+		element.type = (char)readStream.get();
+		if(!std::getline(readStream, element.message))
+		{
+			return false;
+		}
+
+		element.message.pop_back();
+		switch (element.type)
+		{
+			case redis::type::Error:
+			case redis::type::String:
+				return true;
+			case redis::type::Number:
+			{
+				help::Math::ToNumber(element.message, element.number);
+				return true;
+			}
+			case redis::type::BinString:
+			{
+				int count = 0;
+				size_t length = 0;
+				help::Math::ToNumber(element.message, count);
+				if (count <= 0)
+				{
+					break;
+				}
+				char buffer[512] = { 0};
+				element.message.clear();
+				element.message.reserve(count);
+				while(count > 0 && this->RecvSomeSync(length))
+				{
+					int len = std::min(count, (int)length);
+					len = std::min(len, (int)sizeof(buffer));
+					if(readStream.readsome(buffer, len) != len)
+					{
+						return false;
+					}
+					count -= len;
+					element.message.append(buffer, len);
+				}
+				if(count != 0)
+				{
+					return false;
+				}
+				if(!this->RecvSync(2, length))
+				{
+					return false;
+				}
+				readStream.ignore(2);
+				break;
+			}
+			case redis::type::Array:
+			{
+				int count = 0;
+				size_t length = 0;
+				help::Math::ToNumber(element.message, count);
+				for (int index = 0; index < count; index++)
+				{
+					if (!this->RecvLineSync(length))
+					{
+						break;
+					}
+					Element newElement;
+					if (!this->OnMessage(readStream, length, newElement))
+					{
+						return false;
+					}
+					element.list.emplace_back(newElement);
+				}
+				break;
+			}
+			default:
+			CONSOLE_LOG_ERROR("type:{}", element.type);
+				break;
+		}
+		return true;
+	}
+
+	void Client::OnReceiveLine(std::istream& buffer, size_t size)
+	{
+		this->mResponse = std::make_unique<redis::Response>();
+		if(!this->OnMessage(buffer, size, this->mResponse->element))
+		{
+			this->mResponse->element.message = "decode error";
+			this->mResponse->element.type = redis::type::Error;
+		}
+		this->OnResponse();
+	}
+
+	std::unique_ptr<redis::Response> Client::Sync(std::unique_ptr<redis::Request> request)
+	{
+#ifdef ONLY_MAIN_THREAD
+		return this->ReadResponse(std::move(request));
+#else
+		custom::ThreadSync<bool> threadSync;
+		std::unique_ptr<redis::Response> response;
+		Asio::Socket& sock = this->mSocket->Get();
+		const Asio::Executor& executor = sock.get_executor();
+		asio::post(executor, [this, &request, &threadSync, &response]
+		{
+			response = this->ReadResponse(request);
+			threadSync.SetResult(true);
+		});
+		threadSync.Wait();
+		return response;
+#endif
+	}
+
+	std::unique_ptr<redis::Response> Client::ReadResponse(const std::unique_ptr<redis::Request>& request)
+	{
+		std::unique_ptr<redis::Response> redisResponse = std::make_unique<redis::Response>();
+		if (!this->SendSync(*request))
+		{
+			LOG_ERROR("sync send redis cmd fail : {}", request->ToString());
+			return redisResponse;
+		}
+		size_t readSize = 0;
+		std::istream is(&this->mRecvBuffer);
+		if (!this->RecvLineSync(readSize))
+		{
+			return redisResponse;
+		}
+		this->OnMessage(is, readSize, redisResponse->element);
+		return redisResponse;
+	}
+
+	void Client::OnResponse()
+	{
+		if (this->mResponse == nullptr)
+		{
+			this->mResponse = std::make_unique<redis::Response>();
+		}
+#ifdef ONLY_MAIN_THREAD
+		this->mComponent->OnMessage(id, this->mRequest.release(), this->mResponse.release());
+#else
+		redis::Request* req = this->mRequest.release();
+		redis::Response* resp = this->mResponse.release();
+		asio::post(this->mMainContext, [this, req, resp, id = this->mClientId]
+		{
+			this->mComponent->OnMessage(id, req, resp);
+			delete req;
+		});
+#endif
+	}
+}
