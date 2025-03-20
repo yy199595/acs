@@ -50,7 +50,6 @@ namespace lua
 #endif
 		extern int luaopen_ljwt(lua_State* L);
 		extern int luaopen_lsha1(lua_State * L);
-		extern int luaopen_lsha256(lua_State * L);
 
 		extern int luaopen_lproto(lua_State* L);
 		extern int luaopen_lbase64(lua_State* L);
@@ -61,6 +60,8 @@ namespace lua
 		extern int luaopen_lredisdb(lua_State* L);
 		extern int luaopen_lmonogodb(lua_State* L);
 		extern int luaopen_lsqlitedb(lua_State* L);
+
+		extern int luaopen_lsub_redisdb(lua_State* L);
 
 		extern int luaopen_lexcel(lua_State * L);
 	}

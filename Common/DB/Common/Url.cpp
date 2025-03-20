@@ -3,10 +3,10 @@
 //
 
 #include <regex>
-#include <utility>
 #include "Url.h"
-#include "Util/Tools/String.h"
 #include "bundled/format.h"
+#include "Util/Tools/Math.h"
+#include "Util/Tools/String.h"
 
 namespace db
 {
@@ -62,6 +62,16 @@ namespace db
 		}
 		this->mItems.emplace(key, value);
 		return true;
+	}
+
+	bool Url::Get(const std::string& key, int& value)
+	{
+		auto iter = this->mItems.find(key);
+		if(iter == this->mItems.end())
+		{
+			return false;
+		}
+		return help::Math::ToNumber(iter->second, value);
 	}
 
 	bool Url::Get(const std::string& key, std::string& value)

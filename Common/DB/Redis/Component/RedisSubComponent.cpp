@@ -8,16 +8,24 @@
 #include "Lua/Engine/ModuleClass.h"
 #include "Rpc/Component/DispatchComponent.h"
 #include "Server/Component/ThreadComponent.h"
+#include "Lua/Lib/Lib.h"
+
 namespace acs
 {
 	RedisSubComponent::RedisSubComponent()
 	{
 		this->mDispatch = nullptr;
+		REGISTER_JSON_CLASS_FIELD(redis::Cluster, sub);
 	}
 
 	bool RedisSubComponent::Awake()
 	{
-		return ServerConfig::Inst()->Get("sub", this->mConfig);
+		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
+			ccModule.Open("db.redis.sub", lua::lib::luaopen_lsub_redisdb);
+		});
+		ServerConfig::Inst()->Get("redis", this->mConfig);
+		LOG_CHECK_RET_FALSE(!this->mConfig.sub.empty())
+		return true;
 	}
 
 	bool RedisSubComponent::LateAwake()
@@ -40,77 +48,98 @@ namespace acs
 				return false;
 			}
 		}
-		if(this->mConfig.debug)
-		{
-			std::unique_ptr<redis::Request> request =
-					redis::Request::Make("MONITOR");
-			this->mClient->Sync(std::move(request));
-		}
 		LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>())
 		return true;
 	}
 
 	void RedisSubComponent::OnConnectOK(int id)
 	{
-		std::unique_ptr<redis::Request> request = redis::Request::Make("SUBSCRIBE");
-		auto iter = this->mChannels.begin();
-		for (; iter != this->mChannels.end(); iter++)
+		if(!this->mChannels.empty())
 		{
-			request->AddParameter(*iter);
+			std::unique_ptr<redis::Request> request = redis::Request::Make("SUBSCRIBE");
+			for (auto iter = this->mChannels.begin(); iter != this->mChannels.end(); iter++)
+			{
+				request->AddParameter(*iter);
+			}
+			request->SetRpcId(1);
+			this->mClient->Send(std::move(request));
 		}
-		request->SetRpcId(1);
-		this->mClient->Send(std::move(request));
+	}
+
+	void RedisSubComponent::Send(std::unique_ptr<redis::Request> request, int& rpcId)
+	{
+		rpcId = this->BuildRpcId();
+		{
+			request->SetRpcId(rpcId);
+			this->mClient->Send(std::move(request));
+		}
 	}
 
 	bool RedisSubComponent::Sub(const std::string& channel)
 	{
-		auto iter = this->mChannels.find(channel);
-		if (iter != this->mChannels.end())
+		int rpcId = 0;
+		LOG_CHECK_RET_FALSE(!channel.empty())
+		std::unique_ptr<redis::Request> request = redis::Request::Make("SUBSCRIBE", channel);
 		{
-			return false;
+			this->Send(std::move(request), rpcId);
+			std::unique_ptr<redis::Response> response = this->BuildRpcTask<RedisTask>(rpcId)->Await();
+			return response != nullptr && response->element.type == redis::type::Array;
 		}
-
-//		this->mChannels.insert(channel);
-//		std::unique_ptr<redis::Request> request =
-//				redis::Request::Make("SUBSCRIBE", channel);
-//		{
-//			request->SetRpcId(1);
-//			this->mClient->Send(std::move(request));
-//			LOG_DEBUG("sub redis channel => {}", channel);
-//		}
-		return true;
 	}
 
 	bool RedisSubComponent::UnSub(const std::string& channel)
 	{
-		auto iter = this->mChannels.find(channel);
-		if (iter == this->mChannels.end())
+		int rpcId = 0;
+		std::unique_ptr<redis::Request> request = redis::Request::Make("UNSUBSCRIBE", channel);
 		{
-			return false;
+			this->Send(std::move(request), rpcId);
+			std::unique_ptr<redis::Response> response = this->BuildRpcTask<RedisTask>(rpcId)->Await();
+			return response != nullptr && response->element.type == redis::type::Array;
 		}
-
-		std::unique_ptr<redis::Request> request =
-				redis::Request::Make("UNSUBSCRIBE", channel);
-		{
-			request->SetRpcId(1);
-			this->mClient->Send(std::move(request));
-		}
-		this->mChannels.erase(iter);
 		return true;
 	}
 
-	void RedisSubComponent::OnMessage(int, redis::Request* request, redis::Response* response) noexcept
+	void RedisSubComponent::OnMessage(int, redis::Request* request, redis::Response* resp) noexcept
 	{
 		do
 		{
-			if(this->mConfig.debug)
-			{
-				CONSOLE_LOG_DEBUG("request => {}", request->ToString())
-				CONSOLE_LOG_DEBUG("response => {}", request->ToString())
-			}
+			std::unique_ptr<redis::Response> response(resp);
 			const redis::Element & element = response->element;
 			if (element.type != redis::type::Array || element.list.size() != 3)
 			{
+				if(element.type == redis::type::Error)
+				{
+					LOG_ERROR("response => {}", response->ToString())
+				}
+				break;
+			}
+			if(request != nullptr && request->GetRpcId() > 0)
+			{
+				const std::string& option = element.list[0].message;
+				if(option == "subscribe")
+				{
+					const redis::Element & element1 = element.list[1];
+					const redis::Element & element2 = element.list[2];
+					if(element2.number == 1)
+					{
+						this->mChannels.emplace(element1.message);
+					}
+				}
+				else if(option == "unsubscribe")
+				{
+					const redis::Element & element1 = element.list[1];
+					const redis::Element & element2 = element.list[2];
+					if(element2.number == 1)
+					{
+						auto iter = this->mChannels.find(element1.message);
+						if(iter != this->mChannels.end())
+						{
+							this->mChannels.erase(iter);
+						}
+					}
+				}
+				int rpcId = request->GetRpcId();
+				this->OnResponse(rpcId, std::move(response));
 				break;
 			}
 			const std::string& channel = element.list[1].message;
@@ -121,14 +150,12 @@ namespace acs
 				rpcMessage->SetContent(rpc::Porto::Json, message);
 				rpcMessage->GetHead().Add(rpc::Header::func, channel);
 			}
-			if(this->mDispatch->OnMessage(rpcMessage.get()) != XCode::Ok)
+			if(this->mDispatch->OnMessage(rpcMessage.get()) == XCode::Ok)
 			{
-				break;
+				rpcMessage.release();
 			}
-			rpcMessage.release();
 		}
 		while (false);
-		delete response;
 		this->mClient->StartReceive();
 	}
 }

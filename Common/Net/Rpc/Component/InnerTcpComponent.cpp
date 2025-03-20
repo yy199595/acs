@@ -14,6 +14,7 @@ namespace acs
     InnerTcpComponent::InnerTcpComponent()
 		: mNumPool(SERVER_MAX_COUNT)
     {
+		this->mWaitCount = 0;
 		this->mActor = nullptr;
 		this->mThread = nullptr;
 		this->mDispatch = nullptr;
@@ -38,6 +39,10 @@ namespace acs
 				this->StartClose(message->SockId());
 				break;
 			case rpc::Type::Request:
+				if(message->GetRpcId() > 0)
+				{
+					this->mWaitCount++;
+				}
 				code = this->OnRequest(message);
 				break;
 			case rpc::Type::Forward:
@@ -62,6 +67,10 @@ namespace acs
 //					}
 //				}
 //#endif
+				if(message->GetRpcId() > 0)
+				{
+					this->mWaitCount++;
+				}
 				code = this->mDispatch->OnMessage(message);
 				break;
 			}
@@ -198,7 +207,8 @@ namespace acs
     {
 		std::unique_ptr<json::w::Value> data = document.AddObject("inner");
 		{
-			data->Add("client", (int)this->mClients.size());
+			data->Add("wait", this->mWaitCount);
+			data->Add("client", this->mClients.size());
 		}
     }
 

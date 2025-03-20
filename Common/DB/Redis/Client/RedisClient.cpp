@@ -116,6 +116,19 @@ namespace redis
 				return false;
 			}
 		}
+
+		if(this->mConfig.db > 0)
+		{
+			auto request = redis::Request::Make("SELECT", this->mConfig.db);
+			std::unique_ptr<redis::Response> response = this->ReadResponse(request);
+			if (response == nullptr || !response->IsOk())
+			{
+				CONSOLE_LOG_ERROR("select db:{}", this->mConfig.db);
+				return false;
+			}
+		}
+
+
 		if(this->mRequest == nullptr)
 		{
 			std::shared_ptr<tcp::Client> self = this->shared_from_this();
@@ -135,7 +148,7 @@ namespace redis
 #else
 		Asio::Context& context = this->mSocket->GetContext();
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
-		asio::post(context, [this, request = command.release()]
+		asio::post(context, [this, self, request = command.release()]
 		{
 			this->Write(*request);
 			this->mRequest.reset(request);

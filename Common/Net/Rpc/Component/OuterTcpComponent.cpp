@@ -3,7 +3,7 @@
 //
 #include "XCode/XCode.h"
 #include"OuterTcpComponent.h"
-#include"Rpc/Client/OuterTcpClient.h"
+#include"Rpc/Client/OuterTcpSession.h"
 #include"Server/Config/CodeConfig.h"
 
 #include"Entity/Actor/App.h"
@@ -90,7 +90,7 @@ namespace acs
 
 		int sockId = this->mSocketPool.BuildNumber();
 		Asio::Context & io = this->mApp->GetContext();
-		std::shared_ptr<rpc::OuterTcpClient> outerNetClient = std::make_shared<rpc::OuterTcpClient>(sockId, this, io);
+		std::shared_ptr<rpc::OuterTcpSession> outerNetClient = std::make_shared<rpc::OuterTcpSession>(sockId, this, io);
 		{
 			outerNetClient->StartReceive(socket);
 			this->mGateClientMap.emplace(sockId, outerNetClient);

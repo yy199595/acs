@@ -24,6 +24,8 @@
 
 #include "Util/Ssl/rsa.h"
 #include "Util/Ssl/LuaRsa.h"
+#include "Yyjson/Lua/ljson.h"
+
 #endif
 
 
@@ -93,6 +95,7 @@ namespace acs
 		os.PushMember("platform", std::string("linux"));
 #elif __OS_WIN__
 		os.PushMember("platform", std::string("win"));
+		os.PushStaticFunction("SetConsoleTitle", SetConsoleTitle);
 #endif
 
 #ifdef __DEBUG__
@@ -171,6 +174,14 @@ namespace acs
 		Lua::ClassProxyHelper classProxyHelper9(this->mLuaEnv, "table");
 		classProxyHelper9.PushExtensionFunction("serialize", lua::lfmt::serialize);
 		classProxyHelper9.PushExtensionFunction("deserialize", lua::lfmt::deserialize);
+
+
+		Lua::ClassProxyHelper classProxyHelper10(this->mLuaEnv, "JsonValue");
+		classProxyHelper10.BeginRegister<lua::JsonValue>();
+		classProxyHelper10.PushExtensionFunction("encode", lua::ljson::encode);
+		classProxyHelper10.PushExtensionFunction("add_member", lua::ljson::add_member);
+		classProxyHelper10.PushExtensionFunction("add_object", lua::ljson::add_object);
+		classProxyHelper10.PushExtensionFunction("add_array", lua::ljson::add_array);
 	}
 
 	bool LuaComponent::LateAwake()

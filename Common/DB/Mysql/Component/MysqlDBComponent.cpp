@@ -137,12 +137,6 @@ namespace acs
 
 	void MysqlDBComponent::OnMessage(int id, mysql::Request* request, mysql::Response* response) noexcept
 	{
-		if(id == 0) //订阅消息
-		{
-			this->OnBinLog(response);
-			this->mBinLogClient->StartReceive();
-			return;
-		}
 		this->mCount++;
 		if(this->mMessages.empty())
 		{
@@ -183,7 +177,10 @@ namespace acs
 			}
 		}
 		int rpcId = request->GetRpcId();
-		this->OnResponse(rpcId, std::unique_ptr<mysql::Response>(response));
+		if(rpcId > 0)
+		{
+			this->OnResponse(rpcId, std::unique_ptr<mysql::Response>(response));
+		}
 	}
 
 	void MysqlDBComponent::OnExplain(const std::string& sql, long long ms) noexcept
@@ -206,16 +203,6 @@ namespace acs
 				}
 			}
 		}
-	}
-
-	void MysqlDBComponent::OnBinLog(mysql::Response* response) noexcept
-	{
-		if(response->HasError())
-		{
-			LOG_ERROR("{}", response->ToString())
-			return;
-		}
-		LOG_DEBUG("binlog => {}", response->ToString());
 	}
 
 	void MysqlDBComponent::OnSendFailure(int id, mysql::Request* message)
@@ -244,6 +231,7 @@ namespace acs
 			int id = 0;
 			while(this->mFreeClients.Pop(id))
 			{
+				//CONSOLE_LOG_WARN("mysql client:{} ping", id)
 				this->Send(id, std::make_unique<mysql::Request>(mysql::cmd::PING));
 			}
 			for(const int id : this->mRetryClients)

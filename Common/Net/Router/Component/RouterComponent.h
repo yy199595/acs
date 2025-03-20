@@ -26,7 +26,6 @@ namespace acs
 		void OnSystemUpdate() noexcept final;
 		void OnRecord(json::w::Document &document) final;
 	private:
-		unsigned int mCount;
 		class DispatchComponent * mDispatch;
 		std::queue<rpc::Message *> mLocalMessages;
 		std::unordered_map<char, rpc::IInnerSender *> mSenders;

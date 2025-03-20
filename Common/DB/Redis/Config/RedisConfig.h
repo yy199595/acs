@@ -27,6 +27,7 @@ namespace redis
 	public:
 		Config() : db::Url("redis") { }
 	public:
+		int db = 0;
 		int conn_count = 3;
 		std::string address;
 		std::string password;

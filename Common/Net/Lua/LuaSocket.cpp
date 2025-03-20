@@ -56,7 +56,7 @@ namespace lua
 					tcpClient->async = true;
 					tcpClient->mSocket.reset(tcpSocket);
 				}
-				waitTaskSource->SetResult<lua::TcpClient *>(tcpClient);
+				waitTaskSource->SetResultPtr<lua::TcpClient>(tcpClient);
 				return;
 			}
 			tcpSocket->Destroy();
@@ -118,7 +118,7 @@ namespace lua
 		}
 		Asio::Context & io = tcpClient->mSocket->GetContext();
 		tcpClient->mTimer = std::make_unique<Asio::Timer>(io);
-		tcpClient->timeout = luaL_checknumber(L, 2) * 1000;
+		tcpClient->timeout = (int)(luaL_checknumber(L, 2) * 1000);
 		return 0;
 	}
 

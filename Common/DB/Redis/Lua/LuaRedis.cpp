@@ -114,7 +114,7 @@ namespace lua
 				lua::yyjson::read(lua, 2, redisLuaData.json);
 				break;
 			default:
-				luaL_error(lua, "parameter muset table or string");
+				luaL_error(lua, "parameter must table or string");
 				return 0;
 		}
 		int id = 0;
@@ -153,37 +153,35 @@ namespace lua
         return 1;
     }
 
-	int redis::Sub(lua_State* lua)
+	int sub_redis::Run(lua_State* L)
 	{
-		static RedisSubComponent * subComponent = nullptr;
-		if(subComponent == nullptr)
+		static RedisSubComponent* redisComponent = nullptr;
+		if(redisComponent == nullptr)
 		{
-			subComponent = App::Get<RedisSubComponent>();
-			if(subComponent == nullptr)
+			redisComponent = App::Get<RedisSubComponent>();
+			if (redisComponent == nullptr)
 			{
-				luaL_error(lua, "not add RedisSubComponent");
+				luaL_error(L, "RedisComponent Is Null");
 				return 0;
 			}
 		}
-		const char* channel = luaL_checkstring(lua, 1);
-		lua_pushboolean(lua, subComponent->Sub(channel));
-		return 1;
+		lua_pushthread(L);
+		const char * cmd = luaL_checkstring(L, 1);
+		std::unique_ptr<::redis::Request> request = std::make_unique<::redis::Request>();
+		{
+			request->SetCommand(cmd);
+			int count = (int)luaL_len(L, 2);
+			for (int i = 0; i < count; i++)
+			{
+				lua_geti(L, 2, i + 1);
+				int index = lua_absindex(L, -1);
+				ReadFromIndex(L, index, request.get());
+				lua_pop(L, 1);
+			}
+		}
+		int id = 0;
+		redisComponent->Send(std::move(request), id);
+		return redisComponent->AddTask(new LuaRedisTask(L, id))->Await();
 	}
 
-	int redis::UnSub(lua_State* lua)
-	{
-		static RedisSubComponent* subComponent = nullptr;
-		if (subComponent == nullptr)
-		{
-			subComponent = App::Get<RedisSubComponent>();
-			if (subComponent == nullptr)
-			{
-				luaL_error(lua, "not add RedisSubComponent");
-				return 0;
-			}
-		}
-		const char* channel = luaL_checkstring(lua, 1);
-		lua_pushboolean(lua, subComponent->UnSub(channel));
-		return 1;
-	}
 }

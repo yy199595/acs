@@ -64,6 +64,7 @@ namespace acs
 		void OnSendFailure(int id, redis::Request *message) final;
 	private:
 		redis::Cluster mConfig;
+		unsigned long long mSumCount;
 		class ThreadComponent * mThread;
 		custom::Queue<int> mFreeClients; //空闲客户端
 		std::shared_ptr<redis::Client> mSubClient;

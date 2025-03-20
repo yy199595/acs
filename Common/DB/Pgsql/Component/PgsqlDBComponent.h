@@ -33,7 +33,7 @@ namespace acs
 
 namespace acs
 {
-	class PgsqlDBComponent  : public RpcComponent<pgsql::Response>,
+	class PgsqlDBComponent  : public RpcComponent<pgsql::Response>, public IServerRecord,
 							  public IRpc<pgsql::Request, pgsql::Response>, public ISecondUpdate
 	{
 	public:
@@ -53,11 +53,13 @@ namespace acs
 		void OnConnectOK(int id) final;
 		void OnClientError(int id, int code) final;
 		void OnSecondUpdate(int tick) noexcept final;
+		void OnRecord(json::w::Document &document) final;
 		void OnSendFailure(int id, pgsql::Request *message) final;
 		void OnExplain(const std::string & sql, long long ms) noexcept;
 		void OnMessage(int, pgsql::Request *request, pgsql::Response *response) noexcept final;
 	private:
 		pgsql::Cluster mConfig;
+		unsigned long long mSumCount;
 		class ThreadComponent * mThread;
 		custom::Queue<int> mFreeClients;
 		std::unordered_set<int> mRetryClients; //断开了 重试的客户端

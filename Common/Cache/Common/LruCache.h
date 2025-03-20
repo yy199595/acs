@@ -10,7 +10,7 @@ namespace custom
 	class LRUCache
 	{
 	public:
-		LRUCache(size_t capacity) : capacity_(capacity)
+		explicit LRUCache(size_t capacity) : capacity_(capacity)
 		{
 		}
 

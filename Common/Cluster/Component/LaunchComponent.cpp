@@ -186,6 +186,7 @@ namespace acs
 					}
 				}
 				this->mTcpListens.emplace_back(listenConfig);
+				this->mApp->AddListen(listenConfig.name, listenConfig.address);
 			}
 		}
 		return true;

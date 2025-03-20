@@ -38,14 +38,23 @@ TypeDecode["json"] = function(value)
 end
 
 TypeDecode["int"] = function(value)
-    return tonumber(value) or 0
+    if value == nil or #value == 0 then
+        return 0
+    end
+    return math.tointeger(value)
 end
 
 TypeDecode["float"] = function(value)
+    if value == nil or #value == 0 then
+        return 0
+    end
     return tonumber(value) or 0
 end
 
 TypeDecode["double"] = function(value)
+    if value == nil or #value == 0 then
+        return 0
+    end
     return tonumber(value) or 0
 end
 

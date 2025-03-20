@@ -1,4 +1,5 @@
 
+os.execute("chcp 65001")
 local lfmt = require("util.fmt")
 local log = require("Console")
 local app = require("core.app")
@@ -71,6 +72,7 @@ function Excel:OnAwake()
         self.Handler[output.type].config = output
     end
     local sum = #files
+    local t1 = time.ms()
     for idx, path in ipairs(files) do
         if self:IsIgnore(path) then
             goto continue
@@ -79,12 +81,14 @@ function Excel:OnAwake()
         if not ok then
             log.Error(excelFile)
         else
+            local process = idx / sum
             local name = fs.GetFileName(path)
-            self:OnReadFile(excelFile, name)
-            log.Info("{}", GetProcess(idx, sum))
+            self:OnReadFile(excelFile, name, process)
         end
         :: continue ::
     end
+    log.Debug("导出总耗时 => {:.2f}s", (time.ms() - t1) / 1000.0)
+    os.exit()
 end
 
 function Excel:DecodeByType(type, value)
@@ -122,7 +126,9 @@ function Excel:OnReadSheet(sheet, fileName)
         if cell1 then
             descs[value] = cell1:get_value()
         end
-        fields[y] = value
+        if value ~= "" then
+            fields[y] = value
+        end
         ::continue::
     end
 
@@ -138,6 +144,7 @@ function Excel:OnReadSheet(sheet, fileName)
         types[y] = value
         ::continue::
     end
+    local t1 = time.ms()
     local documents = {}
     for x = self.Line.ValueStartLine, last_row do
         local item = {}
@@ -156,22 +163,33 @@ function Excel:OnReadSheet(sheet, fileName)
                         log.Error("file:{} x:{} y:{}", fileName, x, y)
                         return false
                     end
-                    item[filed] = target
+                    rawset(item, filed, target)
+
                 end
             end
             ::continue::
         end
+        if os.SetConsoleTitle then
+            os.SetConsoleTitle(lfmt.format("[{}]  {:.2f}%", fileName, (x / last_row) * 100))
+        end
+
         if next(item) then
             table.insert(documents, item)
         end
     end
+    log.Debug("[{}ms] 读取{} 成功共({})行", time.ms() - t1, fileName, #documents)
+    local result = { }
     for _, output in ipairs(self.output) do
         local handler = self.Handler[output.type]
         if handler == nil then
             log.Error("找不到导出处理函数:%s", output.type)
             return
         end
-        local content = handler.Run(documents, types, fields, name, descs)
+        local t1 = time.ms()
+        if result[output] == nil then
+            result[output] = handler.Run(documents, types, fields, name, descs)
+        end
+        local content = result[output]
         if content == nil or content == "" then
             return false
         end
@@ -181,13 +199,13 @@ function Excel:OnReadSheet(sheet, fileName)
             log.Error("打开文件[{}]失败", path)
             return false
         end
-       --log.Debug("导出文件{}到{}成功", name, path)
+        log.Info("[{}ms] 导出文件{}到{}成功", (time.ms() - t1), name, path)
     end
 
     return true
 end
 
-function Excel:OnReadFile(excelFile, fileName)
+function Excel:OnReadFile(excelFile, fileName, process)
     local sheets = excelFile:GetSheets()
     for _, sheet in ipairs(sheets) do
         local name = sheet:get_name()
@@ -197,8 +215,10 @@ function Excel:OnReadFile(excelFile, fileName)
         if not self:IsValid(name) then
             goto continue
         end
+        local t1 = time.ms()
         if self:OnReadSheet(sheet, fileName) then
-            log.Debug("导出文件分页[{}:{}]成功", fileName, name)
+            local t2 = time.ms() - t1
+            log.Debug("[{}ms] ({:.2f}%) 导出文件分页[{}:{}]成功", t2, process * 100, fileName, name)
         else
             log.Error("导出文件分页[{}:{}]失败", fileName, name)
         end

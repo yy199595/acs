@@ -9,11 +9,21 @@ namespace lua
 	class JsonValue
 	{
 	public:
-		~JsonValue() { yyjson_mut_doc_free(this->doc);}
+		~JsonValue();
 	public:
 		yyjson_mut_doc * doc;
 		yyjson_mut_val * val;
 	};
+
+	namespace ljson
+	{
+		extern int encode(lua_State * L);
+		extern int create(lua_State * L);
+		extern int add_array(lua_State * L);
+		extern int add_object(lua_State * L);
+		extern int add_member(lua_State * L);
+		extern yyjson_mut_val * encode(lua_State * L, yyjson_mut_doc * doc, int index);
+	}
 
 	class yyjson
 	{

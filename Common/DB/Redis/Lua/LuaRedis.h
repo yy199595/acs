@@ -12,9 +12,12 @@ namespace lua
 		extern int Run(lua_State * lua);
 		extern int Call(lua_State * lua);
 		extern int Send(lua_State * lua);
-		extern int Sub(lua_State* lua);
-		extern int UnSub(lua_State* lua);
 	};
+
+	namespace sub_redis
+	{
+		extern int Run(lua_State* lua);
+	}
 }
 
 #endif //APP_LUAREDIS_H

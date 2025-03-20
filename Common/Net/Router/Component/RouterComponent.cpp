@@ -12,7 +12,6 @@ namespace acs
 {
 	RouterComponent::RouterComponent()
 	{
-		this->mCount = 0;
         this->mDispatch = nullptr;
 	}
 
@@ -63,9 +62,8 @@ namespace acs
 	{
 		auto jsonObject = document.AddObject("router");
 		{
-			jsonObject->Add("wait", this->mCount);
-			jsonObject->Add("send", this->mLocalMessages.size());
-			jsonObject->Add("count", this->mLocalMessages.size());
+			jsonObject->Add("sender", this->mSenders.size());
+			jsonObject->Add("local", this->mLocalMessages.size());
 		}
 	}
 
@@ -80,15 +78,6 @@ namespace acs
 //			message->TempHead().Add("t", help::Time::NowMil());
 //		}
 //#endif
-		switch(message->GetType())
-		{
-			case rpc::Type::Request:
-				++this->mCount;
-				break;
-			case rpc::Type::Response:
-				--this->mCount;
-				break;
-		}
 		char net = message->GetNet();
 		if(net == rpc::Net::Client)
 		{
@@ -110,7 +99,6 @@ namespace acs
 		rpc::Message * data = message.release();
 		if(iter->second->Send(id, data) != XCode::Ok)
 		{
-			//LOG_ERROR("{}", data->ToString());
 			delete data;
 			return XCode::SendMessageFail;
 		}

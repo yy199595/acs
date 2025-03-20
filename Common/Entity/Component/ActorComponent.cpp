@@ -50,10 +50,7 @@ namespace actor
 namespace acs
 {
 
-	ActorComponent::ActorComponent()
-	{
-
-	}
+	ActorComponent::ActorComponent() = default;
 
 	bool ActorComponent::LateAwake()
 	{

@@ -52,7 +52,6 @@ namespace acs
 		void OnClientError(int id, int code) final;
 		void OnSecondUpdate(int tick) noexcept final;
 		void OnRecord(json::w::Document &document) final;
-		void OnBinLog(mysql::Response *response) noexcept;
 		void OnSendFailure(int id, mysql::Request *message) final;
 		void OnExplain(const std::string & sql, long long ms) noexcept;
 		void OnMessage(int id, mysql::Request *request, mysql::Response *response) noexcept final;
@@ -62,7 +61,6 @@ namespace acs
 		class ThreadComponent * mThread;
 		custom::Queue<int> mFreeClients; //空闲的客户端
 		std::unordered_set<int> mRetryClients; //断开了 重试的客户端
-		std::shared_ptr<mysql::Client> mBinLogClient;
 		std::queue<std::unique_ptr<mysql::Request>> mMessages;
 		std::unordered_map<int, std::shared_ptr<mysql::Client>> mClients;
 	};

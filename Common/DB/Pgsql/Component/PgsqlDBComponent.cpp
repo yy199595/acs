@@ -19,12 +19,14 @@ namespace acs
 {
 	PgsqlDBComponent::PgsqlDBComponent()
 	{
+		this->mSumCount = 0;
 		this->mThread = nullptr;
 		this->mConfig.count = 1;
 		this->mConfig.debug = false;
 
 		REGISTER_JSON_CLASS_FIELD(db::Explain, open);
 		REGISTER_JSON_CLASS_FIELD(db::Explain, command);
+		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, ping);
 		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, count);
 		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, debug);
 		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, script);
@@ -35,7 +37,8 @@ namespace acs
 
 	bool PgsqlDBComponent::Awake()
 	{
-		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
+		LuaCCModuleRegister::Add([](Lua::CCModule& ccModule)
+		{
 			ccModule.Open("db.pgsql", lua::lib::luaopen_lpgsqldb);
 		});
 		return ServerConfig::Inst()->Get("pgsql", this->mConfig);
@@ -45,14 +48,14 @@ namespace acs
 	{
 		LOG_CHECK_RET_FALSE(!this->mConfig.address.empty())
 		this->mThread = this->GetComponent<ThreadComponent>();
-		for(int x = 0; x < this->mConfig.address.size(); x++)
+		for (int x = 0; x < this->mConfig.address.size(); x++)
 		{
-			const std::string & address = this->mConfig.address[x];
+			const std::string& address = this->mConfig.address[x];
 			for (int index = 0; index < this->mConfig.count; index++)
 			{
 				pgsql::Config config;
 				timer::ElapsedTimer timer1;
-				if(!PgsqlDBComponent::DecodeUrl(address, config))
+				if (!PgsqlDBComponent::DecodeUrl(address, config))
 				{
 					return false;
 				}
@@ -70,7 +73,6 @@ namespace acs
 						LOG_ERROR("connect {} => {} ", address, desc);
 						return false;
 					}
-					this->mFreeClients.Push(id);
 					this->mClients.emplace(id, client);
 					LOG_INFO("[{}ms] connect {} ok", timer1.GetMs(), address);
 				}
@@ -81,7 +83,7 @@ namespace acs
 
 	bool PgsqlDBComponent::DecodeUrl(const std::string& url, pgsql::Config& config)
 	{
-		if(!config.Decode(url))
+		if (!config.Decode(url))
 		{
 			return false;
 		}
@@ -95,7 +97,7 @@ namespace acs
 
 	void PgsqlDBComponent::OnConnectOK(int id)
 	{
-		if(this->mClients.find(id) != this->mClients.end())
+		if (this->mClients.find(id) != this->mClients.end())
 		{
 			this->mFreeClients.Push(id);
 			LOG_DEBUG("pgsql client:{} login ok", id);
@@ -105,7 +107,7 @@ namespace acs
 	void PgsqlDBComponent::OnClientError(int id, int code)
 	{
 		auto iter = this->mClients.find(id);
-		if(iter == this->mClients.end())
+		if (iter == this->mClients.end())
 		{
 			return;
 		}
@@ -116,17 +118,38 @@ namespace acs
 
 	void PgsqlDBComponent::OnSecondUpdate(int tick) noexcept
 	{
-		if(this->mConfig.ping > 0 && tick % this->mConfig.ping == 0)
+		if (this->mConfig.ping > 0 && tick % this->mConfig.ping == 0)
 		{
-			for(const int id : this->mRetryClients)
+			int id = 0;
+			std::string sql("SELECT 1");
+			while (this->mFreeClients.Pop(id))
+			{
+				//CONSOLE_LOG_WARN("pgsql client:{} ping", id)
+				this->Send(id, std::make_unique<pgsql::Request>(sql));
+			}
+			for (const int id: this->mRetryClients)
 			{
 				auto iter = this->mClients.find(id);
-				if(iter != this->mClients.end())
+				if (iter != this->mClients.end())
 				{
 					iter->second->Start(nullptr);
 				}
 			}
 			this->mRetryClients.clear();
+		}
+	}
+
+	void PgsqlDBComponent::OnRecord(json::w::Document& document)
+	{
+		timer::ElapsedTimer timer1;
+		this->Run("SELECT 1");
+		std::unique_ptr<json::w::Value> jsonValue = document.AddObject("pgsql");
+		{
+			jsonValue->Add("sum", this->mSumCount);
+			jsonValue->Add("client", this->mClients.size());
+			jsonValue->Add("free", this->mFreeClients.Size());
+			jsonValue->Add("ping", fmt::format("{}ms", timer1.GetMs()));
+			jsonValue->Add("wait", this->mMessages.size() + this->AwaitCount());
 		}
 	}
 
@@ -140,11 +163,11 @@ namespace acs
 	{
 		const std::string newSql = fmt::format("EXPLAIN {}", sql);
 		std::unique_ptr<pgsql::Response> response1 = this->Run(newSql);
-		LoggerComponent * logger = this->GetComponent<LoggerComponent>();
+		LoggerComponent* logger = this->GetComponent<LoggerComponent>();
 		{
-			if(!response1->mResults.empty())
+			if (!response1->mResults.empty())
 			{
-				const std::string & result = response1->mResults.front();
+				const std::string& result = response1->mResults.front();
 				std::unique_ptr<custom::LogInfo> sqlLog = std::make_unique<custom::LogInfo>();
 				{
 					sqlLog->Level = custom::LogLevel::None;
@@ -160,15 +183,16 @@ namespace acs
 
 	void PgsqlDBComponent::OnMessage(int id, pgsql::Request* request, pgsql::Response* response) noexcept
 	{
+		this->mSumCount++;
 		int rpcId = request->GetRpcId();
-		if(!response->mError.empty())
+		if (!response->mError.empty())
 		{
 			LOG_ERROR("[request] {}", request->ToString());
 			LOG_ERROR("[response] {}", response->mError);
 		}
 		else
 		{
-			if(this->mConfig.explain.open)
+			if (this->mConfig.explain.open && rpcId > 0)
 			{
 				std::string cmd;
 				if (request->GetCommand(cmd) && cmd != "EXPLAIN" && this->mConfig.explain.HasCommand(cmd))
@@ -182,20 +206,24 @@ namespace acs
 				}
 			}
 
-			if(this->mConfig.debug)
+			if (this->mConfig.debug)
 			{
 				LOG_DEBUG("[{}ms] ({}) {}", request->GetCostTime(), response->mResults.size(), request->ToString())
 			}
 		}
-		this->OnResponse(rpcId, std::unique_ptr<pgsql::Response>(response));
+		if (this->mMessages.empty())
 		{
-			if(!this->mMessages.empty())
-			{
-				this->Send(id, std::move(this->mMessages.front()));
-				this->mMessages.pop();
-				return;
-			}
 			this->mFreeClients.Push(id);
+		}
+		else
+		{
+			this->Send(id, std::move(this->mMessages.front()));
+			this->mMessages.pop();
+		}
+
+		if (rpcId > 0)
+		{
+			this->OnResponse(rpcId, std::unique_ptr<pgsql::Response>(response));
 		}
 	}
 
@@ -222,7 +250,7 @@ namespace acs
 		int id = 0;
 		rpcId = this->BuildRpcId();
 		request->SetRpcId(rpcId);
-		if(!this->mFreeClients.Pop(id))
+		if (!this->mFreeClients.Pop(id))
 		{
 			this->mMessages.emplace(std::move(request));
 			return;
@@ -233,7 +261,7 @@ namespace acs
 	void PgsqlDBComponent::Send(int id, std::unique_ptr<pgsql::Request> request)
 	{
 		auto iter = this->mClients.find(id);
-		if(iter != this->mClients.end())
+		if (iter != this->mClients.end())
 		{
 			iter->second->Send(std::move(request));
 			return;

@@ -6,7 +6,7 @@
 #define GAMEKEEPER_GATECLIENTCOMPONENT_H
 
 #include "Core/Queue/Queue.h"
-#include "Rpc//Client/OuterTcpClient.h"
+#include "Rpc//Client/OuterTcpSession.h"
 #include "Entity/Component/Component.h"
 #include "Server/Component/ITcpComponent.h"
 
@@ -47,7 +47,7 @@ namespace acs
 		rpc::IOuterMessage * mOuter;
 		math::NumberPool<int> mSocketPool;
 		custom::Queue<rpc::Message *> mBroadCastMessages; //广播消息
-		std::unordered_map<int, std::shared_ptr<rpc::OuterTcpClient>> mGateClientMap;
+		std::unordered_map<int, std::shared_ptr<rpc::OuterTcpSession>> mGateClientMap;
 		//std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mForwardClientMap;
 	};
 }

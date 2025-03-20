@@ -7,11 +7,13 @@
 #include"Redis/Client/RedisClient.h"
 #include"Redis/Config/RedisConfig.h"
 #include"Entity/Component/Component.h"
+#include "Rpc/Component/RpcComponent.h"
 
 
 namespace acs
 {
-	class RedisSubComponent final : public Component, public IRpc<redis::Request, redis::Response>
+	class RedisSubComponent final : public RpcComponent<redis::Response>,
+			public IRpc<redis::Request, redis::Response>
 	{
 	public:
 		RedisSubComponent();
@@ -19,6 +21,7 @@ namespace acs
 	public:
 		bool Sub(const std::string & chanel);
 		bool UnSub(const std::string & chanel);
+		void Send(std::unique_ptr<redis::Request> request, int & rpcId);
 	private:
 		bool Awake() final;
 		bool LateAwake() final;

@@ -116,6 +116,7 @@ namespace acs
 				return false;
 			}
 			this->mListens[key] = value;
+			CONSOLE_LOG_DEBUG("[{}:{}] add listen => {}://{}", this->Name(), id, key, value)
 		}
 		return true;
 	}

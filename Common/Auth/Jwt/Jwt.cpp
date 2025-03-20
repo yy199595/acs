@@ -1,43 +1,11 @@
 
-#ifdef __ENABLE_OPEN_SSL__
 #include "Jwt.h"
-#include <openssl/bio.h>
+#include "Proto/Bson/base64.h"
+#ifdef __ENABLE_OPEN_SSL__
 #include <openssl/evp.h>
-#include <openssl/pem.h>
 #include <openssl/hmac.h>
-#include <openssl/sha.h>
-
 namespace jwt
 {
-	std::string base64_encode(const std::string& input)
-	{
-		BIO* bio, * b64;
-		BUF_MEM* bufferPtr;
-		bio = BIO_new(BIO_s_mem());
-		b64 = BIO_new(BIO_f_base64());
-		BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
-		BIO_push(b64, bio);
-		BIO_write(b64, input.c_str(), static_cast<int>(input.length()));
-		BIO_flush(b64);
-		BIO_get_mem_ptr(b64, &bufferPtr);
-		std::string result(bufferPtr->data, bufferPtr->length);
-		BIO_free_all(b64);
-		return result;
-	}
-
-	std::string base64_decode(const std::string& input)
-	{
-		BIO* bio, * b64;
-		char buffer[512] = { 0 };
-		b64 = BIO_new(BIO_f_base64());
-		BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
-		bio = BIO_new_mem_buf(input.c_str(), static_cast<int>(input.length()));
-		bio = BIO_push(b64, bio);
-		int length = BIO_read(bio, buffer, sizeof(buffer));
-		BIO_free_all(b64);
-		return std::string(buffer, length);
-	}
-
 	std::string hmac_sha256(const std::string& key, const std::string& data)
 	{
 		unsigned char result[EVP_MAX_MD_SIZE];
@@ -48,34 +16,39 @@ namespace jwt
 	}
 }
 
+#else
+#include "Util/Crypt/sha1.h"
+#endif
+
 std::string jwt::Create(const std::string& payload, const std::string& secret)
 {
-	std::string header = "{}";
-	std::string encoded_header = base64_encode(header);
-	std::string encoded_payload = base64_encode(payload);
-	std::string signature_input = encoded_header + "." + encoded_payload;
-	std::string signature = hmac_sha256(secret, signature_input);
-	return encoded_header + "." + encoded_payload + "." + base64_encode(signature);
+	std::string encoded_payload = _bson::base64::encode(payload);
+#ifdef __ENABLE_OPEN_SSL__
+	std::string signature = hmac_sha256(secret, encoded_payload);
+#else
+	std::string signature = help::Sha1::GetHMacHash(secret, encoded_payload);
+#endif
+	return encoded_payload + "." + _bson::base64::encode(signature);
 }
 
 bool jwt::Verify(const std::string& jwt, const std::string& secret, std::string& payload)
 {
-	size_t first_dot = jwt.find('.');
-	size_t second_dot = jwt.find('.', first_dot + 1);
-	if (first_dot == std::string::npos || second_dot == std::string::npos)
+	size_t pos = jwt.find('.');
+	if(pos == std::string::npos)
 	{
-		return false; // Invalid JWT format
+		return false;
 	}
-
-	std::string encoded_header = jwt.substr(0, first_dot);
-	payload = jwt.substr(first_dot + 1, second_dot - first_dot - 1);
-	std::string encoded_signature = jwt.substr(second_dot + 1);
-
-	std::string signature_input = encoded_header + "." + payload;
-	std::string calculated_signature = hmac_sha256(secret, signature_input);
-	std::string decoded_signature = base64_decode(encoded_signature);
-
-	payload = base64_decode(payload);
-	return calculated_signature == decoded_signature;
-}
+	std::string first = jwt.substr(0, pos);
+	std::string second = jwt.substr(pos + 1);
+#ifdef __ENABLE_OPEN_SSL__
+	std::string signature = _bson::base64::encode(hmac_sha256(secret, first));
+#else
+	std::string signature = _bson::base64::encode(help::Sha1::GetHMacHash(secret, first));
 #endif
+	if(signature != second)
+	{
+		return false;
+	}
+	payload = _bson::base64::decode(first);
+	return true;
+}

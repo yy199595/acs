@@ -29,6 +29,7 @@ namespace acs
 		int OnForward(rpc::Message * message) noexcept;
 		rpc::InnerTcpClient * GetClient(int id);
 	private:
+		unsigned long long mWaitCount;
 		class ActorComponent * mActor;
 		math::NumberPool<int> mNumPool;
 		class ThreadComponent * mThread;

@@ -82,16 +82,24 @@ namespace lua
     int lib::luaopen_lredisdb(lua_State* L)
     {
         luaL_Reg l[] = {
-            {"sub", lua::redis::Sub},
             {"run", lua::redis::Run},
             {"send", lua::redis::Send},
             {"call", lua::redis::Call},
-            {"unsub", lua::redis::UnSub},
             {nullptr, nullptr}
         };
         luaL_newlib(L, l);
         return 1;
     }
+
+	int lib::luaopen_lsub_redisdb(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{"run", lua::sub_redis::Run},
+				{nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
+	}
 }
 
 namespace lua
@@ -192,7 +200,9 @@ namespace lua
             {"GetListen", acs::LuaActor::GetListen},
             {"GetConfig", acs::LuaActor::GetConfig},
             {"GetServers", acs::LuaActor::GetServers},
+			{"AllInfo", acs::LuaActor::AllInfo},
             {"MakeServer", acs::LuaActor::MakeServer},
+			{"RemoveServer", acs::LuaActor::RemoveServer},
             {"HasComponent", acs::LuaActor::HasComponent},
             {nullptr, nullptr}
         };
@@ -210,6 +220,8 @@ namespace lua
             {"encode", yyjson::encode},
             {"decode", yyjson::decode},
             {"pretty", yyjson::pretty},
+			{"new", lua::ljson::create},
+
             {nullptr, nullptr}
         };
         luaL_newlib(L, l);

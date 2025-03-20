@@ -14,6 +14,7 @@ namespace db
 		explicit Url(std::string proto);
 	public:
 		bool Decode(const std::string & url);
+		bool Get(const std::string & key, int & value);
 		bool Get(const std::string & key, std::string & value);
 	private:
 		bool Add(const std::string & key, const std::string & value);

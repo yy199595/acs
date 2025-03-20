@@ -31,6 +31,10 @@ namespace acs
 
 		template<typename T>
 		inline void SetResult(T result);
+
+		template<typename T>
+		inline void SetResultPtr(T * result);
+
 		inline void SetError(const char * error);
 		void SetResult(int code, std::unique_ptr<rpc::Message> response);
 
@@ -51,6 +55,13 @@ namespace acs
 	{
 		Lua::Parameter::Write(this->mLua, result);
         Lua::Coroutine::Resume(this->mLua, 1);
+	}
+
+	template<typename T>
+	inline void LuaWaitTaskSource::SetResultPtr(T* result)
+	{
+		Lua::UserDataParameter::UserDataStruct<T*>::WritePtr(this->mLua, result);
+		Lua::Coroutine::Resume(this->mLua, 1);
 	}
 
 	void LuaWaitTaskSource::SetError(const char* error)

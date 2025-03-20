@@ -83,6 +83,7 @@ namespace acs
 		static bool DecodeUrl(const std::string & url, mongo::Config & config);
 	private:
 		mongo::Cluster mConfig;
+		unsigned long long mSumCount;
 		custom::Queue<int> mFreeClients;
 		std::unordered_set<int> mRetryClients; //断开了 重试的客户端
 		std::queue<std::unique_ptr<mongo::Request>> mRequests;

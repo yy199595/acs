@@ -70,7 +70,7 @@ namespace acs
 {
 	MongoDBComponent::MongoDBComponent()
 	{
-
+		this->mSumCount = 0;
 		REGISTER_JSON_CLASS_FIELD(db::Explain, open);
 		REGISTER_JSON_CLASS_FIELD(db::Explain, command);
 
@@ -191,6 +191,7 @@ namespace acs
 
 	void MongoDBComponent::OnMessage(int id, mongo::Request * request, mongo::Response * response) noexcept
 	{
+		this->mSumCount++;
 		if (response == nullptr)
 		{
 			LOG_FATAL("send mongo cmd = {}", request->ToString());
@@ -230,30 +231,32 @@ namespace acs
 			}
 			if(this->mConfig.debug)
 			{
-				//CONSOLE_LOG_INFO("[request] = {}", request->ToString());
-				//CONSOLE_LOG_INFO("[response:{}] = {}", request->GetCostTime(), response->ToString());
+				CONSOLE_LOG_INFO("[request] = {}", request->ToString());
+				CONSOLE_LOG_INFO("[response:{}] = {}", request->GetCostTime(), response->ToString());
+			}
+		}
+
+		if (this->mRequests.empty())
+		{
+			this->mFreeClients.Push(id);
+		}
+		else
+		{
+			std::unique_ptr<mongo::Request>& request1 = this->mRequests.front();
+			{
+				this->Send(id, std::move(request1));
+				this->mRequests.pop();
 			}
 		}
 		if(rpcId > 0)
 		{
 			this->OnResponse(rpcId, std::unique_ptr<mongo::Response>(response));
 		}
-
-		if (this->mRequests.empty())
-		{
-			this->mFreeClients.Push(id);
-			return;
-		}
-		std::unique_ptr<mongo::Request>& request1 = this->mRequests.front();
-		{
-			this->Send(id, std::move(request1));
-			this->mRequests.pop();
-		}
 	}
 
 	void MongoDBComponent::OnSecondUpdate(int tick) noexcept
 	{
-		if(tick % this->mConfig.ping == 0)
+		if(this->mConfig.ping > 0 && tick % this->mConfig.ping == 0)
 		{
 			int id = 0;
 			while(this->mFreeClients.Pop(id))
@@ -265,6 +268,7 @@ namespace acs
 					request->document.Add("ping", 1);
 				}
 				this->Send(id, std::move(request));
+				//CONSOLE_LOG_WARN("mongodb client:{} ping", id)
 			}
 			for(const int id : this->mRetryClients)
 			{

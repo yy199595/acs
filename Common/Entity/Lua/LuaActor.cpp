@@ -65,13 +65,29 @@ namespace acs
 			luaL_error(l, "not id or name");
 			return 0;
 		}
-
-		ActorComponent * actMgr = App::ActorMgr();
-		std::unique_ptr<Server> server = std::make_unique<Server>(id, name);
+		Actor * target = (Server *)App::ActorMgr()->GetActor(id);
+		if(target == nullptr)
 		{
-			server->Decode(document);
-			lua_pushboolean(l, actMgr->AddActor(std::move(server)));
+			std::unique_ptr<Server> server = std::make_unique<Server>(id, name);
+			{
+				target = server.get();
+				App::ActorMgr()->AddActor(std::move(server));
+			}
 		}
+		if(!target->Decode(document))
+		{
+			App::ActorMgr()->DelActor(id);
+			return 0;
+		}
+		App::ActorMgr()->AddGroup(target->Name(), id);
+		lua_pushboolean(l, true);
+		return 1;
+	}
+
+	int LuaActor::RemoveServer(lua_State* L)
+	{
+		long long id = luaL_checkinteger(L, 1);
+		lua_pushboolean(L, App::ActorMgr()->DelActor(id));
 		return 1;
 	}
 
@@ -284,6 +300,25 @@ namespace acs
 			return 0;
 		}
 		lua_pushlstring(lua, address.c_str(), address.size());
+		return 1;
+	}
+
+	int LuaActor::AllInfo(lua_State* L)
+	{
+		Server* server = App::Inst();
+		if(lua_isinteger(L, 1))
+		{
+			long long id = luaL_checkinteger(L, 1);
+			server = dynamic_cast<Server*>(App::ActorMgr()->GetActor(id));
+		}
+		if(server == nullptr)
+		{
+			return 0;
+		}
+		json::w::Document document;
+		server->Encode(document);
+		std::string json = document.JsonString();
+		lua::yyjson::write(L, json.c_str(), json.size());
 		return 1;
 	}
 }

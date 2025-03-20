@@ -11,6 +11,7 @@ namespace acs
 {
 	RedisComponent::RedisComponent()
 	{
+		this->mSumCount = 0;
 		this->mThread = nullptr;
 		REGISTER_JSON_CLASS_FIELD(redis::Cluster, ping);
 		REGISTER_JSON_CLASS_FIELD(redis::Cluster, count);
@@ -41,7 +42,7 @@ namespace acs
 		this->Run("PING");
 		std::unique_ptr<json::w::Value> data = document.AddObject("redis");
 		{
-			data->Add("sum", this->CurrentRpcCount());
+			data->Add("sum", this->mSumCount);
 			data->Add("client", this->mClients.size());
 			data->Add("free", this->mFreeClients.Size());
 			data->Add("ping", fmt::format("{}ms", timer1.GetMs()));
@@ -91,6 +92,7 @@ namespace acs
 		{
 			return false;
 		}
+		config.Get("db", config.db);
 		config.Get("password", config.password);
 		LOG_CHECK_RET_FALSE(config.Get("address", config.address))
 		return true;
@@ -134,6 +136,7 @@ namespace acs
 				{
 					request->SetRpcId(0);
 					this->Send(id, std::move(request));
+					//CONSOLE_LOG_WARN("redis client:{} ping", id)
 				}
 			}
 			for(const int id : this->mRetryClients)
@@ -151,6 +154,7 @@ namespace acs
 
 	void RedisComponent::OnMessage(int id, redis::Request * request, redis::Response * response) noexcept
 	{
+		this->mSumCount++;
 		if (response->HasError())
 		{
 			LOG_ERROR("redis request = {}", request->ToString());
@@ -161,21 +165,24 @@ namespace acs
 			CONSOLE_LOG_DEBUG("[request] = {}", request->ToString());
 			CONSOLE_LOG_DEBUG("[response:{}ms] = {}", request->GetCostTime(), response->ToString());
 		}
-		int rpcId = request->GetRpcId();
-		if(rpcId > 0)
-		{
-			this->OnResponse(rpcId, std::unique_ptr<redis::Response>(response));
-		}
 
 		if(this->mRequests.empty())
 		{
 			this->mFreeClients.Push(id);
-			return;
 		}
-		std::unique_ptr<redis::Request> & request1 = this->mRequests.front();
+		else
 		{
-			this->Send(id, std::move(request1));
-			this->mRequests.pop();
+			std::unique_ptr<redis::Request> & request1 = this->mRequests.front();
+			{
+				this->Send(id, std::move(request1));
+				this->mRequests.pop();
+			}
+		}
+
+		int rpcId = request->GetRpcId();
+		if(rpcId > 0)
+		{
+			this->OnResponse(rpcId, std::unique_ptr<redis::Response>(response));
 		}
 	}
 
