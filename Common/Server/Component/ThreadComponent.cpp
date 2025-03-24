@@ -22,7 +22,7 @@ namespace acs
 		this->mThreadCount = std::thread::hardware_concurrency();
 		if(ServerConfig::Inst()->Get("core", jsonObject))
 		{
-			jsonObject->Get("thread", threadCount);
+			jsonObject->Get("thread", this->mThreadCount);
 		}
 #endif
 		for (int index = 0; index < this->mThreadCount; index++)

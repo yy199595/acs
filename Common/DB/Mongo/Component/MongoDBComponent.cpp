@@ -71,6 +71,7 @@ namespace acs
 	MongoDBComponent::MongoDBComponent()
 	{
 		this->mSumCount = 0;
+		this->mRetryCount = 0;
 		REGISTER_JSON_CLASS_FIELD(db::Explain, open);
 		REGISTER_JSON_CLASS_FIELD(db::Explain, command);
 
@@ -79,6 +80,7 @@ namespace acs
 		REGISTER_JSON_CLASS_FIELD(mongo::Cluster, ping);
 		REGISTER_JSON_CLASS_FIELD(mongo::Cluster, debug);
 		REGISTER_JSON_CLASS_FIELD(mongo::Cluster, count);
+		REGISTER_JSON_CLASS_FIELD(mongo::Cluster, retry);
 		REGISTER_JSON_CLASS_FIELD(mongo::Cluster, explain);
 
 		REGISTER_JSON_CLASS_MUST_FIELD(mongo::Cluster, address);
@@ -109,6 +111,7 @@ namespace acs
 				{
 					return false;
 				}
+				this->mRetryCount++;
 				timer::ElapsedTimer timer1;
 				int id = (x + 1) * 100 + index + 1;
 				config.conn_count = this->mConfig.conn_count;
@@ -154,9 +157,10 @@ namespace acs
 
 	void MongoDBComponent::OnConnectOK(int id)
 	{
+		this->mRetryCount--;
 		if(this->mClients.find(id) != this->mClients.end())
 		{
-			this->mFreeClients.Push(id);
+			this->AddFreeClient(id);
 			LOG_DEBUG("mongo client:{} login ok", id);
 		}
 	}
@@ -168,6 +172,7 @@ namespace acs
 		{
 			return;
 		}
+		this->mRetryCount--;
 		this->mRetryClients.emplace(id);
 		std::string address = iter->second->GetAddress();
 		LOG_WARN("mongo client ({}) login fail", address)
@@ -192,6 +197,7 @@ namespace acs
 	void MongoDBComponent::OnMessage(int id, mongo::Request * request, mongo::Response * response) noexcept
 	{
 		this->mSumCount++;
+		this->AddFreeClient(id);
 		if (response == nullptr)
 		{
 			LOG_FATAL("send mongo cmd = {}", request->ToString());
@@ -236,18 +242,6 @@ namespace acs
 			}
 		}
 
-		if (this->mRequests.empty())
-		{
-			this->mFreeClients.Push(id);
-		}
-		else
-		{
-			std::unique_ptr<mongo::Request>& request1 = this->mRequests.front();
-			{
-				this->Send(id, std::move(request1));
-				this->mRequests.pop();
-			}
-		}
 		if(rpcId > 0)
 		{
 			this->OnResponse(rpcId, std::unique_ptr<mongo::Response>(response));
@@ -270,6 +264,9 @@ namespace acs
 				this->Send(id, std::move(request));
 				//CONSOLE_LOG_WARN("mongodb client:{} ping", id)
 			}
+		}
+		if(this->mConfig.retry > 0 && tick % this->mConfig.retry == 0)
+		{
 			for(const int id : this->mRetryClients)
 			{
 				auto iter = this->mClients.find(id);
@@ -332,6 +329,17 @@ namespace acs
 		this->Send(std::move(request));
 	}
 
+	void MongoDBComponent::AddFreeClient(int id)
+	{
+		if(!this->mRequests.empty())
+		{
+			this->Send(id, std::move(this->mRequests.front()));
+			this->mRequests.pop();
+			return;
+		}
+		this->mFreeClients.Push(id);
+	}
+
 	void MongoDBComponent::Send(std::unique_ptr<mongo::Request> request)
 	{
 
@@ -367,6 +375,7 @@ namespace acs
 		this->Run(std::move(request));
 		std::unique_ptr<json::w::Value> data = document.AddObject("mongo");
 		{
+			data->Add("retry", this->mRetryCount);
 			data->Add("sum", this->CurrentRpcCount());
 			data->Add("free", this->mFreeClients.Size());
 			data->Add("client", this->mClients.size());

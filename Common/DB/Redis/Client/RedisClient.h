@@ -28,7 +28,6 @@ namespace redis
 	private:
 		bool OnMessage(std::istream &readStream, size_t size, Element & element);
 	private:
-		void OnResponse();
 		bool Auth(bool connect);
 		void OnSendMessage(size_t size) final;
 		void OnReadError(const Asio::Code &code) final;

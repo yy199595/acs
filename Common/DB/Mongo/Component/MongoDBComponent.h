@@ -78,10 +78,12 @@ namespace acs
 		void OnExplain(std::unique_ptr<mongo::Request> request, long long ms) noexcept;
 		void OnMessage(int id, mongo::Request * request, mongo::Response * message) noexcept final;
 	private:
+		void AddFreeClient(int id);
 		void Send(std::unique_ptr<mongo::Request> request);
 		void Send(int id, std::unique_ptr<mongo::Request> request);
 		static bool DecodeUrl(const std::string & url, mongo::Config & config);
 	private:
+		int mRetryCount;
 		mongo::Cluster mConfig;
 		unsigned long long mSumCount;
 		custom::Queue<int> mFreeClients;

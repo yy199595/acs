@@ -16,6 +16,7 @@ namespace mongo
 		Cluster(): count(1), debug(false) { }
     public:
         int ping = 15;
+		int retry = 5; //重试时间(秒)
 		bool debug = false;
 		int count = 1;
 		std::string log;

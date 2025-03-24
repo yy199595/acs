@@ -2,7 +2,6 @@
 
 local app = require("App")
 local log = require("Log")
-local redis = require("RedisComponent")
 local RpcService = require("RpcService")
 
 local GateSystem = RpcService()

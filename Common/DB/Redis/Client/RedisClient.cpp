@@ -183,8 +183,10 @@ namespace redis
 		{
 			return false;
 		}
-
-		element.message.pop_back();
+		if(element.message.back() == '\r')
+		{
+			element.message.pop_back();
+		}
 		switch (element.type)
 		{
 			case redis::type::Error:
@@ -264,7 +266,25 @@ namespace redis
 			this->mResponse->element.message = "decode error";
 			this->mResponse->element.type = redis::type::Error;
 		}
-		this->OnResponse();
+		size_t count = this->mRecvBuffer.size();
+		if(count > 0)
+		{
+			std::string str;
+			str.resize(count);
+			std::istream is(&this->mRecvBuffer);
+			is.readsome((char*)str.data(), count);
+		}
+#ifdef ONLY_MAIN_THREAD
+		this->mComponent->OnMessage(id, this->mRequest.release(), this->mResponse.release());
+#else
+		redis::Request* req = this->mRequest.release();
+		redis::Response* resp = this->mResponse.release();
+		asio::post(this->mMainContext, [this, req, resp, id = this->mClientId]
+		{
+			this->mComponent->OnMessage(id, req, resp);
+			delete req;
+		});
+#endif
 	}
 
 	std::unique_ptr<redis::Response> Client::Sync(std::unique_ptr<redis::Request> request)
@@ -302,24 +322,5 @@ namespace redis
 		}
 		this->OnMessage(is, readSize, redisResponse->element);
 		return redisResponse;
-	}
-
-	void Client::OnResponse()
-	{
-		if (this->mResponse == nullptr)
-		{
-			this->mResponse = std::make_unique<redis::Response>();
-		}
-#ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnMessage(id, this->mRequest.release(), this->mResponse.release());
-#else
-		redis::Request* req = this->mRequest.release();
-		redis::Response* resp = this->mResponse.release();
-		asio::post(this->mMainContext, [this, req, resp, id = this->mClientId]
-		{
-			this->mComponent->OnMessage(id, req, resp);
-			delete req;
-		});
-#endif
 	}
 }

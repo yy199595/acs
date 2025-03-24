@@ -8,14 +8,17 @@
 #include "Lua/Engine/ModuleClass.h"
 #include "Rpc/Component/DispatchComponent.h"
 #include "Server/Component/ThreadComponent.h"
+#include "Timer/Component/TimerComponent.h"
 #include "Lua/Lib/Lib.h"
 
 namespace acs
 {
 	RedisSubComponent::RedisSubComponent()
 	{
+		this->mTimer = nullptr;
 		this->mDispatch = nullptr;
 		REGISTER_JSON_CLASS_FIELD(redis::Cluster, sub);
+		REGISTER_JSON_CLASS_FIELD(redis::Cluster, retry);
 	}
 
 	bool RedisSubComponent::Awake()
@@ -48,6 +51,7 @@ namespace acs
 				return false;
 			}
 		}
+		this->mTimer = this->GetComponent<TimerComponent>();
 		LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>())
 		return true;
 	}
@@ -63,6 +67,17 @@ namespace acs
 			}
 			request->SetRpcId(1);
 			this->mClient->Send(std::move(request));
+		}
+	}
+
+	void RedisSubComponent::OnClientError(int id, int code)
+	{
+		if(this->mConfig.retry > 0)
+		{
+			int ms = this->mConfig.retry * 1000;
+			this->mTimer->DelayCall(ms, [this]() {
+				this->mClient->Start(nullptr);
+			});
 		}
 	}
 
@@ -113,46 +128,51 @@ namespace acs
 				}
 				break;
 			}
+			const std::string& option = element.list[0].message;
+			if(option == "subscribe")
+			{
+				const redis::Element & element1 = element.list[1];
+				const redis::Element & element2 = element.list[2];
+				if(element2.number == 1)
+				{
+					LOG_INFO("sub ({}) ok", element1.message)
+					this->mChannels.emplace(element1.message);
+				}
+			}
+			else if(option == "unsubscribe")
+			{
+				const redis::Element & element1 = element.list[1];
+				const redis::Element & element2 = element.list[2];
+				if(element2.number == 1)
+				{
+					auto iter = this->mChannels.find(element1.message);
+					if(iter != this->mChannels.end())
+					{
+						this->mChannels.erase(iter);
+						LOG_INFO("unsub ({}) ok", element1.message)
+					}
+				}
+			}
+			else if(option == "message")
+			{
+				const std::string& channel = element.list[1].message;
+				const std::string& message = element.list[2].message;
+				//LOG_DEBUG("[{}] ({}) {}", option, channel, message)
+				std::unique_ptr<rpc::Message> rpcMessage = std::make_unique<rpc::Message>();
+				{
+					rpcMessage->SetType(rpc::Type::Request);
+					rpcMessage->SetContent(rpc::Porto::Json, message);
+					rpcMessage->GetHead().Add(rpc::Header::func, channel);
+				}
+				if(this->mDispatch->OnMessage(rpcMessage.get()) == XCode::Ok)
+				{
+					rpcMessage.release();
+				}
+			}
 			if(request != nullptr && request->GetRpcId() > 0)
 			{
-				const std::string& option = element.list[0].message;
-				if(option == "subscribe")
-				{
-					const redis::Element & element1 = element.list[1];
-					const redis::Element & element2 = element.list[2];
-					if(element2.number == 1)
-					{
-						this->mChannels.emplace(element1.message);
-					}
-				}
-				else if(option == "unsubscribe")
-				{
-					const redis::Element & element1 = element.list[1];
-					const redis::Element & element2 = element.list[2];
-					if(element2.number == 1)
-					{
-						auto iter = this->mChannels.find(element1.message);
-						if(iter != this->mChannels.end())
-						{
-							this->mChannels.erase(iter);
-						}
-					}
-				}
 				int rpcId = request->GetRpcId();
 				this->OnResponse(rpcId, std::move(response));
-				break;
-			}
-			const std::string& channel = element.list[1].message;
-			const std::string& message = element.list[2].message;
-			std::unique_ptr<rpc::Message> rpcMessage = std::make_unique<rpc::Message>();
-			{
-				rpcMessage->SetType(rpc::Type::Request);
-				rpcMessage->SetContent(rpc::Porto::Json, message);
-				rpcMessage->GetHead().Add(rpc::Header::func, channel);
-			}
-			if(this->mDispatch->OnMessage(rpcMessage.get()) == XCode::Ok)
-			{
-				rpcMessage.release();
 			}
 		}
 		while (false);

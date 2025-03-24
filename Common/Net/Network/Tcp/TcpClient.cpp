@@ -13,15 +13,15 @@ namespace tcp
 			: mMaxCount(maxCount)
 	{
 		this->mConnectCount = 0;
-		this->mIsConnected = false;
+		this->mStatus = tcp::status::none;
 	}
 
 	Client::Client(Socket* socket, size_t count)
 			: mMaxCount(count)
 	{
 		this->mConnectCount = 0;
-		this->mIsConnected = false;
 		this->mSocket.reset(socket);
+		this->mStatus = tcp::status::none;
 	}
 
 	void Client::SetSocket(Socket* socket)
@@ -38,26 +38,26 @@ namespace tcp
 		this->ClearRecvStream();
 	}
 
-	void Client::Connect(int timeout)
+	bool Client::Connect(int timeout)
 	{
-		if(this->mIsConnected)
+		if(this->mStatus == tcp::status::connect)
 		{
-			return;
+			return false;
 		}
 
 		Asio::Code code;
 		this->mConnectCount++;
 		this->ClearRecvStream();
 		this->ClearSendStream();
-		this->mIsConnected = true;
+		this->mStatus = tcp::status::connect;
 		unsigned short port = this->mSocket->GetPort();
 		const std::string& ip = this->mSocket->GetIp();
 		Asio::Address address = asio::ip::make_address(ip, code);
 		if (code.value() != Asio::OK)
 		{
-			this->mIsConnected = false;
+			this->mStatus = tcp::status::none;
 			this->OnConnect(code, this->mConnectCount);
-			return;
+			return false;
 		}
 
 		this->ClearBuffer();
@@ -72,7 +72,7 @@ namespace tcp
 			{
 				self->StopTimer();
 			}
-			self->mIsConnected = false;
+			self->mStatus = tcp::status::none;
 #ifdef __ENABLE_OPEN_SSL__
 			if (self->mSocket != nullptr && self->mSocket->IsOpenSsl())
 			{
@@ -90,6 +90,7 @@ namespace tcp
 			}
 			self->OnConnect(code, self->mConnectCount);
 		});
+		return true;
 	}
 
 	void Client::Connect(const std::string& host, const std::string& port, int timeout)
@@ -149,8 +150,14 @@ namespace tcp
 		});
 	}
 
-	void Client::ReadAll(int timeout)
+	bool Client::ReadAll(int timeout)
 	{
+		if(this->mStatus == tcp::status::read
+			|| this->mStatus == tcp::status::connect)
+		{
+			return false;
+		}
+		this->mStatus = tcp::status::read;
 		this->StartTimer(timeout, tcp::timeout::read);
 		std::shared_ptr<Client> self = this->shared_from_this();
 		auto callBack = [self, timeout](const asio::error_code& code, size_t size)
@@ -159,6 +166,7 @@ namespace tcp
 			{
 				self->StopTimer();
 			}
+			self->mStatus = tcp::status::none;
 			std::istream ss(&self->mRecvBuffer);
 			if (code.value() == Asio::OK)
 			{
@@ -181,15 +189,22 @@ namespace tcp
 		{
 			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
 			asio::async_read(sock, this->mRecvBuffer, asio::transfer_all(), callBack);
-			return;
+			return true;
 		}
 #endif
 		Asio::Socket& sock = this->mSocket->Get();
 		asio::async_read(sock, this->mRecvBuffer, asio::transfer_all(), callBack);
+		return true;
 	}
 
-	void Client::ReadLine(int timeout)
+	bool Client::ReadLine(int timeout)
 	{
+		if(this->mStatus == tcp::status::read
+		   || this->mStatus == tcp::status::connect)
+		{
+			return false;
+		}
+		this->mStatus = tcp::status::read;
 		this->StartTimer(timeout, tcp::timeout::read);
 		std::shared_ptr<Client> self = this->shared_from_this();
 		auto callback = [self, timeout](const Asio::Code& code, size_t size)
@@ -198,6 +213,7 @@ namespace tcp
 			{
 				self->StopTimer();
 			}
+			self->mStatus = tcp::status::none;
 			std::istream ss(&self->mRecvBuffer);
 			if (code.value() == Asio::OK)
 			{
@@ -221,14 +237,15 @@ namespace tcp
 		{
 			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
 			asio::async_read_until(sock, this->mRecvBuffer, "\r\n", callback);
-			return;
+			return true;
 		}
 #endif
 		Asio::Socket& sock = this->mSocket->Get();
 		asio::async_read_until(sock, this->mRecvBuffer, "\r\n", callback);
+		return true;
 	}
 
-	void Client::ReadSome(int timeout)
+	bool Client::ReadSome(int timeout)
 	{
 		std::istream ss(&this->mRecvBuffer);
 		if (this->mRecvBuffer.size() > 0)
@@ -236,12 +253,20 @@ namespace tcp
 			asio::error_code code;
 			size_t size = this->mRecvBuffer.size();
 			this->OnReceiveMessage(ss, size, code);
-			return;
+			return true;
 		}
+
+		if(this->mStatus == tcp::status::read
+		   || this->mStatus == tcp::status::connect)
+		{
+			return false;
+		}
+		this->mStatus = tcp::status::read;
 		this->StartTimer(timeout, tcp::timeout::read);
 		std::shared_ptr<Client> self = this->shared_from_this();
 		auto callBack = [self, timeout](const asio::error_code& code, size_t size)
 		{
+			self->mStatus = tcp::status::none;
 			if(timeout > 0)
 			{
 				self->StopTimer();
@@ -268,34 +293,42 @@ namespace tcp
 			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
 			//sock.async_read_some(this->mRecvBuffer.prepare(1024), callBack);
 			asio::async_read(sock, this->mRecvBuffer, asio::transfer_at_least(1), callBack);
-			return;
+			return true;
 		}
 #endif
 		Asio::Socket& sock = this->mSocket->Get();
 		//sock.async_read_some(this->mRecvBuffer.prepare(1024), callBack);
 		asio::async_read(sock, this->mRecvBuffer, asio::transfer_at_least(1), callBack);
+		return true;
 	}
 
-	void Client::ReadLength(size_t length, int timeout)
+	bool Client::ReadLength(size_t length, int timeout)
 	{
 		if (length <= 0)
 		{
 			//CONSOLE_LOG_FATAL("length = {}", length);
 			this->OnReadError(std::make_error_code(std::errc::bad_message));
-			return;
+			return false;
 		}
 		if (this->mMaxCount > 0 && length >= this->mMaxCount)
 		{
 			this->OnReadError(std::make_error_code(std::errc::bad_message));
-			return;
+			return false;
 		}
 		std::istream ss(&this->mRecvBuffer);
 		if (this->mRecvBuffer.size() >= length)
 		{
 			asio::error_code code;
 			this->OnReceiveMessage(ss, length, code);
-			return;
+			return true;
 		}
+
+		if(this->mStatus == tcp::status::read
+		   || this->mStatus == tcp::status::connect)
+		{
+			return false;
+		}
+		this->mStatus = tcp::status::read;
 
 		this->StartTimer(timeout, tcp::timeout::read);
 		std::shared_ptr<Client> self = this->shared_from_this();
@@ -305,6 +338,7 @@ namespace tcp
 			{
 				self->StopTimer();
 			}
+			self->mStatus = tcp::status::none;
 			std::istream ss(&self->mRecvBuffer);
 			if (code.value() == Asio::OK)
 			{
@@ -323,11 +357,12 @@ namespace tcp
 		{
 			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
 			asio::async_read(sock, this->mRecvBuffer, asio::transfer_exactly(length), callBack);
-			return;
+			return true;
 		}
 #endif
 		Asio::Socket& sock = this->mSocket->Get();
 		asio::async_read(sock, this->mRecvBuffer, asio::transfer_exactly(length), callBack);
+		return true;
 	}
 
 	void Client::Write(tcp::IProto& message, int timeout)
@@ -648,6 +683,7 @@ namespace tcp
 		{
 			if (code.value() == Asio::OK)
 			{
+				self->mStatus = tcp::status::none;
 				Asio::Code code(asio::error::timed_out);
 				switch (flag)
 				{

@@ -100,6 +100,10 @@ namespace acs
 					{
 						this->mAcceptor->open(ep.protocol());
 						this->mAcceptor->set_option(asio::ip::tcp::acceptor::reuse_address(true));
+#if !defined(__OS_WIN__) && defined(SO_REUSEPORT)
+						int one = 1;
+						setsockopt(this->mAcceptor->native_handle(), SOL_SOCKET,  SO_REUSEPORT, &one, sizeof(one));
+#endif
 						this->mAcceptor->bind(ep);
 						if(config.max_conn == 0)
 						{

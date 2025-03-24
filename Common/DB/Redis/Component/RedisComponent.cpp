@@ -12,9 +12,11 @@ namespace acs
 	RedisComponent::RedisComponent()
 	{
 		this->mSumCount = 0;
+		this->mRetryCount = 0;
 		this->mThread = nullptr;
 		REGISTER_JSON_CLASS_FIELD(redis::Cluster, ping);
 		REGISTER_JSON_CLASS_FIELD(redis::Cluster, count);
+		REGISTER_JSON_CLASS_FIELD(redis::Cluster, retry);
 		REGISTER_JSON_CLASS_FIELD(redis::Cluster, debug);
 		REGISTER_JSON_CLASS_FIELD(redis::Cluster, script);
 		REGISTER_JSON_CLASS_MUST_FIELD(redis::Cluster, address);
@@ -43,6 +45,7 @@ namespace acs
 		std::unique_ptr<json::w::Value> data = document.AddObject("redis");
 		{
 			data->Add("sum", this->mSumCount);
+			data->Add("retry", this->mRetryCount);
 			data->Add("client", this->mClients.size());
 			data->Add("free", this->mFreeClients.Size());
 			data->Add("ping", fmt::format("{}ms", timer1.GetMs()));
@@ -65,6 +68,7 @@ namespace acs
 				{
 					return false;
 				}
+				this->mRetryCount++;
 				timer::ElapsedTimer timer1;
 				int id = (x + 1) * 100 + index + 1;
 				config.conn_count = this->mConfig.conn_count;
@@ -102,7 +106,8 @@ namespace acs
 	{
 		if(this->mClients.find(id) != this->mClients.end())
 		{
-			this->mFreeClients.Push(id);
+			this->mRetryCount--;
+			this->AddFreeClient(id);
 			LOG_DEBUG("redis client:{} login ok", id);
 		}
 	}
@@ -114,6 +119,7 @@ namespace acs
 		{
 			return;
 		}
+		this->mRetryCount++;
 		this->mRetryClients.emplace(id);
 		std::string address = iter->second->GetAddress();
 		LOG_WARN("redis client ({}) login fail", address)
@@ -127,7 +133,7 @@ namespace acs
 
 	void RedisComponent::OnSecondUpdate(int tick) noexcept
 	{
-		if(this->mConfig.ping > 0 && tick % this->mConfig.ping == 0)
+		if(this->mConfig.ping > 0 && (tick % this->mConfig.ping) == 0)
 		{
 			int id = 0;
 			while(this->mFreeClients.Pop(id))
@@ -139,6 +145,9 @@ namespace acs
 					//CONSOLE_LOG_WARN("redis client:{} ping", id)
 				}
 			}
+		}
+		if(this->mConfig.retry > 0 && (tick % this->mConfig.retry) == 0) //重试
+		{
 			for(const int id : this->mRetryClients)
 			{
 				auto iter = this->mClients.find(id);
@@ -155,6 +164,7 @@ namespace acs
 	void RedisComponent::OnMessage(int id, redis::Request * request, redis::Response * response) noexcept
 	{
 		this->mSumCount++;
+		this->AddFreeClient(id);
 		if (response->HasError())
 		{
 			LOG_ERROR("redis request = {}", request->ToString());
@@ -164,19 +174,6 @@ namespace acs
 		{
 			CONSOLE_LOG_DEBUG("[request] = {}", request->ToString());
 			CONSOLE_LOG_DEBUG("[response:{}ms] = {}", request->GetCostTime(), response->ToString());
-		}
-
-		if(this->mRequests.empty())
-		{
-			this->mFreeClients.Push(id);
-		}
-		else
-		{
-			std::unique_ptr<redis::Request> & request1 = this->mRequests.front();
-			{
-				this->Send(id, std::move(request1));
-				this->mRequests.pop();
-			}
 		}
 
 		int rpcId = request->GetRpcId();
@@ -347,6 +344,17 @@ namespace acs
 		}
 		//LOG_DEBUG("redis[{}] request:{}", id, request->ToString());
 		iter->second->Send(std::move(request));
+	}
+
+	void RedisComponent::AddFreeClient(int id)
+	{
+		if(!this->mRequests.empty())
+		{
+			this->Send(id, std::move(this->mRequests.front()));
+			this->mRequests.pop();
+			return;
+		}
+		this->mFreeClients.Push(id);
 	}
 
 	void RedisComponent::OnDestroy()

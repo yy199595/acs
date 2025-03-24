@@ -86,19 +86,6 @@ namespace pgsql
 		asio::post(context, [self = this->shared_from_this(), &threadSync, this]()
 		{
 			int code = this->Auth(true);
-			if(code == XCode::Ok && !this->mConfig.script.empty())
-			{
-				std::string sql;
-				if (help::fs::ReadTxtFile(this->mConfig.script, sql))
-				{
-					pgsql::Result result;
-					if (!this->ReadResponse(sql, result))
-					{
-						code = XCode::CreateSqlFail;
-						CONSOLE_LOG_ERROR("{}", this->mResponse.mError);
-					}
-				}
-			}
 			threadSync.SetResult(code);
 		});
 		return threadSync.Wait();
@@ -157,7 +144,16 @@ namespace pgsql
 			return XCode::PasswordAuthFail;
 		}
 		unsigned int authType = pgsql::ReadLength(response.c_str());
-		return this->Auth(authType, response.substr(4));
+		int code = this->Auth(authType, response.substr(4));
+		if(code == XCode::Ok && this->mRequest == nullptr)
+		{
+			std::shared_ptr<tcp::Client> self = this->shared_from_this();
+			asio::post(this->mMain, [self, this, id = this->mClientId]()
+			{
+				this->mComponent->OnConnectOK(id);
+			});
+		}
+		return code;
 	}
 
 	int Client::Auth(unsigned int type, const std::string & message)
@@ -337,14 +333,6 @@ namespace pgsql
 			return XCode::PasswordAuthFail;
 		}
 		this->ReadResponse(this->mResponse);
-		if(this->mRequest == nullptr)
-		{
-			std::shared_ptr<tcp::Client> self = this->shared_from_this();
-			asio::post(this->mMain, [self, this, id = this->mClientId]()
-			{
-				this->mComponent->OnConnectOK(id);
-			});
-		}
 		return XCode::Ok;
 	}
 #endif

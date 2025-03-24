@@ -13,7 +13,7 @@
 namespace acs
 {
 	class RedisSubComponent final : public RpcComponent<redis::Response>,
-			public IRpc<redis::Request, redis::Response>
+									public IRpc<redis::Request, redis::Response>
 	{
 	public:
 		RedisSubComponent();
@@ -26,9 +26,11 @@ namespace acs
 		bool Awake() final;
 		bool LateAwake() final;
 		void OnConnectOK(int id) final;
+		void OnClientError(int id, int code) final;
 		void OnMessage(int, redis::Request *request, redis::Response *response) noexcept final;
 	private:
 		redis::Cluster mConfig;
+		class TimerComponent * mTimer;
 		class DispatchComponent * mDispatch;
 		std::shared_ptr<redis::Client> mClient;
 		std::unordered_set<std::string> mChannels;

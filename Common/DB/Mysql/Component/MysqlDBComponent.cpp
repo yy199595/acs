@@ -20,12 +20,14 @@ namespace acs
 	MysqlDBComponent::MysqlDBComponent()
 	{
 		this->mCount = 0;
+		this->mRetryCount = 0;
 		this->mThread = nullptr;
 		REGISTER_JSON_CLASS_FIELD(db::Explain, open);
 		REGISTER_JSON_CLASS_FIELD(db::Explain, command);
 
 		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, ping);
 		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, count);
+		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, retry);
 		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, script);
 		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, debug);
 		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, explain);
@@ -72,6 +74,7 @@ namespace acs
 				{
 					return false;
 				}
+				this->mRetryCount++;
 				int id = (x + 1) * 100 + index + 1;
 				config.script = this->mConfig.script;
 				config.conn_count = this->mConfig.conn_count;
@@ -114,18 +117,19 @@ namespace acs
 		std::unique_ptr<json::w::Value> jsonObject = document.AddObject("mysql");
 		{
 			jsonObject->Add("sum", this->mCount);
+			jsonObject->Add("retry", this->mRetryCount);
 			jsonObject->Add("client", this->mClients.size());
 			jsonObject->Add("free", this->mFreeClients.Size());
-			jsonObject->Add("retry", this->mRetryClients.size());
 			jsonObject->Add("ping", fmt::format("{}ms", timer1.GetMs()));
 		}
 	}
 
 	void MysqlDBComponent::OnConnectOK(int id)
 	{
+		this->mRetryCount--;
 		if(this->mClients.find(id) != this->mClients.end())
 		{
-			this->mFreeClients.Push(id);
+			this->AddFreeClient(id);
 			LOG_DEBUG("mysql client:{} login ok", id);
 		}
 	}
@@ -138,18 +142,7 @@ namespace acs
 	void MysqlDBComponent::OnMessage(int id, mysql::Request* request, mysql::Response* response) noexcept
 	{
 		this->mCount++;
-		if(this->mMessages.empty())
-		{
-			this->mFreeClients.Push(id);
-		}
-		else
-		{
-			std::unique_ptr<mysql::Request>& req = this->mMessages.front();
-			{
-				this->Send(id, std::move(req));
-			}
-			this->mMessages.pop();
-		}
+		this->AddFreeClient(id);
 		if(response->HasError())
 		{
 			LOG_ERROR("{}", request->ToString());
@@ -219,6 +212,7 @@ namespace acs
 		{
 			return;
 		}
+		this->mRetryCount++;
 		this->mRetryClients.emplace(id);
 		std::string address = iter->second->GetAddress();
 		LOG_WARN("mysql client ({}) login fail", address)
@@ -234,6 +228,9 @@ namespace acs
 				//CONSOLE_LOG_WARN("mysql client:{} ping", id)
 				this->Send(id, std::make_unique<mysql::Request>(mysql::cmd::PING));
 			}
+		}
+		if(this->mConfig.retry > 0 && tick % this->mConfig.retry == 0)
+		{
 			for(const int id : this->mRetryClients)
 			{
 				auto iter = this->mClients.find(id);
@@ -254,6 +251,17 @@ namespace acs
 			request->SetRpcId(rpcId);
 			this->Send(std::move(request));
 		}
+	}
+
+	void MysqlDBComponent::AddFreeClient(int id)
+	{
+		if(!this->mMessages.empty())
+		{
+			this->Send(id, std::move(this->mMessages.front()));
+			this->mMessages.pop();
+			return;
+		}
+		this->mFreeClients.Push(id);
 	}
 
 	void MysqlDBComponent::Send(int id, std::unique_ptr<mysql::Request> request)

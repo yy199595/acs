@@ -1,11 +1,6 @@
 {
-    "excel": {
-    },
     "server": {
         "rpc": [
-            "MongoDB",
-            "MysqlDB",
-            "PgsqlDB",
             "NodeSystem",
             "GateSystem",
             "EventSystem",
@@ -19,7 +14,6 @@
             "Admin",
             "Watch",
             "LogMgr",
-            "MongoBackup",
             "QuickSDK",
             "FileUpload",
             "ResourceMgr",
@@ -38,12 +32,8 @@
             "KcpComponent",
             "UdpComponent",
             "WsClientComponent",
-            "RedisComponent",
-            "MongoComponent",
-            "MysqlDBComponent",
             "OssComponent",
             "SqliteComponent",
-            "PgsqlDBComponent",
             "TelnetComponent"
         ]
     }

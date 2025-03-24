@@ -15,6 +15,15 @@ namespace tcp
 		send = 2,
 		connect = 3,
 	};
+
+	enum class status
+	{
+		none,
+		send,
+		read,
+		close,
+		connect,
+	};
 }
 
 namespace tcp
@@ -30,11 +39,11 @@ namespace tcp
 		void SetSocket(Socket * socket);
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
 	protected:
-		void ReadAll(int timeout = 0);
-		void Connect(int timeout = 0);
-		void ReadLine(int timeout = 0);
-		void ReadSome(int timeout = 0);
-		void ReadLength(size_t size, int timeout = 0);
+		bool ReadAll(int timeout = 0);
+		bool Connect(int timeout = 0);
+		bool ReadLine(int timeout = 0);
+		bool ReadSome(int timeout = 0);
+		bool ReadLength(size_t size, int timeout = 0);
 		void Connect(const std::string & host, const std::string & port, int timeout = 0);
 	protected:
 		void ClearBuffer();
@@ -55,6 +64,7 @@ namespace tcp
 		void StopUpdate();
 		void StartUpdate(int timeout);
 		void StartTimer(int timeout, tcp::timeout flag);
+		inline tcp::status GetStatus() const { return this->mStatus; }
 	protected:
 		virtual void OnUpdate() { }
 		virtual void OnReadError(const Asio::Code & code) = 0;
@@ -71,7 +81,7 @@ namespace tcp
         asio::streambuf mRecvBuffer;
 		std::unique_ptr<tcp::Socket> mSocket;
 	private:
-		bool mIsConnected;
+		tcp::status mStatus;
 		std::unique_ptr<asio::steady_timer> mTimer;
 		std::unique_ptr<asio::steady_timer> mUpdateTimer;
 	};

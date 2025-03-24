@@ -36,9 +36,9 @@ namespace acs
 	LuaComponent::LuaComponent()
 	{
 		this->mLuaEnv = nullptr;
-		lua::Config::RegisterField("main", &lua::Config::main);
-		lua::Config::RegisterField("require", &lua::Config::require);
-		lua::Config::RegisterField("modules", &lua::Config::modules);
+		REGISTER_JSON_CLASS_FIELD(lua::Config, main);
+		REGISTER_JSON_CLASS_FIELD(lua::Config, require);
+		REGISTER_JSON_CLASS_FIELD(lua::Config, modules);
 	}
 
 	bool LuaComponent::Awake()
@@ -210,7 +210,7 @@ namespace acs
 		const std::string & path = iter1->second->FullPath;
 		if(luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
 		{
-			LOG_ERROR("{}", lua_tostring(this->mLuaEnv, -1));
+			LOG_ERROR("[{}] {}", name, lua_tostring(this->mLuaEnv, -1));
 			lua_pop(this->mLuaEnv, 1);
 			return nullptr;
 		}

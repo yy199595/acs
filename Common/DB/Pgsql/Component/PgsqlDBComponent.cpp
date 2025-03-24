@@ -6,8 +6,7 @@
 #include "Lua/Lib/Lib.h"
 #include "Entity/Actor/App.h"
 #include "PgsqlDBComponent.h"
-
-#include "Mysql/Common/MysqlProto.h"
+#include "Util/File/FileHelper.h"
 #include "Server/Config/CodeConfig.h"
 #include "Server/Config/ServerConfig.h"
 #include "Server/Component/ThreadComponent.h"
@@ -20,6 +19,7 @@ namespace acs
 	PgsqlDBComponent::PgsqlDBComponent()
 	{
 		this->mSumCount = 0;
+		this->mRetryCount = 0;
 		this->mThread = nullptr;
 		this->mConfig.count = 1;
 		this->mConfig.debug = false;
@@ -28,6 +28,7 @@ namespace acs
 		REGISTER_JSON_CLASS_FIELD(db::Explain, command);
 		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, ping);
 		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, count);
+		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, retry);
 		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, debug);
 		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, script);
 		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, explain);
@@ -41,7 +42,13 @@ namespace acs
 		{
 			ccModule.Open("db.pgsql", lua::lib::luaopen_lpgsqldb);
 		});
-		return ServerConfig::Inst()->Get("pgsql", this->mConfig);
+		LOG_CHECK_RET_FALSE(ServerConfig::Inst()->Get("pgsql", this->mConfig))
+		if(!this->mConfig.script.empty())
+		{
+			std::string path = this->mConfig.script;
+			return help::fs::ReadTxtFile(path, this->mConfig.script);
+		}
+		return true;
 	}
 
 	bool PgsqlDBComponent::LateAwake()
@@ -59,6 +66,7 @@ namespace acs
 				{
 					return false;
 				}
+				this->mRetryCount++;
 				int id = (x + 1) * 100 + index + 1;
 				config.script = this->mConfig.script;
 				config.conn_count = this->mConfig.conn_count;
@@ -81,6 +89,14 @@ namespace acs
 		return true;
 	}
 
+	void PgsqlDBComponent::OnStart()
+	{
+		if(!this->mConfig.script.empty())
+		{
+			this->Run(this->mConfig.script);
+		}
+	}
+
 	bool PgsqlDBComponent::DecodeUrl(const std::string& url, pgsql::Config& config)
 	{
 		if (!config.Decode(url))
@@ -97,9 +113,10 @@ namespace acs
 
 	void PgsqlDBComponent::OnConnectOK(int id)
 	{
+		this->mRetryCount--;
 		if (this->mClients.find(id) != this->mClients.end())
 		{
-			this->mFreeClients.Push(id);
+			this->AddFreeClient(id);
 			LOG_DEBUG("pgsql client:{} login ok", id);
 		}
 	}
@@ -111,6 +128,7 @@ namespace acs
 		{
 			return;
 		}
+		this->mRetryCount++;
 		this->mRetryClients.emplace(id);
 		std::string address = iter->second->GetAddress();
 		LOG_WARN("pgsql client ({}) login fail", address)
@@ -127,6 +145,9 @@ namespace acs
 				//CONSOLE_LOG_WARN("pgsql client:{} ping", id)
 				this->Send(id, std::make_unique<pgsql::Request>(sql));
 			}
+		}
+		if (this->mConfig.retry > 0 && tick % this->mConfig.retry == 0)
+		{
 			for (const int id: this->mRetryClients)
 			{
 				auto iter = this->mClients.find(id);
@@ -146,6 +167,7 @@ namespace acs
 		std::unique_ptr<json::w::Value> jsonValue = document.AddObject("pgsql");
 		{
 			jsonValue->Add("sum", this->mSumCount);
+			jsonValue->Add("retry", this->mRetryCount);
 			jsonValue->Add("client", this->mClients.size());
 			jsonValue->Add("free", this->mFreeClients.Size());
 			jsonValue->Add("ping", fmt::format("{}ms", timer1.GetMs()));
@@ -184,6 +206,7 @@ namespace acs
 	void PgsqlDBComponent::OnMessage(int id, pgsql::Request* request, pgsql::Response* response) noexcept
 	{
 		this->mSumCount++;
+		this->AddFreeClient(id);
 		int rpcId = request->GetRpcId();
 		if (!response->mError.empty())
 		{
@@ -211,16 +234,6 @@ namespace acs
 				LOG_DEBUG("[{}ms] ({}) {}", request->GetCostTime(), response->mResults.size(), request->ToString())
 			}
 		}
-		if (this->mMessages.empty())
-		{
-			this->mFreeClients.Push(id);
-		}
-		else
-		{
-			this->Send(id, std::move(this->mMessages.front()));
-			this->mMessages.pop();
-		}
-
 		if (rpcId > 0)
 		{
 			this->OnResponse(rpcId, std::unique_ptr<pgsql::Response>(response));
@@ -243,6 +256,17 @@ namespace acs
 	{
 		int rpcId = 0;
 		this->Send(std::move(request), rpcId);
+	}
+
+	void PgsqlDBComponent::AddFreeClient(int id)
+	{
+		if(!this->mMessages.empty())
+		{
+			this->Send(id, std::move(this->mMessages.front()));
+			this->mMessages.pop();
+			return;
+		}
+		this->mFreeClients.Push(id);
 	}
 
 	void PgsqlDBComponent::Send(std::unique_ptr<pgsql::Request> request, int& rpcId)

@@ -22,6 +22,7 @@ namespace mysql
 	public:
 		int ping = 15;
 		int count = 1;
+		int retry = 5; //重试时间
 		int conn_count = 3; //重试次数
 		bool debug = false;
 		std::string script;

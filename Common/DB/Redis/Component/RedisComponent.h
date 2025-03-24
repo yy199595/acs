@@ -50,6 +50,7 @@ namespace acs
 		void Send(int id, std::unique_ptr<redis::Request> request) noexcept;
 		void OnMessage(int id, redis::Request * request, redis::Response * response) noexcept final;
 	private:
+		void AddFreeClient(int id);
 		static bool DecodeUrl(const std::string & url, redis::Config & config);
 		bool OnLoadScript(const std::string & name, const std::string &md5);
 	private:
@@ -63,6 +64,7 @@ namespace acs
 		void OnRecord(json::w::Document &document) final;
 		void OnSendFailure(int id, redis::Request *message) final;
 	private:
+		int mRetryCount;
 		redis::Cluster mConfig;
 		unsigned long long mSumCount;
 		class ThreadComponent * mThread;

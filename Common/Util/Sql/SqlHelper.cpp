@@ -221,7 +221,7 @@ namespace acs
 	bool SqlHelper::Insert(const db::sql::insert & request, std::string& sqlCommand)
 	{
 		json::r::Document document;
-		if(document.Decode(request.document()))
+		if(!document.Decode(request.document()))
 		{
 			return false;
 		}
@@ -232,7 +232,7 @@ namespace acs
 	bool SqlHelper::Replace(const db::sql::save & request, std::string& sqlCommand)
 	{
 		json::r::Document document;
-		if(document.Decode(request.data()))
+		if(!document.Decode(request.data()))
 		{
 			return false;
 		}

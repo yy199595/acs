@@ -42,6 +42,7 @@ namespace acs
 		std::unique_ptr<mysql::Response> Run(const std::string & sql);
 		std::unique_ptr<mysql::Response> Run(std::unique_ptr<mysql::Request> request);
 	private:
+		void AddFreeClient(int id);
 		void Send(int id, std::unique_ptr<mysql::Request> request);
 		static bool DecodeUrl(const std::string & url, mysql::Config & config);
 	private:
@@ -56,6 +57,7 @@ namespace acs
 		void OnExplain(const std::string & sql, long long ms) noexcept;
 		void OnMessage(int id, mysql::Request *request, mysql::Response *response) noexcept final;
 	private:
+		int mRetryCount;
 		mysql::Cluster mConfig;
 		unsigned long long mCount; //总处理数量
 		class ThreadComponent * mThread;

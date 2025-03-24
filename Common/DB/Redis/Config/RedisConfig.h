@@ -15,8 +15,10 @@ namespace redis
 		int id = 1;
 		int ping = 15;
 		int count = 1;
+		int retry = 5; //重试时间(秒)
 		bool debug = false;
 		int conn_count = 3;
+		std::string mq;
 		std::string sub;
         std::string script;
 		std::vector<std::string> address;

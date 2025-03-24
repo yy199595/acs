@@ -34,7 +34,7 @@ namespace acs
 namespace acs
 {
 	class PgsqlDBComponent  : public RpcComponent<pgsql::Response>, public IServerRecord,
-							  public IRpc<pgsql::Request, pgsql::Response>, public ISecondUpdate
+							  public IRpc<pgsql::Request, pgsql::Response>, public ISecondUpdate, public IStart
 	{
 	public:
 		PgsqlDBComponent();
@@ -45,10 +45,12 @@ namespace acs
 		std::unique_ptr<pgsql::Response> Run(const std::string & sql);
 		std::unique_ptr<pgsql::Response> Run(std::unique_ptr<pgsql::Request> request);
 	private:
+		void AddFreeClient(int id);
 		void Send(int id, std::unique_ptr<pgsql::Request> request);
 		static bool DecodeUrl(const std::string & url, pgsql::Config & config);
 	private:
 		bool Awake() final;
+		void OnStart() final;
 		bool LateAwake() final;
 		void OnConnectOK(int id) final;
 		void OnClientError(int id, int code) final;
@@ -58,6 +60,7 @@ namespace acs
 		void OnExplain(const std::string & sql, long long ms) noexcept;
 		void OnMessage(int, pgsql::Request *request, pgsql::Response *response) noexcept final;
 	private:
+		int mRetryCount;
 		pgsql::Cluster mConfig;
 		unsigned long long mSumCount;
 		class ThreadComponent * mThread;

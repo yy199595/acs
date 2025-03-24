@@ -177,7 +177,9 @@ void RegisterAll()
 
 int main(int argc, char** argv)
 {
-	long long newId = help::ID::Create(1, 8);
+#ifdef __OS_WIN__
+	system("chcp 65001");
+#endif
 
 	int id = 0;
 	RegisterAll();

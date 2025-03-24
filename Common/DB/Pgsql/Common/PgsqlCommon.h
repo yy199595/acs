@@ -16,6 +16,7 @@ namespace pgsql
 	public:
 		int ping = 15;
 		int count = 1;
+		int retry = 5;
 		bool debug = false;
 		db::Explain explain;
 		int conn_count = 3;

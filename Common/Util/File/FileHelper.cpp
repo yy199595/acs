@@ -160,6 +160,7 @@ namespace help
 			return false;
 #endif
 		}
+		outFile.clear();
 		char buffer[128] = { 0 };
 		do
 		{
