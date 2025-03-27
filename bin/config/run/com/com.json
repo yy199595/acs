@@ -92,7 +92,6 @@
         "rpc": "${WORK_DIR}/config/service/rpc",
         "http": "${WORK_DIR}/config/service/http",
         "client": "${WORK_DIR}/config/service/client.json",
-        "cluster": "${WORK_DIR}/config/cluster",
         "machine" : "${WORK_DIR}/config/cluster/machine.json"
     },
     "lua": {

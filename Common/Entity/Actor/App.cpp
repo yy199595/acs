@@ -44,6 +44,7 @@ namespace acs
 		this->mLastGuidTime = 0;
 		this->mActor = nullptr;
 		this->mProto = nullptr;
+		this->mStartMemory = 0;
 		this->mCoroutine = nullptr;
 		this->mStatus = ServerStatus::Init;
 #ifdef __OS_WIN__
@@ -70,10 +71,6 @@ namespace acs
 		if (!this->mConfig.GetPath("cluster", path)) //加载集群配置
 		{
 			return false;
-		}
-		if (os::System::GetEnv("cluster", cluster))
-		{
-			path = fmt::format("{}/{}.json", path, cluster);
 		}
 		TextConfig* config = new ClusterConfig();
 		if (!config->LoadConfig(path))
@@ -235,7 +232,7 @@ namespace acs
 						os::SystemInfo systemInfo;
 						constexpr double MB = 1024 * 1024.0f;
 						os::System::GetSystemInfo(systemInfo);
-						double mb = (double)systemInfo.use_memory / MB;
+						double mb = (double)(systemInfo.use_memory - this->mStartMemory) / MB;
 						SetConsoleTitle(fmt::format("{:.3f}MB", mb).c_str());
 #endif
 #if defined(__OS_WIN__) || defined(__OS_MAC__)
@@ -274,12 +271,8 @@ namespace acs
 			}
 			std::this_thread::sleep_for(sleepTime);
 		}
-#ifdef __OS_WIN__
-		return std::getchar();
-#else
 		printf("========== close server ==========\n");
 		return XServerCode::Ok;
-#endif
 	}
 
 	long long App::MakeGuid()
@@ -380,7 +373,6 @@ namespace acs
 			}
 			CONSOLE_LOG_INFO("[{:.2f}%] close {} => {}", process * 100, name1, name2);
 			component->OnDestroy();
-
 		}
 		this->mContext.stop();
 	}
@@ -425,8 +417,12 @@ namespace acs
 			}
 			timerComponent->CancelTimer(timerId);
 		}
+		os::SystemInfo systemInfo;
+		os::System::GetSystemInfo(systemInfo);
+
 		completeComponents.clear();
 		this->mStatus = ServerStatus::Ready;
+		this->mStartMemory = systemInfo.use_memory;
 		long long t = help::Time::NowMil() - this->mStartTime;
 		LOG_INFO("  ===== start {} ok [{:.3f}s] =======", this->Name(), t / 1000.0f);
 	}

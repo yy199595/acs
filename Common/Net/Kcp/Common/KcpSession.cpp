@@ -22,12 +22,12 @@ namespace kcp
 		this->mSocket.send_to(asio::buffer(buf, len), this->mRemote);
 	}
 
-	int Session::Decode(const char* message, int len, std::array<char, kcp::BUFFER_COUNT>& buffer)
+	int Session::Decode(const char* message, int len, char * buffer)
 	{
 		ikcp_input(this->mKcp, message, len);
 		this->mLastTime = help::Time::NowSec();
 		//LOG_DEBUG("[{}] receive message count={}", this->mAddress, len)
-		return ikcp_recv(this->mKcp, buffer.data(), kcp::BUFFER_COUNT);
+		return ikcp_recv(this->mKcp, buffer, kcp::BUFFER_COUNT);
 	}
 
 	void Session::Send(tcp::IProto* message)

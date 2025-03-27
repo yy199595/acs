@@ -41,7 +41,6 @@ namespace http
 
 	void Session::StartReceive(int sockId, tcp::Socket* socket, int timeout)
 	{
-		assert(sockId > 0);
 		this->SetSocket(socket);
 		this->mRequest.SetSockId(sockId);
 #ifdef __DEBUG__
@@ -105,22 +104,6 @@ namespace http
 		{
 			httpHead.Add(http::Header::ContentLength, 0);
 		}
-#ifdef __DEBUG__
-		std::string t;
-		long long time = 0;
-		if (this->mRequest.Header().Del("t", t))
-		{
-			time = std::stoll(t);
-			time = help::Time::NowMil() - time;
-		}
-		const HttpStatus status = this->mResponse.Code();
-		const std::string error = HttpStatusToString(status);
-		if (status != HttpStatus::OK)
-		{
-			LOG_WARN("({}ms) [{}:{}]=>{} ({})", time,
-					url.Method(), this->mRequest.GetSockId(), url.ToStr(), error);
-		}
-#endif
 #ifdef ONLY_MAIN_THREAD
 		this->Write(this->mResponse);
 #else

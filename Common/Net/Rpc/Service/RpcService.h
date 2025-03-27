@@ -22,7 +22,8 @@ namespace acs
 		RpcService();
 	protected:
 		bool LateAwake() final;
-		virtual bool OnInit() = 0; //注册rpc回调
+		virtual bool OnInit() = 0; //注册rpc回调ls
+
 	public:
 		Lua::LuaModule * GetLuaModule() { return this->mLuaModule; }
 		const std::string& GetServer() const { return this->mCluster; }

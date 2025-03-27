@@ -186,6 +186,11 @@ namespace acs
 
 	void MongoDBComponent::OnDestroy()
 	{
+		while(!this->mRequests.empty())
+		{
+			this->mApp->Sleep();
+			LOG_DEBUG("wait mongo request invoke => {}", this->mRequests.size());
+		}
 		auto iter = this->mClients.begin();
 		for(; iter != this->mClients.end(); iter++)
 		{
@@ -198,6 +203,7 @@ namespace acs
 	{
 		this->mSumCount++;
 		this->AddFreeClient(id);
+		std::unique_ptr<mongo::Response> resp(response);
 		if (response == nullptr)
 		{
 			LOG_FATAL("send mongo cmd = {}", request->ToString());
@@ -244,7 +250,7 @@ namespace acs
 
 		if(rpcId > 0)
 		{
-			this->OnResponse(rpcId, std::unique_ptr<mongo::Response>(response));
+			this->OnResponse(rpcId, std::move(resp));
 		}
 	}
 

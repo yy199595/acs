@@ -6,7 +6,7 @@ namespace lua
 {
 	JsonValue::~JsonValue()
 	{
-		if(this->val == yyjson_mut_doc_get_root(this->doc))
+		if(this->mDelete)
 		{
 			yyjson_mut_doc_free(this->doc);
 		}
@@ -113,11 +113,11 @@ namespace lua
 		return result;
 	}
 
-	bool yyjson::write(lua_State* L, yyjson_doc* doc, bool numkeyable)
-	{
-		decode_one(L, yyjson_doc_get_root(doc), numkeyable);
-		return true;
-	}
+//	bool yyjson::write(lua_State* L, yyjson_doc* doc, bool numkeyable)
+//	{
+//		decode_one(L, yyjson_doc_get_root(doc), numkeyable);
+//		return true;
+//	}
 
 	bool yyjson::write(lua_State* L, yyjson_val* val, bool numkeyable)
 	{
@@ -326,7 +326,7 @@ namespace lua
 		{
 			isArray = lua_toboolean(L, 1);
 		}
-		std::unique_ptr<lua::JsonValue> jsonValue = std::make_unique<lua::JsonValue>();
+		std::unique_ptr<lua::JsonValue> jsonValue = std::make_unique<lua::JsonValue>(true);
 		{
 			jsonValue->doc = yyjson_mut_doc_new(nullptr);
 			jsonValue->val = isArray ? yyjson_mut_arr(jsonValue->doc)
@@ -345,7 +345,7 @@ namespace lua
 			luaL_error(L, "json value object is null");
 			return 0;
 		}
-		std::unique_ptr<lua::JsonValue> newJsonArray = std::make_unique<lua::JsonValue>();
+		std::unique_ptr<lua::JsonValue> newJsonArray = std::make_unique<lua::JsonValue>(false);
 		if (yyjson_mut_is_arr(jsonValue->val))
 		{
 			newJsonArray->val = yyjson_mut_arr(jsonValue->doc);
@@ -377,7 +377,7 @@ namespace lua
 			luaL_error(L, "json value object is null");
 			return 0;
 		}
-		std::unique_ptr<lua::JsonValue> newJsonArray = std::make_unique<lua::JsonValue>();
+		std::unique_ptr<lua::JsonValue> newJsonArray = std::make_unique<lua::JsonValue>(false);
 		if (yyjson_mut_is_arr(jsonValue->val))
 		{
 			newJsonArray->val = yyjson_mut_obj(jsonValue->doc);

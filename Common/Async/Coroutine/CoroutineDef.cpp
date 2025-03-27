@@ -10,17 +10,25 @@ namespace acs
 
 	TaskContext * TaskContextPool::Pop()
 	{
-		TaskContext * newCoroutine = nullptr;
-		std::unique_ptr<TaskContext> coroutine  = std::make_unique<TaskContext>();
+		TaskContext* newCoroutine = nullptr;
+		std::unique_ptr<TaskContext> coroutine;
+		if (!this->mObjectPool.empty())
 		{
-			newCoroutine = coroutine.get();
-			coroutine->mContext = nullptr;
-			coroutine->mFunction = nullptr;
-			coroutine->mState = CorState::Ready;
-			coroutine->mCoroutineId = this->mNumPool.BuildNumber();
-			coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
+			coroutine = std::move(this->mObjectPool.front());
+			this->mObjectPool.pop();
 		}
-		this->mCoroutines.emplace(coroutine->mCoroutineId, std::move(coroutine));
+		else
+		{
+			coroutine = std::make_unique<TaskContext>();
+		}
+
+		newCoroutine = coroutine.get();
+		coroutine->mContext = nullptr;
+		coroutine->callback = nullptr;
+		coroutine->status = CorState::Ready;
+		coroutine->id = this->mNumPool.BuildNumber();
+		coroutine->sid = coroutine->id & (cor::SHARED_STACK_NUM - 1);
+		this->mCoroutines.emplace(coroutine->id, std::move(coroutine));
 		return newCoroutine;
 	}
 
@@ -30,7 +38,7 @@ namespace acs
 		auto iter = this->mCoroutines.begin();
 		for(; iter != this->mCoroutines.end(); iter++)
 		{
-			if(iter->second->mState == CorState::Suspend)
+			if(iter->second->status == CorState::Suspend)
 			{
 				count++;
 			}
@@ -44,7 +52,7 @@ namespace acs
 		auto iter = this->mCoroutines.begin();
 		for(; iter != this->mCoroutines.end(); iter++)
 		{
-			size += iter->second->mStack.size;
+			size += iter->second->stack.size;
 		}
 		return size;
 	}
@@ -61,6 +69,11 @@ namespace acs
 		if(iter == this->mCoroutines.end())
 		{
 			return false;
+		}
+		std::unique_ptr<TaskContext> coroutine = std::move(iter->second);
+		if(this->mObjectPool.size() < cor::COROUTINE_CONTEXT_COUNT)
+		{
+			this->mObjectPool.emplace(std::move(coroutine));
 		}
 		this->mCoroutines.erase(iter);
 		return true;

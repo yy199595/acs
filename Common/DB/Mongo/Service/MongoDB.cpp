@@ -286,7 +286,7 @@ namespace acs
 	// $gt:大于   $lt:小于  $gte:大于或等于  $lte:小于或等于 $ne:不等于
 	int MongoDB::Update(const db::mongo::update& request, db::mongo::response& response)
 	{
-		return this->UpdateData(request, request.upsert(), response);
+		return this->UpdateData(request, request.upsert(), request.multi(), response);
 	}
 
 	int MongoDB::Updates(const db::mongo::updates& request, db::mongo::response& response)
@@ -582,7 +582,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int MongoDB::UpdateData(const db::mongo::update& request, bool upsert, db::mongo::response& response)
+	int MongoDB::UpdateData(const db::mongo::update& request, bool upsert, bool multi, db::mongo::response& response)
 	{
 		bson::Writer::Document dataDocument;
 		bson::Writer::Document selectorDocument;
@@ -602,7 +602,7 @@ namespace acs
 		}
 		const std::string& table = request.tab();
 		std::unique_ptr<mongo::Request> mongoRequest = mongo::MongoFactory::Update(table, selectorDocument,
-				dataDocument, cmd, upsert);
+				dataDocument, cmd, upsert, multi);
 		if (mongoRequest == nullptr)
 		{
 			return XCode::CallArgsError;

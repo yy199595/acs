@@ -308,7 +308,6 @@ namespace ws
 
 	void Session::OnReadError(const Asio::Code& code)
 	{
-		CONSOLE_LOG_ERROR("[{}] => {}", this->mSocket->GetAddress(), code.message())
 		this->Close(XCode::NetReadFailure);
 	}
 

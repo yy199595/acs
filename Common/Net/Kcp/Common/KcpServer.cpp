@@ -10,7 +10,7 @@ namespace kcp
 {
 	Server::Server(asio::io_context& io, kcp::Server::Component* component, unsigned short port, Asio::Context& main)
 			: mContext(io), mSocket(io, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)), mComponent(component),
-			  mTimer(io), mMainContext(main), mTime(KCP_UPDATE_INTERVAL)
+			  mTimer(io), mMainContext(main), mTime(KCP_UPDATE_INTERVAL), mRecvBuf(mRecvBuffer, kcp::BUFFER_COUNT)
 	{
 
 	}
@@ -41,8 +41,7 @@ namespace kcp
 			}
 			asio::post(this->mContext, [this] { this->StartReceive(); });
 		};
-		this->mSocket.async_receive_from(asio::buffer(this->mRecvBuffer),
-				this->mSenderPoint, callback);
+		this->mSocket.async_receive_from(this->mRecvBuf, this->mSenderPoint, callback);
 	}
 
 	bool Server::Send(const std::string& addr, tcp::IProto* message)
@@ -120,16 +119,16 @@ namespace kcp
 		{
 			return;
 		}
-		int len = kcpSession->Decode(this->mRecvBuffer.data(), (int)size, this->mDecodeBuffer);
+		int len = kcpSession->Decode(this->mRecvBuffer, (int)size, this->mDecodeBuffer);
 		if (len <= 0)
 		{
 			return;
 		}
 		std::unique_ptr<rpc::Message> rpcPacket = std::make_unique<rpc::Message>();
 		{
-			if (!rpcPacket->Decode(this->mDecodeBuffer.data(), len))
+			if (!rpcPacket->Decode(this->mDecodeBuffer, len))
 			{
-				CONSOLE_LOG_ERROR("{}", std::string(this->mRecvBuffer.data(), len))
+				CONSOLE_LOG_ERROR("{}", std::string(this->mRecvBuffer, len))
 				return;
 			}
 			rpcPacket->SetNet(rpc::Net::Kcp);

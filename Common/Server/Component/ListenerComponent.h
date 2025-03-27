@@ -12,7 +12,7 @@
 
 namespace acs
 {
-	class ListenerComponent final : public Component, public INetListen
+	class ListenerComponent final : public Component, public INetListen, public IServerRecord
 	{
 	public:
 		explicit ListenerComponent();
@@ -24,11 +24,17 @@ namespace acs
 		void Accept();
 		tcp::Socket* CreateSocket();
 		void OnAcceptSocket(tcp::Socket* sock);
+		void OnRecord(json::w::Document &document) final;
 	private:
 		ListenConfig mConfig;
 #ifdef __ENABLE_OPEN_SSL__
 		Asio::ssl::Context mSslCtx;
 #endif
+		std::atomic_int mSumCount;
+		std::atomic_int mDoneCount;
+		std::atomic_int mFailCount;
+
+		Asio::Executor mExecutor;
 		class ITcpListen * mTcpListen;
 		std::queue<tcp::Socket*> mSocketPool;
 		class ThreadComponent* mThreadComponent;

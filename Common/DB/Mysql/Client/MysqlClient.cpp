@@ -65,16 +65,16 @@ namespace mysql
 	{
 		Asio::Context& context = this->mSocket->GetContext();
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
-		asio::post(context, [message = request.release(), this, self]()
+		asio::post(context, [req = request.release(), this, self]()
 		{
 			unsigned char index = ++this->mIndex;
 			if (index == 255)
 			{
 				this->mIndex = 0;
 			}
-			message->SetIndex(0);
-			this->Write(*message);
-			this->mMessage.reset(message);
+			req->SetIndex(0);
+			this->mMessage.reset(req);
+			this->Write(*this->mMessage);
 		});
 	}
 
@@ -244,7 +244,6 @@ namespace mysql
 
 	void Client::OnConnect(const Asio::Code& code, int count)
 	{
-		CONSOLE_LOG_WARN("connect [{}] count=>{}  {}", this->mSocket->GetAddress(), count, code.message());
 		if (code.value() != Asio::OK)
 		{
 			if (count <= this->mConfig.conn_count)
@@ -258,7 +257,6 @@ namespace mysql
 			if (this->mMessage != nullptr)
 			{
 				this->Write(*this->mMessage);
-				CONSOLE_LOG_DEBUG("resend => {}", this->mMessage->ToString())
 			}
 			return;
 		}
@@ -284,7 +282,6 @@ namespace mysql
 		if (code != asio::error::eof)
 		{
 			this->Connect(10);
-			CONSOLE_LOG_ERROR("{}", code.message());
 		}
 	}
 
@@ -338,56 +335,59 @@ namespace mysql
 			while (this->mResponse.GetPackageCode() != mysql::PACKAGE_EOF)
 			{
 				pos = 0;
-				json::w::Document document;
-				for (const mysql::FieldInfo& fieldInfo: this->mFields)
+				if(this->mResponse.GetPackageCode() != mysql::PACKAGE_OK)
 				{
-					std::string value = this->mResponse.ReadString(pos);
-					switch (fieldInfo.type)
+					json::w::Document document;
+					for (const mysql::FieldInfo& fieldInfo: this->mFields)
 					{
-						case mysql::field::MYSQL_TYPE_TINY:
-						case mysql::field::MYSQL_TYPE_SHORT:
-						case mysql::field::MYSQL_TYPE_INT24:
-						case mysql::field::MYSQL_TYPE_YEAR:
-						case mysql::field::MYSQL_TYPE_LONG:
-						case mysql::field::MYSQL_TYPE_LONGLONG:
-						case mysql::field::MYSQL_TYPE_NEWDECIMAL:
+						std::string value = this->mResponse.ReadString(pos);
+						switch (fieldInfo.type)
 						{
-							long long number = 0;
-							if (!value.empty())
+							case mysql::field::MYSQL_TYPE_TINY:
+							case mysql::field::MYSQL_TYPE_SHORT:
+							case mysql::field::MYSQL_TYPE_INT24:
+							case mysql::field::MYSQL_TYPE_YEAR:
+							case mysql::field::MYSQL_TYPE_LONG:
+							case mysql::field::MYSQL_TYPE_LONGLONG:
+							case mysql::field::MYSQL_TYPE_NEWDECIMAL:
 							{
-								number = std::stoll(value);
+								long long number = 0;
+								if (!value.empty())
+								{
+									number = std::stoll(value);
+								}
+								document.Add(fieldInfo.name.c_str(), number);
+								break;
 							}
-							document.Add(fieldInfo.name.c_str(), number);
-							break;
-						}
-						case mysql::field::MYSQL_TYPE_FLOAT:
-						case mysql::field::MYSQL_TYPE_DOUBLE:
-						{
-							double number = 0;
-							if (!value.empty())
+							case mysql::field::MYSQL_TYPE_FLOAT:
+							case mysql::field::MYSQL_TYPE_DOUBLE:
 							{
-								number = std::stod(value);
+								double number = 0;
+								if (!value.empty())
+								{
+									number = std::stod(value);
+								}
+								document.Add(fieldInfo.name.c_str(), number);
+								break;
 							}
-							document.Add(fieldInfo.name.c_str(), number);
-							break;
+							case mysql::field::MYSQL_TYPE_JSON:
+							{
+								document.AddObject(fieldInfo.name.c_str(), value);
+								break;
+							}
+							case mysql::field::MYSQL_TYPE_NULL:
+							{
+								document.AddNull(fieldInfo.name.c_str());
+								break;
+							}
+							default:
+								document.Add(fieldInfo.name.c_str(), value);
+								break;
 						}
-						case mysql::field::MYSQL_TYPE_JSON:
-						{
-							document.AddObject(fieldInfo.name.c_str(), value);
-							break;
-						}
-						case mysql::field::MYSQL_TYPE_NULL:
-						{
-							document.AddNull(fieldInfo.name.c_str());
-							break;
-						}
-						default:
-							document.Add(fieldInfo.name.c_str(), value);
-							break;
 					}
+					document.Encode(&json);
+					mysqlResult.contents.emplace_back(json);
 				}
-				document.Encode(&json);
-				mysqlResult.contents.emplace_back(json);
 				this->SyncReadResponse(this->mResponse);
 			}
 		}

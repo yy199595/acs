@@ -74,8 +74,8 @@ namespace acs
 			}
 			if (lua_istable(lua, -1))
 			{
-				lua::JsonValue jsonValue;
 				json::w::Document document;
+				lua::JsonValue jsonValue(true);
 				lua::yyjson::read(lua, -1, jsonValue);
 				{
 					document.Add("code", code);

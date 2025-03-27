@@ -43,23 +43,14 @@ namespace acs
 		~TaskContext();
 #endif
 
-#ifdef __MEMORY_POOL_OPERATOR__
-	public:
-		void * operator new(size_t size);
-		void operator delete (void * ptr);
-#endif
 	 public:
 		void Invoke();
 	 public:
 		int sid;
-        Stack mStack;
-        CorState mState;
+        Stack stack;
+		unsigned int id;
+        CorState status;
         tb_context_t mContext;
-		unsigned int mCoroutineId;
-		std::unique_ptr<StaticMethod> mFunction;
-#ifdef __MEMORY_POOL_OPERATOR__
-	private:
-		static std::vector<void *> sAllocArray;
-#endif
+		std::unique_ptr<StaticMethod> callback;
     };
 }

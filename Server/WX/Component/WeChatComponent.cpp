@@ -22,6 +22,8 @@
 
 #include "Auth/Aes/Aes.h"
 #include "Core/System/System.h"
+#include "Util/Tools/TimeHelper.h"
+
 const std::string WE_CHAT_HOST = "https://api.mch.weixin.qq.com";
 
 namespace wx

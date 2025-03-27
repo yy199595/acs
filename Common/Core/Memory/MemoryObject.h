@@ -49,9 +49,9 @@ namespace memory
 		for (memory::Object<T> * object : sObjects)
 		{
 			index++;
-			if(index >= 5000 && index >= sObjects.size() - 10)
+			if(index >= 1000 && index >= sObjects.size() - 10)
 			{
-				printf("[%d] %p\n", (int)index, object);
+				printf("(%s)[%d] %p\n", typeid(T).name(), (int)index, object);
 			}
 		}
 		return sObjects.size();

@@ -413,6 +413,21 @@ namespace acs
 		}
 	}
 
+	void HttpWebComponent::OnClientError(int id, int code)
+	{
+		auto iter = this->mHttpClients.find(id);
+		if(iter != this->mHttpClients.end())
+		{
+			this->mHttpClients.erase(iter);
+		}
+		if(code == XCode::Ok)
+		{
+			this->mSuccessCount++;
+			return;
+		}
+		this->mFailureCount++;
+	}
+
 	bool HttpWebComponent::OnListen(tcp::Socket* socket) noexcept
 	{
 		int sockId = this->mNumPool.BuildNumber();

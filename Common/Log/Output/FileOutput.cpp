@@ -80,13 +80,6 @@ namespace custom
 		static std::string LogError(" [error]");
 		static std::string LogFatal(" [fatal]");
 		long long nowTime = help::Time::NowSec();
-
-		std::string t1 = help::Time::GetYearMonthDayString();
-		std::string t2 = help::Time::GetYearMonthDayString(this->mOpenFileTime);
-		if(t1 != t2)
-		{
-			CONSOLE_LOG_INFO("t1:{}  t2:{}", t1 , t2);
-		}
 		std::string time = help::Time::GetDateString(nowTime);
 		if(!help::Time::IsSameDay(nowTime, this->mOpenFileTime))
 		{

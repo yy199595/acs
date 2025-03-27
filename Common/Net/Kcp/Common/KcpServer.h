@@ -33,9 +33,10 @@ namespace kcp
 		asio::ip::udp::socket mSocket;
 		Asio::Context & mMainContext;
 		std::chrono::milliseconds mTime;
+		asio::mutable_buffers_1 mRecvBuf;
 		asio::ip::udp::endpoint mSenderPoint;
-		std::array<char, kcp::BUFFER_COUNT> mRecvBuffer;
-		std::array<char, kcp::BUFFER_COUNT> mDecodeBuffer;
+		char mRecvBuffer[kcp::BUFFER_COUNT];
+		char mDecodeBuffer[kcp::BUFFER_COUNT];
 		std::unordered_map<std::string, std::unique_ptr<kcp::Session>> mClients;
 	};
 }

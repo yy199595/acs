@@ -99,7 +99,7 @@ namespace acs
 			{
 				if (lua_istable(lua, 3))
 				{
-					lua::JsonValue jsonValue;
+					lua::JsonValue jsonValue(true);
 					lua::yyjson::read(lua, -1, jsonValue);
 					{
 						json::w::Document document;

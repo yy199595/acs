@@ -34,7 +34,7 @@ namespace acs
 namespace acs
 {
 	class PgsqlDBComponent  : public RpcComponent<pgsql::Response>, public IServerRecord,
-							  public IRpc<pgsql::Request, pgsql::Response>, public ISecondUpdate, public IStart
+							  public IRpc<pgsql::Request, pgsql::Response>, public ISecondUpdate, public IStart, public IDestroy
 	{
 	public:
 		PgsqlDBComponent();
@@ -52,6 +52,7 @@ namespace acs
 		bool Awake() final;
 		void OnStart() final;
 		bool LateAwake() final;
+		void OnDestroy() final;
 		void OnConnectOK(int id) final;
 		void OnClientError(int id, int code) final;
 		void OnSecondUpdate(int tick) noexcept final;

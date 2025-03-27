@@ -9,7 +9,8 @@ namespace custom
 	AsioThread::AsioThread(int update)
 		:mContext(1), mUpdate(update), mTimer(mContext)
 	{
-
+		this->mId = 0;
+		this->mLastTime = 0;
 	}
 
 	void AsioThread::Stop()
@@ -32,6 +33,7 @@ namespace custom
 
 	void AsioThread::StartTimer()
 	{
+		this->mLastTime = help::Time::NowSec();
 		this->mTimer.expires_after(std::chrono::seconds(this->mUpdate));
 		this->mTimer.async_wait([self = this->shared_from_this()](const asio::error_code& code)
 		{

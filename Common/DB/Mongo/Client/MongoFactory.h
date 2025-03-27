@@ -18,7 +18,7 @@ namespace mongo
 		static std::unique_ptr<Request> CreateIndex(const std::string & tab, const std::string & key, int sort = 1, bool unquie = false);
 		static std::unique_ptr<Request> Delete(const std::string & tab, bson::Writer::Document & document, int limit = 1);
 		static std::unique_ptr<Request> Command(const std::string & tab, const std::string & cmd, const json::r::Document & json);
-		static std::unique_ptr<Request> Update(const std::string & tab, bson::Writer::Document & select,  bson::Writer::Document & update, const char * tag, bool upsert);
+		static std::unique_ptr<Request> Update(const std::string & tab, bson::Writer::Document & select,  bson::Writer::Document & update, const char * tag, bool upsert, bool multi);
 	};
 }
 

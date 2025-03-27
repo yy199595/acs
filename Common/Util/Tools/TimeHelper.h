@@ -9,13 +9,13 @@ namespace help
     {
 		struct Date
 		{
-			int Year;
-			int Month;
-			int Day;
-			int Hour;
-			int Minute;
-			int Second;
-			int Week;
+			int Year = 0;
+			int Month = 0;
+			int Day = 0;
+			int Hour = 0;
+			int Minute = 0;
+			int Second = 0;
+			int Week = 0;
 		};
 
 
@@ -31,7 +31,7 @@ namespace help
 
         extern std::string GetDateStr(long long time = 0);
 
-		extern Time::Date GetTimeDate(long long t = 0);
+		extern void GetTimeDate(Time::Date & date, long long t = 0);
 
         // 获取毫秒时间戳
         extern long long NowMil();

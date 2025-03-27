@@ -27,6 +27,7 @@ namespace acs
 		int GetSrvId() const { return (int)this->GetId(); }
 		const std::string & Address() const { return this->mRpcAddress; }
 		int Make(const std::string &func, std::unique_ptr<rpc::Message> &request) const final ;
+		const std::unordered_map<std::string, std::string> & GetListens() const { return this->mListens; }
 	private:
 		long long mAppId;
 		std::string mRpc;

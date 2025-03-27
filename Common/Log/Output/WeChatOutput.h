@@ -14,7 +14,7 @@ namespace custom
 	class WeChatOutput : public IOutput
 	{
 	public:
-		WeChatOutput(std::string url);
+		explicit WeChatOutput(std::string url);
 	private:
 		bool Start(Asio::Context &io) final;
 		void Push(Asio::Context &io, const std::string &name, const custom::LogInfo &logInfo) final;

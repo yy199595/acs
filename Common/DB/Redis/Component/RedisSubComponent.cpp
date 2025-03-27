@@ -78,6 +78,7 @@ namespace acs
 			this->mTimer->DelayCall(ms, [this]() {
 				this->mClient->Start(nullptr);
 			});
+			LOG_ERROR("redis sub try connect");
 		}
 	}
 

@@ -18,12 +18,6 @@ namespace acs
 {
 	bool LaunchComponent::Awake()
 	{
-		std::unique_ptr<json::r::Value> luaObject;
-		if (this->mApp->Config().Get("lua", luaObject))
-		{
-			this->mApp->AddComponent<LuaComponent>();
-		}
-
 		if (ClusterConfig::Inst() == nullptr)
 		{
 			return true;
@@ -37,16 +31,25 @@ namespace acs
 		std::vector<std::string> components;
 		std::vector<std::string> rpcService;
 		std::vector<std::string> httpService;
-		nodeConfig->GetComponents(components);
-		nodeConfig->GetRpcServices(rpcService);
-		nodeConfig->GetHttpServices(httpService);
-		if(!rpcService.empty() || !httpService.empty())
+		if(nodeConfig->GetComponents(components) > 0)
 		{
 			LOG_CHECK_RET_FALSE(this->AddComponent(components));
-			LOG_CHECK_RET_FALSE(this->AddRpcService(rpcService));
-			LOG_CHECK_RET_FALSE(this->AddHttpService(httpService));
-			LOG_CHECK_RET_FALSE(this->LoadListenConfig())
 		}
+		std::unique_ptr<json::r::Value> luaObject;
+		if (this->mApp->Config().Get("lua", luaObject))
+		{
+			this->mApp->AddComponent<LuaComponent>();
+		}
+		if(nodeConfig->GetRpcServices(rpcService) > 0)
+		{
+			LOG_CHECK_RET_FALSE(this->AddRpcService(rpcService));
+		}
+		if(nodeConfig->GetHttpServices(httpService) > 0)
+		{
+			LOG_CHECK_RET_FALSE(this->AddHttpService(httpService));
+		}
+
+		LOG_CHECK_RET_FALSE(this->LoadListenConfig());
 		return true;
 	}
 

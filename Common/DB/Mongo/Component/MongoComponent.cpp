@@ -438,7 +438,7 @@ namespace acs
 		db::mongo::update request;
 		{
 			request.set_tab(tab);
-			request.set_tab("$push");
+			request.mutable_document()->set_cmd("$push");
 			filter.Encode(request.mutable_document()->mutable_filter());
 			value.Encode(request.mutable_document()->mutable_document());
 		}

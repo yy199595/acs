@@ -120,6 +120,7 @@ namespace acs
 			jsonObject->Add("retry", this->mRetryCount);
 			jsonObject->Add("client", this->mClients.size());
 			jsonObject->Add("free", this->mFreeClients.Size());
+			jsonObject->Add("wait", this->mMessages.size());
 			jsonObject->Add("ping", fmt::format("{}ms", timer1.GetMs()));
 		}
 	}
@@ -136,13 +137,18 @@ namespace acs
 
 	void MysqlDBComponent::OnDestroy()
 	{
-
+		while(!this->mMessages.empty())
+		{
+			this->mApp->Sleep();
+			LOG_DEBUG("wait mysql request invoke => {}", this->mMessages.size());
+		}
 	}
 
 	void MysqlDBComponent::OnMessage(int id, mysql::Request* request, mysql::Response* response) noexcept
 	{
 		this->mCount++;
 		this->AddFreeClient(id);
+		std::unique_ptr<mysql::Response> resp(response);
 		if(response->HasError())
 		{
 			LOG_ERROR("{}", request->ToString());
@@ -172,7 +178,7 @@ namespace acs
 		int rpcId = request->GetRpcId();
 		if(rpcId > 0)
 		{
-			this->OnResponse(rpcId, std::unique_ptr<mysql::Response>(response));
+			this->OnResponse(rpcId, std::move(resp));
 		}
 	}
 

@@ -21,16 +21,13 @@ namespace custom
 			output->Close();
 		}
 #else
-		custom::ThreadSync<bool> threadSync;
-		this->mContext.post([this, &threadSync]
+		asio::post(this->mContext, [this]()
 		{
 			for(IOutput * output : this->mOutputs)
 			{
 				output->Close();
 			}
-			threadSync.SetResult(true);
 		});
-		threadSync.Wait();
 #endif
 
 	}

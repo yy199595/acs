@@ -52,6 +52,7 @@ namespace acs
 		unsigned int StartCoroutine(std::function<void()> && func);
 		inline Asio::Context & GetContext() { return this->mContext; }
         bool OnDelComponent(Component *component) final { return false; }
+		inline long long GetStartUseMemory() const { return this->mStartMemory; }
 	public:
 		template<typename T>
 		static inline T * Get() { return App::Inst()->GetComponent<T>(); }
@@ -73,6 +74,7 @@ namespace acs
 		ServerStatus mStatus;
 		Asio::Context mContext;
 		ServerConfig & mConfig;
+		long long mStartMemory;
 		long long mLastGuidTime;
 		long long mNextNewDayTime; //下次新的一天时间
 		asio::signal_set mSignal;

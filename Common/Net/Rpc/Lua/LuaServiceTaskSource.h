@@ -12,6 +12,9 @@
 namespace acs
 {
 	class LuaServiceTaskSource
+#ifdef __SHARE_PTR_COUNTER__
+	: public memory::Object<LuaServiceTaskSource>
+#endif
     {
     public:
 		explicit LuaServiceTaskSource(rpc::Message * packet);

@@ -5,7 +5,9 @@
 #ifndef APP_LEVEL_H
 #define APP_LEVEL_H
 #include<string>
-
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
 namespace custom
 {
 	enum class LogLevel
@@ -21,6 +23,9 @@ namespace custom
 	};
 
 	struct LogInfo
+#ifdef __SHARE_PTR_COUNTER__
+	: public memory::Object<LogInfo>
+#endif
 	{
 	public:
 		LogLevel Level;

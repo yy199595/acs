@@ -177,9 +177,10 @@ namespace acs
 		}
 
 		int rpcId = request->GetRpcId();
+		std::unique_ptr<redis::Response> resp(response);
 		if(rpcId > 0)
 		{
-			this->OnResponse(rpcId, std::unique_ptr<redis::Response>(response));
+			this->OnResponse(rpcId, std::move(resp));
 		}
 	}
 
@@ -359,8 +360,11 @@ namespace acs
 
 	void RedisComponent::OnDestroy()
 	{
-//		this->Run("QUIT");
-//		this->SyncRun("QUIT");
+		while(!this->mRequests.empty())
+		{
+			this->mApp->Sleep();
+			LOG_DEBUG("wait redis command invoke => {}", this->mRequests.size());
+		}
 	}
 
 	bool RedisComponent::UnLock(const std::string& key)

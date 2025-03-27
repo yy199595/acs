@@ -80,7 +80,6 @@ namespace redis
 			if (this->mRequest != nullptr)
 			{
 				this->Write(*this->mRequest);
-				CONSOLE_LOG_DEBUG("resend => {}", this->mRequest->ToString())
 			}
 			return;
 		}
@@ -112,7 +111,7 @@ namespace redis
 			if (response == nullptr || !response->IsOk())
 			{
 				this->mSocket->Close();
-				CONSOLE_LOG_ERROR("auth redis user failure {}", response->ToString());
+				//CONSOLE_LOG_ERROR("auth redis user failure {}", response->ToString());
 				return false;
 			}
 		}
@@ -123,7 +122,7 @@ namespace redis
 			std::unique_ptr<redis::Response> response = this->ReadResponse(request);
 			if (response == nullptr || !response->IsOk())
 			{
-				CONSOLE_LOG_ERROR("select db:{}", this->mConfig.db);
+				//CONSOLE_LOG_ERROR("select db:{}", this->mConfig.db);
 				return false;
 			}
 		}
@@ -148,10 +147,10 @@ namespace redis
 #else
 		Asio::Context& context = this->mSocket->GetContext();
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
-		asio::post(context, [this, self, request = command.release()]
+		asio::post(context, [this, self, req = command.release()]
 		{
-			this->Write(*request);
-			this->mRequest.reset(request);
+			this->mRequest.reset(req);
+			this->Write(*this->mRequest);
 		});
 #endif
 
@@ -165,11 +164,13 @@ namespace redis
 	void Client::OnSendMessage(const Asio::Code& code)
 	{
 		this->Connect(5);
+		CONSOLE_LOG_WARN("[{}] send error", this->mClientId);
 	}
 
 	void Client::OnReadError(const Asio::Code& code)
 	{
 		this->Connect(5);
+		CONSOLE_LOG_WARN("[{}] read error", this->mClientId);
 	}
 
 	bool Client::OnMessage(std::istream& readStream, size_t size, redis::Element& element)
@@ -252,8 +253,7 @@ namespace redis
 				break;
 			}
 			default:
-			CONSOLE_LOG_ERROR("type:{}", element.type);
-				break;
+				return false;
 		}
 		return true;
 	}
@@ -311,7 +311,7 @@ namespace redis
 		std::unique_ptr<redis::Response> redisResponse = std::make_unique<redis::Response>();
 		if (!this->SendSync(*request))
 		{
-			LOG_ERROR("sync send redis cmd fail : {}", request->ToString());
+			//LOG_ERROR("sync send redis cmd fail : {}", request->ToString());
 			return redisResponse;
 		}
 		size_t readSize = 0;

@@ -9,10 +9,13 @@ namespace lua
 	class JsonValue
 	{
 	public:
+		explicit JsonValue(bool del) : mDelete(del) { }
 		~JsonValue();
 	public:
-		yyjson_mut_doc * doc;
-		yyjson_mut_val * val;
+		yyjson_mut_doc * doc = nullptr;
+		yyjson_mut_val * val = nullptr;
+	private:
+		bool mDelete;
 	};
 
 	namespace ljson
@@ -45,7 +48,7 @@ namespace lua
 
 		static bool write(lua_State* L, const char* buf, size_t len, bool numkeyable = false);
 
-		static bool write(lua_State* L, yyjson_doc * val, bool numkeyable = false);
+		//static bool write(lua_State* L, yyjson_doc * val, bool numkeyable = false);
 
 		static bool write(lua_State* L, yyjson_val* val, bool numkeyable = false);
 

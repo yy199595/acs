@@ -36,7 +36,7 @@ namespace acs
 		int Databases(com::array::string& response);
 		int Collections(const com::type_string& request, com::array::string& response);
 	private:
-		int UpdateData(const db::mongo::update & request, bool upsert, db::mongo::response& response);
+		int UpdateData(const db::mongo::update & request, bool upsert, bool multi, db::mongo::response& response);
 	private:
         std::string mBuffer;
 		class MongoDBComponent * mMongo;

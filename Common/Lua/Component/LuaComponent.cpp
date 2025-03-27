@@ -210,7 +210,7 @@ namespace acs
 		const std::string & path = iter1->second->FullPath;
 		if(luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
 		{
-			LOG_ERROR("[{}] {}", name, lua_tostring(this->mLuaEnv, -1));
+			LOG_ERROR("{}", lua_tostring(this->mLuaEnv, -1));
 			lua_pop(this->mLuaEnv, 1);
 			return nullptr;
 		}
@@ -329,6 +329,7 @@ namespace acs
 		{
 			iter->second->Call("OnUpdate", tick);
 		}
+
 	}
 
 	void LuaComponent::CheckModuleHotfix(const std::string& module)
@@ -359,10 +360,11 @@ namespace acs
 		LOG_INFO("load lua file [{}] ok", moduleInfo->LocalPath);
 	}
 
-	void LuaComponent::OnDestroy()
+	void LuaComponent::OnAppStop()
 	{
 		for(auto iter = this->mLuaModules.begin(); iter != this->mLuaModules.end(); iter++)
 		{
+			LOG_INFO("close {}", iter->first);
 			iter->second->Await("OnDestroy");
 		}
 	}
@@ -396,6 +398,20 @@ namespace acs
 		}
 		return lua_tonumber(this->mLuaEnv, -1);
 	}
+
+	void LuaComponent::CollectCollectgarbage() const
+	{
+		lua_settop(this->mLuaEnv, 0);
+		lua_getglobal(this->mLuaEnv, "collectgarbage");
+
+		lua_pushstring(this->mLuaEnv, "collect");
+		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
+		{
+			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+			lua_pop(this->mLuaEnv, 1);
+		}
+	}
+
 
 	void LuaComponent::OnRecord(json::w::Document& document)
 	{

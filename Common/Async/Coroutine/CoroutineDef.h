@@ -1,17 +1,16 @@
 #pragma once
-#include<list>
 #include<memory>
 #include<unordered_map>
-#include"Core/Pool/ArrayPool.h"
+#include"Context/context.h"
 #include"Util/Tools/NumberBuilder.h"
 #include"Entity/Component/IComponent.h"
-#include"Context/context.h"
 
-#define STACK_SIZE (1024 * 1024)
-#define SHARED_STACK_NUM 1 //共享栈个数
-
-#define COR_POOL_COUNT 100
-
+namespace cor
+{
+	constexpr int STACK_SIZE = 1024 * 1024; //共享栈大小
+	constexpr int SHARED_STACK_NUM = 8; //共享栈个数
+	constexpr int COROUTINE_CONTEXT_COUNT = 100; //TaskContext 对象池
+}
 
 namespace acs
 {
@@ -31,6 +30,7 @@ namespace acs
 		size_t GetCount() const { return this->mCoroutines.size(); }
 	private:
 		math::NumberPool<unsigned int> mNumPool;
+		std::queue<std::unique_ptr<TaskContext>> mObjectPool;
 		std::unordered_map<unsigned int, std::unique_ptr<TaskContext>> mCoroutines;
 	};
 }

@@ -12,7 +12,7 @@ namespace custom
 	class AsioThread : public std::enable_shared_from_this<AsioThread>
 	{
 	public:
-		AsioThread(int update = 10);
+		explicit AsioThread(int update = 10);
 		AsioThread(const AsioThread & t) = delete;
 		AsioThread(const AsioThread && t) = delete;
 	public:

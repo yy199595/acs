@@ -6,6 +6,8 @@ namespace acs
 {
 	TimerComponent::TimerComponent()
 	{
+		this->mDoneCount = 0;
+		this->mCancelCount = 0;
 		this->mNextUpdateTime = 0;
 	}
 
@@ -61,6 +63,7 @@ namespace acs
 		auto iter = this->mTimerMap.find(id);
 		if (iter != this->mTimerMap.end())
 		{
+			this->mCancelCount++;
             this->mTimerMap.erase(iter);
 			return true;
 		}
@@ -113,6 +116,16 @@ namespace acs
 		}
 	}
 
+	void TimerComponent::OnRecord(json::w::Document& document)
+	{
+		std::unique_ptr<json::w::Value> jsonValue = document.AddObject("timer");
+		{
+			jsonValue->Add("wait", this->mTimerMap.size());
+			jsonValue->Add("done", this->mDoneCount);
+			jsonValue->Add("cancel", this->mCancelCount);
+		}
+	}
+
 	void TimerComponent::OnFrameUpdate(long long nowTime) noexcept
 	{
 		while(!this->mLastFrameTriggerTimers.empty())
@@ -150,6 +163,7 @@ namespace acs
 		{
 			return false;
 		}
+		this->mDoneCount++;
 		iter->second->Invoke();
 		this->mTimerMap.erase(iter);
 		return true;

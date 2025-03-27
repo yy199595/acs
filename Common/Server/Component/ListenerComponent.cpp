@@ -17,6 +17,10 @@ namespace acs
 		: mSslCtx(asio::ssl::context::tlsv12_server)
 #endif
 	{
+		this->mSumCount.exchange(0);
+		this->mDoneCount.exchange(0);
+		this->mFailCount.exchange(0);
+
 		this->mAcceptor = nullptr;
 		this->mTcpListen = nullptr;
 		this->mThreadComponent = nullptr;
@@ -46,7 +50,7 @@ namespace acs
 			return false;
 		}
 		std::string ip;
-		unsigned short port = 0;
+		this->mExecutor = io.get_executor();
 		this->mAcceptor = std::make_unique<Asio::Acceptor>(io);
 #ifdef __ENABLE_OPEN_SSL__
 		if (!config.cert.empty() && !config.key.empty())
@@ -93,7 +97,7 @@ namespace acs
 		custom::ThreadSync<bool> threadSync;
 		asio::post(io, [&threadSync, this, config]
 			{
-				Asio::EndPoint ep(asio::ip::make_address(config.ip), config.port);
+				Asio::EndPoint ep(asio::ip::address(), config.port);
 				while (!this->mAcceptor->is_open())
 				{
 					try
@@ -127,7 +131,7 @@ namespace acs
 		}
 #endif
 		this->mConfig = config;
-		asio::post(io, [this] { this->Accept(); });
+		asio::post(this->mExecutor, [this] { this->Accept(); });
 		return true;
 	}
 
@@ -153,9 +157,11 @@ namespace acs
 		{
 			do
 			{
+				this->mSumCount++;
 				if (code.value() != Asio::OK)
 				{
 					sock->Destroy();
+					this->mFailCount++;
 					break;
 				}
 				sock->Init();
@@ -169,6 +175,7 @@ namespace acs
 						if (code1.value() != Asio::OK)
 						{
 							sock->Destroy();
+							this->mFailCount++;
 							return;
 						}
 						Asio::Context& io = this->mApp->GetContext();
@@ -177,6 +184,7 @@ namespace acs
 					break;
 				}
 #endif
+				this->mDoneCount++;
 #ifdef ONLY_MAIN_THREAD
 				this->OnAcceptSocket(sock);
 #else
@@ -184,15 +192,7 @@ namespace acs
 				asio::post(io, [this, sock] { this->OnAcceptSocket(sock); });
 #endif
 			} while (false);
-			if (this->mAcceptor != nullptr)
-			{
-#ifdef ONLY_MAIN_THREAD
-				this->Accept();
-#else
-				const Asio::Executor& executor = this->mAcceptor->get_executor();
-				asio::post(executor, [this] { this->Accept(); });
-#endif
-			}
+			asio::post(this->mExecutor, [this] { this->Accept(); });
 		};
 
 		this->mAcceptor->async_accept(sock->Get(), callback);
@@ -206,6 +206,17 @@ namespace acs
 		}
 	}
 
+	void ListenerComponent::OnRecord(json::w::Document& document)
+	{
+		std::string key = fmt::format("listen_{}", this->mConfig.name);
+		std::unique_ptr<json::w::Value> jsonValue = document.AddObject(key.c_str());
+		{
+			jsonValue->Add("sum", this->mSumCount.load(std::memory_order_relaxed));
+			jsonValue->Add("done", this->mDoneCount.load(std::memory_order_relaxed));
+			jsonValue->Add("fail", this->mFailCount.load(std::memory_order_relaxed));
+		}
+	}
+
 	bool ListenerComponent::StopListen()
 	{
 #ifdef ONLY_MAIN_THREAD
@@ -215,8 +226,7 @@ namespace acs
 		return code.value() == Asio::OK;
 #else
 		custom::ThreadSync<bool> threadSync;
-		const Asio::Executor & executor = this->mAcceptor->get_executor();
-		asio::post(executor, [&threadSync, this] ()
+		asio::post(this->mExecutor, [&threadSync, this] ()
 		{
 			Asio::Code code;
 			this->mAcceptor->close(code);

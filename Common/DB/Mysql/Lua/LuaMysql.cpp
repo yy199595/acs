@@ -7,7 +7,6 @@
 #include"LuaMysql.h"
 #include"Entity/Actor/App.h"
 #include"Mysql/Lua/LuaMysqlTask.h"
-#include"Proto/Include/Message.h"
 #include"Mysql/Component/MysqlDBComponent.h"
 #include"Proto/Component/ProtoComponent.h"
 using namespace acs;

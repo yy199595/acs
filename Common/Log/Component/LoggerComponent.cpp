@@ -82,6 +82,7 @@ namespace acs
 	void LoggerComponent::OnDestroy()
 	{
 		this->DropAllLog();
+		std::this_thread::sleep_for(std::chrono::seconds(1)); //等待日志保存
 	}
 
 	void LoggerComponent::Flush()
@@ -203,10 +204,10 @@ namespace acs
 					mongoConfig.mechanism = mongo::auth::SCRAM_SHA1;
 				}
 #ifdef __ENABLE_OPEN_SSL__
-				return mongoConfig.mechanism == mongo::auth::SCRAM_SHA1
-					   || mongoConfig.mechanism == mongo::auth::SCRAM_SHA256;
+				assert(mongoConfig.mechanism == mongo::auth::SCRAM_SHA1
+					   || mongoConfig.mechanism == mongo::auth::SCRAM_SHA256);
 #else
-				return config.mechanism == mongo::auth::SCRAM_SHA1;
+				assert(config.mechanism == mongo::auth::SCRAM_SHA1);
 #endif
 				logger->AddOutput<custom::MongoOutput>(mongoConfig);
 			}

@@ -65,7 +65,7 @@ namespace mongo
 	}
 
 	std::unique_ptr<Request> MongoFactory::Update(const std::string& table,
-			bson::Writer::Document& select, bson::Writer::Document& update,const char* tag, bool upsert)
+			bson::Writer::Document& select, bson::Writer::Document& update,const char* tag, bool upsert, bool multi)
 	{
 		std::unique_ptr<Request> mongoRequest;
 		MongoFactory::New(table, "update", mongoRequest);
@@ -75,7 +75,7 @@ namespace mongo
 				updateDocument.Add(tag, update);
 			}
 			bson::Writer::Document updateInfo;
-			updateInfo.Add("multi", false); //默认更新一个文档
+			updateInfo.Add("multi", multi); //默认更新一个文档
 			updateInfo.Add("upsert", upsert); //true不存在插入
 			updateInfo.Add("u", updateDocument);
 			updateInfo.Add("q", select);

@@ -4,7 +4,6 @@ local assert = _G.assert
 local log = require("Log")
 local app = require("App")
 local json = require("util.json")
-local Component = require("Component")
 
 local MONGO_DB = "MongoDB"
 local log_error = log.Error
@@ -12,7 +11,7 @@ local json_encode = json.encode
 local json_decode = json.decode
 local table_insert = table.insert
 
-local MongoComponent = Component()
+local MongoComponent = { }
 
 function MongoComponent:GetActorId()
     if app:HasComponent(MONGO_DB) then
@@ -49,7 +48,7 @@ function MongoComponent:Insert(tab, documents)
 end
 
 function MongoComponent:Save(tab, filter, document)
-    return self:Update(tab, filter, document, "$set", true)
+    return self:UpdateOne(tab, filter, document, "$set", true)
 end
 
 ---@param tab string
@@ -215,36 +214,62 @@ end
 ---@param update table
 ---@param tag string
 ---@return number
-function MongoComponent:Update(tab, select, update, cmd, upsert)
-    if select == nil or update == nil then
-        log_error("select=%s update=%s", select, update)
+function MongoComponent:Update(tab, filter, update, cmd, upsert)
+    if filter == nil or update == nil then
+        log_error("select={} update={}", filter, update)
         return
     end
     local request = {
         tab = tab,
         document = {
             cmd = cmd or "$set",
-            filter = json_encode(select),
+            filter = json_encode(filter),
             document = json_encode(update)
         },
+        multi = true,
         upsert = upsert or false,
     }
     local session = self:GetActorId()
     return app:Call(session, "MongoDB.Update", request)
 end
 
-function MongoComponent:Updates(tab, documents, tag)
+---@param tab string
+---@param select table|string
+---@param update table
+---@param tag string
+---@return number
+function MongoComponent:UpdateOne(tab, filter, update, cmd, upsert)
+    if filter == nil or update == nil then
+        log_error("select={} update={}", filter, update)
+        return
+    end
+    local request = {
+        tab = tab,
+        document = {
+            cmd = cmd or "$set",
+            filter = json_encode(filter),
+            document = json_encode(update)
+        },
+        multi = false,
+        upsert = upsert or false,
+    }
+    local session = self:GetActorId()
+    return app:Call(session, "MongoDB.Update", request)
+end
+
+function MongoComponent:Updates(tab, documents, cmd)
     local request = {
         tab = tab,
         document = { }
     }
+    cmd = cmd or "$set"
     for _, value in ipairs(documents) do
         local filter = json_encode(value.filter)
         local updater = json_encode(value.document)
         table_insert(request.document, {
             filter = filter,
             document = updater,
-            cmd = value.cmd or "$set"
+            cmd = value.cmd or cmd
         })
     end
     local session = self:GetActorId()
@@ -253,7 +278,7 @@ end
 
 function MongoComponent:UpdateById(tab, id, update, tag)
     local filter = { _id = id }
-    return self:Update(tab, filter, update, tag)
+    return self:UpdateOne(tab, filter, update, tag)
 end
 
 ---@param tab string
@@ -262,7 +287,7 @@ end
 ---@param value any
 ---@return number
 function MongoComponent:Push(tab, select, field, value)
-    return self:Update(tab, select, {
+    return self:UpdateOne(tab, select, {
         [field] = value
     }, "$push")
 end
@@ -335,7 +360,7 @@ end
 ---@param upsert boolean
 ---@return number
 function MongoComponent:PushSet(tab, filter, field, value, upsert)
-    return self:Update(tab, filter, {
+    return self:UpdateOne(tab, filter, {
         [field] = value
     }, "$addToSet", upsert or false)
 end
@@ -345,7 +370,7 @@ end
 ---@param field string
 ---@return number
 function MongoComponent:DelArray(tab, filter, field, value)
-    return self:Update(tab, filter, {
+    return self:UpdateOne(tab, filter, {
         [field] = value
     }, "$pull", false)
 end

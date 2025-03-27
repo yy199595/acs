@@ -6,7 +6,7 @@
 #include"Entity/Component/Component.h"
 namespace acs
 {
-    class TimerComponent final : public Component, public ISystemUpdate, public IFrameUpdate
+	class TimerComponent final : public Component, public ISystemUpdate, public IFrameUpdate, public IServerRecord
 	{
 	 public:
 		TimerComponent();
@@ -30,6 +30,7 @@ namespace acs
 		bool Awake() final;
 		void OnSystemUpdate() noexcept final;
 		void OnFrameUpdate(long long) noexcept final;
+		void OnRecord(json::w::Document &document) final;
 		bool InvokeTimer(long long timerId);
 		bool AddTimerToWheel(long long timerId);
 		bool AddTimerToWheel(std::unique_ptr<TimerBase> timer);
@@ -39,6 +40,8 @@ namespace acs
 		const int OtherLayerCount = 32;
 		const int FirstLayerCount = 256;
 	 private:
+		int mDoneCount;
+		int mCancelCount;
 		long long mNextUpdateTime;
 		std::list<long long> mUpdateTimer;
 		std::vector<TimeWheelLayer*> mTimerLayers;

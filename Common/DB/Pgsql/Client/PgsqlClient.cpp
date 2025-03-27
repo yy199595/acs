@@ -97,8 +97,8 @@ namespace pgsql
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
 		asio::post(context, [self, this, req = request.release()]()
 		{
-			this->Write(*req);
 			this->mRequest.reset(req);
+			this->Write(*this->mRequest);
 		});
 	}
 
@@ -418,7 +418,7 @@ namespace pgsql
 				return;
 			}
 		}
-		else if(this->Auth(false))
+		else if(this->Auth(false) == XCode::Ok)
 		{
 			if(this->mRequest != nullptr)
 			{

@@ -1118,6 +1118,7 @@ const ::google::protobuf::uint32 TableStruct_s2s_2fdb_2eproto::offsets[] PROTOBU
   PROTOBUF_FIELD_OFFSET(::db::mongo_update, tab_),
   PROTOBUF_FIELD_OFFSET(::db::mongo_update, document_),
   PROTOBUF_FIELD_OFFSET(::db::mongo_update, upsert_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_update, multi_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::db::mongo_response, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -1335,34 +1336,34 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 135, -1, sizeof(::db::mongo_updater)},
   { 143, -1, sizeof(::db::mongo_updates)},
   { 150, -1, sizeof(::db::mongo_update)},
-  { 158, -1, sizeof(::db::mongo_response)},
-  { 164, -1, sizeof(::db::mongo_inc_request)},
-  { 170, -1, sizeof(::db::mongo_inc_response)},
-  { 176, -1, sizeof(::db::mongo_inc)},
-  { 181, -1, sizeof(::db::mongo_find_modify_request)},
-  { 190, -1, sizeof(::db::mongo_find_modify_response)},
-  { 196, -1, sizeof(::db::mongo_find_modify)},
-  { 201, -1, sizeof(::db::mongo_command_request)},
-  { 209, -1, sizeof(::db::mongo_command_response)},
-  { 215, -1, sizeof(::db::mongo_command)},
-  { 220, -1, sizeof(::db::mongo_merge_request)},
-  { 228, -1, sizeof(::db::mongo_merge_response)},
-  { 234, -1, sizeof(::db::mongo_merge)},
-  { 239, -1, sizeof(::db::mongo)},
-  { 244, -1, sizeof(::db::sql_create)},
-  { 251, -1, sizeof(::db::sql_index)},
-  { 260, -1, sizeof(::db::sql_exec)},
-  { 266, -1, sizeof(::db::sql_insert)},
-  { 274, -1, sizeof(::db::sql_save)},
-  { 282, -1, sizeof(::db::sql_query_request)},
-  { 291, -1, sizeof(::db::sql_query_page)},
-  { 302, -1, sizeof(::db::sql_query_response)},
-  { 309, -1, sizeof(::db::sql_query)},
-  { 314, -1, sizeof(::db::sql_del)},
-  { 323, -1, sizeof(::db::sql_inc)},
-  { 330, -1, sizeof(::db::sql_update)},
-  { 340, -1, sizeof(::db::sql_response)},
-  { 347, -1, sizeof(::db::sql)},
+  { 159, -1, sizeof(::db::mongo_response)},
+  { 165, -1, sizeof(::db::mongo_inc_request)},
+  { 171, -1, sizeof(::db::mongo_inc_response)},
+  { 177, -1, sizeof(::db::mongo_inc)},
+  { 182, -1, sizeof(::db::mongo_find_modify_request)},
+  { 191, -1, sizeof(::db::mongo_find_modify_response)},
+  { 197, -1, sizeof(::db::mongo_find_modify)},
+  { 202, -1, sizeof(::db::mongo_command_request)},
+  { 210, -1, sizeof(::db::mongo_command_response)},
+  { 216, -1, sizeof(::db::mongo_command)},
+  { 221, -1, sizeof(::db::mongo_merge_request)},
+  { 229, -1, sizeof(::db::mongo_merge_response)},
+  { 235, -1, sizeof(::db::mongo_merge)},
+  { 240, -1, sizeof(::db::mongo)},
+  { 245, -1, sizeof(::db::sql_create)},
+  { 252, -1, sizeof(::db::sql_index)},
+  { 261, -1, sizeof(::db::sql_exec)},
+  { 267, -1, sizeof(::db::sql_insert)},
+  { 275, -1, sizeof(::db::sql_save)},
+  { 283, -1, sizeof(::db::sql_query_request)},
+  { 292, -1, sizeof(::db::sql_query_page)},
+  { 303, -1, sizeof(::db::sql_query_response)},
+  { 310, -1, sizeof(::db::sql_query)},
+  { 315, -1, sizeof(::db::sql_del)},
+  { 324, -1, sizeof(::db::sql_inc)},
+  { 331, -1, sizeof(::db::sql_update)},
+  { 341, -1, sizeof(::db::sql_response)},
+  { 348, -1, sizeof(::db::sql)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -1424,7 +1425,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_s2s_2fdb_2eproto[] =
-  "\n\014s2s/db.proto\022\002db\"\262\013\n\005mongo\032(\n\006insert\022\013"
+  "\n\014s2s/db.proto\022\002db\"\301\013\n\005mongo\032(\n\006insert\022\013"
   "\n\003tab\030\001 \001(\t\022\021\n\tdocuments\030\002 \003(\t\032\312\002\n\004find\032"
   "E\n\007request\022\013\n\003tab\030\001 \001(\t\022\r\n\005limit\030\003 \001(\005\022\016"
   "\n\006filter\030\002 \001(\t\022\016\n\006fields\030\004 \003(\t\032^\n\004page\022\013"
@@ -1449,41 +1450,42 @@ const char descriptor_table_protodef_s2s_2fdb_2eproto[] =
   "\006unique\030\004 \001(\010\0328\n\007updater\022\013\n\003cmd\030\001 \001(\t\022\016\n"
   "\006filter\030\002 \001(\t\022\020\n\010document\030\003 \001(\t\032;\n\007updat"
   "es\022\013\n\003tab\030\001 \001(\t\022#\n\010document\030\002 \003(\0132\021.db.m"
-  "ongo.updater\032J\n\006update\022\013\n\003tab\030\001 \001(\t\022#\n\010d"
+  "ongo.updater\032Y\n\006update\022\013\n\003tab\030\001 \001(\t\022#\n\010d"
   "ocument\030\002 \001(\0132\021.db.mongo.updater\022\016\n\006upse"
-  "rt\030\003 \001(\010\032\031\n\010response\022\r\n\005count\030\001 \001(\005\0328\n\003i"
-  "nc\032\026\n\007request\022\013\n\003key\030\001 \001(\t\032\031\n\010response\022\r"
-  "\n\005value\030\001 \001(\005\032s\n\013find_modify\032F\n\007request\022"
-  "\013\n\003tab\030\001 \001(\t\022\016\n\006filter\030\002 \001(\t\022\016\n\006update\030\003"
-  " \001(\t\022\016\n\006fields\030\004 \003(\t\032\034\n\010response\022\020\n\010docu"
-  "ment\030\001 \001(\t\032^\n\007command\0325\n\007request\022\013\n\003tab\030"
-  "\001 \001(\t\022\013\n\003cmd\030\002 \001(\t\022\020\n\010document\030\003 \001(\t\032\034\n\010"
-  "response\022\020\n\010document\030\001 \001(\t\032[\n\005merge\0328\n\007r"
-  "equest\022\r\n\005field\030\001 \001(\t\022\016\n\006source\030\002 \001(\t\022\016\n"
-  "\006target\030\003 \001(\t\032\030\n\010response\022\014\n\004uuid\030\001 \001(\t\""
-  "\274\005\n\003sql\032%\n\006create\022\r\n\005table\030\001 \001(\t\022\014\n\004keys"
-  "\030\002 \003(\t\032@\n\005index\022\013\n\003tab\030\001 \001(\t\022\014\n\004name\030\002 \001"
-  "(\t\022\014\n\004sort\030\003 \001(\005\022\016\n\006unique\030\004 \001(\010\032\023\n\004exec"
-  "\022\013\n\003sql\030\001 \001(\t\0327\n\006insert\022\014\n\004flag\030\001 \001(\005\022\r\n"
-  "\005table\030\002 \001(\t\022\020\n\010document\030\003 \001(\t\0321\n\004save\022\014"
-  "\n\004flag\030\001 \001(\005\022\r\n\005table\030\002 \001(\t\022\014\n\004data\030\003 \001("
-  "\t\032\342\001\n\005query\032G\n\007request\022\r\n\005table\030\001 \001(\t\022\r\n"
-  "\005limit\030\002 \001(\005\022\016\n\006filter\030\003 \001(\t\022\016\n\006fields\030\004"
-  " \003(\t\032b\n\004page\022\r\n\005table\030\001 \001(\t\022\r\n\005limit\030\002 \001"
-  "(\005\022\016\n\006filter\030\003 \001(\t\022\016\n\006sorter\030\004 \001(\t\022\014\n\004pa"
-  "ge\030\005 \001(\005\022\016\n\006fields\030\006 \003(\t\032,\n\010response\022\r\n\005"
-  "error\030\001 \001(\t\022\021\n\tdocuments\030\002 \003(\014\032A\n\003del\022\014\n"
+  "rt\030\003 \001(\010\022\r\n\005multi\030\004 \001(\010\032\031\n\010response\022\r\n\005c"
+  "ount\030\001 \001(\005\0328\n\003inc\032\026\n\007request\022\013\n\003key\030\001 \001("
+  "\t\032\031\n\010response\022\r\n\005value\030\001 \001(\005\032s\n\013find_mod"
+  "ify\032F\n\007request\022\013\n\003tab\030\001 \001(\t\022\016\n\006filter\030\002 "
+  "\001(\t\022\016\n\006update\030\003 \001(\t\022\016\n\006fields\030\004 \003(\t\032\034\n\010r"
+  "esponse\022\020\n\010document\030\001 \001(\t\032^\n\007command\0325\n\007"
+  "request\022\013\n\003tab\030\001 \001(\t\022\013\n\003cmd\030\002 \001(\t\022\020\n\010doc"
+  "ument\030\003 \001(\t\032\034\n\010response\022\020\n\010document\030\001 \001("
+  "\t\032[\n\005merge\0328\n\007request\022\r\n\005field\030\001 \001(\t\022\016\n\006"
+  "source\030\002 \001(\t\022\016\n\006target\030\003 \001(\t\032\030\n\010response"
+  "\022\014\n\004uuid\030\001 \001(\t\"\274\005\n\003sql\032%\n\006create\022\r\n\005tabl"
+  "e\030\001 \001(\t\022\014\n\004keys\030\002 \003(\t\032@\n\005index\022\013\n\003tab\030\001 "
+  "\001(\t\022\014\n\004name\030\002 \001(\t\022\014\n\004sort\030\003 \001(\005\022\016\n\006uniqu"
+  "e\030\004 \001(\010\032\023\n\004exec\022\013\n\003sql\030\001 \001(\t\0327\n\006insert\022\014"
+  "\n\004flag\030\001 \001(\005\022\r\n\005table\030\002 \001(\t\022\020\n\010document\030"
+  "\003 \001(\t\0321\n\004save\022\014\n\004flag\030\001 \001(\005\022\r\n\005table\030\002 \001"
+  "(\t\022\014\n\004data\030\003 \001(\t\032\342\001\n\005query\032G\n\007request\022\r\n"
+  "\005table\030\001 \001(\t\022\r\n\005limit\030\002 \001(\005\022\016\n\006filter\030\003 "
+  "\001(\t\022\016\n\006fields\030\004 \003(\t\032b\n\004page\022\r\n\005table\030\001 \001"
+  "(\t\022\r\n\005limit\030\002 \001(\005\022\016\n\006filter\030\003 \001(\t\022\016\n\006sor"
+  "ter\030\004 \001(\t\022\014\n\004page\030\005 \001(\005\022\016\n\006fields\030\006 \003(\t\032"
+  ",\n\010response\022\r\n\005error\030\001 \001(\t\022\021\n\tdocuments\030"
+  "\002 \003(\014\032A\n\003del\022\014\n\004flag\030\001 \001(\005\022\r\n\005table\030\002 \001("
+  "\t\022\016\n\006filter\030\003 \001(\t\022\r\n\005limit\030\004 \001(\005\032!\n\003inc\022"
+  "\013\n\003key\030\001 \001(\t\022\r\n\005count\030\002 \001(\005\032V\n\006update\022\014\n"
   "\004flag\030\001 \001(\005\022\r\n\005table\030\002 \001(\t\022\016\n\006filter\030\003 \001"
-  "(\t\022\r\n\005limit\030\004 \001(\005\032!\n\003inc\022\013\n\003key\030\001 \001(\t\022\r\n"
-  "\005count\030\002 \001(\005\032V\n\006update\022\014\n\004flag\030\001 \001(\005\022\r\n\005"
-  "table\030\002 \001(\t\022\016\n\006filter\030\003 \001(\t\022\020\n\010document\030"
-  "\004 \001(\t\022\r\n\005limit\030\005 \001(\005\032(\n\010response\022\r\n\005erro"
-  "r\030\001 \001(\t\022\r\n\005count\030\002 \001(\rb\006proto3"
+  "(\t\022\020\n\010document\030\004 \001(\t\022\r\n\005limit\030\005 \001(\005\032(\n\010r"
+  "esponse\022\r\n\005error\030\001 \001(\t\022\r\n\005count\030\002 \001(\rb\006p"
+  "roto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_s2s_2fdb_2eproto = {
   false, InitDefaults_s2s_2fdb_2eproto, 
   descriptor_table_protodef_s2s_2fdb_2eproto,
-  "s2s/db.proto", &assign_descriptors_table_s2s_2fdb_2eproto, 2190,
+  "s2s/db.proto", &assign_descriptors_table_s2s_2fdb_2eproto, 2205,
 };
 
 void AddDescriptors_s2s_2fdb_2eproto() {
@@ -9191,6 +9193,7 @@ mongo_update::HasBitSetters::document(const mongo_update* msg) {
 const int mongo_update::kTabFieldNumber;
 const int mongo_update::kDocumentFieldNumber;
 const int mongo_update::kUpsertFieldNumber;
+const int mongo_update::kMultiFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 mongo_update::mongo_update()
@@ -9211,7 +9214,9 @@ mongo_update::mongo_update(const mongo_update& from)
   } else {
     document_ = nullptr;
   }
-  upsert_ = from.upsert_;
+  ::memcpy(&upsert_, &from.upsert_,
+    static_cast<size_t>(reinterpret_cast<char*>(&multi_) -
+    reinterpret_cast<char*>(&upsert_)) + sizeof(multi_));
   // @@protoc_insertion_point(copy_constructor:db.mongo.update)
 }
 
@@ -9220,8 +9225,8 @@ void mongo_update::SharedCtor() {
       &scc_info_mongo_update_s2s_2fdb_2eproto.base);
   tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&document_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&upsert_) -
-      reinterpret_cast<char*>(&document_)) + sizeof(upsert_));
+      reinterpret_cast<char*>(&multi_) -
+      reinterpret_cast<char*>(&document_)) + sizeof(multi_));
 }
 
 mongo_update::~mongo_update() {
@@ -9254,7 +9259,9 @@ void mongo_update::Clear() {
     delete document_;
   }
   document_ = nullptr;
-  upsert_ = false;
+  ::memset(&upsert_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&multi_) -
+      reinterpret_cast<char*>(&upsert_)) + sizeof(multi_));
   _internal_metadata_.Clear();
 }
 
@@ -9304,6 +9311,13 @@ const char* mongo_update::_InternalParse(const char* begin, const char* end, voi
       case 3: {
         if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
         msg->set_upsert(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // bool multi = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
+        msg->set_multi(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
@@ -9380,6 +9394,19 @@ bool mongo_update::MergePartialFromCodedStream(
         break;
       }
 
+      // bool multi = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &multi_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -9428,6 +9455,11 @@ void mongo_update::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->upsert(), output);
   }
 
+  // bool multi = 4;
+  if (this->multi() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->multi(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -9462,6 +9494,11 @@ void mongo_update::SerializeWithCachedSizes(
   // bool upsert = 3;
   if (this->upsert() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->upsert(), target);
+  }
+
+  // bool multi = 4;
+  if (this->multi() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->multi(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -9504,6 +9541,11 @@ size_t mongo_update::ByteSizeLong() const {
     total_size += 1 + 1;
   }
 
+  // bool multi = 4;
+  if (this->multi() != 0) {
+    total_size += 1 + 1;
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -9541,6 +9583,9 @@ void mongo_update::MergeFrom(const mongo_update& from) {
   if (from.upsert() != 0) {
     set_upsert(from.upsert());
   }
+  if (from.multi() != 0) {
+    set_multi(from.multi());
+  }
 }
 
 void mongo_update::CopyFrom(const ::google::protobuf::Message& from) {
@@ -9572,6 +9617,7 @@ void mongo_update::InternalSwap(mongo_update* other) {
     GetArenaNoVirtual());
   swap(document_, other->document_);
   swap(upsert_, other->upsert_);
+  swap(multi_, other->multi_);
 }
 
 ::google::protobuf::Metadata mongo_update::GetMetadata() const {

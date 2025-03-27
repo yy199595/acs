@@ -1,10 +1,9 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+﻿
 #include"TimeHelper.h"
 #include<chrono>
 #include<ctime>
 #include<sstream>
 #include <iomanip>
-#include <regex>
 
 using namespace std::chrono;
 
@@ -12,31 +11,27 @@ namespace help
 {
     long long Time::ScaleTotalTime = 0;
 
-	Time::Date Time::GetTimeDate(long long t)
+	void Time::GetTimeDate(Time::Date & timeDate, long long t)
 	{
-		time_t t1 = t;
-		if(t1 == 0)
-		{
-			t1 = NowSec();
-		}
-		Time::Date timeData;
+		time_t t1 = t == 0 ? NowSec() : t;
 		std::tm * tm1 = std::localtime(&t1);
 		{
-			timeData.Day = tm1->tm_mday;
-			timeData.Hour = tm1->tm_hour;
-			timeData.Minute = tm1->tm_min;
-			timeData.Second = tm1->tm_sec;
-			timeData.Month = tm1->tm_mon + 1;
-			timeData.Week = tm1->tm_wday + 1;
-			timeData.Year = tm1->tm_year + 1900;
+			timeDate.Day = tm1->tm_mday;
+			timeDate.Hour = tm1->tm_hour;
+			timeDate.Minute = tm1->tm_min;
+			timeDate.Second = tm1->tm_sec;
+			timeDate.Month = tm1->tm_mon + 1;
+			timeDate.Week = tm1->tm_wday + 1;
+			timeDate.Year = tm1->tm_year + 1900;
 		}
-		return timeData;
 	}
 
 	bool Time::IsSameDay(long long t1, long long t2)
 	{
-		Time::Date timeData1 = GetTimeDate(t1);
-		Time::Date timeData2 = GetTimeDate(t2);
+		Time::Date timeData1;
+		Time::Date timeData2;
+		GetTimeDate(timeData1, t1);
+		GetTimeDate(timeData2, t2);
 		return timeData1.Year == timeData2.Year && timeData1.Month == timeData2.Month && timeData1.Day == timeData2.Day;
 	}
 
@@ -169,7 +164,7 @@ namespace help
 
     std::string Time::GetYearMonthDayString(long long t)
     {
-        char str[100];
+        char str[100] = { 0 };
         if(t == 0)
 		{
 			t = NowSec();

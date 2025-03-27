@@ -200,9 +200,6 @@ namespace mongo
 		const bson::Reader::Document & document2 = response2->Document();
 		if (!document2.Get("payload", parsedSource))
 		{
-#ifdef __DEBUG__
-			CONSOLE_LOG_ERROR("{}", response2->ToString());
-#endif
 			return false;
 		}
 		bool done = false;
@@ -254,7 +251,6 @@ namespace mongo
 		std::unique_ptr<Response> response1 = this->SyncSendMongoCommand(request1);
 		if (response1 == nullptr)
 		{
-			CONSOLE_LOG_ERROR("saslStart failed: response is null");
 			return false;
 		}
 
@@ -263,7 +259,6 @@ namespace mongo
 		const bson::Reader::Document & document1 = response1->Document();
 		if (!document1.Get("payload", server_first) || !document1.Get("conversationId", conversationId))
 		{
-			CONSOLE_LOG_ERROR("{}", response1->ToString());
 			return false;
 		}
 
@@ -272,7 +267,6 @@ namespace mongo
 		help::Str::Split(parsedSource, ',', ret);
 		if (ret.size() < 3)
 		{
-			CONSOLE_LOG_ERROR("{}", parsedSource);
 			return false;
 		}
 
@@ -282,7 +276,6 @@ namespace mongo
 
 		if (rnonce.find(nonce) != 0)
 		{
-			CONSOLE_LOG_ERROR("Server nonce {} does not start with client nonce {}", rnonce, nonce);
 			return false;
 		}
 
@@ -332,9 +325,6 @@ namespace mongo
 		const bson::Reader::Document & document2 = response2->Document();
 		if (!document2.Get("payload", parsedSource2))
 		{
-#ifdef __DEBUG__
-			CONSOLE_LOG_ERROR("saslContinue response: {}", response2->ToString());
-#endif
 			return false;
 		}
 
@@ -356,7 +346,6 @@ namespace mongo
 		std::unique_ptr<Response> response3 = this->SyncSendMongoCommand(request3);
 		if (response3 == nullptr)
 		{
-			CONSOLE_LOG_ERROR("Final saslContinue failed: response is null");
 			return false;
 		}
 
@@ -365,9 +354,6 @@ namespace mongo
 		{
 			return true;
 		}
-#ifdef __DEBUG__
-		CONSOLE_LOG_ERROR("Final response: {}", response3->ToString());
-#endif
 		return false;
 	}
 
@@ -415,7 +401,7 @@ namespace mongo
 			this->mResponse.reset();
 			return;
 		}
-		if (code != XCode::Ok && request->GetRpcId() != response->RpcId())
+		if (request->GetRpcId() != response->RpcId())
 		{
 			response->SetRpcId(request->GetRpcId());
 		}
@@ -441,14 +427,14 @@ namespace mongo
 #else
 		Asio::Context& context = this->mSocket->GetContext();
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
-		asio::post(context, [this, self, data = request.release()]
+		asio::post(context, [this, self, req = request.release()]
 		{
-			if(data->dataBase.empty())
+			if(req->dataBase.empty())
 			{
-				data->dataBase = this->mConfig.db;
+				req->dataBase = this->mConfig.db;
 			}
-			this->mRequest.reset(data);
-			this->Write(*data);
+			this->mRequest.reset(req);
+			this->Write(*this->mRequest);
 		});
 #endif
 	}
@@ -535,7 +521,6 @@ namespace mongo
 			if (this->mRequest != nullptr)
 			{
 				this->Write(*this->mRequest);
-				CONSOLE_LOG_DEBUG("resend => {}", this->mRequest->ToString())
 			}
 			return;
 		}
@@ -561,7 +546,6 @@ namespace mongo
 			if (!this->ConnectSync(code))
 			{
 				const std::string& addr = this->mConfig.address;
-				CONSOLE_LOG_ERROR("connect mongo server {} fail {}", addr, code.message());
 				return false;
 			}
 		}

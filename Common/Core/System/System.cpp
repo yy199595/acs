@@ -216,7 +216,11 @@ namespace os
 		}
 		return fmt::format("{}/{}", mWorkPath, path);
     }
-
+#ifdef __OS_WIN__
+	// 全局变量保存上一次的CPU时间
+	static ULONGLONG lastSysTime = 0;
+	static ULONGLONG lastProcTime = 0;
+#endif
 	bool System::GetSystemInfo(SystemInfo& systemInfo)
 	{
 #ifdef __OS_MAC__
@@ -277,25 +281,47 @@ namespace os
 #else
 		HANDLE hProcess = GetCurrentProcess();
 		FILETIME ftSysIdle, ftSysKernel, ftSysUser, ftProcCreation, ftProcExit, ftProcKernel, ftProcUser;
-		if (GetSystemTimes(&ftSysIdle, &ftSysKernel, &ftSysUser) && GetProcessTimes(hProcess, &ftProcCreation, &ftProcExit, &ftProcKernel, &ftProcUser))
+
+		// 初始化默认值
+		systemInfo.cpu = 0.0;
+		systemInfo.use_memory = 0;
+		systemInfo.max_memory = 0;
+
+		if (GetSystemTimes(&ftSysIdle, &ftSysKernel, &ftSysUser) &&
+			GetProcessTimes(hProcess, &ftProcCreation, &ftProcExit, &ftProcKernel, &ftProcUser))
 		{
-			ULONGLONG sysKernel = static_cast<ULONGLONG>(ftSysKernel.dwHighDateTime) << 32 | ftSysKernel.dwLowDateTime;
-			ULONGLONG sysUser = static_cast<ULONGLONG>(ftSysUser.dwHighDateTime) << 32 | ftSysUser.dwLowDateTime;
-			ULONGLONG procKernel = static_cast<ULONGLONG>(ftProcKernel.dwHighDateTime) << 32 | ftProcKernel.dwLowDateTime;
-			ULONGLONG procUser = static_cast<ULONGLONG>(ftProcUser.dwHighDateTime) << 32 | ftProcUser.dwLowDateTime;
+			ULONGLONG sysKernel = (ULONGLONG(ftSysKernel.dwHighDateTime) << 32) | ftSysKernel.dwLowDateTime;
+			ULONGLONG sysUser = (ULONGLONG(ftSysUser.dwHighDateTime) << 32) | ftSysUser.dwLowDateTime;
+			ULONGLONG procKernel = (ULONGLONG(ftProcKernel.dwHighDateTime) << 32) | ftProcKernel.dwLowDateTime;
+			ULONGLONG procUser = (ULONGLONG(ftProcUser.dwHighDateTime) << 32) | ftProcUser.dwLowDateTime;
+
 			ULONGLONG sysTime = sysKernel + sysUser;
 			ULONGLONG procTime = procKernel + procUser;
-			systemInfo.cpu = procTime / (double)sysTime;
+
+			if (lastSysTime > 0 && lastProcTime > 0) {
+				ULONGLONG sysTimeDiff = sysTime - lastSysTime;
+				ULONGLONG procTimeDiff = procTime - lastProcTime;
+
+				if (sysTimeDiff > 0) {
+					systemInfo.cpu = (procTimeDiff / double(sysTimeDiff)) * 100.0;
+				}
+			}
+
+			lastSysTime = sysTime;
+			lastProcTime = procTime;
 		}
 
 		PROCESS_MEMORY_COUNTERS pmc;
-		GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc));
-		systemInfo.use_memory = (long long)pmc.WorkingSetSize;
+		pmc.cb = sizeof(PROCESS_MEMORY_COUNTERS);
+		if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
+			systemInfo.use_memory = (long long)pmc.WorkingSetSize; // 单位：字节
+		}
 
 		MEMORYSTATUSEX memStatus;
 		memStatus.dwLength = sizeof(memStatus);
-		GlobalMemoryStatusEx(&memStatus);
-		systemInfo.max_memory = (long long)memStatus.ullTotalPhys;
+		if (GlobalMemoryStatusEx(&memStatus)) {
+			systemInfo.max_memory = (long long)memStatus.ullTotalPhys; // 单位：字节
+		}
         CloseHandle(hProcess);
 #endif
 		return true;

@@ -13,6 +13,8 @@
 #include "Oss/Component/OssComponent.h"
 #include "Async/Component/CoroutineComponent.h"
 #include "Mongo/Component/MongoDBComponent.h"
+#include "Util/Tools/TimeHelper.h"
+
 namespace acs
 {
 	MongoBackup::MongoBackup()

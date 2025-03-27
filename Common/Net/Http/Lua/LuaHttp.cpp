@@ -168,7 +168,7 @@ namespace lua
         if (lua_isstring(lua, 2))
         {
             const char *data = luaL_checklstring(lua, 2, &size);
-            request->SetContent(http::Header::JSON, data, size);
+            request->SetContent(http::Header::TEXT, data, size);
         }
         else if (lua_istable(lua, 2))
         {

@@ -8,6 +8,9 @@
 #include "DB/Common/Explain.h"
 #include "Proto/Message/IProto.h"
 
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
 namespace pgsql
 {
 	constexpr unsigned int VERSION = 196608;
@@ -135,6 +138,9 @@ namespace pgsql
 namespace pgsql
 {
 	class Request : public tcp::IProto
+#ifdef __SHARE_PTR_COUNTER__
+		, public memory::Object<Request>
+#endif
 	{
 	public:
 		explicit Request(std::string sql) :  mRpcId(0), mType(pgsql::type::query), mMessage(std::move(sql)) { }
@@ -156,6 +162,9 @@ namespace pgsql
 namespace pgsql
 {
 	class Response
+#ifdef __SHARE_PTR_COUNTER__
+	: public memory::Object<Response>
+#endif
 	{
 	public:
 		int count = 0;
@@ -170,6 +179,9 @@ namespace pgsql
 namespace pgsql
 {
 	class Result : public tcp::IProto
+#ifdef __SHARE_PTR_COUNTER__
+		, public memory::Object<Result>
+#endif
 	{
 	public:
 		Result();

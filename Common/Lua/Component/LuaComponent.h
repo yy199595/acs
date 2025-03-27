@@ -1,8 +1,6 @@
 #pragma once
-#include<set>
 #include<memory>
 #include<unordered_map>
-#include<Core/Event/IEvent.h>
 #include"Lua/Module/LuaModule.h"
 #include"Lua/Config/LuaConfig.h"
 #include"Entity/Component/Component.h"
@@ -21,7 +19,7 @@ namespace acs
 
 	class LuaComponent final : public Component,
 							   public IStart, public IComplete, public IHotfix,
-							   public IServerRecord, public IDestroy, public ISecondUpdate
+							   public IServerRecord, public IAppStop, public ISecondUpdate
 	{
 	public:
 		LuaComponent();
@@ -33,7 +31,7 @@ namespace acs
 		bool Awake() final;
 		void OnStart() final;
 		bool LateAwake() final;
-		void OnDestroy() final;
+		void OnAppStop() final;
 		void OnComplete() final;
 		bool OnHotFix() final;
 		void OnSecondUpdate(int tick) noexcept final;
@@ -42,6 +40,7 @@ namespace acs
 		void LoadAllLib();
 		bool LoadAllFile();
 		void RegisterLuaClass();
+		void CollectCollectgarbage() const;
 		void AddRequire(const std::string & direct);
 		void CheckModuleHotfix(const std::string & module);
 	private:

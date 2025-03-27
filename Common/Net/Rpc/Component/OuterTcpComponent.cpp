@@ -38,12 +38,6 @@ namespace acs
 		if(iter != this->mGateClientMap.end())
 		{
 			iter->second->BindPlayer(userId);
-#if __DEBUG__
-			os::SystemInfo systemInfo;
-			os::System::GetSystemInfo(systemInfo);
-			double mb = (double )systemInfo.use_memory / (1024 * 1024.0f);
-			LOG_DEBUG("[{}] user({}) login ok => {:.3f}MB", this->mGateClientMap.size(), userId, mb);
-#endif
 		}
 	}
 

@@ -9,31 +9,30 @@ namespace acs
 {
 
 	ThreadComponent::ThreadComponent()
-		: mThreadCount(0)
 	{
-
+		this->mIndex = -1;
 	}
 
     bool ThreadComponent::Awake()
 	{
-		this->mThreadCount = 1;
-#ifdef __OS_LINUX__
+		size_t count = 2;
 		std::unique_ptr<json::r::Value> jsonObject;
-		this->mThreadCount = std::thread::hardware_concurrency();
 		if(ServerConfig::Inst()->Get("core", jsonObject))
 		{
-			jsonObject->Get("thread", this->mThreadCount);
+			if(!jsonObject->Get("thread", count))
+			{
+				count = std::thread::hardware_concurrency();
+			}
 		}
-#endif
-		for (int index = 0; index < this->mThreadCount; index++)
+		for (int index = 0; index < count; index++)
 		{
 			std::shared_ptr<custom::AsioThread> netThread = std::make_shared<custom::AsioThread>();
 			{
 				netThread->Start(index + 1, "net");
-				this->mNetThreads.emplace(netThread);
+				this->mNetThreads.emplace_back(netThread);
 			}
 		}
-		printf("thread count = %d\n", this->mThreadCount);
+		printf("thread count = %d\n", count);
 		return true;
 	}
 
@@ -45,15 +44,24 @@ namespace acs
 			std::shared_ptr<custom::AsioThread> netThread = this->mNetThreads.front();
 			{
 				netThread->Stop();
-				this->mNetThreads.pop();
 			}
+			this->mNetThreads.clear();
 		}
 #endif
 	}
 
 	void ThreadComponent::OnRecord(json::w::Document& document)
 	{
-		document.AddObject("thread")->Add("count", this->mThreadCount);
+		long long nowTime = help::Time::NowSec();
+		std::lock_guard<std::mutex> lock(this->mLock);
+		std::unique_ptr<json::w::Value> jsonValue = document.AddObject("thread");
+		for(const std::shared_ptr<custom::AsioThread> & netThread : this->mNetThreads)
+		{
+			std::string key = std::to_string(netThread->GetId());
+			long long invite = nowTime - netThread->GetLastTime();
+			jsonValue->Add(key.c_str(), invite);
+		}
+		jsonValue->Add("count", this->mNetThreads.size());
 	}
 
     Asio::Context& ThreadComponent::GetContext()
@@ -61,10 +69,15 @@ namespace acs
 #ifdef ONLY_MAIN_THREAD
 		return this->mApp->GetContext();
 #else
-		std::shared_ptr<custom::AsioThread> netThread = this->mNetThreads.front();
+		std::lock_guard<std::mutex> lock(this->mLock);
+		size_t index = this->mIndex++;
+		if(index >= this->mNetThreads.size())
 		{
-			this->mNetThreads.pop();
-			this->mNetThreads.emplace(netThread);
+			index = 0;
+			this->mIndex = 0;
+		}
+		std::shared_ptr<custom::AsioThread> & netThread = this->mNetThreads.at(index);
+		{
 			return netThread->Context();
 		}
 #endif

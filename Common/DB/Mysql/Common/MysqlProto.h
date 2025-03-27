@@ -9,6 +9,10 @@
 #include"Proto/Message/IProto.h"
 #include "Mysql/Common/MysqlCommon.h"
 
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
+
 namespace mysql
 {
 	inline int ReadLength(const char * header)
@@ -34,6 +38,9 @@ namespace mysql
 namespace mysql
 {
 	class Request : public tcp::IProto
+#ifdef __SHARE_PTR_COUNTER__
+		, public memory::Object<Request>
+#endif
 	{
 	public:
 		explicit Request(char cmd);
@@ -93,6 +100,9 @@ namespace mysql
 namespace mysql
 {
 	class Response
+#ifdef __SHARE_PTR_COUNTER__
+	: public memory::Object<Request>
+#endif
 	{
 	public:
 		Response();

@@ -9,6 +9,7 @@
 #include "Yyjson/Document/Document.h"
 #include "Lua/Component/LuaComponent.h"
 #include "Server/Component/ConfigComponent.h"
+#include "Core/Event/IEvent.h"
 
 #ifdef __SHARE_PTR_COUNTER__
 

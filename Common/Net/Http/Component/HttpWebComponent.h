@@ -45,6 +45,7 @@ namespace acs
 		void OnRecord(json::w::Document& document) final;
 	private:
 		void StartClose(int id, int) final;
+		void OnClientError(int id, int code) final;
 		bool OnListen(tcp::Socket *socket) noexcept final;
 		void OnReadHead(http::Request *request, http::Response *response) noexcept final;
 		void OnMessage(http::Request * request, http::Response * response) noexcept final;

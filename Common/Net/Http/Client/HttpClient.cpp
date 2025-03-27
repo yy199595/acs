@@ -122,9 +122,6 @@ namespace http
 
 	void Client::OnSendMessage(const asio::error_code &code)
 	{
-#ifdef __OS_WIN__
-		CONSOLE_LOG_ERROR(code.message());
-#endif
 		this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
 	}
 
@@ -149,14 +146,8 @@ namespace http
 		{
 			return;
 		}
-		http::Request* request = std::move(this->mRequest).release();
-		http::Response* response = std::move(this->mResponse).release();
-		if (response->Code() != HttpStatus::OK && response->Code() != HttpStatus::FOUND)
-		{
-			//LOG_ERROR("http request : {}", request->ToString())
-			//LOG_ERROR("http response : {}", response->ToString())
-		}
-
+		http::Request* request = this->mRequest.release();
+		http::Response* response = this->mResponse.release();
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(request, response);
 #else

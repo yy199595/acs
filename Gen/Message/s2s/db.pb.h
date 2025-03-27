@@ -3193,6 +3193,12 @@ class mongo_update :
   bool upsert() const;
   void set_upsert(bool value);
 
+  // bool multi = 4;
+  void clear_multi();
+  static const int kMultiFieldNumber = 4;
+  bool multi() const;
+  void set_multi(bool value);
+
   // @@protoc_insertion_point(class_scope:db.mongo.update)
  private:
   class HasBitSetters;
@@ -3201,6 +3207,7 @@ class mongo_update :
   ::google::protobuf::internal::ArenaStringPtr tab_;
   ::db::mongo_updater* document_;
   bool upsert_;
+  bool multi_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2fdb_2eproto;
 };
@@ -9379,6 +9386,20 @@ inline void mongo_update::set_upsert(bool value) {
   
   upsert_ = value;
   // @@protoc_insertion_point(field_set:db.mongo.update.upsert)
+}
+
+// bool multi = 4;
+inline void mongo_update::clear_multi() {
+  multi_ = false;
+}
+inline bool mongo_update::multi() const {
+  // @@protoc_insertion_point(field_get:db.mongo.update.multi)
+  return multi_;
+}
+inline void mongo_update::set_multi(bool value) {
+  
+  multi_ = value;
+  // @@protoc_insertion_point(field_set:db.mongo.update.multi)
 }
 
 // -------------------------------------------------------------------

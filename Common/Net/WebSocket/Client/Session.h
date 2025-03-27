@@ -2,8 +2,8 @@
 // Created by 64658 on 2025/1/2.
 //
 
-#ifndef APP_HTTPSESSION_H
-#define APP_SESSION_H
+#ifndef APP_WS_SESSION_H
+#define APP_WS_SESSION_H
 #include "Network/Tcp/Client.h"
 #include "Entity/Component/IComponent.h"
 #include "WebSocket/Common/WebSocketMessage.h"
@@ -59,4 +59,4 @@ namespace ws
 
 
 
-#endif //APP_HTTPSESSION_H
+#endif //APP_WS_SESSION_H

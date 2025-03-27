@@ -23,7 +23,7 @@ namespace acs
 			{
 				return 0;
 			}
-			return this->Resume(co->mCoroutineId);
+			return this->Resume(co->id);
 		}
 		inline unsigned int Start(std::function<void()>&& func) noexcept
 		{
@@ -34,7 +34,7 @@ namespace acs
 				{
 					return 0;
 				}
-				return this->Resume(co->mCoroutineId);
+				return this->Resume(co->id);
 			}
 		}
 	 public:
@@ -53,7 +53,7 @@ namespace acs
 		inline unsigned int GetContextId() const
 		{
 			return this->mRunContext == nullptr ? 0 :
-				   this->mRunContext->mCoroutineId;
+				   this->mRunContext->id;
 		}
 		size_t Count() const { return this->mCorPool.GetCount(); }
 	 private:
@@ -64,9 +64,9 @@ namespace acs
 		TaskContextPool mCorPool;
 		TaskContext* mRunContext;
 		tb_context_t mMainContext;
-		Stack mSharedStack[SHARED_STACK_NUM];
 		std::queue<unsigned int> mLastQueues;
 		class TimerComponent * mTimerComponent;
+		Stack mSharedStack[cor::SHARED_STACK_NUM];
         std::queue<TaskContext  *> mResumeContexts;
 	};
 }

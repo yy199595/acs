@@ -58,7 +58,7 @@ namespace Lua
 		inline int OnDestroy(lua_State* lua)
 		{
 			PtrProxy<T>::Destroy(lua, -1);
-			//printf("destory object %s\n", typeid(T).name());
+			//printf("destroy object %s\n", typeid(T).name());
 			return 0;
 		}
 	}// namespace ClassMateProxy

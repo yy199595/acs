@@ -97,6 +97,15 @@ namespace acs
 		}
 	}
 
+	void PgsqlDBComponent::OnDestroy()
+	{
+		while(!this->mMessages.empty())
+		{
+			this->mApp->Sleep();
+			LOG_DEBUG("wait pgsql request invoke => {}", this->mMessages.size());
+		}
+	}
+
 	bool PgsqlDBComponent::DecodeUrl(const std::string& url, pgsql::Config& config)
 	{
 		if (!config.Decode(url))
@@ -178,7 +187,7 @@ namespace acs
 	void PgsqlDBComponent::OnSendFailure(int id, pgsql::Request* message)
 	{
 		this->Send(std::unique_ptr<pgsql::Request>(message));
-		LOG_WARN("[{}] resend pgsql => {}", message->ToString())
+		LOG_WARN("[{}] resend pgsql => {}", id, message->ToString())
 	}
 
 	void PgsqlDBComponent::OnExplain(const std::string& sql, long long ms) noexcept
@@ -208,6 +217,7 @@ namespace acs
 		this->mSumCount++;
 		this->AddFreeClient(id);
 		int rpcId = request->GetRpcId();
+		std::unique_ptr<pgsql::Response> resp(response);
 		if (!response->mError.empty())
 		{
 			LOG_ERROR("[request] {}", request->ToString());
@@ -236,7 +246,7 @@ namespace acs
 		}
 		if (rpcId > 0)
 		{
-			this->OnResponse(rpcId, std::unique_ptr<pgsql::Response>(response));
+			this->OnResponse(rpcId, std::move(resp));
 		}
 	}
 
