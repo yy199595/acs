@@ -24,8 +24,8 @@
 #include "Util/Zip/Zip.h"
 #include "Mysql/Lua/LuaMysql.h"
 #include "Pgsql/Lua/LuaPgsql.h"
-#include "Util/Tools/StringStream.h"
-
+#include "Node/Lua/LuaNode.h"
+#include "Router/Lua/LuaRouter.h"
 namespace lua
 {
 
@@ -190,25 +190,58 @@ namespace lua
     {
         luaL_Reg l[] = {
             {"Stop", acs::LuaActor::Stop},
-            {"Send", acs::LuaActor::Send},
-            {"Call", acs::LuaActor::Call},
-            {"GetPath", acs::LuaActor::GetPath},
-            {"NewGuid", acs::LuaActor::NewGuid},
-            {"NewUuid", acs::LuaActor::NewUuid},
-            {"Publish", acs::LuaActor::Publish},
-            {"AddListen", acs::LuaActor::AddListen},
-            {"GetListen", acs::LuaActor::GetListen},
-            {"GetConfig", acs::LuaActor::GetConfig},
-            {"GetServers", acs::LuaActor::GetServers},
-			{"AllInfo", acs::LuaActor::AllInfo},
-            {"MakeServer", acs::LuaActor::MakeServer},
-			{"RemoveServer", acs::LuaActor::RemoveServer},
-            {"HasComponent", acs::LuaActor::HasComponent},
+            {"GetPath", acs::LuaApp::GetPath},
+            {"NewGuid", acs::LuaApp::NewGuid},
+            {"NewUuid", acs::LuaApp::NewUuid},
+            {"GetConfig", acs::LuaApp::GetConfig},
+            {"HasComponent", acs::LuaApp::HasComponent},
             {nullptr, nullptr}
         };
         luaL_newlib(L, l);
         return 1;
     }
+
+	int lib::luaopen_lactor(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{"Send", acs::LuaActor::Send},
+				{"Call", acs::LuaActor::Call},
+				{"Broadcast", acs::LuaActor::Broadcast},
+				{nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
+	}
+
+	int lib::luaopen_lnode(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{"next", lua::node::Next },
+				{"rand", lua::node::Rand },
+				{"hash", lua::node::Hash },
+				{"query", lua::node::Query },
+				{"create", lua::node::Create },
+				{"remove", lua::node::Remove },
+				{"get_info", lua::node::AllInfo },
+				{"get_listen", lua::node::GetListen },
+				{"add_listen", lua::node::AddListen },
+				{"get_nodes", acs::LuaActor::GetServers},
+				{nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
+	}
+
+	int lib::luaopen_lrouter(lua_State* L)
+	{
+		luaL_Reg l[] = {
+				{"send", acs::LuaRouter::Send},
+				{"call", acs::LuaRouter::Call},
+				{nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
+	}
 }
 
 namespace lua
@@ -310,9 +343,9 @@ namespace lua
     int lib::luaopen_ltimer(lua_State* L)
     {
         luaL_Reg l[] = {
-            {"Add", lua::Timer::Add},
-            {"Remove", lua::Timer::Remove},
-            {"AddUpdate", lua::Timer::AddUpdate},
+            {"timeout", lua::Timer::Add},
+            {"cancel", lua::Timer::Remove},
+            {"update", lua::Timer::AddUpdate},
             {nullptr, nullptr}
         };
         luaL_newlib(L, l);

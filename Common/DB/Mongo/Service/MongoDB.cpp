@@ -4,7 +4,6 @@
 
 #include"MongoDB.h"
 #include"Entity/Actor/App.h"
-#include"Util/File/FileHelper.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Mongo/Client/MongoFactory.h"
 #include"Mongo/Component/MongoDBComponent.h"
@@ -25,24 +24,24 @@ namespace acs
 
 	bool MongoDB::OnInit()
 	{
-		BIND_SERVER_RPC_METHOD(MongoDB::Run);
-		BIND_SERVER_RPC_METHOD(MongoDB::Inc);
-		BIND_SERVER_RPC_METHOD(MongoDB::Find);
-		BIND_SERVER_RPC_METHOD(MongoDB::Count);
-		BIND_SERVER_RPC_METHOD(MongoDB::Insert);
-		BIND_SERVER_RPC_METHOD(MongoDB::Delete);
-		BIND_SERVER_RPC_METHOD(MongoDB::Update);
-		BIND_SERVER_RPC_METHOD(MongoDB::Facet);
-		BIND_SERVER_RPC_METHOD(MongoDB::GetMore);
-		BIND_SERVER_RPC_METHOD(MongoDB::Updates);
-		BIND_SERVER_RPC_METHOD(MongoDB::SetIndex);
-		BIND_SERVER_RPC_METHOD(MongoDB::FindOne);
-		BIND_SERVER_RPC_METHOD(MongoDB::FindPage);
-		BIND_SERVER_RPC_METHOD(MongoDB::Distinct);
-		BIND_SERVER_RPC_METHOD(MongoDB::Databases);
-		BIND_SERVER_RPC_METHOD(MongoDB::Aggregate);
-		BIND_SERVER_RPC_METHOD(MongoDB::Collections);
-		BIND_SERVER_RPC_METHOD(MongoDB::FindAndModify);
+		BIND_RPC_METHOD(MongoDB::Run);
+		BIND_RPC_METHOD(MongoDB::Inc);
+		BIND_RPC_METHOD(MongoDB::Find);
+		BIND_RPC_METHOD(MongoDB::Count);
+		BIND_RPC_METHOD(MongoDB::Insert);
+		BIND_RPC_METHOD(MongoDB::Delete);
+		BIND_RPC_METHOD(MongoDB::Update);
+		BIND_RPC_METHOD(MongoDB::Facet);
+		BIND_RPC_METHOD(MongoDB::GetMore);
+		BIND_RPC_METHOD(MongoDB::Updates);
+		BIND_RPC_METHOD(MongoDB::SetIndex);
+		BIND_RPC_METHOD(MongoDB::FindOne);
+		BIND_RPC_METHOD(MongoDB::FindPage);
+		BIND_RPC_METHOD(MongoDB::Distinct);
+		BIND_RPC_METHOD(MongoDB::Databases);
+		BIND_RPC_METHOD(MongoDB::Aggregate);
+		BIND_RPC_METHOD(MongoDB::Collections);
+		BIND_RPC_METHOD(MongoDB::FindAndModify);
 		LOG_CHECK_RET_FALSE(this->mMongo = this->GetComponent<MongoDBComponent>())
 		return true;
 	}
@@ -94,7 +93,6 @@ namespace acs
 		{
 			return XCode::Failure;
 		}
-
 		const bson::Reader::Document& readDocument = mongoResponse->Document();
 
 		std::unique_ptr<bson::Reader::Document> document1;
@@ -361,18 +359,17 @@ namespace acs
 			{
 				mongoRequest->document.Add("batchSize", request.batchsize());
 			}
+
+			mongoRequest->cmd = "getMore";
+			std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
+			if (mongoResponse == nullptr)
 			{
-				mongoRequest->cmd = "getMore";
-				std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
-				if (mongoResponse == nullptr)
-				{
-					return XCode::Failure;
-				}
-				response.set_cursor(mongoResponse->GetCursor());
-				for (const std::string& document: mongoResponse->GetResults())
-				{
-					response.add_documents(document);
-				}
+				return XCode::Failure;
+			}
+			response.set_cursor(mongoResponse->GetCursor());
+			for (const std::string& document: mongoResponse->GetResults())
+			{
+				response.add_documents(document);
 			}
 		}
 		return XCode::Ok;

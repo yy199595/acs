@@ -33,11 +33,11 @@ namespace acs
 		int OnRequest(rpc::Message * message);
 	private:
 		ListenConfig mConfig;
-		class ActorComponent * mActor;
+		class NodeComponent * mActor;
 		asio::streambuf mReceiveBuffer;
 		asio_udp::endpoint mRemotePoint;
 		class DispatchComponent * mDispatch;
-		std::unique_ptr<kcp::Server> mKcpServer;
+		std::shared_ptr<kcp::Server> mKcpServer;
 		std::unordered_map<int, std::shared_ptr<kcp::IClient>> mClients;
 	};
 }

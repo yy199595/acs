@@ -9,7 +9,7 @@
 
 namespace custom
 {
-	class AsioThread : public std::enable_shared_from_this<AsioThread>
+	class AsioThread
 	{
 	public:
 		explicit AsioThread(int update = 10);
@@ -21,18 +21,18 @@ namespace custom
 		Asio::Context & Context() { return mContext; }
 		inline int GetId() const { return this->mId; }
 		const std::string & Name() const { return this->mName; }
+		inline size_t GetEventCount() const { return this->mCount; }
 		inline long long GetLastTime() const { return this->mLastTime; }
 	private:
 		void Run();
-		void StartTimer();
 	private:
 		int mId;
 		int mUpdate;
+		size_t mCount;
 		std::string mName;
 		std::thread mThread;
 		long long mLastTime;
 		Asio::Context mContext;
-		asio::system_timer mTimer;
 	};
 }
 

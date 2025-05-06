@@ -1,7 +1,7 @@
 #include"TimeWheelLayer.h"
 namespace acs
 {
-    TimeWheelLayer::TimeWheelLayer(int layerId, int count, int min, int max)
+    TimeWheelLayer::TimeWheelLayer(int layerId, int count, unsigned int min,  unsigned int max)
         : mMin(min), mMax(max), mLayerId(layerId), mMaxCount(count)
     {
         this->mCurIndex = 0;
@@ -12,25 +12,21 @@ namespace acs
         }
     }
 
-    bool TimeWheelLayer::AddTimer(int tick, long long timerId)
+    bool TimeWheelLayer::AddTimer(unsigned int tick, long long timerId)
 	{
 		if (tick >= this->mMin && tick < this->mMax)
 		{
-			int index = this->mMin == 0 ? tick : (tick - this->mMin) / this->mMin;
+			unsigned int index = this->mMin == 0 ? tick : (tick - this->mMin) / this->mMin;
 
 			if (index + this->mCurIndex < this->mMaxCount)
 			{
 				index += this->mCurIndex;
 				this->mTimerSlot[index].push(timerId);
-//				printf("[layer = %d] [tick = %d] [curIndex = %d] [slot = %d]\n",
-//					this->mLayerId, tick, this->mCurIndex, index);
 			}
 			else
 			{
 				index = index + this->mCurIndex - this->mMaxCount;
 				this->mTimerSlot[index].push(timerId);
-//				printf("[layer = %d] [tick = %d] [curIndex = %d] [slot = %d]\n",
-//					this->mLayerId, tick, this->mCurIndex, index);
 			}
 			return true;
 		}
@@ -45,9 +41,4 @@ namespace acs
 		}
 		return this->mTimerSlot[this->mCurIndex++];
 	}
-
-    bool TimeWheelLayer::JumpNextLayer()
-    {
-        return this->mCurIndex >= this->mMaxCount;
-    }
 }// namespace Sentry

@@ -10,6 +10,8 @@
 #include "WebSocket/Client/Session.h"
 #include "Core/Event/IEvent.h"
 
+constexpr char msg_format = rpc::msg::json;
+
 namespace acs
 {
 	OuterWebSocketComponent::OuterWebSocketComponent()
@@ -24,7 +26,7 @@ namespace acs
 		int id = this->mClientPool.BuildNumber();
 		Asio::Context & io = this->mApp->GetContext();
 		std::shared_ptr<ws::Session> sessionClient
-				= std::make_unique<ws::Session>(id, this, io);
+				= std::make_unique<ws::Session>(id, this, io, msg_format);
 		{
 			sessionClient->StartReceive(socket);
 			this->mSessions.emplace(id, sessionClient);
@@ -44,14 +46,12 @@ namespace acs
 	void OuterWebSocketComponent::OnMessage(int id, rpc::Message* request, rpc::Message* response) noexcept
 	{
 		++this->mSumCount;
-		int code = this->mOuter->OnMessage(request);
-		if(code != XCode::Ok)
+		if(this->mOuter->OnMessage(request) != XCode::Ok)
 		{
 			auto iter = this->mSessions.find(id);
 			if(iter != this->mSessions.end())
 			{
 				iter->second->Stop();
-				this->mSessions.erase(iter);
 			}
 		}
 	}

@@ -11,6 +11,7 @@ namespace mongo
 {
 	struct BackupConfig : public json::Object<BackupConfig>
 	{
+		int batchSize;
 		oss::Config oss;
 		std::string path;
 		std::string upload; //上传路径
@@ -31,8 +32,6 @@ namespace acs
 		int Upload(const http::FromContent & request, json::w::Document & response);
 		int Backup(const http::FromContent & request, json::w::Document & response);
 		int Recover(const http::FromContent & request, json::w::Document & response);
-	private:
-		int GetTableCount(const std::string & tab);
 	private:
 		mongo::BackupConfig mConfig;
 		class MongoDBComponent* mMongo;

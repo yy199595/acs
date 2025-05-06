@@ -8,49 +8,19 @@
 #include"Core/Map/HashMap.h"
 #include"Rpc/Service/RpcService.h"
 #include "Yyjson/Object/JsonObject.h"
-namespace acs
-{
-	struct LoginInfo : public json::Object<LoginInfo>
-	{
-		std::string ip;
-		long long login_time;
-	};
 
-	struct FriendInfo : public json::Object<FriendInfo>
-	{
-		int id;
-		long long friend_id;
-		long long add_time;
-		std::vector<FriendInfo> friend_list;
-	};
-
-	struct PlayerAccountInfo : public json::Object<PlayerAccountInfo>
-	{
-		long long user_id;
-		std::string account;
-		std::string password;
-		long long create_time;
-		long long register_time;
-		LoginInfo login_info;
-		std::vector<int> item_list;
-		std::vector<FriendInfo> friend_list;
-		std::unordered_map<std::string, int> friend_sex;
-		std::unordered_map<std::string, FriendInfo> friend_map;
-	};
-}
 
 namespace acs
 {
 	class ChatSystem : public RpcService
 	{
 	private:
-		bool Awake() final;
 		bool OnInit() final;
 	private:
 		int OnPing(long long playerId);
 		int OnChat(long long playerId, const c2s::chat::request & request);
 	private:
-		class ActorComponent * mActor;
+		class PlayerComponent * mPlayerMgr;
 		custom::HashMap<long long, long long> mChatTime;
 	};
 }

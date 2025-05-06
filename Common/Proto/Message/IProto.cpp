@@ -1,6 +1,5 @@
 #include "IProto.h"
 #include "Util/Tools/Math.h"
-#include "Util/Tools/String.h"
 #include "Util/Tools/TimeHelper.h"
 #include "Yyjson/Document/Document.h"
 #include "Lua/Engine/UserDataParameter.h"
@@ -23,8 +22,12 @@ namespace tcp
 {
 	bool IHeader::Get(const std::string& k, int& v) const
 	{
-		auto iter = this->mHeader.find(k);
-		if(iter == this->mHeader.end())
+		auto iter = std::find_if(this->mHeader.begin(), this->mHeader.end(),
+				[&k](const std::pair<std::string, std::string>& item)
+				{
+					return item.first == k;
+				});
+		if (iter == this->mHeader.end())
 		{
 			return false;
 		}
@@ -33,18 +36,21 @@ namespace tcp
 
 	bool IHeader::Has(const std::string& k) const
 	{
-		auto iter = this->mHeader.find(k);
-		if(iter == this->mHeader.end())
-		{
-			return false;
-		}
-		return true;
+		return std::any_of(this->mHeader.begin(), this->mHeader.end(),
+				[&k](const std::pair<std::string, std::string>& item)
+				{
+					return item.first == k;
+				});
 	}
 
 	bool IHeader::Get(const std::string& k, long long& v) const
 	{
-		auto iter = this->mHeader.find(k);
-		if(iter == this->mHeader.end())
+		auto iter = std::find_if(this->mHeader.begin(), this->mHeader.end(),
+				[&k](const std::pair<std::string, std::string>& item)
+				{
+					return item.first == k;
+				});
+		if (iter == this->mHeader.end())
 		{
 			return false;
 		}
@@ -53,7 +59,11 @@ namespace tcp
 
 	bool IHeader::Get(const std::string& k, std::string& v) const
 	{
-		auto iter = this->mHeader.find(k);
+		auto iter = std::find_if(this->mHeader.begin(), this->mHeader.end(),
+				[&k](const std::pair<std::string, std::string>& item)
+				{
+					return item.first == k;
+				});
 		if (iter == this->mHeader.end())
 		{
 			return false;
@@ -65,34 +75,26 @@ namespace tcp
 
 	bool IHeader::IsEqual(const std::string& k, const std::string& v) const
 	{
-		auto iter = this->mHeader.find(k);
-		if(iter == this->mHeader.end())
+		auto iter = std::find_if(this->mHeader.begin(), this->mHeader.end(),
+				[&k](const std::pair<std::string, std::string>& item)
+				{
+					return item.first == k;
+				});
+		if (iter == this->mHeader.end())
 		{
 			return false;
 		}
 		return iter->second == v;
 	}
 
-	bool IHeader::Add(const std::string& k, int v)
+	void IHeader::Add(const std::string& k, int v)
 	{
-		auto iter = this->mHeader.find(k);
-		if(iter != this->mHeader.end())
-		{
-			return false;
-		}
-		this->mHeader.emplace(k, std::to_string(v));
-		return true;
+		this->mHeader.emplace_back(k, std::to_string(v));
 	}
 
-	bool IHeader::Add(const std::string& k, long long v)
+	void IHeader::Add(const std::string& k, long long v)
 	{
-		auto iter = this->mHeader.find(k);
-		if(iter != this->mHeader.end())
-		{
-			return false;
-		}
-		this->mHeader.emplace(k, std::to_string(v));
-		return true;
+		this->mHeader.emplace_back(k, std::to_string(v));
 	}
 
 	void IHeader::WriteLua(lua_State* l, const tcp::IHeader& header)
@@ -135,30 +137,38 @@ namespace tcp
 		return 1;
 	}
 
-	bool IHeader::Add(const std::string& k, const std::string& v)
+	void IHeader::Add(const std::string& k, const std::string& v)
 	{
 		if(k.empty() || v.empty())
 		{
-			return false;
+			return;
 		}
-		auto iter = this->mHeader.find(k);
-		if(iter != this->mHeader.end())
-		{
-			return false;
-		}
-		this->mHeader.emplace(k, v);
-		return true;
+		this->mHeader.emplace_back(k, v);
 	}
 
 	void IHeader::Set(const std::string& k, const std::string& v)
 	{
-		this->mHeader[k] = v;
+		auto iter = std::find_if(this->mHeader.begin(), this->mHeader.end(),
+				[&k](const std::pair<std::string, std::string>& item)
+				{
+					return item.first == k;
+				});
+		if (iter != this->mHeader.end())
+		{
+			iter->second = v;
+			return;
+		}
+		this->mHeader.emplace_back(k, v);
 	}
 
 	bool IHeader::Del(const std::string& k)
 	{
-		auto iter = this->mHeader.find(k);
-		if(iter == this->mHeader.end())
+		auto iter = std::find_if(this->mHeader.begin(), this->mHeader.end(),
+				[&k](const std::pair<std::string, std::string>& item)
+				{
+					return item.first == k;
+				});
+		if (iter == this->mHeader.end())
 		{
 			return false;
 		}
@@ -168,12 +178,16 @@ namespace tcp
 
 	bool IHeader::Del(const std::string& k, int& v)
 	{
-		auto iter = this->mHeader.find(k);
-		if(iter == this->mHeader.end())
+		auto iter = std::find_if(this->mHeader.begin(), this->mHeader.end(),
+				[&k](const std::pair<std::string, std::string>& item)
+				{
+					return item.first == k;
+				});
+		if (iter == this->mHeader.end())
 		{
 			return false;
 		}
-		if(!help::Math::ToNumber(iter->second, v))
+		if (!help::Math::ToNumber(iter->second, v))
 		{
 			return false;
 		}
@@ -183,8 +197,12 @@ namespace tcp
 
 	bool IHeader::Del(const std::string& k, std::string& v)
 	{
-		auto iter = this->mHeader.find(k);
-		if(iter == this->mHeader.end())
+		auto iter = std::find_if(this->mHeader.begin(), this->mHeader.end(),
+				[&k](const std::pair<std::string, std::string>& item)
+				{
+					return item.first == k;
+				});
+		if (iter == this->mHeader.end())
 		{
 			return false;
 		}

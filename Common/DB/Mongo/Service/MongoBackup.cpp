@@ -6,7 +6,7 @@
 #include "MongoBackup.h"
 #include "Util/Zip/Zip.h"
 #include "Core/System/System.h"
-#include "Entity/Actor/Server.h"
+#include "Node/Actor/Node.h"
 #include "Server/Config/ServerConfig.h"
 #include "Util/File/DirectoryHelper.h"
 #include "Util/File/FileHelper.h"
@@ -14,7 +14,9 @@
 #include "Async/Component/CoroutineComponent.h"
 #include "Mongo/Component/MongoDBComponent.h"
 #include "Util/Tools/TimeHelper.h"
-
+#include "Server/Component/ThreadComponent.h"
+#include "Async/Source/TaskSource.h"
+#include "Entity/Actor/App.h"
 namespace acs
 {
 	MongoBackup::MongoBackup()
@@ -22,11 +24,13 @@ namespace acs
 		this->mMongo = nullptr;
 		REGISTER_JSON_CLASS_MUST_FIELD(mongo::BackupConfig, oss);
 		REGISTER_JSON_CLASS_MUST_FIELD(mongo::BackupConfig, path);
+		REGISTER_JSON_CLASS_MUST_FIELD(mongo::BackupConfig, batchSize);
 		REGISTER_JSON_CLASS_MUST_FIELD(mongo::BackupConfig, collections);
 	}
 
 	bool MongoBackup::Awake()
 	{
+		this->mConfig.batchSize = 500;
 		return ServerConfig::Inst()->Get("mongo.backup", this->mConfig);
 	}
 
@@ -74,21 +78,6 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int MongoBackup::GetTableCount(const std::string& tab)
-	{
-		std::unique_ptr<mongo::Request> mongoRequest = std::make_unique<mongo::Request>();
-		{
-			int count = 0;
-			mongoRequest->GetCollection("count", tab);
-			std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
-			if (mongoResponse != nullptr && mongoResponse->Document().Get("n", count))
-			{
-				return count;
-			}
-		}
-		return 0;
-	}
-
 	int MongoBackup::Backup(const http::FromContent& request, json::w::Document& response)
 	{
 		std::string name;
@@ -113,9 +102,6 @@ namespace acs
 			unsigned int count = 0;
 			std::string jsonString;
 			std::unique_ptr<bson::Reader::Document> document1;
-			std::vector<std::unique_ptr<bson::Reader::Document>> results;
-
-			results.clear();
 			std::unique_ptr<mongo::Request> mongoRequest = std::make_unique<mongo::Request>();
 			{
 				bson::Writer::Document document;
@@ -135,21 +121,43 @@ namespace acs
 					break;
 				}
 				mongoRequest = std::make_unique<mongo::Request>();
-				mongoRequest->document.Add("getMore", mongoResponse->GetCursor());
-				mongoRequest->document.Add("collection", tab);
-				mongoRequest->cmd = "getMore";
+				{
+					mongoRequest->cmd = "getMore";
+					mongoRequest->document.Add("getMore", mongoResponse->GetCursor());
+					mongoRequest->document.Add("collection", tab);
+					if(this->mConfig.batchSize > 0)
+					{
+						mongoRequest->document.Add("batchSize", this->mConfig.batchSize);
+					}
+				}
 				mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 			}
 			jsonValue->Add(tab.c_str(), count);
 			ofs.close();
 		}
+
 		long long t2 = help::Time::NowMil();
+		Asio::Context & main = this->mApp->GetContext();
 		std::string zipPath = fmt::format("{}/{}.zip", this->mConfig.path, name);
-		if(help::zip::Create(dir, zipPath))
+		Asio::Context & context  = this->GetComponent<ThreadComponent>()->GetContext();
+		std::unique_ptr<TaskSource<bool>> waitTaskSource = std::make_unique<TaskSource<bool>>();
+		asio::post(context, [&main, dir, zipPath, taskSource = waitTaskSource.get()] ()
 		{
-			help::dir::RemoveAllFile(dir);
-		}
+			bool result = false;
+			if(help::zip::Create(dir, zipPath))
+			{
+				help::dir::RemoveAllFile(dir);
+			}
+			asio::post(main, [result, taskSource] { taskSource->SetResult(result); });
+		});
+
+		waitTaskSource->Await();
 		long long t3 = help::Time::NowMil();
+		std::unique_ptr<json::w::Value> timeObject = response.AddObject("time");
+		{
+			timeObject->Add("pull", fmt::format("{}ms", t2 - t1));
+			timeObject->Add("zip", fmt::format("{}ms", t3 - t2));
+		}
 		LOG_INFO("压缩时间 [{}ms]", t3 - t2);
 		LOG_INFO("[{:.2f}s]备份数据成功 => {}", (t2 - t1) / 1000.0f, doneCount)
 		return XCode::Ok;

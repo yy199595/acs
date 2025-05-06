@@ -6,7 +6,6 @@
 #include "MongoClient.h"
 #include "XCode/XCode.h"
 #include "Util/Crypt/sha1.h"
-#include "Util/Tools/TimeHelper.h"
 #include "Util/Crypt/MD5Helper.h"
 #include "Proto/Bson/base64.h"
 #include "Util/Tools/String.h"
@@ -406,7 +405,7 @@ namespace mongo
 			response->SetRpcId(request->GetRpcId());
 		}
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnMessage(id, request.release(), response.release());
+		this->mComponent->OnMessage(this->mClientId, request.get(), response.release());
 #else
 		mongo::Request* req = request.release();
 		mongo::Response* resp = response.release();
@@ -419,10 +418,14 @@ namespace mongo
 #endif
 	}
 
-	void Client::SendMongoCommand(std::unique_ptr<Request> request)
+	void Client::Send(std::unique_ptr<Request> request)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->mRequest = std::move(request);
+		if(this->mRequest->dataBase.empty())
+		{
+			this->mRequest->dataBase = this->mConfig.db;
+		}
 		this->Write(*this->mRequest);
 #else
 		Asio::Context& context = this->mSocket->GetContext();
@@ -464,6 +467,9 @@ namespace mongo
 
 	std::unique_ptr<mongo::Response> Client::SyncMongoCommand(std::unique_ptr<Request> request)
 	{
+#ifdef ONLY_MAIN_THREAD
+		return this->SyncSendMongoCommand(request);
+#else
 		custom::ThreadSync<bool> threadSync;
 		std::unique_ptr<mongo::Response> response;
 		Asio::Socket& sock = this->mSocket->Get();
@@ -475,6 +481,7 @@ namespace mongo
 		});
 		threadSync.Wait();
 		return response;
+#endif
 	}
 
 	std::unique_ptr<Response> Client::SyncSendMongoCommand(const std::unique_ptr<Request>& request)

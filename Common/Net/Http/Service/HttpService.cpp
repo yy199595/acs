@@ -3,7 +3,6 @@
 //
 #include"HttpService.h"
 #include"Yyjson/Lua/ljson.h"
-#include"Lua/Module/LuaModule.h"
 #include"Lua/Component/LuaComponent.h"
 #include"Rpc/Lua/LuaServiceTaskSource.h"
 

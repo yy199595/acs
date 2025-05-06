@@ -75,6 +75,8 @@ namespace acs
 		moduleRegistry.Open("util.base64", lua::lib::luaopen_lbase64);
 
 		moduleRegistry.Open("core.app", lua::lib::luaopen_lapp);
+		moduleRegistry.Open("core.node", lua::lib::luaopen_lnode);
+		moduleRegistry.Open("core.actor", lua::lib::luaopen_lactor);
 
 		moduleRegistry.Open("net.tcp", lua::lib::luaopen_ltcp);
 		moduleRegistry.Open("util.lxlsx", lua::lib::luaopen_lexcel);
@@ -88,6 +90,7 @@ namespace acs
 
 		os.PushMember("dir", os::System::WorkPath());
 		os.PushStaticFunction("setenv", os::System::LuaSetEnv);
+		os.PushExtensionFunction("run", LuaCore::Run);
 		os.PushExtensionFunction("get_system_info", LuaCore::GetSystemInfo);
 #ifdef __OS_MAC__
 		os.PushMember("platform", std::string("mac"));
@@ -182,6 +185,7 @@ namespace acs
 		classProxyHelper10.PushExtensionFunction("add_member", lua::ljson::add_member);
 		classProxyHelper10.PushExtensionFunction("add_object", lua::ljson::add_object);
 		classProxyHelper10.PushExtensionFunction("add_array", lua::ljson::add_array);
+
 	}
 
 	bool LuaComponent::LateAwake()
@@ -309,16 +313,15 @@ namespace acs
 		return true;
 	}
 
-	bool LuaComponent::OnHotFix()
+	bool LuaComponent::OnRefresh()
 	{
-		auto iter = this->mModulePaths.begin();
-		for (; iter != this->mModulePaths.end(); iter++)
+		for (auto iter = this->mModulePaths.begin(); iter != this->mModulePaths.end(); iter++)
 		{
-			this->CheckModuleHotfix(iter->first);
+			this->RefreshLuaModule(iter->first);
 		}
-		for(auto iter = this->mLuaModules.begin(); iter != this->mLuaModules.end(); iter++)
+		for(auto iter1 = this->mLuaModules.begin(); iter1 != this->mLuaModules.end(); iter1++)
 		{
-			iter->second->Await("OnHotFix");
+			iter1->second->Await("OnRefresh");
 		}
 		return true;
 	}
@@ -332,7 +335,7 @@ namespace acs
 
 	}
 
-	void LuaComponent::CheckModuleHotfix(const std::string& module)
+	void LuaComponent::RefreshLuaModule(const std::string& module)
 	{
 		auto iter = this->mModulePaths.find(module);
 		if (iter == this->mModulePaths.end())
@@ -418,7 +421,7 @@ namespace acs
 		std::unique_ptr<json::w::Value> jsonObject = document.AddObject("lua");
 		{
 			double memory = this->GetMemorySize();
-			jsonObject->Add("module", this->mModulePaths.size());
+			jsonObject->Add("module", this->mLuaModules.size());
 			jsonObject->Add("memory", fmt::format("{:.2f}KB", memory));
 		}
 	}

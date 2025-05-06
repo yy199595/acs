@@ -10,11 +10,7 @@
 #ifdef __ENABLE_OPEN_SSL__
 #include "openssl/sha.h"
 #endif
-#include <utility>
-#ifdef __OS_WIN__
-#else
-#include <arpa/inet.h>
-#endif
+
 namespace mysql
 {
 	Request::Request(char cmd)

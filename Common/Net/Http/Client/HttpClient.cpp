@@ -4,7 +4,6 @@
 #include <regex>
 #include "HttpClient.h"
 #include "Util/Tools/Guid.h"
-#include "Util/Tools/String.h"
 
 namespace http
 {
@@ -22,16 +21,15 @@ namespace http
 	void Client::Do(std::unique_ptr<http::Request> request,
 			std::unique_ptr<http::Response> response, int taskId)
 	{
+		this->mSockId = taskId;
 		this->mRequest = std::move(request);
 		this->mResponse = std::move(response);
-		this->mResponse->Header().Add("t", taskId);
 #ifdef ONLY_MAIN_THREAD
 		const http::Url &url = this->mRequest->GetUrl();
 		this->Connect(url.Host(), url.Port(), 5);
 #else
-		Asio::Socket& sock = this->mSocket->Get();
-		const Asio::Executor& executor = sock.get_executor();
-		asio::post(executor, [this, self = this->shared_from_this()]
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [this, self = this->shared_from_this()]
 		{
 			const http::Url& url = this->mRequest->GetUrl();
 			this->Connect(url.Host(), url.Port(), this->mRequest->Timeout());
@@ -103,16 +101,22 @@ namespace http
 	{
 		if (code.value() != Asio::OK)
 		{
-			const http::Url &url = this->mRequest->GetUrl();
+//			if(count <= 3)
+//			{
+//				this->Connect(3);
+//				return;
+//			}
 			this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
-			return;
 		}
-		this->StopTimer();
-		if (this->mRequest->Header().KeepAlive())
+		else
 		{
-			this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
+			this->StopTimer();
+			if (this->mRequest->Header().KeepAlive())
+			{
+				this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
+			}
+			this->Write(*this->mRequest);
 		}
-		this->Write(*this->mRequest);
 	}
 
 	void Client::OnSendMessage(size_t size)
@@ -133,10 +137,7 @@ namespace http
 		}
 		this->StopTimer();
 		this->mSocket->Close();
-		if (code != HttpStatus::OK)
-		{
-			this->mResponse->SetCode(code);
-		}
+		this->mResponse->SetCode(code);
 		http::Content* httpData = const_cast<http::Content*>(this->mResponse->GetBody());
 		if (httpData != nullptr)
 		{
@@ -152,21 +153,26 @@ namespace http
 		this->mComponent->OnMessage(request, response);
 #else
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
-		asio::post(this->mMainContext, [this, self, request, response] { this->mComponent->OnMessage(request, response); });
+		asio::post(this->mMainContext, [this, self, request, response]
+		{
+			this->mComponent->OnMessage(this->mSockId, request, response);
+			delete request;
+		});
 #endif
 	}
 
 	void Client::OnReadError(const Asio::Code &code)
 	{
-		if (this->mRecvBuffer.size() == 0)
+		HttpStatus status = HttpStatus::INTERNAL_SERVER_ERROR;
+		if(code == asio::error::eof)
 		{
-			if (code == asio::error::eof)
-			{
-				this->OnComplete(HttpStatus::OK);
-				return;
-			}
-			this->OnComplete(HttpStatus::BAD_REQUEST);
+			status = HttpStatus::OK;
 		}
+		else if(code == asio::error::timed_out)
+		{
+			status = HttpStatus::REQUEST_TIMEOUT;
+		}
+		this->OnComplete(status);
 	}
 
 	void Client::OnReceiveLine(std::istream &is, size_t size)
@@ -194,7 +200,7 @@ namespace http
 			break;
 		case tcp::read::big_long:
 		case tcp::read::decode_error: // 解析错误
-			this->OnComplete(HttpStatus::BAD_REQUEST);
+			this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
 			break;
 		default:
 			this->ReadLength(flag);

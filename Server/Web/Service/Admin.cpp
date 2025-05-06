@@ -9,7 +9,7 @@
 #include"Message/com/com.pb.h"
 #include"Util/File/FileHelper.h"
 #include"Util/Tools/TimeHelper.h"
-#include"Auth/Jwt/Jwt.h"
+#include "Timer/Timer/ElapsedTimer.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Mongo/Component/MongoComponent.h"
 namespace acs
@@ -32,24 +32,24 @@ namespace acs
 		BIND_COMMON_HTTP_METHOD(Admin::HttpInterface);
 
 		this->mProto = this->GetComponent<ProtoComponent>();
-		this->mActor = this->GetComponent<ActorComponent>();
+		this->mActor = this->GetComponent<NodeComponent>();
 		return true;
 	}
 
 	int Admin::Ping(const http::FromContent & request, json::w::Value & response)
 	{
 		int id = 0;
-		if(!request.Get("id", id))
+		Actor* node = App::Inst();
+		if(request.Get("id", id))
 		{
-			return XCode::CallArgsError;
-		}
-		Actor* server = this->mActor->GetActor(id);
-		if(server == nullptr)
-		{
-			return XCode::NotFoundActor;
+			node = this->mActor->Get(id);
+			if(node == nullptr)
+			{
+				return XCode::NotFoundActor;
+			}
 		}
 		long long t1 = help::Time::NowMil();
-		int code = server->Call("NodeSystem.Ping");
+		int code = node->Call("NodeSystem.Ping");
 		{
 			response.Add("time", help::Time::NowMil() - t1);
 		}
@@ -70,6 +70,20 @@ namespace acs
 		response.Add("name", methodConfig->fullname.c_str());
 		response.Add("service", methodConfig->service.c_str());
 
+		switch(methodConfig->proto)
+		{
+			case rpc::Proto::Protobuf:
+			{
+				std::string json;
+				pb::Message * request = this->mProto->Temp(methodConfig->request);
+				if(request && pb_json::MessageToJsonString(*request, &json, options).ok())
+				{
+					response.Add("req", json.c_str(), json.size());
+				}
+				response.Add("request", methodConfig->request.c_str());
+				break;
+			}
+		}
 		if(!methodConfig->request.empty())
 		{
 			std::string json;
@@ -89,7 +103,7 @@ namespace acs
 			{
 				response.Add("res", json.c_str(), json.size());
 			}
-			response.Add("response", methodConfig->response.c_str());
+			response.Add("response", methodConfig->response);
 		}
 
 		response.Add("open", methodConfig->open);
@@ -183,7 +197,7 @@ namespace acs
 		{
 			return XCode::CallArgsError;
 		}
-		Actor* server = this->mActor->GetActor(id);
+		Actor* server = this->mActor->Get(id);
 		if(server == nullptr)
 		{
 			return XCode::NotFoundActor;
@@ -199,7 +213,7 @@ namespace acs
 			response.Add("error", "not field:id");
 			return XCode::CallArgsError;
 		}
-		Actor* server = this->mActor->GetActor(id);
+		Actor* server = this->mActor->Get(id);
 		if(server == nullptr)
 		{
 			response.Add("error", "not find server");
@@ -227,17 +241,27 @@ namespace acs
 		{
 			serverActors.emplace_back(id);
 		}
+		else
+		{
+			this->mActor->GetNodes(serverActors);
+			serverActors.emplace_back(this->mApp->GetNodeId());
+		}
 
 		std::unique_ptr<json::w::Value> document = response.AddArray("list");
 		std::unique_ptr<com::type::json> result = std::make_unique<com::type::json>();
 		for(const int serverId : serverActors)
 		{
 			result->Clear();
-			if(Actor * server = this->mActor->GetActor(serverId))
+			if(Actor * server = this->mActor->Get(serverId))
 			{
+				timer::ElapsedTimer timer1;
 				if (server->Call("NodeSystem.RunInfo", result.get()) == XCode::Ok)
 				{
-					document->PushObject(result->json());
+					std::unique_ptr<json::w::Value> jsonValue;
+					if(document->PushObject(result->json(), jsonValue))
+					{
+						jsonValue->Add("ping", timer1.GetMs());
+					}
 				}
 			}
 		}

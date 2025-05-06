@@ -61,7 +61,7 @@ namespace _bson {
         bsonobj();
 
         ~bsonobj() {
-            _objdata = 0; // defensive
+            _objdata = nullptr; // defensive
         }
 
         /** Readable representation of a BSON object in an extended JSON-style notation.

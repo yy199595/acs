@@ -233,13 +233,13 @@ namespace acs
 		int level = 0;
 		LOG_ERROR_CHECK_ARGS(request.Get("id", id));
 		LOG_ERROR_CHECK_ARGS(request.Get("level", level));
-		Actor * targetServer = App::ActorMgr()->GetActor(id);
-		if(targetServer == nullptr)
+		Node * node = App::ActorMgr()->Get(id);
+		if(node == nullptr)
 		{
 			return XCode::NotFoundActor;
 		}
 		com::type::int32 message;
 		message.set_value(level);
-		return targetServer->Call("NodeSystem.SetLogLevel", message);
+		return node->Call("NodeSystem.SetLogLevel", message);
 	}
 }

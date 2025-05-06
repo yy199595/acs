@@ -76,7 +76,7 @@ namespace acs
 			{
 				return XCode::Ok;
 			}
-			return this->mComplaint->OnComplaint(*jsonData);
+			return this->mComplaint->OnComplaint(jsonData->JsonObject());
 		}
 		response.Text(text.c_str(), text.size());
 		return XCode::Ok;

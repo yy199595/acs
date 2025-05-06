@@ -24,9 +24,10 @@ namespace ws
 
 namespace ws
 {
-	Client::Client(int id, ws::Component* component, Asio::Context& main)
+	Client::Client(int id, ws::Component* component, Asio::Context& main, char msg)
 			: tcp::Client(1024 * 10), mSockId(id), mComponent(component), mMainContext(main)
 	{
+		this->mMsg = msg;
 		this->mHttpRequest = nullptr;
 		this->mHttpResponse = nullptr;
 	}
@@ -155,6 +156,7 @@ namespace ws
 			this->mStream.str("");
 			std::unique_ptr<ws::Message> wsMessage = std::make_unique<ws::Message>();
 			{
+				message->SetMsg(this->mMsg);
 				message->OnSendMessage(this->mStream);
 				wsMessage->SetBody(ws::OPCODE_BIN, this->mStream.str(), true);
 			}
@@ -229,11 +231,16 @@ namespace ws
 				auto self = this->shared_from_this();
 				const std::string & message = this->mMessage->GetMessageBody();
 				std::unique_ptr<rpc::Message> request = std::make_unique<rpc::Message>();
-				if(!request->Decode(message.c_str(), (int)message.size()))
 				{
-					this->Close(XCode::UnKnowPacket);
-					return;
+					request->SetMsg(this->mMsg);
+					std::stringstream buffer(message);
+					if(request->OnRecvMessage(buffer, message.size()) != 0)
+					{
+						this->Close(XCode::UnKnowPacket);
+						return;
+					}
 				}
+
 				request->SetNet(rpc::Net::Ws);
 				request->SetSockId(this->mSockId);
 				asio::post(this->mMainContext, [self, this, req = request.release()]

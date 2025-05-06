@@ -21,6 +21,15 @@ namespace mysql
 
 	int Client::Start(tcp::Socket* socket)
 	{
+#ifdef ONLY_MAIN_THREAD
+		if(socket == nullptr)
+		{
+			this->Connect(5);
+			return XCode::Ok;
+		}
+		this->SetSocket(socket);
+		return this->Auth(true);
+#else
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
 		if (socket == nullptr)
 		{
@@ -49,6 +58,8 @@ namespace mysql
 			threadSync.SetResult(code);
 		});
 		return threadSync.Wait();
+#endif
+
 	}
 
 	void Client::StartReceive()
@@ -260,7 +271,14 @@ namespace mysql
 			}
 			return;
 		}
-
+#ifdef ONLY_MAIN_THREAD
+		int id = this->mClientID;
+		this->mComponent->OnClientError(id, XCode::NetConnectFailure);
+		if (this->mMessage != nullptr)
+		{
+			this->mComponent->OnSendFailure(id, this->mMessage.release());
+		}
+#else
 		int id = this->mClientID;
 		asio::post(this->mMain, [this, self = this->shared_from_this(), id]
 		{
@@ -270,6 +288,8 @@ namespace mysql
 				this->mComponent->OnSendFailure(id, this->mMessage.release());
 			}
 		});
+#endif
+
 	}
 
 	void Client::OnSendMessage(const Asio::Code& code)
@@ -398,6 +418,11 @@ namespace mysql
 	{
 		std::unique_ptr<mysql::Response> response = this->ReadResponse();
 		{
+			
+#ifdef ONLY_MAIN_THREAD
+			std::unique_ptr<mysql::Request> request = std::move(this->mMessage);
+			this->mComponent->OnMessage(this->mClientID, request.get(), response.release());
+#else
 			mysql::Request* req = nullptr;
 			if (this->mMessage != nullptr)
 			{
@@ -405,10 +430,12 @@ namespace mysql
 			}
 			std::shared_ptr<tcp::Client> self = this->shared_from_this();
 			asio::post(this->mMain, [this, self, req, resp = response.release()]
-			{
-				this->mComponent->OnMessage(this->mClientID, req, resp);
-				delete req;
-			});
+				{
+					this->mComponent->OnMessage(this->mClientID, req, resp);
+					delete req;
+				});
+#endif
+			
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace sqlite
 namespace acs
 {
 	class SqlHelper;
-	class SqliteComponent final : public Component, public IDestroy, public IHotfix
+	class SqliteComponent final : public Component, public IDestroy, public IRefresh
 	{
 	public:
 		SqliteComponent();
@@ -35,7 +35,7 @@ namespace acs
 		bool Set(const std::string & key, const std::string & value);
 	private:
 		bool Awake() final;
-		bool OnHotFix() final;
+		bool OnRefresh() final;
 		bool LateAwake() final;
 		void OnDestroy() final;
 		bool InvokeSqlFromPath(const std::string & path);

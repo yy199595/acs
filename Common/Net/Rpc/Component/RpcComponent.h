@@ -19,7 +19,7 @@ namespace acs
         typedef IRpcTask<T> * RpcTask;
     public:
         template<typename T1>
-		inline T1 * AddTask(T1 * task, int timeout = 0)
+		inline T1 * AddTask(T1 * task)
         {
 			int k = task->GetRpcId();
 			assert(k != 0);
@@ -34,16 +34,16 @@ namespace acs
             return task;
         }
 		template<typename T1>
-		inline T1 * BuildRpcTask(int rpcId, int timeout = 0)
+		inline T1 * BuildRpcTask(int rpcId)
 		{
 			T1 * task = new T1(rpcId);
-			return this->AddTask(task, timeout);
+			return this->AddTask(task);
 		}
 
 		inline bool OnResponse(int key, std::unique_ptr<T> message);
 		inline size_t AwaitCount() const { return this->mTasks.size(); }
 		inline int BuildRpcId() { return this->mNumberPool.BuildNumber(); }
-		inline int CurrentRpcCount() { return this->mNumberPool.CurrentNumber(); }
+		inline long long CurrentRpcCount() { return this->mNumberPool.CurrentNumber(); }
 	protected:
 		void OnLastFrameUpdate(long long) noexcept final;
 		virtual void OnDelTask(int k) { }

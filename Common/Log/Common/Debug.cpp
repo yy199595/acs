@@ -3,11 +3,13 @@
 //
 #include"Debug.h"
 
+#ifdef __OS_LINUX__
+#include<execinfo.h>
+#endif
+
 #ifndef __OS_WIN__
 #include<cxxabi.h>
-#include <execinfo.h>
 #else
-
 #include <windows.h>
 #include <dbghelp.h>
 #include <codecvt>

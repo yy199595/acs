@@ -34,13 +34,12 @@ namespace http
 	public:
 		void Clear() final;
 		bool KeepAlive() const;
+		void SetKeepAlive(bool keep, int timeout);
 		bool GetContentType(std::string & type) const;
 		bool GetContentLength(long long & length) const;
 		int OnRecvMessage(std::istream &os, size_t size) final;
-		inline void SetKeepAlive(bool keep) { this->mKeepAlive = keep; }
     private:
 		int mCounter;
-		bool mKeepAlive;
     };
 }
 

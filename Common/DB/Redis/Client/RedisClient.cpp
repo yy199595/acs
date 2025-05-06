@@ -31,12 +31,13 @@ namespace redis
 	bool Client::Start(tcp::Socket * socket)
 	{
 #ifdef ONLY_MAIN_THREAD
-		Asio::Code code;
-		if(!this->ConnectSync(code))
+		if(socket == nullptr)
 		{
-			return false;
+			this->Connect(5);
+			return true;
 		}
-		return this->InitRedisClient(this->mConfig.Password);
+		this->SetSocket(socket);
+		return this->Auth(true);
 #else
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
 		if(socket == nullptr)
@@ -83,6 +84,13 @@ namespace redis
 			}
 			return;
 		}
+#ifdef ONLY_MAIN_THREAD
+		if(this->mRequest != nullptr)
+		{
+			this->mComponent->OnSendFailure(this->mClientId, this->mRequest.release());
+		}
+		this->mComponent->OnClientError(this->mClientId, XCode::NetConnectFailure);
+#else
 		auto self = this->shared_from_this();
 		asio::post(this->mMainContext, [this, self, id = this->mClientId]
 		{
@@ -92,6 +100,8 @@ namespace redis
 			}
 			this->mComponent->OnClientError(id, XCode::NetConnectFailure);
 		});
+#endif
+
 	}
 
 	bool Client::Auth(bool connect)
@@ -126,7 +136,6 @@ namespace redis
 				return false;
 			}
 		}
-
 
 		if(this->mRequest == nullptr)
 		{
@@ -275,7 +284,8 @@ namespace redis
 			is.readsome((char*)str.data(), count);
 		}
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnMessage(id, this->mRequest.release(), this->mResponse.release());
+		std::unique_ptr<redis::Request> request = std::move(this->mRequest);
+		this->mComponent->OnMessage(this->mClientId, request.get(), this->mResponse.release());
 #else
 		redis::Request* req = this->mRequest.release();
 		redis::Response* resp = this->mResponse.release();
@@ -290,7 +300,7 @@ namespace redis
 	std::unique_ptr<redis::Response> Client::Sync(std::unique_ptr<redis::Request> request)
 	{
 #ifdef ONLY_MAIN_THREAD
-		return this->ReadResponse(std::move(request));
+		return this->ReadResponse(request);
 #else
 		custom::ThreadSync<bool> threadSync;
 		std::unique_ptr<redis::Response> response;

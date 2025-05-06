@@ -10,7 +10,7 @@
 #include<string>
 #include<cstring>
 #include<cstdint>
-#include<unordered_map>
+#include<vector>
 #include <utility>
 struct lua_State;
 
@@ -63,7 +63,6 @@ namespace tcp
 		{
 			return {};
 		}
-		virtual size_t CalcMessageLength() { return 0; }
 		virtual int OnSendMessage(std::ostream& os) = 0; //返回剩余要发送的字节数
 		virtual int OnRecvMessage(std::istream& os, size_t size)
 		{
@@ -143,7 +142,7 @@ namespace tcp
 		}
 
 		template<typename T>
-		inline void Read(const char* buffer, T& value, size_t size = sizeof(T), bool endian = true) {
+		inline std::enable_if_t<std::is_integral<T>::value, void> Read(const char* buffer, T& value, size_t size = sizeof(T), bool endian = true) {
 			value = 0;
 
 			// 判断当前机器的字节序
@@ -160,7 +159,7 @@ namespace tcp
 		}
 
 		template<typename T>
-		inline void Write(char * buffer, const T&value, bool endian = true)
+		inline std::enable_if_t<std::is_integral<T>::value, void> Write(char * buffer, const T&value, bool endian = true)
 		{
 			size_t size = sizeof(T); // 获取类型 T 的字节大小
 			if(endian)
@@ -192,9 +191,8 @@ namespace tcp
 				os.write(str, size);
 			}
 		}
-
-
 	}
+
 
 	class IHeader
 	{
@@ -202,9 +200,9 @@ namespace tcp
 		IHeader() = default;
 		virtual ~IHeader() = default;
 	public:
-		bool Add(const std::string & k, int v);
-		bool Add(const std::string & k, long long v);
-		bool Add(const std::string & k, const std::string & v);
+		void Add(const std::string & k, int v);
+		void Add(const std::string & k, long long v);
+		void Add(const std::string & k, const std::string & v);
 		void Set(const std::string & k, const std::string & v);
 	public:
 		static int LuaGet(lua_State * l);
@@ -225,7 +223,7 @@ namespace tcp
 		bool Get(const std::string &k, std::string & v) const;
 		bool IsEqual(const std::string &k, const std::string & v) const;
 	protected:
-		std::unordered_map<std::string, std::string> mHeader;
+		std::vector<std::pair<std::string, std::string>> mHeader;
 	};
 }
 #endif //APP_IPROTO_H

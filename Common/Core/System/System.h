@@ -6,8 +6,9 @@
 #define APP_SYSTEM_H
 
 #endif //APP_SYSTEM_H
-#include<string>
-#include<unordered_map>
+#include <string>
+#include <vector>
+#include <unordered_map>
 namespace os
 {
 	class SystemInfo
@@ -18,6 +19,14 @@ namespace os
 		long long max_memory = 0;
 	};
 
+#ifdef __OS_LINUX__
+	struct CPUUsage {
+    	unsigned long utime;  // 用户态时间（jiffies）
+    	unsigned long stime;  // 内核态时间（jiffies）
+    	unsigned long total;   // 系统总时间（jiffies）
+	};
+#endif
+
     class System
     {
     public:
@@ -25,6 +34,8 @@ namespace os
 		static bool GetSystemInfo(SystemInfo & systemInfo);
 		static std::string FormatPath(const std::string & path);
         static const std::string & WorkPath() { return System::mWorkPath; }
+	public:
+		static bool Run(const std::string & cmd, std::string & output);
 	public:
         static bool HasEnv(const std::string& k);
 		static bool GetEnv(const std::string & k, int & v);
@@ -36,6 +47,9 @@ namespace os
 		static void LuaSetEnv(const char * key, const char * val);
 	private:
         static bool SubValue(std::string& value);
+#ifdef __OS_LINUX__
+		static CPUUsage GetCPUUsage();
+#endif
 	private:
         static std::string mWorkPath;
 		static std::unordered_map<std::string, std::string> mSubValues;

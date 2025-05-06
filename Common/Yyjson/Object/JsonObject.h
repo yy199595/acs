@@ -4,7 +4,7 @@
 
 #ifndef APP_JSONOBJECT_H
 #define APP_JSONOBJECT_H
-#include <unordered_map>
+#include <map>
 #include "Yyjson/Document/Document.h"
 namespace json
 {
@@ -13,6 +13,8 @@ namespace json
 	public:
 		virtual bool Set(json::w::Value & document, const std::string & key, void * obj) = 0;
 		virtual bool Get(const json::r::Value & document, const std::string & key, void * obj) const = 0;
+	public:
+		std::string name;
 	};
 
 	template<typename T, typename V>
@@ -125,7 +127,7 @@ namespace json
 			{
 				return false;
 			}
-			ValueProxy<T, V> * valueProxy = dynamic_cast<ValueProxy<T, V> *>(iter->second);
+			ValueProxy<T, V> * valueProxy = dynamic_cast<ValueProxy<T, V> *>(iter->second.get());
 			if(valueProxy == nullptr)
 			{
 				return false;
@@ -161,7 +163,7 @@ namespace json
 			{
 				return false;
 			}
-			values.emplace(name, new ObjectArrayValueProxy<T, V>(member, must));
+			values.emplace(name, std::make_unique<ObjectArrayValueProxy<T, V>>(member, must));
 			return true;
 		}
 
@@ -174,7 +176,7 @@ namespace json
 			{
 				return false;
 			}
-			values.emplace(name, new ObjectMapValueProxy<T, V>(member, must));
+			values.emplace(name, std::make_unique<ObjectMapValueProxy<T, V>>(member, must));
 			return true;
 		}
 
@@ -187,7 +189,7 @@ namespace json
 			{
 				return false;
 			}
-			values.emplace(name, new MapValueProxy<T, V>(member, must));
+			values.emplace(name, std::make_unique<MapValueProxy<T, V>>(member, must));
 			return true;
 		}
 
@@ -201,7 +203,7 @@ namespace json
 			{
 				return false;
 			}
-			values.emplace(name, new ValueProxy<T, V>(member, must));
+			values.emplace(name, std::make_unique<ValueProxy<T, V>>(member, must));
 			return true;
 		}
 
@@ -214,12 +216,12 @@ namespace json
 			{
 				return false;
 			}
-			values.emplace(name, new ObjectValueProxy<T, V>(member, must));
+			values.emplace(name, std::make_unique<ObjectValueProxy<T, V>>(member, must));
 			return true;
 		}
 
 	private:
-		static std::unordered_map<std::string, ValueBase *> values;
+		static std::map<std::string, std::unique_ptr<ValueBase>> values;
 	};
 
 	template<typename T>
@@ -432,7 +434,6 @@ namespace json
 		T * inst = (T*)obj;
 		std::unique_ptr<json::w::Value> jsonObject = document.AddObject(key.c_str());
 		{
-			;
 			for(auto iter = (inst->*field).begin(); iter != (inst->*field).end(); iter++)
 			{
 				jsonObject->Add(iter->first.c_str(), iter->second);
@@ -444,7 +445,7 @@ namespace json
 
 
 	template<typename T>
-	std::unordered_map<std::string, ValueBase*> Object<T>::values;
+	std::map<std::string, std::unique_ptr<ValueBase>> Object<T>::values;
 
 }
 

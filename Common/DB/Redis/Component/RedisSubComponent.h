@@ -6,14 +6,13 @@
 #define APP_REDISSUBCOMPONENT_H
 #include"Redis/Client/RedisClient.h"
 #include"Redis/Config/RedisConfig.h"
-#include"Entity/Component/Component.h"
 #include "Rpc/Component/RpcComponent.h"
 
 
 namespace acs
 {
 	class RedisSubComponent final : public RpcComponent<redis::Response>,
-									public IRpc<redis::Request, redis::Response>
+									public IRpc<redis::Request, redis::Response>, public ISecondUpdate
 	{
 	public:
 		RedisSubComponent();
@@ -27,13 +26,17 @@ namespace acs
 		bool LateAwake() final;
 		void OnConnectOK(int id) final;
 		void OnClientError(int id, int code) final;
+		void OnSecondUpdate(int tick) noexcept final;
+		void OnNotFindResponse(int key, std::unique_ptr<redis::Response> message) final;
 		void OnMessage(int, redis::Request *request, redis::Response *response) noexcept final;
 	private:
+		bool mIsSend; //是否正在发送
 		redis::Cluster mConfig;
 		class TimerComponent * mTimer;
 		class DispatchComponent * mDispatch;
 		std::shared_ptr<redis::Client> mClient;
 		std::unordered_set<std::string> mChannels;
+		std::queue<std::unique_ptr<redis::Request>> mMessages;
 	};
 }
 

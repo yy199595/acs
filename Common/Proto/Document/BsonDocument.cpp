@@ -115,6 +115,7 @@ namespace bson
 			{
 				return false;
 			}
+			document.reserve(element.size());
 			std::vector<_bson::bsonelement> arr = element.Array();
 			for(_bson::bsonelement & item : arr)
 			{
@@ -149,15 +150,10 @@ namespace bson
 			return json;
 		}
 
-		bool Document::FromByJson(const json::r::Document& document)
+		bool Document::FromByJson(const json::r::Value& document)
 		{
-			std::vector<const char *> keys;
-			if(document.GetKeys(keys) < 0)
-			{
-				return false;
-			}
 			std::unique_ptr<json::r::Value> jsonValue;
-			for(const char * key : keys)
+			for(const char * key : document.GetAllKey())
 			{
 				if(document.Get(key, jsonValue))
 				{
@@ -469,14 +465,20 @@ namespace bson
         bool Document::WriterToJson(std::string * jsonStr)
         {
             json::w::Document jsonWriter;
-            _bson::bsonobjiterator bsonIterator(this->mObject);
+			this->WriterToJson(jsonWriter);
+			return jsonWriter.Encode(jsonStr);
+        }
+
+		bool Document::WriterToJson(json::w::Document& document)
+		{
+			_bson::bsonobjiterator bsonIterator(this->mObject);
 			while(bsonIterator.more())
 			{
 				_bson::bsonelement bsonElement = bsonIterator.next();
-				this->WriterToJson(bsonElement, jsonWriter);
+				this->WriterToJson(bsonElement, document);
 			}
-            return jsonWriter.Encode(jsonStr);
-        }
+			return true;
+		}
 
 
         void Document::WriterToJson(const _bson::bsonelement &element, json::w::Value &json)

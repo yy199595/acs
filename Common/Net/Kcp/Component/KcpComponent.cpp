@@ -24,7 +24,7 @@ namespace acs
 
 	bool KcpComponent::LateAwake()
 	{
-		this->mActor = this->GetComponent<ActorComponent>();
+		this->mActor = this->GetComponent<NodeComponent>();
 		this->mDispatch = this->GetComponent<DispatchComponent>();
 		return true;
 	}
@@ -58,7 +58,6 @@ namespace acs
 			return false;
 		}
 #endif
-		this->mKcpServer.reset(nullptr);
 		return true;
 	}
 
@@ -70,7 +69,7 @@ namespace acs
 			{
 				unsigned int port = listen.port;
 				Asio::Context& io = this->mApp->GetContext();
-				this->mKcpServer = std::make_unique<kcp::Server>(context, this, port, io);
+				this->mKcpServer = std::make_shared<kcp::Server>(context, this, port, io);
 			}
 			asio::post(context, [this] { this->mKcpServer->Start(); });
 			return true;
@@ -149,7 +148,7 @@ namespace acs
 		if (code != XCode::Ok)
 		{
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			LOG_ERROR("call {} code = {}", message->GetHead().GetStr("func"), desc);
+			LOG_ERROR("call {} code = {}", message->GetHead().GetStr(rpc::Header::func), desc);
 
 			if (message->GetRpcId() == 0)
 			{

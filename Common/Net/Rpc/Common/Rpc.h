@@ -26,21 +26,31 @@ namespace rpc
         constexpr char Max = 127;
     };
 
+	namespace msg //协议格式
+	{
+		constexpr char none = 0;
+		constexpr char bin = 1;  //带长度
+		constexpr char json = 2;
+		constexpr char text = 3; //不带长度
+	}
+
+
 	// rpc消息头
 	namespace Header
 	{
-		constexpr const char* func = "func";
-		constexpr const char* code = "code";
-		constexpr const char* sock_id = "sock";
-		constexpr const char* player_id = "pid";
-		constexpr const char* client_sock_id = "cli";
-		constexpr const char* forward_tar = "tar";
-		constexpr const char* app_id = "aid";
-		constexpr const char * from_addr = "from_addr";
+		constexpr const char* func = "$func";
+		constexpr const char* code = "$code";
+		constexpr const char* sock_id = "$sock";
+		constexpr const char* client_sock_id = "$cli";
+		constexpr const char* forward_tar = "$tar";
+		constexpr const char* app_id = "$aid";
+		constexpr const char * from_addr = "$from_addr";
+		constexpr const char * id = "$id"; //actor id
+		constexpr const char * channel = "$channel"; //频道
 	}
 
 	//协议类型
-    namespace Porto
+    namespace Proto
     {
 		constexpr char None = 0;
 		constexpr char Json = 1;
@@ -72,6 +82,7 @@ namespace rpc
 		constexpr char Fixed = 0; //固定转发
 		constexpr char Random = 1; //随机分配
 		constexpr char Hash = 2;  //id哈希
+		constexpr char Next = 3; //轮询
 		// 自定义扩展
 		constexpr char Max = std::numeric_limits<char>::max();
 	}
@@ -91,7 +102,7 @@ namespace rpc
 	public:
 		ProtoLenType Len = 0; //协议包长度
 		char Type = rpc::Type::None; //协议类型
-		char Porto = rpc::Porto::None; //使用的通信协议
+		char Porto = rpc::Proto::None; //使用的通信协议
 		char Source = rpc::Source::None; //消息源
 		int RpcId = 0; // rpcId
 	};

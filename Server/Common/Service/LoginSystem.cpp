@@ -6,21 +6,21 @@
 #include"Entity/Actor/App.h"
 #include"Core/Event/IEvent.h"
 #include"Lua/Module/LuaModule.h"
-#include "Common/Entity/Player.h"
+#include "Common/Component/PlayerComponent.h"
 
 namespace acs
 {
 	LoginSystem::LoginSystem()
 	{
-		this->mActor = nullptr;
+		this->mPlayerMgr = nullptr;
 	}
 
 	bool LoginSystem::OnInit()
 	{
-		BIND_SERVER_RPC_METHOD(LoginSystem::Login);
-		BIND_SERVER_RPC_METHOD(LoginSystem::Logout);
+		BIND_RPC_METHOD(LoginSystem::Login);
+		BIND_RPC_METHOD(LoginSystem::Logout);
 		this->mApp->GetComponents(this->mLoginComponents);
-		this->mActor = this->GetComponent<ActorComponent>();
+		this->mPlayerMgr = this->GetComponent<PlayerComponent>();
 		return true;
 	}
 
@@ -29,7 +29,7 @@ namespace acs
 		int gateId = (int)id;
 		int sockId = request.client_id();
 		long long playerId = request.user_id();
-		if(this->mActor->GetActor(playerId) == nullptr)
+		if(this->mPlayerMgr->Get(playerId) == nullptr)
 		{
 			std::unique_ptr<Player> player = std::make_unique<Player>(playerId, gateId, sockId);
 			{
@@ -52,7 +52,7 @@ namespace acs
     int LoginSystem::Logout(long long id, const s2s::logout::request& request)
     {
 		long long playerId = request.user_id();
-		Player * player = this->mActor->GetActor<Player>(playerId);
+		Player * player = this->mPlayerMgr->Get(playerId);
 		if(player == nullptr)
 		{
 			return XCode::NotFindUser;
@@ -67,7 +67,7 @@ namespace acs
 			luaModule->Await("OnLogout", playerId);
 		}
 		int sockId = player->GetClientID();
-		this->mActor->DelActor(playerId);
+		this->mPlayerMgr->Remove(playerId, true);
 		help::PlayerLogoutEvent::Trigger(playerId, sockId);
 		return XCode::Ok;
     }

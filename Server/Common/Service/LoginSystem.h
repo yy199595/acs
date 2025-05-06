@@ -20,7 +20,7 @@ namespace acs
 	private:
 		bool OnInit() final;
 	private:
-		class ActorComponent * mActor;
+		class PlayerComponent * mPlayerMgr;
 		std::vector<ILogin *> mLoginComponents;
 	};
 }

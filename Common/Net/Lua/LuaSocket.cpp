@@ -246,9 +246,15 @@ namespace lua
 		{
 			Asio::Context& io = acs::App::Inst()->GetContext();
 
+			Asio::Code code;
 			Asio::Resolver resolver(io);
 			Asio::ResolverQuery query(host, "");
-			auto iter = resolver.resolve(query);
+			auto iter = resolver.resolve(query, code);
+			if(code.value() != Asio::OK)
+			{
+				luaL_error(L, "query : %s", code.message().c_str());
+				return 0;
+			}
 			Asio::Resolver::iterator end;
 			for (; iter != end; iter++)
 			{

@@ -10,10 +10,13 @@ namespace http
 	struct Config : public json::Object<Config>
 	{
 		bool auth;
+		int pool = 0; //对象池数量
 		std::string root;
 		std::string index;
 		std::string upload;
 		std::string domain;
+		int send_timeout = 5;
+		int read_timeout = 5;
         std::vector<std::string> whiteList;
 		std::unordered_map<std::string, std::string> header;
 	};

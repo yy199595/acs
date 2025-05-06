@@ -191,7 +191,7 @@ namespace rpc
 		{
 			case tcp::Decode::None:
 			{
-				tcp::Data::Read(readStream, this->mProtoHead);
+				tcp::Data::ReadHead(readStream, this->mProtoHead, true);
 
 				if (this->mProtoHead.Len >= this->mMaxCount)
 				{
@@ -228,10 +228,10 @@ namespace rpc
 			{
 				case rpc::Type::Ping:
 				{
-					rpc::Message* pingMessage = new rpc::Message();
+					std::unique_ptr<rpc::Message> pingMessage = std::make_unique<rpc::Message>();
 					{
-						pingMessage->SetType(rpc::Type::Ping);
-						this->AddToSendQueue(pingMessage);
+						pingMessage->SetType(rpc::Type::Pong);
+						this->AddToSendQueue(pingMessage.release());
 					}
 					break;
 				}
@@ -270,18 +270,23 @@ namespace rpc
 
 	void InnerTcpClient::Close()
 	{
+#ifdef ONLY_MAIN_THREAD
+		this->CloseSocket();
+#else
 		Asio::Context & context = this->mSocket->GetContext();
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(context, [this, self] { this->CloseSocket(); });
+#endif
 	}
 
 	void InnerTcpClient::StartReceive(tcp::Socket* socket)
 	{
 		this->SetSocket(socket);
+#ifdef ONLY_MAIN_THREAD
 		this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
 		this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
 		this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
-
+#else
 		Asio::Context & context = this->mSocket->GetContext();
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(context, [this, self]
@@ -290,5 +295,6 @@ namespace rpc
 			this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
 			this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
 		});
+#endif
 	}
 }

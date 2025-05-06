@@ -35,6 +35,7 @@ namespace http
 		void OnSendMessage(size_t size) final;
 		void OnSendMessage(const asio::error_code &code) final;
 	 private:
+		int mSockId;
 		Component * mComponent;
 		Asio::Context & mMainContext;
         std::unique_ptr<http::Request> mRequest;

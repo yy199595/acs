@@ -6,7 +6,6 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Lua/Engine/UserDataParameter.h"
 #include "Util/Tools/Math.h"
-#include "Log/Common/CommonLogDef.h"
 
 namespace http
 {
@@ -210,7 +209,7 @@ namespace http
 		this->mHead.Clear();
 		this->mError.clear();
 		this->mVersion.clear();
-		this->mBody = nullptr;
+		this->mBody.reset();
 		this->mCode = (int)HttpStatus::OK;
 		this->mParseState = tcp::Decode::None;
 	}

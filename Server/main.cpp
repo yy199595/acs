@@ -1,4 +1,6 @@
-﻿#include "Entity/Actor/App.h"
+﻿
+//#include "vld.h"
+#include "Entity/Actor/App.h"
 #include "Timer/Component/TimerComponent.h"
 #include "Async/Component/CoroutineComponent.h"
 #include "Lua/Component/LuaComponent.h"
@@ -12,7 +14,7 @@
 
 #include "Http/Component/HttpComponent.h"
 #include "Http/Component/HttpWebComponent.h"
-#include "Entity/Component/ActorComponent.h"
+#include "Node/Component/NodeComponent.h"
 
 #include "Server/Component/ConfigComponent.h"
 #include "Cluster/Component/LaunchComponent.h"
@@ -62,7 +64,6 @@
 #include "Sqlite/Component/SqliteComponent.h"
 #include "Log/Component/LoggerComponent.h"
 
-#include "Server/Config/ServerConfig.h"
 #include "Router/Component/RouterComponent.h"
 
 #include "Example/Service/ChatSystem.h"
@@ -75,7 +76,8 @@
 
 #include "Quick/Service/QuickSDK.h"
 
-#include "Event/Service/EventSystem.h"
+#include "PubSub/Service/PubSubSystem.h"
+#include "PubSub/Component/PubSubComponent.h"
 
 #include "Client/Component/WsClientComponent.h"
 #include "Web/Service/Admin.h"
@@ -84,14 +86,24 @@
 
 #include "Mongo/Service/MongoBackup.h"
 #include "Telnet/Component/TelnetComponent.h"
+#include "Common/Component/PlayerComponent.h"
+
+#include "Registry/Service/RegistryService.h"
+
+#include "Local/Component/LocalNetComponent.h"
+
+#include "Mongo/Service/MongoReadProxy.h"
+#include "Mongo/Service/MongoWriteProxy.h"
 using namespace acs;
+
+
 
 void RegisterComponent()
 {
 	REGISTER_COMPONENT(TimerComponent);
 	REGISTER_COMPONENT(ProtoComponent);
 	REGISTER_COMPONENT(ThreadComponent);
-	REGISTER_COMPONENT(ActorComponent);
+	REGISTER_COMPONENT(NodeComponent);
 	REGISTER_COMPONENT(CoroutineComponent);
 
 	REGISTER_COMPONENT(LaunchComponent);
@@ -121,7 +133,7 @@ void RegisterComponent()
 
 	REGISTER_COMPONENT(RecordComponent);
 
-	REGISTER_COMPONENT(DelayQueueComponent);
+	REGISTER_COMPONENT(DelayMQComponent);
 	REGISTER_COMPONENT(WXNoticeComponent);
 
 	REGISTER_COMPONENT(NotifyComponent);
@@ -142,6 +154,11 @@ void RegisterComponent()
 	REGISTER_COMPONENT(PgsqlDBComponent);
 
 	REGISTER_COMPONENT(TelnetComponent);
+
+	REGISTER_COMPONENT(PlayerComponent);
+
+	REGISTER_COMPONENT(PubSubComponent);
+	REGISTER_COMPONENT(LocalNetComponent);
 }
 
 void RegisterAll()
@@ -172,7 +189,13 @@ void RegisterAll()
 	REGISTER_COMPONENT(QuickSDK);
 
 	REGISTER_COMPONENT(Watch);
-	REGISTER_COMPONENT(EventSystem);
+	REGISTER_COMPONENT(PubSubSystem);
+
+	REGISTER_COMPONENT(RegistryService);
+
+	REGISTER_COMPONENT(MongoReadProxy);
+	REGISTER_COMPONENT(MongoWriteProxy);
+
 }
 
 int main(int argc, char** argv)
@@ -183,16 +206,13 @@ int main(int argc, char** argv)
 
 	int id = 0;
 	RegisterAll();
-	std::string path;
-	ServerConfig config;
+	std::string cmd, name;
 	os::System::Init(argc, argv);
-	os::System::GetEnv("ID", id);
-	os::System::GetEnv("CONFIG", path);
+	os::System::GetEnv("id", id);
+	os::System::GetEnv("name", name);
+	if(!os::System::GetEnv("cmd", cmd))
 	{
-		if(!config.LoadConfig(path))
-		{
-			return -1;
-		}
-		return (new App(id, config))->Run();
+		return (new App(id, name))->Run();
 	}
+	return (new App(id, name))->Run(cmd);
 }

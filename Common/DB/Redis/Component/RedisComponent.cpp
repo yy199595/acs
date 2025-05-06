@@ -41,9 +41,20 @@ namespace acs
 	void RedisComponent::OnRecord(json::w::Document& document)
 	{
 		timer::ElapsedTimer timer1;
-		this->Run("PING");
+		auto response = this->Run("PING");
 		std::unique_ptr<json::w::Value> data = document.AddObject("redis");
 		{
+			size_t sendByteCount = 0;
+			size_t recvByteCount = 0;
+			for(auto iter = this->mClients.begin(); iter != this->mClients.end(); iter++)
+			{
+				sendByteCount += iter->second->SendBufferBytes();
+				recvByteCount += iter->second->RecvBufferBytes();
+			}
+
+			data->Add("send_memory", sendByteCount);
+			data->Add("recv_memory", recvByteCount);
+
 			data->Add("sum", this->mSumCount);
 			data->Add("retry", this->mRetryCount);
 			data->Add("client", this->mClients.size());
@@ -79,7 +90,7 @@ namespace acs
 				{
 					if (!redisCommandClient->Start(sock))
 					{
-						LOG_ERROR("connect redis {} fail", address);
+						LOG_ERROR("connect {} fail", address);
 						return false;
 					}
 					this->mClients.emplace(id, redisCommandClient);
@@ -293,7 +304,7 @@ namespace acs
 			return nullptr;
 		}
 		std::unique_ptr<redis::Response> response = this->Run(std::move(request));
-		if(response == nullptr || response->element.IsString())
+		if(response == nullptr || !response->element.IsString())
 		{
 			return nullptr;
 		}

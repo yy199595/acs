@@ -5,7 +5,9 @@
 #include"Entity/Actor/App.h"
 #include"Network/Tcp/Asio.h"
 #include"Core/System/System.h"
+#ifndef ONLY_MAIN_THREAD
 #include"Core/Thread/ThreadSync.h"
+#endif
 #include"Util/Tools/TimeHelper.h"
 #include"Server/Component/ThreadComponent.h"
 
@@ -17,10 +19,6 @@ namespace acs
 		: mSslCtx(asio::ssl::context::tlsv12_server)
 #endif
 	{
-		this->mSumCount.exchange(0);
-		this->mDoneCount.exchange(0);
-		this->mFailCount.exchange(0);
-
 		this->mAcceptor = nullptr;
 		this->mTcpListen = nullptr;
 		this->mThreadComponent = nullptr;
@@ -61,13 +59,10 @@ namespace acs
 				const std::string& cert = config.cert;
 				this->mSslCtx.use_certificate_chain_file(cert);
 				this->mSslCtx.use_private_key_file(key, asio::ssl::context::pem);
-				this->mSslCtx.set_options(
-						asio::ssl::context::default_workarounds |
-						asio::ssl::context::no_sslv2 |
-						asio::ssl::context::no_sslv3 |
-						asio::ssl::context::no_tlsv1 |
-						asio::ssl::context::no_tlsv1_1 |
-						asio::ssl::context::single_dh_use);
+				this->mSslCtx.set_options(asio::ssl::context::default_workarounds |
+						asio::ssl::context::no_sslv2 | asio::ssl::context::no_sslv3 |
+						asio::ssl::context::no_tlsv1 | asio::ssl::context::no_tlsv1_1 |
+						asio::ssl::context::single_dh_use | asio::ssl::context::no_compression);
 			}
 			catch (std::system_error & error)
 			{
@@ -77,20 +72,24 @@ namespace acs
 		}
 #endif
 #ifdef ONLY_MAIN_THREAD
-		Asio::EndPoint ep(asio::ip::address(), config.Port);
+		Asio::EndPoint ep(asio::ip::address(), config.port);
 		while (!this->mAcceptor->is_open())
 		{
 			try
 			{
 				this->mAcceptor->open(ep.protocol());
 				this->mAcceptor->set_option(asio::ip::tcp::acceptor::reuse_address(true));
+#if !defined(__OS_WIN__) && defined(SO_REUSEPORT)
+				int one = 1;
+				setsockopt(this->mAcceptor->native_handle(), SOL_SOCKET,  SO_REUSEPORT, &one, sizeof(one));
+#endif
 				this->mAcceptor->bind(ep);
 				this->mAcceptor->listen();
 			}
 			catch (std::system_error& error)
 			{
 				this->mAcceptor->close();
-				LOG_ERROR("listen [{}] {}", config.Addr, error.what());
+				CONSOLE_LOG_ERROR("listen [{}] {}", config.address, error.what());
 			}
 		}
 #else
@@ -157,44 +156,45 @@ namespace acs
 		{
 			do
 			{
-				this->mSumCount++;
+				this->Accept();
 				if (code.value() != Asio::OK)
 				{
 					sock->Destroy();
-					this->mFailCount++;
 					break;
 				}
 				sock->Init();
+				//CONSOLE_LOG_INFO("{} listen => {}", this->GetName(), sock->GetAddress())
 #ifdef __ENABLE_OPEN_SSL__
 				if (sock->IsOpenSsl())
 				{
 					Asio::ssl::Socket& ssl = sock->SslSocket();
 					ssl.async_handshake(asio::ssl::stream_base::server,
-							[sock, this](const Asio::Code & code1)
-					{
-						if (code1.value() != Asio::OK)
-						{
-							sock->Destroy();
-							this->mFailCount++;
-							return;
-						}
-						Asio::Context& io = this->mApp->GetContext();
-						asio::post(io, [this, sock] { this->OnAcceptSocket(sock); });
-					});
+							[sock, this](const Asio::Code& code1)
+							{
+								if (code1.value() != Asio::OK)
+								{
+									sock->Destroy();
+									return;
+								}
+								Asio::Context& io = this->mApp->GetContext();
+								asio::post(io, [this, sock] { this->OnAcceptSocket(sock); });
+							});
 					break;
 				}
 #endif
-				this->mDoneCount++;
-#ifdef ONLY_MAIN_THREAD
-				this->OnAcceptSocket(sock);
-#else
 				Asio::Context& io = this->mApp->GetContext();
 				asio::post(io, [this, sock] { this->OnAcceptSocket(sock); });
-#endif
-			} while (false);
-			asio::post(this->mExecutor, [this] { this->Accept(); });
+			}
+			while (false);
 		};
-
+#ifdef __ENABLE_OPEN_SSL__
+		if(sock->IsOpenSsl())
+		{
+			Asio::ssl::Socket & sslSocket = sock->SslSocket();
+			this->mAcceptor->async_accept(sslSocket.lowest_layer(), callback);
+			return;
+		}
+#endif
 		this->mAcceptor->async_accept(sock->Get(), callback);
 	}
 
@@ -206,23 +206,12 @@ namespace acs
 		}
 	}
 
-	void ListenerComponent::OnRecord(json::w::Document& document)
-	{
-		std::string key = fmt::format("listen_{}", this->mConfig.name);
-		std::unique_ptr<json::w::Value> jsonValue = document.AddObject(key.c_str());
-		{
-			jsonValue->Add("sum", this->mSumCount.load(std::memory_order_relaxed));
-			jsonValue->Add("done", this->mDoneCount.load(std::memory_order_relaxed));
-			jsonValue->Add("fail", this->mFailCount.load(std::memory_order_relaxed));
-		}
-	}
-
 	bool ListenerComponent::StopListen()
 	{
 #ifdef ONLY_MAIN_THREAD
 		Asio::Code code;
 		this->mAcceptor->close(code);
-		LOG_WARN("stop listen [{}]", this->mConfig.Addr);
+		LOG_WARN("stop listen [{}]", this->mConfig.address);
 		return code.value() == Asio::OK;
 #else
 		custom::ThreadSync<bool> threadSync;

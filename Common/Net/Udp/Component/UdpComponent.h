@@ -32,7 +32,7 @@ namespace acs
 	private:
 		int OnRequest(rpc::Message * message) noexcept;
 	private:
-		class ActorComponent * mActor;
+		class NodeComponent * mActor;
 		asio::streambuf mReceiveBuffer;
 		asio_udp::endpoint mRemotePoint;
 		class DispatchComponent * mDispatch;

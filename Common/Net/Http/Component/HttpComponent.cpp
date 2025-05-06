@@ -120,9 +120,14 @@ namespace acs
 		return response;
 	}
 
-	void HttpComponent::OnDelTask(int key)
+	void HttpComponent::OnRecord(json::w::Document& document)
 	{
-		this->mUseClients.Del(key);
+		std::unique_ptr<json::w::Value> jsonObject = document.AddObject("http");
+		{
+			jsonObject->Add("wait", this->AwaitCount());
+			jsonObject->Add("sum", this->CurrentRpcCount());
+			jsonObject->Add("client", this->mUseClients.size());
+		}
 	}
 
 	int HttpComponent::Send(std::unique_ptr<http::Request> request, std::function<void(std::unique_ptr<http::Response>)> && cb)
@@ -136,15 +141,14 @@ namespace acs
 		}
 #endif
 		int rpcId = this->BuildRpcId();
-		request->Header().SetKeepAlive(false);
-		const http::Url& url = request->GetUrl();
+		request->Header().Add(http::Header::Connection, http::Header::Close);
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 		std::shared_ptr<http::Client> httpAsyncClient = this->CreateClient(request.get());
 		if (httpAsyncClient == nullptr)
 		{
 			return XCode::Failure;
 		}
-		this->mUseClients.Add(rpcId, httpAsyncClient);
+		this->mUseClients.emplace(rpcId, httpAsyncClient);
 		this->AddTask(new HttpCallbackTask(rpcId, cb));
 		httpAsyncClient->Do(std::move(request), std::move(response), rpcId);
 		return XCode::Ok;
@@ -161,13 +165,13 @@ namespace acs
 		}
 #endif
 		rpcId = this->BuildRpcId();
-		request->Header().SetKeepAlive(false);
+		request->Header().Add(http::Header::Connection, http::Header::Close);
 		std::shared_ptr<http::Client> httpAsyncClient = this->CreateClient(request.get());
 		if (httpAsyncClient == nullptr)
 		{
 			return XCode::Failure;
 		}
-		this->mUseClients.Add(rpcId, httpAsyncClient);
+		this->mUseClients.emplace(rpcId, httpAsyncClient);
 		httpAsyncClient->Do(std::move(request), std::move(response), rpcId);
 		return XCode::Ok;
 	}
@@ -233,11 +237,13 @@ namespace acs
 		return response;
 	}
 
-	void HttpComponent::OnMessage(http::Request* request, http::Response* response) noexcept
+	void HttpComponent::OnMessage(int taskId, http::Request* request, http::Response* response) noexcept
 	{
-		int taskId = 0;
-		delete request;
-		response->Header().Del("t", taskId);
+		auto iter = this->mUseClients.find(taskId);
+		if(iter != this->mUseClients.end())
+		{
+			this->mUseClients.erase(iter);
+		}
 		this->OnResponse(taskId, std::unique_ptr<http::Response>(response));
 	}
 }

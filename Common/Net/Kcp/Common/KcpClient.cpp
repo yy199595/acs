@@ -3,6 +3,7 @@
 //
 
 #include "KcpClient.h"
+#include <sstream>
 #include "Util/Tools/String.h"
 #include "Log/Common/CommonLogDef.h"
 #include "Util/Tools/TimeHelper.h"
@@ -13,7 +14,6 @@ namespace kcp
 			: mContext(io), mComponent(component), mSocket(io, asio_udp::endpoint(asio_udp::v4(), 0)),
 			 mRemoteEndpoint(remote), mTimer(io), mSendStream(&mSendBuffer), mMainContext(main)
 	{
-		this->mDecodeBuffer.fill(0);
 		this->mKcp = ikcp_create(0x01, this);
 		this->mKcp->output = kcp::OnKcpSend;
 		ikcp_wndsize(this->mKcp, kcp::BUFFER_COUNT, kcp::BUFFER_COUNT);
@@ -74,8 +74,9 @@ namespace kcp
 			const char* msg = asio::buffer_cast<const char*>(self->mReceiveBuffer.data());
 
 			ikcp_input(self->mKcp, msg, (int)size);
-			int messageLen = ikcp_recv(self->mKcp, self->mDecodeBuffer.data(), kcp::BUFFER_COUNT);
-			//CONSOLE_LOG_DEBUG("client receive message : {}", messageLen);
+			self->mDecodeBuffer.resize(kcp::BUFFER_COUNT);
+			char * buffer = (char *)self->mDecodeBuffer.data();
+			int messageLen = ikcp_recv(self->mKcp, buffer, kcp::BUFFER_COUNT);
 			if (messageLen > 0)
 			{
 				const std::string address = fmt::format("{}:{}", ip, port);
@@ -84,16 +85,20 @@ namespace kcp
 			self->mReceiveBuffer.consume(size);
 			asio::post(self->mContext, [self] { self->StartReceive(); });
 		};
-		this->mSocket.async_receive_from(this->mReceiveBuffer.prepare(kcp::BUFFER_COUNT),
-				this->mLocalEndpoint, callback);
+		auto buffer = this->mReceiveBuffer.prepare(kcp::BUFFER_COUNT);
+		this->mSocket.async_receive_from(buffer, this->mLocalEndpoint, callback);
 	}
 
-	void Client::OnReceive(const std::string& address, const char* buf, int size)
+	void Client::OnReceive(const std::string& address, const std::string & buf, size_t size)
 	{
+		std::stringstream buffer(buf);
 		std::unique_ptr<rpc::Message> rpcPacket = std::make_unique<rpc::Message>();
 		{
-			if(rpcPacket->Decode(buf, size))
+			rpc::ProtoHead protoHead;
+			tcp::Data::Read(buffer, protoHead);
+			if(rpcPacket->OnRecvMessage(buffer, size) == 0)
 			{
+				rpcPacket->Init(protoHead);
 				rpcPacket->SetNet(rpc::Net::Kcp);
 				rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 				asio::post(this->mMainContext, [this, msg = rpcPacket.release()] {

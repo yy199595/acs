@@ -19,6 +19,7 @@ namespace acs
         bool Update(const db::sql::update & request, std::string& sql);
 		bool FindPage(const db::sql::query::page & request, std::string& sql);
         bool ToSqlCommand(const std::string& table, const std::string& cmd, json::r::Document& message, std::string& sql);
+		bool Create(const std::string & tab, json::r::Value & message, const std::vector<std::string> & keys, std::string & sql);
 		bool Create(const std::string & tab, const std::string & message, const std::vector<std::string> & keys, std::string & sql);
 		bool Create(const std::string & tab, const pb::Message & message, const std::vector<std::string> & keys, std::string & sql);
     private:

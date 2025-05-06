@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2022/10/17.
 //
 
-#include<algorithm>
+#include <algorithm>
 #include"ClusterConfig.h"
 #include"Core/System/System.h"
 #include"Server/Config/ServerConfig.h"
@@ -44,16 +44,9 @@ namespace acs
 
 	bool NodeConfig::HasService(const std::string& service) const
 	{
-		auto iter = std::find(this->mRpcServices.begin(), this->mRpcServices.end(), service);
-		if(iter == this->mRpcServices.end())
-		{
-			iter = std::find(this->mHttpServices.begin(), this->mHttpServices.end(), service);
-			if(iter == this->mHttpServices.end())
-			{
-				return false;
-			}
-		}
-		return true;
+		auto callback = [&service](const std::string & key) { return key == service; };
+		return std::any_of(this->mRpcServices.begin(), this->mRpcServices.end(), callback)
+			|| std::any_of(this->mHttpServices.begin(), this->mHttpServices.end(), callback);
 	}
 
 }

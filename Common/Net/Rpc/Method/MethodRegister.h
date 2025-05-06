@@ -108,6 +108,13 @@ namespace acs
 			return this->AddMethod(std::make_unique<ServiceMethod9<T>>(name, component, func, key));
 		}
 
+		template<typename T>
+		bool Bind(std::string name, ServiceMethodType10<T> func, const std::string key)
+		{
+			T* component = this->mComponent->Cast<T>();
+			return this->AddMethod(std::make_unique<ServiceMethod10<T>>(name, component, func, key));
+		}
+
 		template<typename T, typename T1>
 		bool Bind(std::string name, ServiceMethodType34<T, T1> func, const std::string key)
 		{
@@ -115,12 +122,21 @@ namespace acs
 			return this->AddMethod(std::make_unique<ServiceMethod34<T, T1>>(name, component, func, key));
 		}
 
+		inline bool Has(const std::string & name)
+		{
+			return std::any_of(this->mMethodMap.begin(), this->mMethodMap.end(),
+					[&name](const std::unique_ptr<ServiceMethod>& method)
+					{
+						return method->GetName() == name;
+					});
+		}
+
 	public:
 		ServiceMethod* GetMethod(const std::string& name);
 		bool AddMethod(std::unique_ptr<ServiceMethod> method);
 	private:
 		Component * mComponent;
-		std::unordered_map<std::string, std::unique_ptr<ServiceMethod>> mMethodMap;
+		std::vector<std::unique_ptr<ServiceMethod>> mMethodMap;
 	};
 }
 
@@ -134,11 +150,6 @@ namespace acs
 		template<typename T>
 		bool Bind(const std::string& name, HttpMethod<T> func)
 		{
-			auto iter = this->mHttpMethodMap.find(name);
-			if (iter != this->mHttpMethodMap.end())
-			{
-				return false;
-			}
 			T * component = this->mComponent->Cast<T>();
             std::unique_ptr<HttpServiceMethod> httpServiceMethod =
                     std::make_unique<CppHttpServiceMethod<T>>(name, component, std::move(func));
@@ -148,11 +159,6 @@ namespace acs
 		template<typename T>
 		bool Bind(const std::string& name, HttpMethod2<T> func)
 		{
-			auto iter = this->mHttpMethodMap.find(name);
-			if (iter != this->mHttpMethodMap.end())
-			{
-				return false;
-			}
 			T * component = this->mComponent->Cast<T>();
 			std::unique_ptr<HttpServiceMethod> httpServiceMethod =
 					std::make_unique<CppHttpServiceMethod3<T>>(name, component, std::move(func));
@@ -162,11 +168,6 @@ namespace acs
         template<typename T>
         bool Bind(const std::string& name, HttpJsonMethod1<T> func)
         {
-            auto iter = this->mHttpMethodMap.find(name);
-            if (iter != this->mHttpMethodMap.end())
-            {
-                return false;
-            }
             T * component = this->mComponent->Cast<T>();
             std::unique_ptr<HttpServiceMethod> httpServiceMethod =
                 std::make_unique<JsonHttpServiceMethod1<T>>(name, component, std::move(func));
@@ -176,11 +177,6 @@ namespace acs
 		template<typename T>
 		bool Bind(const std::string& name, HttpMethod4<T> func)
 		{
-			auto iter = this->mHttpMethodMap.find(name);
-			if (iter != this->mHttpMethodMap.end())
-			{
-				return false;
-			}
 			T * component = this->mComponent->Cast<T>();
 			std::unique_ptr<HttpServiceMethod> httpServiceMethod =
 					std::make_unique<CppHttpServiceMethod2<T>>(name, component, std::move(func));
@@ -191,11 +187,6 @@ namespace acs
         template<typename T>
         bool Bind(const std::string& name, HttpJsonMethod2<T> func)
         {
-            auto iter = this->mHttpMethodMap.find(name);
-            if (iter != this->mHttpMethodMap.end())
-            {
-                return false;
-            }
             T * component = this->mComponent->Cast<T>();
             std::unique_ptr<HttpServiceMethod> httpServiceMethod =
                 std::make_unique<JsonHttpServiceMethod2<T>>(name, component, std::move(func));
@@ -205,11 +196,6 @@ namespace acs
         template<typename T>
         bool Bind(const std::string& name, HttpJsonMethod3<T> func)
         {
-            auto iter = this->mHttpMethodMap.find(name);
-            if (iter != this->mHttpMethodMap.end())
-            {
-                return false;
-            }
             T * component = this->mComponent->Cast<T>();
             std::unique_ptr<HttpServiceMethod> httpServiceMethod =
                 std::make_unique<JsonHttpServiceMethod3<T>>(name, component, std::move(func));
@@ -219,11 +205,6 @@ namespace acs
 		template<typename T>
 		bool Bind(const std::string& name, HttpJsonMethod4<T> func)
 		{
-			auto iter = this->mHttpMethodMap.find(name);
-			if (iter != this->mHttpMethodMap.end())
-			{
-				return false;
-			}
 			T * component = this->mComponent->Cast<T>();
 			std::unique_ptr<HttpServiceMethod> httpServiceMethod =
 					std::make_unique<JsonHttpServiceMethod4<T>>(name, component, std::move(func));
@@ -233,11 +214,6 @@ namespace acs
 		template<typename T>
 		bool Bind(const std::string& name, HttpJsonMethod5<T> func)
 		{
-			auto iter = this->mHttpMethodMap.find(name);
-			if (iter != this->mHttpMethodMap.end())
-			{
-				return false;
-			}
 			T * component = this->mComponent->Cast<T>();
 			std::unique_ptr<HttpServiceMethod> httpServiceMethod =
 					std::make_unique<JsonHttpServiceMethod5<T>>(name, component, std::move(func));
@@ -247,11 +223,6 @@ namespace acs
 		template<typename T>
 		bool Bind(const std::string& name, HttpFromMethod1<T> func)
 		{
-			auto iter = this->mHttpMethodMap.find(name);
-			if (iter != this->mHttpMethodMap.end())
-			{
-				return false;
-			}
 			T * component = this->mComponent->Cast<T>();
 			std::unique_ptr<HttpServiceMethod> httpServiceMethod =
 					std::make_unique<FromHttpServiceMethod1<T>>(name, component, std::move(func));
@@ -261,11 +232,6 @@ namespace acs
 		template<typename T>
 		bool Bind(const std::string& name, HttpFromMethod2<T> func)
 		{
-			auto iter = this->mHttpMethodMap.find(name);
-			if (iter != this->mHttpMethodMap.end())
-			{
-				return false;
-			}
 			T * component = this->mComponent->Cast<T>();
 			std::unique_ptr<HttpServiceMethod> httpServiceMethod =
 					std::make_unique<FromHttpServiceMethod2<T>>(name, component, std::move(func));
@@ -275,11 +241,6 @@ namespace acs
 		template<typename T>
 		bool Bind(const std::string& name, HttpFromMethod3<T> func)
 		{
-			auto iter = this->mHttpMethodMap.find(name);
-			if (iter != this->mHttpMethodMap.end())
-			{
-				return false;
-			}
 			T * component = this->mComponent->Cast<T>();
 			std::unique_ptr<HttpServiceMethod> httpServiceMethod =
 					std::make_unique<FromHttpServiceMethod3<T>>(name, component, std::move(func));
@@ -289,24 +250,28 @@ namespace acs
 		template<typename T>
 		bool Bind(const std::string& name, HttpFromMethod4<T> func)
 		{
-			auto iter = this->mHttpMethodMap.find(name);
-			if (iter != this->mHttpMethodMap.end())
-			{
-				return false;
-			}
 			T * component = this->mComponent->Cast<T>();
 			std::unique_ptr<HttpServiceMethod> httpServiceMethod =
 					std::make_unique<FromHttpServiceMethod4<T>>(name, component, std::move(func));
 			return this->AddMethod(std::move(httpServiceMethod));
 		}
 
+		inline bool Has(const std::string & name)
+		{
+			return std::any_of(this->mHttpMethods.begin(), this->mHttpMethods.end(),
+					[&name](const std::unique_ptr<HttpServiceMethod>& method)
+					{
+						return method->GetName() == name;
+					});
+		}
+
 	public:
-		void Clear() { this->mHttpMethodMap.clear(); }
+		void Clear() { this->mHttpMethods.clear(); }
 		HttpServiceMethod* GetMethod(const std::string& name);
         bool AddMethod(std::unique_ptr<HttpServiceMethod> method);
     private:
 		Component * mComponent;
-		std::unordered_map<std::string, std::unique_ptr<HttpServiceMethod>> mHttpMethodMap;
+		std::vector<std::unique_ptr<HttpServiceMethod>> mHttpMethods;
     };
 }
 

@@ -32,7 +32,7 @@ namespace acs
 		int Send(int id, rpc::Message *message) noexcept final;
 		char GetNet() const noexcept final { return rpc::Net::Ws; }
 	private:
-		class ActorComponent * mActor;
+		class NodeComponent * mActor;
 		class ThreadComponent * mThread;
 		math::NumberPool<int> mClientPool;
 		class DispatchComponent * mDispatch;

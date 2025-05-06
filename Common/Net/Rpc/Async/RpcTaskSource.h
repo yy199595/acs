@@ -1,12 +1,8 @@
 ﻿#pragma once
 #include"Lua/Engine/Define.h"
 #include"Rpc/Common/Message.h"
-#include"Async/Coroutine/CoroutineDef.h"
 #include"Async/Source/TaskSource.h"
 #include"Async/Lua/LuaWaitTaskSource.h"
-#ifdef __SHARE_PTR_COUNTER__
-#include "Core/Memory/MemoryObject.h"
-#endif
 namespace acs
 {
     template<typename T>
@@ -23,9 +19,6 @@ namespace acs
     };
 
 	class RpcTaskSource final : public WaitTaskSourceBase, public IRpcTask<rpc::Message>
-#ifdef __SHARE_PTR_COUNTER__
-	, public memory::Object<LuaWaitTaskSource>
-#endif
     {
     public:
 

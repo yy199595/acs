@@ -73,8 +73,6 @@ namespace mongo
 		Response(const std::string & cmd);
 		Response(int id, const std::string & cmd);
     public:
-		int GetCode() const { return this->mCode; }
-		void SetCode(int code) { this->mCode = code; }
 		const Head & GetHead() const { return this->mHead;}
 		inline int RpcId() const { return this->mHead.responseTo; }
 		inline void SetRpcId(int id) { this->mHead.responseTo = id; }
@@ -89,7 +87,6 @@ namespace mongo
 	private:
 		bool DecodeQuery();
 	private:
-		int mCode;
         Head mHead;
 		int mDecodeState;
         int responseFlags;  // bit vector - see details below

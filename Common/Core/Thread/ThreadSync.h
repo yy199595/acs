@@ -4,9 +4,13 @@
 
 #ifndef APP_THREADSYNC_H
 #define APP_THREADSYNC_H
+
+#ifndef ONLY_MAIN_THREAD
+
 #include <queue>
 #include <mutex>
 #include <condition_variable>
+
 
 namespace custom
 {
@@ -39,3 +43,5 @@ namespace custom
 	}
 }
 #endif //APP_THREADSYNC_H
+
+#endif

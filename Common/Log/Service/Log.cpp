@@ -7,7 +7,7 @@ namespace acs
 {
 	bool Log::OnInit()
 	{
-		BIND_SERVER_RPC_METHOD(Log::Login);
+		BIND_RPC_METHOD(Log::Login);
 		return true;
 	}
 

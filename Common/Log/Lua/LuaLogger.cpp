@@ -4,7 +4,6 @@
 
 #include"LuaLogger.h"
 #include"Entity/Actor/App.h"
-#include"Util/Tools/String.h"
 
 using namespace acs;
 namespace lua

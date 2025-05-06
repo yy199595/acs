@@ -4,6 +4,7 @@
 
 #include "MysqlDBComponent.h"
 #include "Entity/Actor/App.h"
+#include "Util/File/FileHelper.h"
 #include "Log/Component/LoggerComponent.h"
 #include "Server/Config/ServerConfig.h"
 #include "Server/Component/ThreadComponent.h"
@@ -11,9 +12,7 @@
 #include "Message/s2s/registry.pb.h"
 #include "Lua/Lib/Lib.h"
 #include "XCode/XCode.h"
-#include "Util/Tools/String.h"
 #include "Server/Config/CodeConfig.h"
-#include "Util/File/FileHelper.h"
 #include "Util/Tools/Math.h"
 namespace acs
 {
@@ -21,7 +20,6 @@ namespace acs
 	{
 		this->mCount = 0;
 		this->mRetryCount = 0;
-		this->mThread = nullptr;
 		REGISTER_JSON_CLASS_FIELD(db::Explain, open);
 		REGISTER_JSON_CLASS_FIELD(db::Explain, command);
 
@@ -56,13 +54,29 @@ namespace acs
 		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
 			ccModule.Open("db.mysql", lua::lib::luaopen_lmysqldb);
 		});
-		return ServerConfig::Inst()->Get("mysql", this->mConfig);
+		if(!ServerConfig::Inst()->Get("mysql", this->mConfig))
+		{
+			return false;
+		}
+		if(!this->mConfig.script.empty())
+		{
+			std::string path = this->mConfig.script;
+			return help::fs::ReadTxtFile(path, this->mConfig.script);
+		}
+		return true;
+	}
+
+	void MysqlDBComponent::OnStart()
+	{
+		if(!this->mConfig.script.empty())
+		{
+			this->Run(this->mConfig.script);
+		}
 	}
 
 	bool MysqlDBComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(!this->mConfig.address.empty())
-		this->mThread = this->GetComponent<ThreadComponent>();
 		for(int x = 0; x < this->mConfig.address.size(); x++)
 		{
 			const std::string & address = this->mConfig.address.at(x);
@@ -79,7 +93,7 @@ namespace acs
 				config.script = this->mConfig.script;
 				config.conn_count = this->mConfig.conn_count;
 				Asio::Context& main = this->mApp->GetContext();
-				tcp::Socket* tcpSocket = this->mThread->CreateSocket(config.address);
+				tcp::Socket* tcpSocket = this->GetComponent<ThreadComponent>()->CreateSocket(config.address);
 				std::shared_ptr<mysql::Client> mysqlClient = std::make_shared<mysql::Client>(id, this, config, main);
 				{
 					int code = mysqlClient->Start(tcpSocket);
@@ -116,6 +130,17 @@ namespace acs
 		this->Run(std::make_unique<mysql::Request>(mysql::cmd::PING));
 		std::unique_ptr<json::w::Value> jsonObject = document.AddObject("mysql");
 		{
+			size_t sendByteCount = 0;
+			size_t recvByteCount = 0;
+			for(auto iter = this->mClients.begin(); iter != this->mClients.end(); iter++)
+			{
+				sendByteCount += iter->second->SendBufferBytes();
+				recvByteCount += iter->second->RecvBufferBytes();
+			}
+
+			jsonObject->Add("send_memory", sendByteCount);
+			jsonObject->Add("recv_memory", recvByteCount);
+
 			jsonObject->Add("sum", this->mCount);
 			jsonObject->Add("retry", this->mRetryCount);
 			jsonObject->Add("client", this->mClients.size());
@@ -151,8 +176,8 @@ namespace acs
 		std::unique_ptr<mysql::Response> resp(response);
 		if(response->HasError())
 		{
-			LOG_ERROR("{}", request->ToString());
-			LOG_ERROR("{}", response->ToString());
+			LOG_WARN("{}", request->ToString());
+			LOG_WARN("{}", response->ToString());
 		}
 		else
 		{

@@ -13,7 +13,7 @@ namespace acs
 
 	WaitLuaTaskSource::~WaitLuaTaskSource()
 	{
-		if(this->ref != 0)
+		if(this->ref > 0)
 		{
 			lua_unref(this->mLua, this->ref);
 		}

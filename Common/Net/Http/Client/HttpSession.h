@@ -23,14 +23,15 @@ namespace http
 		explicit Session(Component * component, Asio::Context & io);
 		~Session() final;
 	 public:
-		bool StartWriter();
 		void StartClose(int code);
-		bool StartWriter(HttpStatus status);
-		bool StartWriter(HttpStatus status, std::unique_ptr<Content> data);
-		void StartReceive(int id, tcp::Socket * socket, int timeout = 10);
+		bool StartWriter(int timeout);
+		bool StartWriter(HttpStatus status, int timeout);
+		bool StartWriter(HttpStatus status, std::unique_ptr<Content> data, int timeout);
 	public:
-		void StartReceiveBody();
-		void StartReceiveBody(std::unique_ptr<http::Content> content);
+		void StartReceiveBody(int timeout);
+		inline int GetClientId() const { return this->mId; }
+		void StartReceive(int id, tcp::Socket * socket, int timeout = 5);
+		void StartReceiveBody(std::unique_ptr<http::Content> content, int timeout);
 	private:
         void OnReadPause();
 		void ClosetClient(int code);
@@ -42,9 +43,8 @@ namespace http
 		void Clear();
 		void OnSendMessage(size_t size) final;
         void OnSendMessage(const asio::error_code &code) final;
-	public:
-		std::string mPath;
 	 private:
+		int mId;
 		Component * mComponent;
 		http::Request mRequest;
 		http::Response mResponse;

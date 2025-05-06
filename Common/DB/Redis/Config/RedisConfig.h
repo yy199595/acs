@@ -16,6 +16,7 @@ namespace redis
 		int ping = 15;
 		int count = 1;
 		int retry = 5; //重试时间(秒)
+		int timeout = 0;
 		bool debug = false;
 		int conn_count = 3;
 		std::string mq;

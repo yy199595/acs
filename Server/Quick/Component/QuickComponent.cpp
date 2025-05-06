@@ -16,14 +16,13 @@ namespace acs
 	QuickComponent::QuickComponent()
 	{
 		this->mHttp = nullptr;
+		REGISTER_JSON_CLASS_MUST_FIELD(quick::Config, md5_key);
+		REGISTER_JSON_CLASS_MUST_FIELD(quick::Config, callback_key);
 	}
 
 	bool QuickComponent::Awake()
 	{
-		std::unique_ptr<json::r::Value> jsonObject;
-		LOG_CHECK_RET_FALSE(this->mApp->Config().Get("quick", jsonObject))
-		LOG_CHECK_RET_FALSE(jsonObject->Get("md5_key", this->mConfig.md5_key))
-		LOG_CHECK_RET_FALSE(jsonObject->Get("callback_key", this->mConfig.callback_key))
+		LOG_CHECK_RET_FALSE(ServerConfig::Inst()->Get("quick", this->mConfig))
 		return true;
 	}
 

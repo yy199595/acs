@@ -24,7 +24,7 @@ namespace acs
 
 	bool UdpComponent::LateAwake()
 	{
-		this->mActor = this->GetComponent<ActorComponent>();
+		this->mActor = this->GetComponent<NodeComponent>();
 		this->mDispatch = this->GetComponent<DispatchComponent>();
 		return true;
 	}
@@ -129,7 +129,7 @@ namespace acs
 		if (code != XCode::Ok)
 		{
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			LOG_ERROR("call {} code = {}", message->GetHead().GetStr("func"), desc);
+			LOG_ERROR("call {} code = {}", message->GetHead().GetStr(rpc::Header::func), desc);
 
 			if (message->GetRpcId() == 0)
 			{

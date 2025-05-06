@@ -4,6 +4,7 @@
 #define _WIN32_WINNT 0x0501
 #endif // !_WIN32_WINNT
 #endif
+
 #include"asio.hpp"
 #ifdef __ENABLE_OPEN_SSL__
 #include"asio/ssl.hpp"
@@ -13,7 +14,7 @@ namespace Asio
 {
 	constexpr int OK = 0;
     typedef asio::error_code Code;
-    typedef asio::io_service Context;
+    typedef asio::io_context Context;
     typedef asio::ip::tcp::socket Socket;
     typedef asio::ip::tcp::endpoint EndPoint;
     typedef asio::io_service::work ContextWork;

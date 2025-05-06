@@ -12,7 +12,6 @@
 #include"Lua/Engine/LuaInclude.h"
 #include"Util/Tools/String.h"
 #include "Core/Map/HashMap.h"
-#include "Util/Crypt/Base64Helper.h"
 #include "Util/Tools/Guid.h"
 
 namespace http
@@ -251,7 +250,7 @@ namespace http
 	{
 		if (this->mJson.empty())
 		{
-			this->Decode(this->mJson);
+			this->mDocument.Decode(this->mJson);
 		}
 		os << http::Header::ContentType << ": " << http::Header::JSON << "\r\n";
 		os << http::Header::ContentLength << ": " << this->mJson.size() << "\r\n";
@@ -265,7 +264,7 @@ namespace http
 
 	void JsonContent::WriteToLua(lua_State* lua)
 	{
-		lua::yyjson::write(lua, this->mValue);
+		lua::yyjson::write(lua, this->mDocument.GetValue());
 	}
 
 	int JsonContent::OnWriteBody(std::ostream& os)

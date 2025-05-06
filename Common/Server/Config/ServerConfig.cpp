@@ -2,7 +2,6 @@
 #include"ServerConfig.h"
 #include"Core/System/System.h"
 #include"Util/File/FileHelper.h"
-#include"Log/Common/CommonLogDef.h"
 #include"Util/File/DirectoryHelper.h"
 
 namespace acs
@@ -85,7 +84,7 @@ namespace acs
 				this->mSecret = secret;
 			}
 		}
-		jsonObject->Get("name", this->mName);
+		os::System::GetEnv("name", this->mName);
 		if(this->Get("path", jsonObject) && jsonObject->IsObject())
 		{
 			std::vector<const char *> keys;

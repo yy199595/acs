@@ -26,11 +26,11 @@ namespace acs
 		int Find(const db::mongo::find::request & request, db::mongo::find::response & response);
 		int FindPage(const db::mongo::find::page & request, db::mongo::find::response & response);
 		int Count(const db::mongo::count::request & request, db::mongo::count::response & response);
+		int Facet(const db::mongo::aggregate::facet & request, db::mongo::find::response& response);
 		int Run(const db::mongo::command::request & request, db::mongo::command::response & response);
 		int Distinct(const db::mongo::find::distinct & request, db::mongo::find_one::response & response);
-		int FindOne(const db::mongo::find_one::request & request, db::mongo::find_one::response & response);
 		int Aggregate(const db::mongo::aggregate::request & request, db::mongo::find::response& response);
-		int Facet(const db::mongo::aggregate::facet & request, db::mongo::find::response& response);
+		int FindOne(const db::mongo::find_one::request & request, db::mongo::find_one::response & response);
 		int FindAndModify(const db::mongo::find_modify ::request & request, db::mongo::find_modify ::response & response);
 	public:
 		int Databases(com::array::string& response);

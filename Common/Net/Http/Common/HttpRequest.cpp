@@ -26,7 +26,7 @@ namespace http
 
 	bool Request::GetIp(std::string& ip) const
 	{
-		if(this->mHead.Get("X-Forwarded-For", ip))
+		if(this->mHead.Get("x-forwarded-for", ip))
 		{
 			return true;
 		}
@@ -114,7 +114,7 @@ namespace http
 		this->mUrl.Clear();
 		this->mHead.Clear();
 		this->mTimeout = 0;
-		this->mBody = nullptr;
+		this->mBody.reset();
 		this->mDecodeStatus = tcp::Decode::None;
 	}
 

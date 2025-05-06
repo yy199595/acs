@@ -30,8 +30,9 @@ namespace Lua
 		{
 			if (lua_isfunction(this->mLua, -1))
 			{
-				std::string func(lua_tostring(this->mLua, -2));
-				this->mCaches.insert(func);
+				size_t size = 0;
+				const char * func = lua_tolstring(this->mLua, -2, &size);
+				this->mCaches.emplace_back(func, size);
 			}
 			lua_pop(this->mLua, 1);
 		}
@@ -50,8 +51,9 @@ namespace Lua
 		{
 			if (lua_isfunction(this->mLua, -1))
 			{
-				std::string func(lua_tostring(this->mLua, -2));
-				this->mCaches.insert(func);
+				size_t size = 0;
+				const char * func = lua_tolstring(this->mLua, -2, &size);
+				this->mCaches.emplace_back(func, size);
 			}
 			lua_pop(this->mLua, 1);
 		}
@@ -77,8 +79,11 @@ namespace Lua
 
 	bool LuaModule::HasFunction(const std::string & name)
 	{
-		auto iter = this->mCaches.find(name);
-		return iter != this->mCaches.end();
+		return std::any_of(this->mCaches.begin(), this->mCaches.end(),
+				[&name](const std::string& key)
+				{
+					return name == key;
+				});
 	}
 
 	bool LuaModule::GetFunction(const std::string& name)

@@ -28,7 +28,7 @@ namespace acs
 		void AddRpcData(json::w::Value & response, const RpcMethodConfig * config);
 	private:
 		class ProtoComponent * mProto;
-		class ActorComponent * mActor;
+		class NodeComponent * mActor;
 	};
 }
 

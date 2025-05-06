@@ -24,13 +24,14 @@ namespace http
 #endif
     {
 	 public:
-		Response(HttpStatus code = HttpStatus::OK);
+		explicit Response(HttpStatus code = HttpStatus::OK);
 		~Response() override = default;
 	public:
 		void Clear() override;
-		Head & Header() { return this->mHead; }
-		HttpStatus Code() const { return (HttpStatus)this->mCode; }
-		const std::string & GetError() const { return this->mError; }
+		inline Head & Header() { return this->mHead; }
+		inline HttpStatus Code() const { return (HttpStatus)this->mCode; }
+		inline const std::string & GetError() const { return this->mError; }
+		inline bool IsOk() const { return this->mCode == (int)HttpStatus::OK;}
 	public:
 		template<typename T>
 		inline const T * To() const;

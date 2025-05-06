@@ -32,7 +32,6 @@ namespace acs
 		for (int i = 0; i < descriptor->field_count(); i++)
 		{
 			const pb::FieldDescriptor* field = descriptor->field(i);
-			const std::string & name = field->name();
 			lua_getfield(this->mLua, index, field->name().c_str());
 			if(!this->EncodeField(message, field, lua_absindex(this->mLua, -1)))
 			{
@@ -104,33 +103,33 @@ namespace acs
 		switch (field->cpp_type())
 		{
 			case pb::FieldDescriptor::CPPTYPE_DOUBLE:
-				reflection->SetDouble(&message, field, (double)lua_tonumber(this->mLua, index));
+				reflection->SetDouble(&message, field, (double)luaL_checknumber(this->mLua, index));
 				break;
 			case pb::FieldDescriptor::CPPTYPE_FLOAT:
-				reflection->SetFloat(&message, field, (float)lua_tonumber(this->mLua, index));
+				reflection->SetFloat(&message, field, (float)luaL_checknumber(this->mLua, index));
 				break;
 			case pb::FieldDescriptor::CPPTYPE_INT32:
-				reflection->SetInt32(&message, field, (pb::int32)lua_tointeger(this->mLua, index));
+				reflection->SetInt32(&message, field, (pb::int32)luaL_checkinteger(this->mLua, index));
 				break;
 			case pb::FieldDescriptor::CPPTYPE_UINT32:
-				reflection->SetUInt32(&message, field, (pb::uint32)lua_tointeger(this->mLua, index));
+				reflection->SetUInt32(&message, field, (pb::uint32)luaL_checkinteger(this->mLua, index));
 				break;
 			case pb::FieldDescriptor::CPPTYPE_INT64:
-				reflection->SetInt64(&message, field, (pb::int64)lua_tointeger(this->mLua, index));
+				reflection->SetInt64(&message, field, (pb::int64)luaL_checkinteger(this->mLua, index));
 				break;
 			case pb::FieldDescriptor::CPPTYPE_UINT64:
-				reflection->SetUInt64(&message, field, (pb::uint64)lua_tointeger(this->mLua, index));
+				reflection->SetUInt64(&message, field, (pb::uint64)luaL_checkinteger(this->mLua, index));
 				break;
 			case pb::FieldDescriptor::CPPTYPE_ENUM:
-				reflection->SetEnumValue(&message, field, (int)lua_tointeger(this->mLua, index));
+				reflection->SetEnumValue(&message, field, (int)luaL_checkinteger(this->mLua, index));
 				break;
 			case pb::FieldDescriptor::CPPTYPE_BOOL:
-				reflection->SetBool(&message, field, lua_toboolean(this->mLua, index) != 0);
+				reflection->SetBool(&message, field, (bool)lua_toboolean(this->mLua, index) != 0);
 				break;
 			case pb::FieldDescriptor::CPPTYPE_STRING:
 			{
 				size_t length = 0;
-				const char* bytes = lua_tolstring(this->mLua, index, &length);
+				const char* bytes = luaL_checklstring(this->mLua, index, &length);
 				reflection->SetString(&message, field, std::string(bytes, length));
 			}
 				break;
@@ -168,33 +167,33 @@ namespace acs
 		switch (field->cpp_type())
 		{
 		case pb::FieldDescriptor::CPPTYPE_DOUBLE:
-			reflection->AddDouble(&message, field, (double)lua_tonumber(this->mLua, index));
+			reflection->AddDouble(&message, field, (double)luaL_checknumber(this->mLua, index));
 			break;
 		case pb::FieldDescriptor::CPPTYPE_FLOAT:
-			reflection->AddFloat(&message, field, (float)lua_tonumber(this->mLua, index));
+			reflection->AddFloat(&message, field, (float)luaL_checknumber(this->mLua, index));
 			break;
 		case pb::FieldDescriptor::CPPTYPE_INT32:
-			reflection->AddInt32(&message, field, (pb::int32)lua_tointeger(this->mLua, index));
+			reflection->AddInt32(&message, field, (pb::int32)luaL_checkinteger(this->mLua, index));
 			break;
 		case pb::FieldDescriptor::CPPTYPE_UINT32:
-			reflection->AddUInt32(&message, field, (pb::uint32)lua_tointeger(this->mLua, index));
+			reflection->AddUInt32(&message, field, (pb::uint32)luaL_checkinteger(this->mLua, index));
 			break;
 		case pb::FieldDescriptor::CPPTYPE_INT64:
-			reflection->AddInt64(&message, field, (pb::int64)lua_tointeger(this->mLua, index));
+			reflection->AddInt64(&message, field, (pb::int64)luaL_checkinteger(this->mLua, index));
 			break;
 		case pb::FieldDescriptor::CPPTYPE_UINT64:
-			reflection->AddUInt64(&message, field, (pb::uint64)lua_tointeger(this->mLua, index));
+			reflection->AddUInt64(&message, field, (pb::uint64)luaL_checkinteger(this->mLua, index));
 			break;
 		case pb::FieldDescriptor::CPPTYPE_ENUM:
-			reflection->AddEnumValue(&message, field, (int)lua_tointeger(this->mLua, index));
+			reflection->AddEnumValue(&message, field, (int)luaL_checkinteger(this->mLua, index));
 			break;
 		case pb::FieldDescriptor::CPPTYPE_BOOL:
-			reflection->AddBool(&message, field, lua_toboolean(this->mLua, index) != 0);
+			reflection->AddBool(&message, field, (bool)lua_toboolean(this->mLua, index) != 0);
 			break;
 		case pb::FieldDescriptor::CPPTYPE_STRING:
 		{
 			size_t length = 0;
-			const char* bytes = lua_tolstring(this->mLua, index, &length);
+			const char* bytes = luaL_checklstring(this->mLua, index, &length);
 			reflection->AddString(&message, field, std::string(bytes, length));
 		}
 			break;

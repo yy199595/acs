@@ -38,6 +38,8 @@ namespace tcp
 	public:
 		void SetSocket(Socket * socket);
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
+		inline size_t SendBufferBytes() const { return this->mRecvBuffer.capacity() * sizeof(std::streambuf::char_type); }
+		inline size_t RecvBufferBytes() const { return this->mRecvBuffer.capacity() * sizeof(std::streambuf::char_type); }
 	protected:
 		bool ReadAll(int timeout = 0);
 		bool Connect(int timeout = 0);
@@ -87,4 +89,4 @@ namespace tcp
 	};
 }
 
-#endif //APP_CLIENT_H
+#endif //APP_TCPCLIENT_H

@@ -34,7 +34,7 @@ namespace acs
 	void LuaServiceTaskSource::WriteRpcResponse(lua_State* lua) noexcept
 	{
 		this->mRpcData->Body()->clear();
-		this->mRpcData->SetProto(rpc::Porto::None);
+		this->mRpcData->SetProto(rpc::Proto::None);
 		this->mCode = (int)luaL_checkinteger(lua, 2);
 		if (this->mCode != XCode::Ok)
 		{
@@ -45,7 +45,7 @@ namespace acs
 			std::string pb;
 			if (this->mRpcData->TempHead().Get("pb", pb))
 			{
-				this->mRpcData->SetProto(rpc::Porto::Protobuf);
+				this->mRpcData->SetProto(rpc::Proto::Protobuf);
 				pb::Message* message = App::GetProto()->Temp(pb);
 				if (message == nullptr)
 				{
@@ -62,7 +62,7 @@ namespace acs
 			}
 			else
 			{
-				this->mRpcData->SetProto(rpc::Porto::Json);
+				this->mRpcData->SetProto(rpc::Proto::Json);
 				lua::yyjson::read(lua, 3, *this->mRpcData->Body());
 			}
 		}
@@ -71,7 +71,7 @@ namespace acs
 			size_t len = 0;
 			const char* str = lua_tolstring(lua, 3, &len);
 			this->mRpcData->Body()->append(str, len);
-			this->mRpcData->SetProto(rpc::Porto::String);
+			this->mRpcData->SetProto(rpc::Proto::String);
 		}
 	}
 

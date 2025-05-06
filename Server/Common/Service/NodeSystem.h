@@ -20,14 +20,14 @@ namespace acs
 		int Shutdown();
 		int LoadConfig();
 		int Ping(long long id);
-		int Find(com::type::json & response);
-		int Add(const com::type::json & request); //新服务器加入
-        int Del(const com::type::int32 & request); //服务器退出
+		int Add(const rpc::Message& request); //新服务器加入
+        int Del(const rpc::Message& request); //服务器退出
         int RunInfo(com::type::json & response); // 获取运行信息
+		int Find(const rpc::Message & request); //查找新加入的节点
 	private:
 		bool OnInit() final;
 	private:
-		class ActorComponent * mActor;
+		class NodeComponent * mNode;
     };
 }
 

@@ -17,6 +17,7 @@ namespace acs
 		bool LateAwake() final;
 		int Send(const std::string& func) const;
 		const std::string & Name() const { return this->mName; }
+		int Send(std::unique_ptr<rpc::Message> message) const;
 		int Send(const std::string& func, const pb::Message& request) const;
 	 public:
 		int Call(const std::string & func) const;
@@ -25,20 +26,18 @@ namespace acs
 		int Call(const std::string & func, const pb::Message & request) const;
 		int Call(const std::string & func, const pb::Message & request, pb::Message * response);
 	public:
-		int Publish(const std::string & event) const;
-		int Publish(const std::string & event, json::w::Document & document) const;
-		int Publish(const std::string & event, char proto, const std::string & data) const;
+		int Send(const std::string & func, const json::w::Document & request);
+		int Call(const std::string & func, const json::w::Document & request);
+		int Call(const std::string & func, const json::w::Document & request, json::r::Document * response);
 	public:
 		int LuaSend(lua_State * lua, std::unique_ptr<rpc::Message>) const;
 		int LuaCall(lua_State * lua, std::unique_ptr<rpc::Message>) const;
 		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::unique_ptr<rpc::Message> &) const;
 	 public:
 		virtual bool OnInit() = 0;
-		virtual void Encode(json::w::Value & document) = 0;
-		virtual bool Decode(json::r::Value & document) { return true;}
 	protected:
 		virtual bool GetAddress(const rpc::Message & request, int & id) const = 0;
-		virtual int Make(const std::string & func, std::unique_ptr<rpc::Message> & request) const = 0;
+		virtual std::unique_ptr<rpc::Message> Make(const std::string & func) const = 0;
 	protected:
 		class RouterComponent * mRouter;
 	private:

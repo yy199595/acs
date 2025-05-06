@@ -4,7 +4,6 @@
 
 #include "UdpClient.h"
 #include "Util/Tools/String.h"
-#include "Entity/Actor/App.h"
 #include "Log/Common/CommonLogDef.h"
 
 namespace udp
@@ -17,8 +16,7 @@ namespace udp
 
 	void Client::Send(tcp::IProto* message)
 	{
-		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(this->mContext, [self, message]()
+		asio::post(this->mContext, [self = this->shared_from_this(), message]()
 		{
 			std::ostream stream(&self->mSendBuffer);
 			int length = message->OnSendMessage(stream);
@@ -50,8 +48,8 @@ namespace udp
 			}
 			asio::post(self->mSocket.get_executor(), [self] { self->StartReceive(); });
 		};
-		this->mSocket.async_receive_from(this->mRecvBuffer.prepare(udp::BUFFER_COUNT),
-				this->mLocalEndpoint, callback);
+		auto buffer = this->mRecvBuffer.prepare(udp::BUFFER_COUNT);
+		this->mSocket.async_receive_from(buffer, this->mLocalEndpoint, callback);
 	}
 
 	void Client::OnReceive(const std::string & address, size_t size)
@@ -59,16 +57,14 @@ namespace udp
 		std::istream is(&this->mRecvBuffer);
 		std::unique_ptr<rpc::Message> rpcPacket = std::make_unique<rpc::Message>();
 		{
+			rpcPacket->SetMsg(rpc::msg::text);
 			tcp::Data::Read(is, rpcPacket->GetProtoHead());
-			if((size - rpc::RPC_PACK_HEAD_LEN) == rpcPacket->GetProtoHead().Len)
+			if (rpcPacket->OnRecvMessage(is, size) == tcp::read::done)
 			{
-				if (rpcPacket->OnRecvMessage(is, rpcPacket->GetProtoHead().Len) == tcp::read::done)
-				{
-					rpcPacket->SetNet(rpc::Net::Udp);
-					std::shared_ptr<Client> self = this->shared_from_this();
-					rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
-					asio::post(this->mMainContext, [self, msg = rpcPacket.release()] { self->mComponent->OnMessage(msg, msg); });
-				}
+				rpcPacket->SetNet(rpc::Net::Udp);
+				std::shared_ptr<Client> self = this->shared_from_this();
+				rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
+				asio::post(this->mMainContext, [self, msg = rpcPacket.release()] { self->mComponent->OnMessage(msg, msg); });
 			}
 		}
 	}

@@ -11,23 +11,22 @@
 #include"Util/File/FileHelper.h"
 #include"Server/Config/CodeConfig.h"
 #include"Util/Tools/TimeHelper.h"
-#include"Lua/Engine/ModuleClass.h"
-#include "Rpc/Component/DispatchComponent.h"
 
 namespace acs
 {
 	HttpWebComponent::HttpWebComponent()
 	{
 		this->mRecord = nullptr;
-		this->mSuccessCount = 0;
-		this->mFailureCount = 0;
 		this->mConfig.index = "index.html";
 		REGISTER_JSON_CLASS_FIELD(http::Config, auth);
 		REGISTER_JSON_CLASS_FIELD(http::Config, root);
 		REGISTER_JSON_CLASS_FIELD(http::Config, index);
 		REGISTER_JSON_CLASS_FIELD(http::Config, upload);
 		REGISTER_JSON_CLASS_FIELD(http::Config, domain);
+		REGISTER_JSON_CLASS_FIELD(http::Config, header);
 		REGISTER_JSON_CLASS_FIELD(http::Config, whiteList);
+		REGISTER_JSON_CLASS_FIELD(http::Config, send_timeout);
+		REGISTER_JSON_CLASS_FIELD(http::Config, read_timeout);
 
 
 		this->mCoroutine = nullptr;
@@ -47,6 +46,9 @@ namespace acs
 		this->mFactory.Add<http::BinContent>(http::Header::PB);
 
 		this->mFactory.Add<http::MultipartFromContent>(http::Header::MulFromData);
+
+		this->mHttpClients.max_load_factor(0.75);
+		this->mHttpClients.reserve(200);
 	}
 
 	bool HttpWebComponent::LateAwake()
@@ -88,9 +90,11 @@ namespace acs
 
 	void HttpWebComponent::OnReadHead(http::Request* request, http::Response* response) noexcept
 	{
+		this->mRecordInfo.sum++;
 		int sockId = request->GetSockId();
 		HttpStatus httpStatus = HttpStatus::OK;
 		auto iter = this->mConfig.header.begin();
+		std::unique_ptr<http::Content> httpContent;
 		for (; iter != this->mConfig.header.end(); iter++)
 		{
 			const std::string& key = iter->first;
@@ -107,12 +111,8 @@ namespace acs
 			const HttpMethodConfig* httpConfig = HttpConfig::Inst()->GetMethodConfig(path);
 			if (httpConfig == nullptr)
 			{
-				if (this->OnNotFound(request, response) != HttpStatus::OK)
-				{
-					httpStatus = HttpStatus::NOT_FOUND;
-					break;
-				}
-				return;
+				httpStatus = this->OnNotFound(path, httpContent);
+				break;
 			}
 
 			if (!httpConfig->open)
@@ -131,14 +131,6 @@ namespace acs
 				httpStatus = HttpStatus::METHOD_NOT_ALLOWED;
 				break;
 			}
-			if (!request->IsMethod("GET"))
-			{
-				httpStatus = this->CreateHttpData(httpConfig, request);
-				if(httpStatus != HttpStatus::OK)
-				{
-					break;
-				}
-			}
 
 			if (this->mConfig.auth && httpConfig->auth)
 			{
@@ -148,6 +140,7 @@ namespace acs
 					break;
 				}
 			}
+
 			if (!httpConfig->WhiteList.empty()) //白名单判断
 			{
 				std::string ip;
@@ -163,17 +156,27 @@ namespace acs
 				this->OnApi(httpConfig, request, response);
 				return;
 			}
-			this->ReadMessageBody(sockId);
+			httpStatus = this->CreateContent(httpConfig, request->ConstHeader(), httpContent);
+			if (httpStatus == HttpStatus::OK)
+			{
+				this->ReadMessageBody(sockId, std::move(httpContent), this->mConfig.read_timeout);
+				return;
+			}
+		}
+		while (false);
+		if(httpContent == nullptr)
+		{
+			this->SendResponse(sockId, httpStatus, this->mConfig.send_timeout);
 			return;
-		} while (false);
-		this->SendResponse(sockId, httpStatus);
+		}
+		this->SendResponse(sockId, httpStatus, std::move(httpContent), this->mConfig.send_timeout);
 	}
 
-	HttpStatus HttpWebComponent::CreateHttpData(
-			const acs::HttpMethodConfig* httpConfig, http::Request* request) noexcept
+	HttpStatus HttpWebComponent::CreateContent(const acs::HttpMethodConfig* httpConfig,
+			const http::Head& head, std::unique_ptr<http::Content> & content) noexcept
 	{
 		std::string cont_type;
-		if (!request->Header().GetContentType(cont_type))
+		if (!head.GetContentType(cont_type))
 		{
 			return HttpStatus::BAD_REQUEST;
 		}
@@ -181,22 +184,19 @@ namespace acs
 		{
 			if (httpConfig->content.find(cont_type) == std::string::npos)
 			{
-				const http::Url& url = request->GetUrl();
-				LOG_ERROR("[{}]({}) {}:{}", url.Method(), url.Path(), cont_type, httpConfig->content);
 				return HttpStatus::BAD_REQUEST;
 			}
 		}
-		std::unique_ptr<http::Content> body;
-		if (!this->mFactory.New(cont_type, body))
+		if (!this->mFactory.New(cont_type, content))
 		{
 			if(!httpConfig->content.empty())
 			{
 				return HttpStatus::UNSUPPORTED_MEDIA_TYPE;
 			}
-			body = std::make_unique<http::TextContent>();
+			content = std::make_unique<http::TextContent>();
 		}
 		long long contentLength = 0;
-		if (!request->ConstHeader().GetContentLength(contentLength))
+		if (!head.GetContentLength(contentLength))
 		{
 			return HttpStatus::LENGTH_REQUIRED;
 		}
@@ -204,7 +204,7 @@ namespace acs
 		{
 			return HttpStatus::BAD_REQUEST;
 		}
-		if (body->GetContentType() == http::ContentType::MULTIPAR)
+		if (content->GetContentType() == http::ContentType::MULTIPAR)
 		{
 			if (this->mConfig.upload.empty())
 			{
@@ -212,9 +212,9 @@ namespace acs
 			}
 			const int limit = httpConfig->limit;
 			const std::string& path = this->mConfig.upload;
-			body->Cast<http::MultipartFromContent>()->Init(path, limit);
+			content->Cast<http::MultipartFromContent>()->Init(path, limit);
 		}
-		else if (body->GetContentType() == http::ContentType::FILE)
+		else if (content->GetContentType() == http::ContentType::FILE)
 		{
 			if (this->mConfig.upload.empty())
 			{
@@ -229,30 +229,42 @@ namespace acs
 			std::string type = cont_type.substr(pos + 1);
 			const std::string& upload = this->mConfig.upload;
 			const std::string path = fmt::format("{}/{}.{}", upload, guid, type);
-			if (!body->Cast<http::FileContent>()->MakeFile(path))
+			if (!content->Cast<http::FileContent>()->MakeFile(path))
 			{
 				return HttpStatus::INTERNAL_SERVER_ERROR;
 			}
 		}
-		request->SetBody(std::move(body));
 		return HttpStatus::OK;
 	}
 
-	HttpStatus HttpWebComponent::OnNotFound(http::Request* request, http::Response* response) noexcept
+	HttpStatus HttpWebComponent::OnNotFound(const std::string & path, std::unique_ptr<http::Content> & content) noexcept
 	{
-		const std::string& path = request->GetUrl().Path();
-		if (path == "/" && !this->mPath.empty())
+		std::string filePath;
+		do
 		{
-			response->File(http::Header::HTML, this->mPath);
-			return HttpStatus::OK;
-		}
-		for (const std::string& dir: this->mRoots)
-		{
-			std::string filePath = fmt::format("{}/{}", dir, path);
-			if (!help::fs::FileIsExist(filePath))
+			if (path == "/" && !this->mPath.empty())
 			{
-				continue;
+				filePath = this->mPath;
+				break;
 			}
+			for (const std::string& dir: this->mRoots)
+			{
+				filePath = fmt::format("{}/{}", dir, path);
+				if (!help::fs::FileIsExist(filePath))
+				{
+					filePath.clear();
+					continue;
+				}
+				break;
+			}
+		}
+		while(false);
+		if(filePath.empty())
+		{
+			return HttpStatus::NOT_FOUND;
+		}
+		std::unique_ptr<http::FileContent> fileContent = std::make_unique<http::FileContent>();
+		{
 			std::string contentType = http::Header::TEXT;
 			size_t pos = filePath.find_last_of('.');
 			if (pos != std::string::npos)
@@ -260,14 +272,18 @@ namespace acs
 				std::string t = filePath.substr(pos + 1);
 				contentType = http::GetContentType(t);
 			}
-			response->File(contentType, filePath);
-			return HttpStatus::OK;
+			if(!fileContent->OpenFile(filePath, contentType))
+			{
+				return HttpStatus::NOT_FOUND;
+			}
+			content = std::move(fileContent);
 		}
-		return HttpStatus::NOT_FOUND;
+		return HttpStatus::OK;
 	}
 
-	void HttpWebComponent::OnMessage(http::Request* request, http::Response* response) noexcept
+	void HttpWebComponent::OnMessage(int id, http::Request* request, http::Response* response) noexcept
 	{
+		request->SetSockId(id);
 		const std::string& path = request->GetUrl().Path();
 		const HttpMethodConfig* httpConfig = HttpConfig::Inst()->GetMethodConfig(path);
 		if (httpConfig != nullptr)
@@ -278,7 +294,7 @@ namespace acs
 		std::string ip;
 		request->Header().Get(http::Header::RealIp, ip);
 		LOG_ERROR("[{}:{}] {}", ip, request->GetUrl().Method(), request->ToString());
-		this->SendResponse(request->GetSockId(), HttpStatus::NOT_FOUND);
+		this->SendResponse(id, HttpStatus::NOT_FOUND, this->mConfig.send_timeout);
 	}
 
 	void HttpWebComponent::OnApi(const acs::HttpMethodConfig* httpConfig,
@@ -339,9 +355,19 @@ namespace acs
 		return HttpStatus::OK;
 	}
 
+	std::shared_ptr<http::Session> HttpWebComponent::GetClient(int id)
+	{
+		auto iter = this->mHttpClients.find(id);
+		return iter == this->mHttpClients.end() ? nullptr : iter->second;
+	}
+
+
 	void HttpWebComponent::Invoke(const HttpMethodConfig* config, http::Request* request, http::Response* response) noexcept
 	{
+		this->mRecordInfo.wait++;
 		HttpStatus code = HttpStatus::OK;
+		int sockId = request->GetSockId();
+		std::shared_ptr<http::Session> session = this->GetClient(sockId); //保留一次引用计数，避免回调执行回来了,对象没了
 		do
 		{
 			http::Head& head = request->Header();
@@ -383,23 +409,36 @@ namespace acs
 				LOG_WARN("({})[{}] code:{} => {}", url.Method(), url.ToStr(), logicCode, desc);
 			}
 #endif
-		} while (false);
+		}
+		while (false);
+		this->mRecordInfo.wait--;
 		if(config->record && this->mRecord != nullptr)
 		{
 			this->mRecord->OnRequestDone(*config, *request, *response);
 		}
-		this->SendResponse(request->GetSockId(), code);
+		this->SendResponse(sockId, code, this->mConfig.send_timeout);
 	}
 
 	void HttpWebComponent::OnRecord(json::w::Document& document)
 	{
+		size_t byteCount = 0;
+		for(auto iter = this->mHttpClients.begin(); iter != this->mHttpClients.end(); iter++)
+		{
+			byteCount += sizeof(http::Session);
+			byteCount += iter->second->SendBufferBytes();
+			byteCount += iter->second->RecvBufferBytes();
+		}
+
 		std::unique_ptr<json::w::Value> data = document.AddObject("web");
 		{
-			data->Add("success", this->mSuccessCount);
-			data->Add("failure", this->mFailureCount);
-			data->Add("sum", this->mNumPool.CurrentNumber());
-			data->Add("client", (int)this->mHttpClients.size());
-			data->Add("wait", this->mHttpClients.size());
+			data->Add("memory", byteCount);
+			data->Add("sum", this->mRecordInfo.sum);
+			data->Add("conn", this->mRecordInfo.conn);
+			data->Add("wait", this->mRecordInfo.wait);
+			data->Add("client", this->mHttpClients.size());
+			data->Add("success", this->mRecordInfo.success);
+			data->Add("failure", this->mRecordInfo.failure);
+			data->Add("timeout", this->mRecordInfo.timeout);
 		}
 	}
 
@@ -415,50 +454,70 @@ namespace acs
 
 	void HttpWebComponent::OnClientError(int id, int code)
 	{
+		if(code == XCode::NetTimeout)
+		{
+			this->mRecordInfo.timeout++;
+		}
 		auto iter = this->mHttpClients.find(id);
 		if(iter != this->mHttpClients.end())
 		{
+			if(code == XCode::Ok && this->mObjectPool.size() < this->mConfig.pool)
+			{
+				this->mObjectPool.emplace_back(iter->second); //正常完整的对象缓存
+			}
 			this->mHttpClients.erase(iter);
 		}
-		if(code == XCode::Ok)
-		{
-			this->mSuccessCount++;
-			return;
-		}
-		this->mFailureCount++;
 	}
 
 	bool HttpWebComponent::OnListen(tcp::Socket* socket) noexcept
 	{
+		this->mRecordInfo.conn++;
 		int sockId = this->mNumPool.BuildNumber();
-		Asio::Context & io = this->mApp->GetContext();
-		std::shared_ptr<http::Session> handlerClient = std::make_shared<http::Session>(this, io);
+		std::shared_ptr<http::Session> handlerClient;
 		{
-			handlerClient->StartReceive(sockId, socket);
-			this->mHttpClients.emplace(sockId, handlerClient);
+			Asio::Context& io = this->mApp->GetContext();
+			handlerClient = std::make_shared<http::Session>(this, io);
 		}
+		handlerClient->StartReceive(sockId, socket);
+		this->mHttpClients.emplace(sockId, handlerClient);
+		//CONSOLE_LOG_DEBUG("http client count => {}", this->mHttpClients.size());
 		return true;
 	}
 
-	bool HttpWebComponent::SendResponse(int id, HttpStatus code)
+	bool HttpWebComponent::SendResponse(int id, HttpStatus code, int timeout)
 	{
-		auto iter = this->mHttpClients.find(id);
-		if(iter == this->mHttpClients.end())
+		std::shared_ptr<http::Session> httpClient = this->GetClient(id);
+		if(httpClient == nullptr)
 		{
-			LOG_ERROR("send message to {} fail", id);
+			this->mRecordInfo.failure++;
 			return false;
 		}
-		return iter->second->StartWriter(code);
+		code == HttpStatus::OK
+		? this->mRecordInfo.success++ : this->mRecordInfo.failure++;
+		return httpClient->StartWriter(code, timeout);
 	}
 
-	bool HttpWebComponent::ReadMessageBody(int id)
+	bool HttpWebComponent::SendResponse(int id, HttpStatus code, std::unique_ptr<http::Content> httpContent, int timeout)
+	{
+		std::shared_ptr<http::Session> httpClient = this->GetClient(id);
+		if(httpClient == nullptr)
+		{
+			this->mRecordInfo.failure++;
+			return false;
+		}
+		code == HttpStatus::OK
+		? this->mRecordInfo.success++ : this->mRecordInfo.failure++;
+		return httpClient->StartWriter(code, std::move(httpContent), timeout);
+	}
+
+	bool HttpWebComponent::ReadMessageBody(int id, std::unique_ptr<http::Content> httpContent, int timeout)
 	{
 		auto iter = this->mHttpClients.find(id);
 		if(iter == this->mHttpClients.end())
 		{
 			return false;
 		}
-		iter->second->StartReceiveBody();
+		iter->second->StartReceiveBody(std::move(httpContent), timeout);
 		return true;
 	}
 }

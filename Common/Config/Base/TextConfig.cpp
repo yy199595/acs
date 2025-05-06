@@ -9,6 +9,10 @@ namespace acs
 {
     bool TextConfig::LoadConfig(const std::string &path)
     {
+		if(path.empty())
+		{
+			return false;
+		}
         std::string content;
         this->mPath = path;
 		if(!os::System::ReadFile(this->mPath, content))

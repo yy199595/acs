@@ -28,7 +28,7 @@ namespace ssl
 namespace acs
 {
 	class HttpComponent final : public RpcComponent<http::Response>,
-								public IRpc<http::Request, http::Response>
+								public IRpc<http::Request, http::Response>, public IServerRecord
 	{
 	public:
 		HttpComponent();
@@ -45,15 +45,15 @@ namespace acs
 	private:
 		bool Awake() final;
 		bool LateAwake() final;
-		void OnDelTask(int key) final;
+		void OnRecord(json::w::Document &document) final;
 		std::shared_ptr<http::Client> CreateClient(http::Request * request);
-		void OnMessage(http::Request *request, http::Response *response) noexcept final;
+		void OnMessage(int taskId, http::Request *request, http::Response *response) noexcept final;
 	private:
 		class ThreadComponent * mNetComponent;
 #ifdef __ENABLE_OPEN_SSL__
 		asio::ssl::context mSslContext;
 		std::unordered_map<std::string, asio::ssl::context *> mSslContexts;
 #endif
-		custom::HashMap<int, std::shared_ptr<http::Client>> mUseClients;
+		std::unordered_map<int, std::shared_ptr<http::Client>> mUseClients;
 	};
 }

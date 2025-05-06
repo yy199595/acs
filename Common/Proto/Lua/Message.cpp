@@ -74,62 +74,60 @@ namespace lua
 
 	int MessageEx::Encode(lua_State* lua)
 	{
-		std::unique_ptr<pb::Message> message;
-		if(lua_isuserdata(lua, 1))
+		pb::Message* message = nullptr;
+		if (lua_isuserdata(lua, 1))
 		{
-			pb::Message * pbMessage = Lua::UserDataParameter::Read<pb::Message*>(lua, 1);
-			if(pbMessage == nullptr)
-			{
-				return 0;
-			}
-			message.reset(pbMessage);
+			message = Lua::UserDataParameter::Read<pb::Message*>(lua, 1);
 		}
 		else if (lua_istable(lua, 2))
 		{
 			const char* name = luaL_checkstring(lua, 1);
-			pb::Message * data = App::GetProto()->Read(lua, name, 2);
-			if(data == nullptr)
-			{
-				return 0;
-			}
-			message.reset(data);
+			message = App::GetProto()->Read(lua, name, 2);
 		}
-		else if(lua_isstring(lua, 2))
+		else if (lua_isstring(lua, 2))
 		{
 			size_t size = 0;
 			const char* name = luaL_checkstring(lua, 1);
-			const char * json = luaL_checklstring(lua, 2, &size);
-			if(!App::GetProto()->New(name, json, size, message))
+			message = App::GetProto()->Temp(name);
+			if (message == nullptr)
 			{
+				luaL_error(lua, "not find pb:%s", name);
+				return 0;
+			}
+			const char* json = luaL_checklstring(lua, 2, &size);
+			pb::StringPiece stringPiece(json, (int)size);
+			if (!pb_json::JsonStringToMessage(stringPiece, message).ok())
+			{
+				luaL_error(lua, "json to pb:%s", name);
 				return 0;
 			}
 		}
-		if(message != nullptr)
+		if (message == nullptr)
 		{
-			std::string data;
-			message->SerializeToString(&data);
-			lua_pushlstring(lua, data.c_str(), data.size());
-			return 1;
+			return 0;
 		}
-		return 0;
+		std::string data;
+		message->SerializeToString(&data);
+		lua_pushlstring(lua, data.c_str(), data.size());
+		return 1;
 	}
 
 	int MessageEx::Decode(lua_State* lua)
 	{
 		size_t size = 0;
-		std::unique_ptr<pb::Message> message;
 		const char * name = luaL_checkstring(lua, 1);
 		const char * data = luaL_checklstring(lua, 2, &size);
-		ProtoComponent* messageComponent = App::GetProto();
-		if(!messageComponent->New(name, message))
+		pb::Message * pbMessage = App::GetProto()->Temp(name);
+		if(pbMessage == nullptr)
 		{
 			return 0;
 		}
-		if(!message->ParseFromArray(data, (int)size))
+
+		if(!pbMessage->ParseFromArray(data, (int)size))
 		{
 			return 0;
 		}
-		messageComponent->Write(lua, *message);
+		App::GetProto()->Write(lua, *pbMessage);
 		return 1;
 	}
 

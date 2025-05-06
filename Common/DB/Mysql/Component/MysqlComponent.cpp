@@ -21,27 +21,13 @@ namespace acs
 
 	bool MysqlComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
+		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<NodeComponent>())
 		return true;
 	}
 
-	class Server* MysqlComponent::GetActor()
+	class Node* MysqlComponent::GetNode()
 	{
-		actor::Group * group = this->mActor->GetGroup(this->mServer);
-		if(group == nullptr)
-		{
-			if(this->mApp->HasComponent("MysqlDB"))
-			{
-				return this->mApp;
-			}
-			return nullptr;
-		}
-		long long id = 0;
-		if(!group->Random(id))
-		{
-			return nullptr;
-		}
-		return (Server *)this->mActor->GetActor(id);
+		return this->mActor->Next(this->mServer);
 	}
 
 	int MysqlComponent::Add(const Message& message, int flag)
@@ -56,7 +42,7 @@ namespace acs
 			request.set_table(message.GetTypeName());
 		}
 		const static std::string func("MysqlDB.Add");
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		if(targetServer == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -76,7 +62,7 @@ namespace acs
 			}
 		}
 		const static std::string func("MysqlDB.Save");
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		if(targetServer == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -92,7 +78,7 @@ namespace acs
 			request.set_filter(deleteJson);
 		}
 		const static std::string func("MysqlDB.Delete");
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		if(targetServer == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -111,7 +97,7 @@ namespace acs
 			request.set_document(updateJson);
 		}
 		const static std::string func("MysqlDB.Update");
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		if(targetServer == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -126,7 +112,7 @@ namespace acs
 			request.set_filter(json);
 			request.set_table(response->GetTypeName());
 		}
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		const static std::string func("MysqlDB.Query");
 		if(targetServer == nullptr)
 		{

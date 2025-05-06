@@ -22,9 +22,10 @@ namespace ws
 namespace ws
 {
 
-	Session::Session(int id, Component * component, Asio::Context & main)
+	Session::Session(int id, Component * component, Asio::Context & main, char msg)
 		: tcp::Client(1024 * 10), mSockId(id), mIsHttp(true), mComponent(component), mMainContext(main)
 	{
+		this->mMsg = msg;
 		this->mPlayerId = 0;
 		this->mHttpRequest = nullptr;
 	}
@@ -57,6 +58,7 @@ namespace ws
 		asio::post(context, [this, self = this->shared_from_this(), message] ()
 		{
 			this->mStream.str("");
+			message->SetMsg(this->mMsg);
 			std::unique_ptr<ws::Message> wsMessage = std::make_unique<ws::Message>();
 			{
 				message->OnSendMessage(this->mStream);
@@ -180,32 +182,17 @@ namespace ws
 		std::shared_ptr<Client> self = this->shared_from_this();
 		const std::string & message = this->mMessage->GetMessageBody();
 		std::unique_ptr<rpc::Message> request = std::make_unique<rpc::Message>();
-		switch(this->mMessage->GetHeader().mOpCode)
 		{
-			case ws::OPCODE_BIN:
+			request->SetMsg(this->mMsg);
+			std::stringstream buffer(message);
+			if(request->OnRecvMessage(buffer, message.size()) != 0)
 			{
-				if(!request->Decode(message.c_str(), (int)message.size()))
-				{
-					return false;
-				}
-				break;
-			}
-			case ws::OPCODE_TEXT:
-			{
-				if(!request->DecodeFromJson(message.c_str(), message.size()))
-				{
-					return false;
-				}
-				break;
+				return false;
 			}
 		}
-
 		request->SetNet(rpc::Net::Ws);
 		request->SetSockId(this->mSockId);
-		if(this->mPlayerId > 0)
-		{
-			request->GetHead().Add(rpc::Header::player_id, this->mPlayerId);
-		}
+		request->GetHead().Add(rpc::Header::id, this->mPlayerId);
 		request->GetHead().Add(rpc::Header::client_sock_id, this->mSockId);
 		asio::post(this->mMainContext, [self, this, req = request.release()]
 		{
@@ -217,7 +204,7 @@ namespace ws
 
 	void Session::Close(int code)
 	{
-		if(this->mSockId == 0)
+		if (this->mSockId == 0)
 		{
 			return;
 		}
@@ -226,18 +213,17 @@ namespace ws
 		this->mSocket->Close();
 		this->ClearSendStream();
 		this->ClearRecvStream();
-		while(!this->mWaitSendMessage.empty())
+		while (!this->mWaitSendMessage.empty())
 		{
 			this->mWaitSendMessage.pop();
 		}
-		if(code != XCode::CloseSocket)
+
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mMainContext, [self, this, code, id = this->mSockId]()
 		{
-			std::shared_ptr<Client> self = this->shared_from_this();
-			asio::post(this->mMainContext, [self, this, code, id = this->mSockId]()
-			{
-				this->mComponent->OnClientError(id, code);
-			});
-		}
+			this->mComponent->OnClientError(id, code);
+		});
+
 		this->mSockId = 0;
 	}
 
@@ -248,17 +234,17 @@ namespace ws
 			return false;
 		}
 		const http::Head & head = this->mHttpRequest->ConstHeader();
-		if(!head.IsEqual("Upgrade", "websocket"))
+		if(!head.IsEqual("upgrade", "websocket"))
 		{
 			return false;
 		}
 		int version = 0;
 		std::string value;
-		if(!head.Get("Sec-WebSocket-Key", value))
+		if(!head.Get("sec-websocket-key", value))
 		{
 			return false;
 		}
-		if(!head.Get("Sec-WebSocket-Version", version))
+		if(!head.Get("sec-websocket-version", version))
 		{
 			return false;
 		}

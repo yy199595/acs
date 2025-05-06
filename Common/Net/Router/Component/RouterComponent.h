@@ -10,7 +10,7 @@
 struct lua_State;
 namespace acs
 {
-	class Server;
+	class Node;
 	class RouterComponent final : public Component, public ISystemUpdate, public IServerRecord
 	{
 	public:
@@ -22,6 +22,7 @@ namespace acs
 		int LuaCall(lua_State * lua, int id, std::unique_ptr<rpc::Message> message);
 		std::unique_ptr<rpc::Message> Call(int id, std::unique_ptr<rpc::Message> message);
 	private:
+		bool Awake() final;
 		bool LateAwake() final;
 		void OnSystemUpdate() noexcept final;
 		void OnRecord(json::w::Document &document) final;

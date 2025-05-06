@@ -15,6 +15,7 @@ namespace acs
 {
 	RedisSubComponent::RedisSubComponent()
 	{
+		this->mIsSend = false;
 		this->mTimer = nullptr;
 		this->mDispatch = nullptr;
 		REGISTER_JSON_CLASS_FIELD(redis::Cluster, sub);
@@ -60,13 +61,13 @@ namespace acs
 	{
 		if(!this->mChannels.empty())
 		{
-			std::unique_ptr<redis::Request> request = redis::Request::Make("SUBSCRIBE");
 			for (auto iter = this->mChannels.begin(); iter != this->mChannels.end(); iter++)
 			{
-				request->AddParameter(*iter);
+				int rpcId = 0;
+				const std::string & channel = *iter;
+				std::unique_ptr<redis::Request> request = redis::Request::Make("SUBSCRIBE", channel);
+				this->Send(std::move(request), rpcId);
 			}
-			request->SetRpcId(1);
-			this->mClient->Send(std::move(request));
 		}
 	}
 
@@ -82,11 +83,31 @@ namespace acs
 		}
 	}
 
+	void RedisSubComponent::OnSecondUpdate(int tick) noexcept
+	{
+		if(this->mConfig.ping > 0 && tick % this->mConfig.ping == 0)
+		{
+			int rpcId = 0;
+			this->Send(redis::Request::Make("PING"), rpcId);
+		}
+	}
+
+	void RedisSubComponent::OnNotFindResponse(int key, std::unique_ptr<redis::Response> message)
+	{
+		LOG_ERROR("[{}] => {}", key, message->ToString())
+	}
+
 	void RedisSubComponent::Send(std::unique_ptr<redis::Request> request, int& rpcId)
 	{
 		rpcId = this->BuildRpcId();
 		{
 			request->SetRpcId(rpcId);
+			if(this->mIsSend)
+			{
+				this->mMessages.emplace(std::move(request));
+				return;
+			}
+			this->mIsSend = true;
 			this->mClient->Send(std::move(request));
 		}
 	}
@@ -119,6 +140,7 @@ namespace acs
 	{
 		do
 		{
+			//CONSOLE_LOG_WARN("resp => {}", resp->ToString())
 			std::unique_ptr<redis::Response> response(resp);
 			const redis::Element & element = response->element;
 			if (element.type != redis::type::Array || element.list.size() != 3)
@@ -134,7 +156,7 @@ namespace acs
 			{
 				const redis::Element & element1 = element.list[1];
 				const redis::Element & element2 = element.list[2];
-				if(element2.number == 1)
+				if(element2.number > 0)
 				{
 					LOG_INFO("sub ({}) ok", element1.message)
 					this->mChannels.emplace(element1.message);
@@ -162,7 +184,7 @@ namespace acs
 				std::unique_ptr<rpc::Message> rpcMessage = std::make_unique<rpc::Message>();
 				{
 					rpcMessage->SetType(rpc::Type::Request);
-					rpcMessage->SetContent(rpc::Porto::Json, message);
+					rpcMessage->SetContent(rpc::Proto::Json, message);
 					rpcMessage->GetHead().Add(rpc::Header::func, channel);
 				}
 				if(this->mDispatch->OnMessage(rpcMessage.get()) == XCode::Ok)
@@ -177,6 +199,13 @@ namespace acs
 			}
 		}
 		while (false);
+		this->mIsSend = false;
+		if(!this->mMessages.empty())
+		{
+			this->mClient->Send(std::move(this->mMessages.front()));
+			this->mMessages.pop();
+			return;
+		}
 		this->mClient->StartReceive();
 	}
 }

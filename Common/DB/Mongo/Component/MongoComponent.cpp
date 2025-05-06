@@ -22,7 +22,7 @@ namespace acs
 
 	bool MongoComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
+		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<NodeComponent>())
 		return true;
 	}
 
@@ -34,13 +34,13 @@ namespace acs
 
 	int MongoComponent::Insert(const db::mongo::insert& request)
 	{
-		Server * targetServer = this->GetActor();
+		Node * node = this->GetNode();
 		const static std::string func("MongoDB.Insert");
-		if(targetServer == nullptr)
+		if(node == nullptr)
 		{
 			return XCode::AddressAllotFailure;
 		}
-		return targetServer->Call(func, request);
+		return node->Call(func, request);
 	}
 
 	int MongoComponent::Inc(const char* key)
@@ -49,7 +49,7 @@ namespace acs
 		{
 			request.set_key(key);
 		}
-		Server * server = this->GetActor();
+		Node * server = this->GetNode();
 		if(server == nullptr)
 		{
 			return -1;
@@ -116,7 +116,7 @@ namespace acs
 	int MongoComponent::Save(const db::mongo::update& request)
 	{
 		const static std::string func("MongoDB.Save");
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		if(targetServer == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -127,7 +127,7 @@ namespace acs
 	int MongoComponent::Update(const db::mongo::update& request)
 	{
 		const static std::string func("MongoDB.Update");
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		if(targetServer == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -138,7 +138,7 @@ namespace acs
 	int MongoComponent::Update(const db::mongo::updates& request)
 	{
 		const static std::string func("MongoDB.Updates");
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		if(targetServer == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -149,7 +149,7 @@ namespace acs
 	int MongoComponent::NoWaitUpdate(const db::mongo::update& request)
 	{
 		const static std::string func("MongoDB.Update");
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		if(targetServer == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -157,23 +157,9 @@ namespace acs
 		return targetServer->Send(func, request);
 	}
 
-	Server* MongoComponent::GetActor()
+	Node* MongoComponent::GetNode()
 	{
-		actor::Group * group = this->mActor->GetGroup(this->mServer);
-		if(group == nullptr)
-		{
-			if(this->mApp->HasComponent("MongoDB"))
-			{
-				return this->mApp;
-			}
-			return nullptr;
-		}
-		long long id = 0;
-		if(!group->Random(id))
-		{
-			return nullptr;
-		}
-		return (Server *)this->mActor->GetActor(id);
+		return this->mActor->Next(this->mServer);
 	}
 
 	int MongoComponent::Insert(const char* tab, const std::string& json, bool call)
@@ -183,16 +169,13 @@ namespace acs
 			request.set_tab(tab);
 			request.add_documents(json);
 		}
-		Server * targetServer = this->GetActor();
+		Node * node = this->GetNode();
 		const static std::string func("MongoDB.Insert");
-		if(targetServer == nullptr)
+		if(node == nullptr)
 		{
 			return XCode::AddressAllotFailure;
 		}
-		if(call) {
-			return targetServer->Call(func, request);
-		}
-		return targetServer->Send(func, request);
+		return call ? node->Call(func, request) : node->Send(func, request);
 	}
 
 	int MongoComponent::Insert(const char* tab, const json::w::Document& json, bool call)
@@ -205,16 +188,13 @@ namespace acs
 		{
 			return XCode::SerializationFailure;
 		}
-		Server * targetServer = this->GetActor();
+		Node * node = this->GetNode();
 		const static std::string func("MongoDB.Insert");
-		if(targetServer == nullptr)
+		if(node == nullptr)
 		{
 			return XCode::AddressAllotFailure;
 		}
-		if(call) {
-			return targetServer->Call(func, request);
-		}
-		return targetServer->Send(func, request);
+		return call ? node->Call(func, request) : node->Send(func, request);
 	}
 
 	int MongoComponent::SetIndex(const char* tab, const std::string& field, int sort, bool unique)
@@ -226,7 +206,7 @@ namespace acs
 			request.set_sort(sort);
 			request.set_unique(unique);
 		}
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		const static std::string func("MongoDB.SetIndex");
 		if(targetServer == nullptr)
 		{
@@ -243,7 +223,7 @@ namespace acs
 			request.set_limit(limit);
 			select.Encode(request.mutable_filter());
 		}
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		const static std::string func("MongoDB.Delete");
 		if(targetServer == nullptr)
 		{
@@ -254,7 +234,7 @@ namespace acs
 
 	std::unique_ptr<db::mongo::find::response> MongoComponent::Find(const db::mongo::find::request& request)
 	{
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		const static std::string func("MongoDB.Find");
 		std::unique_ptr<db::mongo::find::response> result
 				= std::make_unique<db::mongo::find::response>();
@@ -300,7 +280,7 @@ namespace acs
 
 	std::unique_ptr<db::mongo::find_one::response> MongoComponent::FindOnce(const db::mongo::find_one::request& request)
 	{
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		const static std::string func("MongoDB.FindOne");
 		if(targetServer == nullptr)
 		{
@@ -315,7 +295,7 @@ namespace acs
 	std::unique_ptr<db::mongo::find_modify::response>
 	MongoComponent::FindAndModify(const db::mongo::find_modify::request& request)
 	{
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		const static std::string func("MongoDB.FindAndModify");
 		if(targetServer == nullptr)
 		{
@@ -363,7 +343,7 @@ namespace acs
 
 	int MongoComponent::Query(const db::mongo::find::request& request, db::mongo::find::response* response)
 	{
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		const static std::string func("MongoDB.Find");
 		if(targetServer == nullptr)
 		{
@@ -379,7 +359,7 @@ namespace acs
 			request.set_tab(tab);
 			doc.Encode(request.mutable_filter());
 		}
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		const static std::string func("MongoDB.Count");
 
 		if(targetServer == nullptr)
@@ -399,7 +379,7 @@ namespace acs
 			request.set_limit(1);
 			document.Encode(request.mutable_filter());
 		}
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		const static std::string func("MongoDB.FindOne");
 
 		if(targetServer == nullptr)
@@ -418,7 +398,7 @@ namespace acs
 
 	int MongoComponent::FindPage(const db::mongo::find::page& request, db::mongo::find::response* response)
 	{
-		Server * targetServer = this->GetActor();
+		Node * targetServer = this->GetNode();
 		const static std::string func("MongoDB.FindPage");
 
 		if(targetServer == nullptr)
@@ -448,7 +428,7 @@ namespace acs
 	std::vector<std::string> MongoComponent::GetDatabases()
 	{
 		std::vector<std::string> result;
-		Server* targetServer = this->GetActor();
+		Node* targetServer = this->GetNode();
 		const static std::string func("MongoDB.Databases");
 		std::unique_ptr<com::array::string> response = std::make_unique<com::array::string>();
 		do
@@ -472,7 +452,7 @@ namespace acs
 	std::vector<std::string> MongoComponent::GetCollects(const std::string& db)
 	{
 		std::vector<std::string> result;
-		Server* targetServer = this->GetActor();
+		Node* targetServer = this->GetNode();
 		const static std::string func("MongoDB.Collections");
 		std::unique_ptr<com::array::string> response = std::make_unique<com::array::string>();
 		do

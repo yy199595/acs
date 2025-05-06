@@ -59,9 +59,9 @@ namespace _bson {
 
     class TrivialAllocator { 
     public:
-        void* Malloc(size_t sz) { return malloc(sz); }
-        void* Realloc(void *p, size_t sz) { return realloc(p, sz); }
-        void Free(void *p) { free(p); }
+        inline void* Malloc(size_t sz) { return malloc(sz); }
+        inline void* Realloc(void *p, size_t sz) { return realloc(p, sz); }
+        inline void Free(void *p) { free(p); }
     };
 
     class StackAllocator {
@@ -96,18 +96,18 @@ namespace _bson {
     template< class Allocator >
     class _BufBuilder {
         // non-copyable, non-assignable
-        _BufBuilder( const _BufBuilder& );
+        _BufBuilder( const _BufBuilder& ) = delete;
         _BufBuilder& operator=( const _BufBuilder& );
         Allocator al;
     public:
-        _BufBuilder(int initsize = 512) : size(initsize) {
+        explicit _BufBuilder(int initsize = 512) : size(initsize) {
             if ( size > 0 ) {
                 data = (char *) al.Malloc(size);
-                if( data == 0 )
+                if( data == nullptr)
                     msgasserted(10000, "out of memory BufBuilder");
             }
             else {
-                data = 0;
+                data = nullptr;
             }
             l = 0;
         }
@@ -116,7 +116,7 @@ namespace _bson {
         void kill() {
             if ( data ) {
                 al.Free(data);
-                data = 0;
+                data = nullptr;
             }
         }
 
@@ -128,7 +128,7 @@ namespace _bson {
             if ( maxSize && size > maxSize ) {
                 al.Free(data);
                 data = (char*)al.Malloc(maxSize);
-                if ( data == 0 )
+                if ( data == nullptr)
                     msgasserted( 15913 , "out of memory BufBuilder::reset" );
                 size = maxSize;
             }
@@ -220,7 +220,7 @@ namespace _bson {
                 msgasserted(13548, ss.str().c_str());
             }
             data = (char *) al.Realloc(data, a);
-            if ( data == NULL )
+            if ( data == nullptr)
                 msgasserted( 16070 , "out of memory BufBuilder::grow_reallocate" );
             size = a;
         }
@@ -233,6 +233,9 @@ namespace _bson {
     };
 
     typedef _BufBuilder<TrivialAllocator> BufBuilder;
+
+	//typedef _BufBuilder<StackAllocator> BufBuilder;
+
 
     /** The StackBufBuilder builds smaller datasets on the stack instead of using malloc.
           this can be significantly faster for small bufs.  However, you can not decouple() the 

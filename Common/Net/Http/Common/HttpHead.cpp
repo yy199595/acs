@@ -7,13 +7,13 @@
 #include"Proto/Message/IProto.h"
 #include"Yyjson/Document/Document.h"
 #include "Util/Tools/String.h"
+#include "bundled/format.h"
 
 namespace http
 {
 	Head::Head()
 	{
 		this->mCounter = 0;
-		this->mKeepAlive = false;
 	}
 
 	bool Head::GetContentType(std::string& type) const
@@ -48,11 +48,25 @@ namespace http
 	bool Head::KeepAlive() const
 	{
 		std::string type;
-		if(!this->Get(http::Header::Connection, type))
+		if(!this->Get("connection", type))
 		{
-			return false;
+			if(!this->Get(http::Header::Connection, type))
+			{
+				return false;
+			}
 		}
-		return type == http::Header::KeepAlive;
+		return type.find(http::Header::KeepAlive) != std::string::npos;
+	}
+
+	void Head::SetKeepAlive(bool keep, int timeout)
+	{
+		if(keep && timeout > 0)
+		{
+			this->Add("Keep-Alive", fmt::format("timeout={}", timeout));
+			this->Add(http::Header::Connection, http::Header::KeepAlive);
+			return;
+		}
+		this->Add(http::Header::Connection, http::Header::Close);
 	}
 
     int Head::OnRecvMessage(std::istream& buffer, size_t size)
@@ -97,13 +111,6 @@ namespace http
 
     int Head::OnSendMessage(std::ostream& buffer)
     {
-		if(!this->Has(http::Header::Connection))
-		{
-			const char * connect = this->mKeepAlive ?
-								   http::Header::KeepAlive : http::Header::Close;
-			this->Add(http::Header::Connection, connect);
-		}
-
 		auto iter = this->mHeader.begin();
         for(; iter != this->mHeader.end(); iter++)
         {

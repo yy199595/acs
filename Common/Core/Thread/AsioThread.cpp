@@ -7,9 +7,10 @@
 namespace custom
 {
 	AsioThread::AsioThread(int update)
-		:mContext(1), mUpdate(update), mTimer(mContext)
+		:mContext(1), mUpdate(update)
 	{
 		this->mId = 0;
+		this->mCount = 0;
 		this->mLastTime = 0;
 	}
 
@@ -20,7 +21,6 @@ namespace custom
 		if(this->mThread.joinable())
 		{
 			this->mThread.join();
-			this->mTimer.cancel(code);
 		}
 	}
 
@@ -31,25 +31,14 @@ namespace custom
 		std::thread(&AsioThread::Run, this).swap(this->mThread);
 	}
 
-	void AsioThread::StartTimer()
-	{
-		this->mLastTime = help::Time::NowSec();
-		this->mTimer.expires_after(std::chrono::seconds(this->mUpdate));
-		this->mTimer.async_wait([self = this->shared_from_this()](const asio::error_code& code)
-		{
-			self->StartTimer();
-			self->mLastTime = help::Time::NowSec();
-		});
-	}
-
 	void AsioThread::Run()
 	{
-		asio::error_code code;
-		Asio::ContextWork work(this->mContext);
+		std::chrono::seconds sleep(this->mUpdate);
+		auto work = asio::make_work_guard(this->mContext);
 		while (!this->mContext.stopped())
 		{
-			this->StartTimer();
-			this->mContext.run(code);
+			this->mCount += this->mContext.run_one_for(sleep);
+			this->mLastTime = help::Time::NowSec();
 		}
 //		while(!this->mContext.stopped())
 //		{

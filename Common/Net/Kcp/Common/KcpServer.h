@@ -9,7 +9,7 @@
 #include "Core/Map/HashMap.h"
 namespace kcp
 {
-	class Server
+	class Server : public std::enable_shared_from_this<Server>
 	{
 	public:
 		typedef acs::IRpc<rpc::Message, rpc::Message> Component;
@@ -27,6 +27,7 @@ namespace kcp
 		kcp::Session * GetSession(const std::string & address);
 	private:
 		Component * mComponent;
+		std::string mDecodeBuffer;
 		asio::system_timer mTimer;
 		asio::io_context & mContext;
 		asio::streambuf mSendBuffer;
@@ -36,7 +37,6 @@ namespace kcp
 		asio::mutable_buffers_1 mRecvBuf;
 		asio::ip::udp::endpoint mSenderPoint;
 		char mRecvBuffer[kcp::BUFFER_COUNT];
-		char mDecodeBuffer[kcp::BUFFER_COUNT];
-		std::unordered_map<std::string, std::unique_ptr<kcp::Session>> mClients;
+		std::unordered_map<std::string, std::shared_ptr<kcp::Session>> mClients;
 	};
 }

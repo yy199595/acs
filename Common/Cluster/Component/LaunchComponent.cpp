@@ -60,7 +60,7 @@ namespace acs
 		{
 			if (!rpcConfig->HasService(name))
 			{
-				LOG_ERROR("not rpc service => ", name);
+				LOG_ERROR("not rpc service => {}", name);
 				return false;
 			}
 			if (this->mApp->HasComponent(name))
@@ -141,7 +141,8 @@ namespace acs
 				{ "tcp", proto_type::tcp },
 				{ "udp", proto_type::udp },
 				{ "http", proto_type::tcp },
-				{ "https", proto_type::tcp }
+				{ "https", proto_type::tcp },
+				{ "ipc", proto_type::local }
 		};
 		for (const char* key: jsonObj->GetAllKey())
 		{
@@ -181,8 +182,10 @@ namespace acs
 				this->mApp->AddComponent(listenConfig.component);
 				if (listenConfig.proto == proto_type::tcp)
 				{
+
+					std::string name = fmt::format("{}:ListenComponent",
+							listenConfig.name);
 					auto listenerComponent = std::make_unique<ListenerComponent>();
-					std::string name = fmt::format("{}:ListenComponent", listenConfig.name);
 					if (!this->mApp->AddComponent(name, std::move(listenerComponent)))
 					{
 						return false;
@@ -199,28 +202,25 @@ namespace acs
 	{
 		for (const ListenConfig& listenConfig: this->mTcpListens)
 		{
+
 			INetListen* tcpListen = nullptr;
-			switch(listenConfig.proto)
+			if(listenConfig.proto == proto_type::tcp)
 			{
-				case proto_type::tcp:
-				{
-					std::string name = fmt::format("{}:ListenComponent", listenConfig.name);
-					tcpListen = this->GetComponent<INetListen>(name);
-					break;
-				}
-				case proto_type::udp:
-				{
-					tcpListen = this->GetComponent<INetListen>(listenConfig.component);
-					break;
-				}
+				std::string name = fmt::format("{}:ListenComponent",
+						listenConfig.name);
+				tcpListen = this->GetComponent<INetListen>(name);
+			}
+			else
+			{
+				tcpListen = this->GetComponent<INetListen>(listenConfig.component);
 			}
 			if (tcpListen == nullptr || !tcpListen->StartListen(listenConfig))
 			{
 				LOG_ERROR("({}) listen [{}] fail", listenConfig.name, listenConfig.address);
 				return false;
 			}
-			this->mApp->AddListen(listenConfig.name, listenConfig.address);
 			LOG_INFO("({:<6}) listen [{}] ok", listenConfig.name, listenConfig.address);
+			this->mApp->AddListen(listenConfig.name, listenConfig.address);
 		}
 		return true;
 	}

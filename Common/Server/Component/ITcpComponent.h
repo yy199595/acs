@@ -20,6 +20,7 @@ namespace acs
 	{
 		constexpr int tcp = 1;
 		constexpr int udp = 2;
+		constexpr int local = 3;
 	}
 
 	struct ListenConfig

@@ -9,13 +9,13 @@
 #include"Entity/Component/Component.h"
 namespace acs
 {
-    class ConfigComponent final : public Component, public IHotfix
+    class ConfigComponent final : public Component, public IRefresh
     {
     public:
         ConfigComponent() = default;
         ~ConfigComponent() override = default;
     public:
-        bool OnHotFix() final;
+        bool OnRefresh() final;
 
         template<typename T>
         const T * GetTextConfig();

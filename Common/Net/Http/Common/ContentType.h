@@ -14,13 +14,14 @@ namespace http
 	class DataType
 	{
 	public:
+		virtual ~DataType() = default;
 		virtual std::unique_ptr<Content> New() = 0;
 	};
 	template<typename T>
 	class DataTypeProxy : public DataType
 	{
 	public:
-		std::unique_ptr<Content> New() { return std::make_unique<T>(); }
+		inline std::unique_ptr<Content> New() final { return std::make_unique<T>(); }
 	};
 }
 
@@ -33,13 +34,13 @@ namespace http
 		template<typename T>
 		void Add(const std::string & content);
 	private:
-		std::unordered_map<std::string, http::DataType *> mContentFactoryMap;
+		std::unordered_map<std::string, std::unique_ptr<http::DataType>> mContentFactoryMap;
 	};
 
 	template<typename T>
 	void ContentFactory::Add(const std::string& content)
 	{
-		this->mContentFactoryMap.emplace(content, new http::DataTypeProxy<T>());
+		this->mContentFactoryMap.emplace(content, std::make_unique<http::DataTypeProxy<T>>());
 	}
 }
 

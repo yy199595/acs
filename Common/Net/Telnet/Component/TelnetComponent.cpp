@@ -98,15 +98,15 @@ namespace acs
 			std::string message;
 			do
 			{
-				std::unique_ptr<rpc::Message> rpcMessage;
-				code = this->mApp->Make("TelnetSystem.Run", rpcMessage);
-				if(code != XCode::Ok)
+				std::unique_ptr<rpc::Message> rpcMessage = this->mApp->Make("TelnetSystem.Run");
+				if(rpcMessage == nullptr)
 				{
+					code = XCode::MakeTcpRequestFailure;
 					break;
 				}
 				document.Encode(rpcMessage->Body());
-				int serverId = this->mApp->GetSrvId();
-				std::unique_ptr<rpc::Message> rpcResponse = this->mRouter->Call(serverId, std::move(rpcMessage));
+				int nodeId = this->mApp->GetNodeId();
+				std::unique_ptr<rpc::Message> rpcResponse = this->mRouter->Call(nodeId, std::move(rpcMessage));
 				if(rpcResponse == nullptr)
 				{
 					code = XCode::Failure;

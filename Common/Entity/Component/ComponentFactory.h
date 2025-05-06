@@ -29,11 +29,13 @@ namespace acs
 			auto iter = mTypeInfoMap.find(name);
 			if (iter != mTypeInfoMap.end())
 			{
-				throw std::logic_error("add " + name + " failure");
+				return false;
 			}
-			auto type = new TypeProxy<T>(name);
-			mTypeInfoMap.insert(std::make_pair(type->Name, type));
-			mTypeInfoMap1.insert(std::make_pair(typeid(T).hash_code(), type));
+			std::unique_ptr<Type> type = std::make_unique<TypeProxy<T>>(name);
+			{
+				mTypeInfoMap.emplace(type->Name, type.get());
+				mTypeInfoMap1.emplace(typeid(T).hash_code(), std::move(type));
+			}
 			return true;
 		}
 
@@ -42,7 +44,7 @@ namespace acs
 		{
 			size_t hash = typeid(T).hash_code();
 			auto iter = mTypeInfoMap1.find(hash);
-			return iter != mTypeInfoMap1.end() ? iter->second : nullptr;
+			return iter != mTypeInfoMap1.end() ? iter->second.get() : nullptr;
 		}
 		template<typename T>
 		static const std::string & GetName()
@@ -55,7 +57,7 @@ namespace acs
 		static Type* GetType(size_t hash)
 		{
 			auto iter = mTypeInfoMap1.find(hash);
-			return iter != mTypeInfoMap1.end() ? iter->second : nullptr;
+			return iter != mTypeInfoMap1.end() ? iter->second.get() : nullptr;
 		}
 
 		template<typename T>
@@ -65,8 +67,8 @@ namespace acs
 		static Type* GetType(const std::string& name);
 	 private:
 		static std::string mEmpty;
-		static std::unordered_map<size_t, Type*> mTypeInfoMap1;
 		static std::unordered_map<std::string, Type*> mTypeInfoMap;
+		static std::unordered_map<size_t, std::unique_ptr<Type>> mTypeInfoMap1;
 	};
 
 	template<typename T>
@@ -78,8 +80,7 @@ namespace acs
 		{
 			return nullptr;
 		}
-		Type* type = iter->second;
-		return CreateComponent(type->Name);		
+		return CreateComponent(iter->second->Name);
 	}
 #define REGISTER_COMPONENT(type) ComponentFactory::Add<type>(#type)
 }// namespace Sentry

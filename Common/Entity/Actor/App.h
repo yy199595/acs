@@ -5,8 +5,8 @@
 #include"Server/Config/ServerConfig.h"
 #include"Rpc/Config/ServiceConfig.h"
 #include"Async/Component/CoroutineComponent.h"
-#include"Entity/Component/ActorComponent.h"
-#include"Entity/Actor/Server.h"
+#include"Node/Component/NodeComponent.h"
+#include"Node/Actor/Node.h"
 namespace acs
 {
 	enum class ServerStatus
@@ -30,21 +30,21 @@ namespace acs
 {
 	class RpcService;
 	class ProtoComponent;
-	class App final : public Server, public Singleton<App>
+	class App final : public Node, public Singleton<App>
 	{
 	 public:
-		explicit App(int id, ServerConfig & config);
+		explicit App(int id, const std::string & name);
 	 public:
-		void Sleep(int ms = 1000);
         inline float GetFps() const { return this->mLogicFps; }
-		inline long long StartTime() const { return this->mStartTime; }
 		inline const ServerConfig & Config() const { return mConfig; }
 		inline ServerStatus GetStatus() const { return this->mStatus; }
-		inline int GetTickCount() const { return this->mTickCount; }
+		inline long long StartTime() const { return this->mStartTime; }
+		inline void Sleep(int ms = 1000) { this->mCoroutine->Sleep(ms); }
 	 public:
 		int Run() noexcept;
+		int Run(const std::string & cmd);
 		void Stop();
-		bool Hotfix();
+		bool Refresh();
 		bool LoadLang() const;
 		long long MakeGuid();
 		std::string NewUuid();
@@ -52,11 +52,12 @@ namespace acs
 		unsigned int StartCoroutine(std::function<void()> && func);
 		inline Asio::Context & GetContext() { return this->mContext; }
         bool OnDelComponent(Component *component) final { return false; }
+		inline size_t GetEventCount() const { return this->mEventCount; }
 		inline long long GetStartUseMemory() const { return this->mStartMemory; }
 	public:
 		template<typename T>
 		static inline T * Get() { return App::Inst()->GetComponent<T>(); }
-		static inline ActorComponent * ActorMgr() { return App::Inst()->mActor; }
+		static inline NodeComponent * ActorMgr() { return App::Inst()->mActor; }
 		static inline ProtoComponent * GetProto() { return App::Inst()->mProto; }
 		static inline CoroutineComponent* Coroutine() { return App::Inst()->mCoroutine; }
 
@@ -71,15 +72,15 @@ namespace acs
 		int mGuidIndex;
         int mTickCount;
 		float mLogicFps;
+		size_t mEventCount;
 		ServerStatus mStatus;
 		Asio::Context mContext;
-		ServerConfig & mConfig;
+		ServerConfig mConfig;
 		long long mStartMemory;
 		long long mLastGuidTime;
-		long long mNextNewDayTime; //下次新的一天时间
 		asio::signal_set mSignal;
         const long long mStartTime;
-		ActorComponent * mActor;
+		NodeComponent * mActor;
 		ProtoComponent * mProto;
 		CoroutineComponent* mCoroutine;
     };

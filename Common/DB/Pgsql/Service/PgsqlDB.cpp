@@ -21,15 +21,15 @@ namespace acs
 
 	bool PgsqlDB::OnInit()
 	{
-		BIND_SERVER_RPC_METHOD(PgsqlDB::Save);
-		BIND_SERVER_RPC_METHOD(PgsqlDB::Exec);
-		BIND_SERVER_RPC_METHOD(PgsqlDB::Query);
-		BIND_SERVER_RPC_METHOD(PgsqlDB::Index);
-		BIND_SERVER_RPC_METHOD(PgsqlDB::Update);
-		BIND_SERVER_RPC_METHOD(PgsqlDB::Delete);
-		BIND_SERVER_RPC_METHOD(PgsqlDB::Create);
-		BIND_SERVER_RPC_METHOD(PgsqlDB::Insert);
-		BIND_SERVER_RPC_METHOD(PgsqlDB::FindPage);
+		BIND_RPC_METHOD(PgsqlDB::Save);
+		BIND_RPC_METHOD(PgsqlDB::Exec);
+		BIND_RPC_METHOD(PgsqlDB::Query);
+		BIND_RPC_METHOD(PgsqlDB::Index);
+		BIND_RPC_METHOD(PgsqlDB::Update);
+		BIND_RPC_METHOD(PgsqlDB::Delete);
+		BIND_RPC_METHOD(PgsqlDB::Create);
+		BIND_RPC_METHOD(PgsqlDB::Insert);
+		BIND_RPC_METHOD(PgsqlDB::FindPage);
 		LOG_CHECK_RET_FALSE(this->mProto = this->GetComponent<ProtoComponent>())
 		LOG_CHECK_RET_FALSE(this->mPgsql = this->GetComponent<PgsqlDBComponent>())
 		return true;

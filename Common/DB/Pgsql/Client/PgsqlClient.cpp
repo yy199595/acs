@@ -10,7 +10,6 @@
 #include "Core/Thread/ThreadSync.h"
 #include "Pgsql/Common/PgsqlCommon.h"
 #include "XCode/XCode.h"
-#include "Util/File/FileHelper.h"
 
 #ifdef __ENABLE_OPEN_SSL__
 #include <openssl/sha.h>
@@ -70,6 +69,15 @@ namespace pgsql
 
 	int Client::Start(tcp::Socket* socket)
 	{
+#ifdef ONLY_MAIN_THREAD
+		if(socket == nullptr)
+		{
+			this->Connect(5);
+			return XCode::Ok;
+		}
+		this->SetSocket(socket);
+		return this->Auth(true);
+#else
 		if(socket == nullptr)
 		{
 			Asio::Context & context = this->mSocket->GetContext();
@@ -89,10 +97,17 @@ namespace pgsql
 			threadSync.SetResult(code);
 		});
 		return threadSync.Wait();
+#endif
+
 	}
 
 	void Client::Send(std::unique_ptr<pgsql::Request> request)
 	{
+#ifdef ONLY_MAIN_THREAD
+		assert(this->mRequest == nullptr);
+		this->mRequest = std::move(request);
+		this->Write(*this->mRequest);
+#else
 		Asio::Context & context = this->mSocket->GetContext();
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
 		asio::post(context, [self, this, req = request.release()]()
@@ -100,6 +115,8 @@ namespace pgsql
 			this->mRequest.reset(req);
 			this->Write(*this->mRequest);
 		});
+#endif
+
 	}
 
 	bool Client::CreateDatabase()
@@ -426,6 +443,14 @@ namespace pgsql
 			}
 			return;
 		}
+#ifdef ONLY_MAIN_THREAD
+		int id = this->mClientId;
+		if(this->mRequest != nullptr)
+		{
+			this->mComponent->OnSendFailure(id, this->mRequest.release());
+		}
+		this->mComponent->OnClientError(id, XCode::ConnectDatabaseFail);
+#else
 		int id = this->mClientId;
 		asio::post(this->mMain, [id, this, self = this->shared_from_this()]()
 		{
@@ -435,6 +460,7 @@ namespace pgsql
 			}
 			this->mComponent->OnClientError(id, XCode::ConnectDatabaseFail);
 		});
+#endif
 	}
 
 	void Client::OnSendMessage(size_t)
@@ -442,13 +468,18 @@ namespace pgsql
 		this->ReadLength(5);
 	}
 
-	void Client::OnReceiveMessage(std::istream& readStream, size_t size, const asio::error_code& code)
+	void Client::OnReceiveMessage(std::istream& , size_t size, const asio::error_code& code)
 	{
 		this->ReadResponse(this->mResponse);
-		pgsql::Request * request = this->mRequest.release();
 		std::unique_ptr<pgsql::Response> response = std::make_unique<pgsql::Response>();
 		{
 			this->mResponse.DecodeData(*response);
+#ifdef ONLY_MAIN_THREAD
+			int id = this->mClientId;
+			std::unique_ptr<pgsql::Request> request = std::move(this->mRequest);
+			this->mComponent->OnMessage(id, request.get(), response.release());
+#else
+			pgsql::Request * request = this->mRequest.release();
 			std::shared_ptr<tcp::Client> self = this->shared_from_this();
 			asio::post(this->mMain, [self, this, request, res = response.release()]
 			{
@@ -456,6 +487,7 @@ namespace pgsql
 				this->mComponent->OnMessage(id, request, res);
 				delete request;
 			});
+#endif
 		}
 	}
 }

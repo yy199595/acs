@@ -35,6 +35,10 @@ namespace lua
 		extern int luaopen_lfmt(lua_State* L);
 		extern int luaopen_lmd5(lua_State* L);
 		extern int luaopen_lapp(lua_State* L);
+		extern int luaopen_lnode(lua_State* L);
+		extern int luaopen_lactor(lua_State* L);
+		extern int luaopen_lrouter(lua_State* L);
+
 		extern int luaopen_llog(lua_State* L);
 		extern int luaopen_ljson(lua_State* L);
 		extern int luaopen_lhttp(lua_State* L);

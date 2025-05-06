@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <string>
-#include"CoroutineDef.h"
-#include"Rpc/Method/MethodProxy.h"
+#include "Rpc/Method/MethodProxy.h"
+#include "Async/Coroutine/Context/context.h"
 
 #ifdef __MEMORY_POOL_OPERATOR__
 #include <vector>
@@ -46,10 +46,11 @@ namespace acs
 	 public:
 		void Invoke();
 	 public:
-		int sid;
         Stack stack;
 		unsigned int id;
+		unsigned int sid;
         CorState status;
+		long long timerId;
         tb_context_t mContext;
 		std::unique_ptr<StaticMethod> callback;
     };

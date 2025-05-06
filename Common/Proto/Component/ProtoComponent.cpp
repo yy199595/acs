@@ -155,6 +155,11 @@ namespace acs
 		return any.UnpackTo(message.get());
     }
 
+	bool ProtoComponent::Has(const std::string& name)
+	{
+		return this->FindMessage(name) != nullptr;
+	}
+
 	pb::Message * ProtoComponent::Temp(const std::string& name)
 	{
 		auto iter = this->mTempMessages.find(name);
@@ -279,7 +284,7 @@ namespace acs
 		return message;
 	}
 
-	bool ProtoComponent::OnHotFix()
+	bool ProtoComponent::OnRefresh()
 	{
 		std::queue<std::string> files;
 		auto iter = this->mFiles.begin();

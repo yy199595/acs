@@ -8,13 +8,12 @@ namespace acs
 	class DelayTimer final : public TimerBase
 	{
 	public:
-		DelayTimer(long long ms, StaticMethod * func)
-			: TimerBase(ms), mFunc(func) {}
-        ~DelayTimer() final { delete this->mFunc;}
+		DelayTimer(long long ms, std::unique_ptr<StaticMethod> func)
+			: TimerBase(ms), mFunc(std::move(func)) {}
 	public:
 		void Invoke() final { this->mFunc->run(); }
 	private:
-		StaticMethod * mFunc;
+		std::unique_ptr<StaticMethod> mFunc;
 	};
 }// namespace Sentry
 

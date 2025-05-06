@@ -6,6 +6,8 @@
 #define APP_HTTPWEBCOMPONENT_H
 #include "Http/Client/Http.h"
 #include "Http/Common/Config.h"
+#include "Http/Common/httpHead.h"
+#include "Net/Record/RecordInfo.h"
 #include "Http/Common/ContentType.h"
 #include "Entity/Component/Component.h"
 #include "Server/Component/ITcpComponent.h"
@@ -48,27 +50,29 @@ namespace acs
 		void OnClientError(int id, int code) final;
 		bool OnListen(tcp::Socket *socket) noexcept final;
 		void OnReadHead(http::Request *request, http::Response *response) noexcept final;
-		void OnMessage(http::Request * request, http::Response * response) noexcept final;
+		void OnMessage(int id, http::Request * request, http::Response * response) noexcept final;
 		void OnApi(const HttpMethodConfig* config, http::Request * request, http::Response * response) noexcept;
 		void Invoke(const HttpMethodConfig* config, http::Request * request, http::Response * response) noexcept;
 	private:
-		bool ReadMessageBody(int id);
-		bool SendResponse(int fd, HttpStatus code);
-		HttpStatus OnNotFound(http::Request* request, http::Response* response) noexcept;
+		bool ReadMessageBody(int id, std::unique_ptr<http::Content> content, int timeout);
 		HttpStatus AuthToken(const HttpMethodConfig* config, http::Request *request) noexcept;
-		HttpStatus CreateHttpData(const HttpMethodConfig* config, http::Request * request) noexcept;
+		HttpStatus OnNotFound(const std::string & path, std::unique_ptr<http::Content> & content) noexcept;
+		bool SendResponse(int fd, HttpStatus code, int timeout);
+		bool SendResponse(int fd, HttpStatus code, std::unique_ptr<http::Content> httpContent, int timeout);
+		HttpStatus CreateContent(const HttpMethodConfig* config, const http::Head & head, std::unique_ptr<http::Content> & content) noexcept;
 	public:
 		bool AddRootDirector(const std::string & dir);
+		std::shared_ptr<http::Session> GetClient(int id);
 	private:
 		std::string mPath;
 		http::Config mConfig;
-		unsigned int mSuccessCount; //成功次数
-		unsigned int mFailureCount; //失败次数
+		record::Info mRecordInfo;
 		http::ContentFactory mFactory;
 		math::NumberPool<int> mNumPool;
 		IHttpRecordComponent * mRecord;
 		std::vector<std::string> mRoots;
 		class CoroutineComponent * mCoroutine;
+		std::vector<std::shared_ptr<http::Session>> mObjectPool;
 		custom::HashMap<std::string, class HttpService *> mHttpServices;
 		std::unordered_map<int, std::shared_ptr<http::Session>> mHttpClients;
 	};

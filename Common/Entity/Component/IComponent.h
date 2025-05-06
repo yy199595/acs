@@ -78,10 +78,10 @@ namespace acs
 	};
 
 	// 热重载调用
-	class IHotfix
+	class IRefresh
 	{
 	public:
-		virtual bool OnHotFix() = 0;
+		virtual bool OnRefresh() = 0;
 	};
 
 	template<typename C, typename T1, typename T2>
@@ -135,17 +135,17 @@ namespace math
 		inline T BuildNumber() noexcept
 		{
 			++this->mIndex;
+			++this->mCount;
 			if(this->mIndex >= this->MaxNum)
 			{
-				++ this->mCount;
 				this->mIndex = 1;
 			}
 			return this->mIndex;
 		}
-		inline T CurrentNumber() const { return this->mIndex; }
+		inline unsigned long long CurrentNumber() const { return this->mCount; }
 	private:
 		T mIndex;
-		int mCount;
+		unsigned long long mCount;
 		T MaxNum = std::numeric_limits<T>::max() - limit;
 	};
 }

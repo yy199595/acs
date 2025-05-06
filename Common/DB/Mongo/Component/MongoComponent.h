@@ -91,7 +91,7 @@ namespace acs
 		std::unique_ptr<db::mongo::find_one::response> FindOnce(const db::mongo::find_one::request & request);
 		std::unique_ptr<db::mongo::find_modify ::response> FindAndModify(const db::mongo::find_modify::request & request);
 	public:
-		class Server * GetActor();
+		class Node * GetNode();
 		std::vector<std::string> GetDatabases();
 		std::vector<std::string> GetCollects(const std::string& db = "");
 	private:
@@ -105,7 +105,7 @@ namespace acs
 		std::string mRpc;
 		std::string mTmp;
 		std::string mServer;
-		class ActorComponent * mActor;
+		class NodeComponent * mActor;
 	};
 
 	template<typename T>

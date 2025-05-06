@@ -175,10 +175,52 @@ namespace help
         return {str, size};
     }
 
-	void Time::CalcHourMinSecond(long long sec, int& hour, int& min, int& second)
+	Time::Date Time::CalcHourMinSecond(long long totalMilliseconds)
 	{
-		hour = sec / help::Time::HourSecond;
-		min = (sec % help::Time::HourSecond) / help::Time::MinSecond;
-		second = sec % help::Time::MinSecond;
+		Time::Date timeData;
+		constexpr int millisecondsInSecond = 1000;
+		constexpr int secondsInMinute = 60;
+		constexpr int secondsInHour = 60 * secondsInMinute;
+		constexpr int secondsInDay = 24 * secondsInHour;
+		constexpr int daysInMonth = 30;
+		constexpr int daysInYear = 365;
+
+		timeData.Milliseconds = totalMilliseconds % millisecondsInSecond;
+		totalMilliseconds /= millisecondsInSecond;
+
+		// 计算年数
+		timeData.Year = totalMilliseconds / (secondsInDay * daysInYear);
+		totalMilliseconds %= (secondsInDay * daysInYear);
+
+		// 计算月数
+		timeData.Month = totalMilliseconds / (secondsInDay * daysInMonth);
+		totalMilliseconds %= (secondsInDay * daysInMonth);
+
+		// 计算天数
+		timeData.Day = totalMilliseconds / secondsInDay;
+		totalMilliseconds %= secondsInDay;
+
+		// 计算小时数
+		timeData.Hour = totalMilliseconds / secondsInHour;
+		totalMilliseconds %= secondsInHour;
+
+		// 计算分钟数
+		timeData.Minute = totalMilliseconds / secondsInMinute;
+
+		// 剩余的秒数
+		timeData.Second = totalMilliseconds % secondsInMinute;
+		return timeData;
+	}
+
+	long long HighTime::NowSec()
+	{
+		auto tmp = high_resolution_clock ::now().time_since_epoch();
+		return duration_cast<std::chrono::seconds>(tmp).count() + Time::ScaleTotalTime * 1000;
+	}
+
+	long long HighTime::NowMil()
+	{
+		auto tmp = high_resolution_clock::now().time_since_epoch();
+		return duration_cast<milliseconds>(tmp).count() + Time::ScaleTotalTime * 1000;
 	}
 }

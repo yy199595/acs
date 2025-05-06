@@ -50,8 +50,21 @@ namespace redis
 		inline void SetCommand(const std::string& cmd) { this->mCommand = cmd;}
 		inline void AddParameter(const std::string& value) { this->mParameters.emplace_back(value); }
 		inline void AddString(const char* str, size_t size) { this->mParameters.emplace_back(str, size); }
-		inline void AddParameter(int value) { this->mParameters.emplace_back(std::to_string(value)); }
-		inline void AddParameter(long long value) { this->mParameters.emplace_back(std::to_string(value)); }
+
+		template<typename T>
+		inline std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value, void> AddParameter(T value) { this->mParameters.emplace_back(std::to_string(value)); }
+
+		template<typename T>
+		inline std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value, void> AddParameter(const std::vector<T> & value)
+		{
+			std::transform(value.begin(), value.end(), std::back_inserter(this->mParameters), [](const T & value)
+			{
+				return std::to_string(value);
+			});
+		}
+		inline void AddParameter(const std::vector<std::string > & value) {
+			this->mParameters.insert(this->mParameters.end(), value.begin(), value.end());
+		}
 	private:
 		static void Encode(Request* self) { }
 		template<typename T, typename... Args>

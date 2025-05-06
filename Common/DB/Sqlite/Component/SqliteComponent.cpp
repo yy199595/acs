@@ -71,7 +71,7 @@ namespace acs
         return true;
     }
 
-    bool SqliteComponent::OnHotFix()
+    bool SqliteComponent::OnRefresh()
     {
         return this->InvokeSqlFromPath(this->mConfig.script);
     }

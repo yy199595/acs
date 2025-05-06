@@ -5,7 +5,6 @@
 #include"Url.h"
 #include<regex>
 #include"sstream"
-#include"Log/Common/CommonLogDef.h"
 namespace http
 {
 	Url::Url() : mVersion(http::Version), mReadCount(0) { }

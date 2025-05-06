@@ -100,11 +100,10 @@ namespace acs
 	bool MongoDBComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(!this->mConfig.address.empty())
-		ThreadComponent* threadComponent = this->GetComponent<ThreadComponent>();
 		for (int x = 0; x < this->mConfig.address.size(); x++)
 		{
 			const std::string& address = this->mConfig.address[x];
-			for (int index = 0; index < this->mConfig.count && threadComponent; index++)
+			for (int index = 0; index < this->mConfig.count; index++)
 			{
 				mongo::Config config;
 				if (!MongoDBComponent::DecodeUrl(address, config))
@@ -116,7 +115,7 @@ namespace acs
 				int id = (x + 1) * 100 + index + 1;
 				config.conn_count = this->mConfig.conn_count;
 				Asio::Context& io = this->mApp->GetContext();
-				tcp::Socket* socketProxy = threadComponent->CreateSocket(config.address);
+				tcp::Socket* socketProxy = this->GetComponent<ThreadComponent>()->CreateSocket(config.address);
 				std::shared_ptr<mongo::Client> mongoClientContext = std::make_unique<mongo::Client>(id, this, config, io);
 				{
 					if (!mongoClientContext->Start(socketProxy))
@@ -211,44 +210,38 @@ namespace acs
 		}
 
 		int rpcId = response->RpcId();
-		if (response->GetCode() != 0)
+
+		if (!response->Document().IsOk())
 		{
-			LOG_WARN("mongo request = {}", request->ToString());
-			LOG_WARN("mongo response = {}", response->ToString());
+			std::string errmsg;
+			LOG_WARN("request => {}", request->ToString());
+			if (response->Document().Get("errmsg", errmsg))
+			{
+				LOG_WARN("response => {}", errmsg);
+			}
 		}
-		else
+		else if (this->mConfig.explain.open && request->cmd.find("explain") == std::string::npos
+			&& this->mConfig.explain.HasCommand(request->cmd))
 		{
-			if(!response->Document().IsOk())
+			std::unique_ptr<mongo::Request> newRequest = std::make_unique<mongo::Request>();
 			{
-				std::string errmsg;
-				LOG_WARN("request => {}", request->ToString());
-				if(response->Document().Get("errmsg", errmsg))
-				{
-					LOG_WARN("response => {}", errmsg);
-				}
+				newRequest->cmd = "explain";
+				newRequest->dataBase = request->dataBase;
+				newRequest->document.Add("explain", request->document);
 			}
-			if(this->mConfig.explain.open && request->cmd.find("explain") == std::string::npos
-			   && this->mConfig.explain.HasCommand(request->cmd))
+			long long ms = request->GetCostTime();
+			this->mApp->StartCoroutine([req = newRequest.release(), ms, this]
 			{
-				std::unique_ptr<mongo::Request> newRequest = std::make_unique<mongo::Request>();
-				{
-					newRequest->cmd = "explain";
-					newRequest->dataBase = request->dataBase;
-					newRequest->document.Add("explain", request->document);
-				}
-				long long ms = request->GetCostTime();
-				this->mApp->StartCoroutine([req = newRequest.release(), ms, this] {
-					this->OnExplain(std::unique_ptr<mongo::Request>(req), ms);
-				});
-			}
-			if(this->mConfig.debug)
-			{
-				CONSOLE_LOG_INFO("[request] = {}", request->ToString());
-				CONSOLE_LOG_INFO("[response:{}] = {}", request->GetCostTime(), response->ToString());
-			}
+				this->OnExplain(std::unique_ptr<mongo::Request>(req), ms);
+			});
+		}
+		if (this->mConfig.debug)
+		{
+			CONSOLE_LOG_INFO("[request] = {}", request->ToString());
+			CONSOLE_LOG_INFO("[response:{}] = {}", request->GetCostTime(), response->ToString());
 		}
 
-		if(rpcId > 0)
+		if (rpcId > 0)
 		{
 			this->OnResponse(rpcId, std::move(resp));
 		}
@@ -366,7 +359,7 @@ namespace acs
 			LOG_ERROR("mongo[{}] request:{}", id, request->ToString());
 			return;
 		}
-		iter->second->SendMongoCommand(std::move(request));
+		iter->second->Send(std::move(request));
 	}
 
 	void MongoDBComponent::OnRecord(json::w::Document& document)
@@ -381,6 +374,17 @@ namespace acs
 		this->Run(std::move(request));
 		std::unique_ptr<json::w::Value> data = document.AddObject("mongo");
 		{
+			size_t sendByteCount = 0;
+			size_t recvByteCount = 0;
+			for(auto iter = this->mClients.begin(); iter != this->mClients.end(); iter++)
+			{
+				sendByteCount += iter->second->SendBufferBytes();
+				recvByteCount += iter->second->RecvBufferBytes();
+			}
+
+			data->Add("send_memory", sendByteCount);
+			data->Add("recv_memory", recvByteCount);
+
 			data->Add("retry", this->mRetryCount);
 			data->Add("sum", this->CurrentRpcCount());
 			data->Add("free", this->mFreeClients.Size());

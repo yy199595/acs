@@ -4,7 +4,6 @@
 
 #include <ctime>
 #include <iomanip>
-#include "Oss/Lua/LuaOss.h"
 #include "OssComponent.h"
 #include "Entity/Actor/App.h"
 #include "Util/Tools/TimeHelper.h"

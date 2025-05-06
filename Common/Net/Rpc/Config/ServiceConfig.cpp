@@ -66,16 +66,17 @@ namespace acs
 		};
 
 		std::unordered_map<std::string, char> ForwardMap{
+				{ "next",   rpc::Forward::Next },
 				{ "hash",   rpc::Forward::Hash },
 				{ "fixed",  rpc::Forward::Fixed },
 				{ "random", rpc::Forward::Random },
 		};
 
 		std::unordered_map<std::string, char> ProtoMap{
-				{ "lua",     rpc::Porto::Lua },
-				{ "pb", rpc::Porto::Protobuf },
-				{ "json",     rpc::Porto::Json },
-				{ "string",   rpc::Porto::String },
+				{ "lua",     rpc::Proto::Lua },
+				{ "pb", rpc::Proto::Protobuf },
+				{ "json",     rpc::Proto::Json },
+				{ "string",   rpc::Proto::String },
 		};
 
 		for (const char* key: keys)
@@ -107,7 +108,7 @@ namespace acs
 				methodConfig->net = rpc::Net::Tcp;
 				methodConfig->to_client = false;
 				methodConfig->ProtoName = "pb";
-				methodConfig->proto = rpc::Porto::Protobuf;
+				methodConfig->proto = rpc::Proto::Protobuf;
 				methodConfig->forward = rpc::Forward::Fixed;
 			}
 			this->mAllServices.insert(methodConfig->service);
@@ -144,7 +145,11 @@ namespace acs
 
 			if (value->Get("request", methodConfig->request))
 			{
-				methodConfig->proto = rpc::Porto::Protobuf;
+				std::unique_ptr<json::r::Value> jsonValue;
+				if(value->Get("request", jsonValue) && jsonValue->IsObject())
+				{
+					methodConfig->proto = rpc::Proto::Json;
+				}
 			}
 			value->Get("auth", methodConfig->auth);
 			value->Get("async", methodConfig->async);
@@ -247,13 +252,8 @@ namespace acs
 {
 	bool HttpConfig::OnLoadJson()
 	{
-		std::vector<const char*> keys;
-		if (this->GetKeys(keys) <= 0)
-		{
-			return false;
-		}
 		std::unique_ptr<json::r::Value> value;
-		for (const char* key: keys)
+		for (const char* key: this->GetAllKey())
 		{
 			std::string url(key);
 			LOG_CHECK_RET_FALSE(this->Get(key, value));
@@ -268,6 +268,7 @@ namespace acs
 				}
 				methodConfig->auth = true;
 				methodConfig->open = true;
+				methodConfig->timeout = 0;
 				methodConfig->permission = 1;
 				methodConfig->async = false;
 				methodConfig->record = false;
@@ -282,6 +283,7 @@ namespace acs
 				value->Get("async", methodConfig->async);
 				value->Get("token", methodConfig->token);
 				value->Get("record", methodConfig->record);
+				value->Get("timeout", methodConfig->timeout);
 				value->Get("permission", methodConfig->permission);
 				value->Get("content-type", methodConfig->content);
 				std::vector<std::string> headers;
@@ -331,7 +333,7 @@ namespace acs
 				this->mAllService.insert(methodConfig->service);
 			}
 		}
-		return true;
+		return !this->mAllService.empty();
 	}
 
 	HttpMethodConfig* HttpConfig::MakeConfig(const std::string& url)

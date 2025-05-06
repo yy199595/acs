@@ -143,13 +143,13 @@ namespace acs
         int Invoke(const http::Request& request, http::Response& response) final
 		{
 			const http::Content* body = request.GetBody();
-			if (request.GetBody() == nullptr || body->GetContentType() != http::ContentType::JSON)
+			if (body == nullptr || body->GetContentType() != http::ContentType::JSON)
 			{
 				return XCode::CallArgsError;
 			}
 			const http::JsonContent* jsonData = (const http::JsonContent*)(body);
 			std::unique_ptr<json::w::Document> document(new json::w::Document());
-			int code = (this->mObj->*mFunction)(*jsonData);
+			int code = (this->mObj->*mFunction)(jsonData->JsonObject());
 			if (code != XCode::Ok)
 			{
 				return code;
@@ -189,7 +189,7 @@ namespace acs
 			}
 			std::unique_ptr<json::w::Document> document2(new json::w::Document());
 			std::unique_ptr<json::w::Value> document3 = document2->AddObject("data");
-			int code = (this->mObj->*mFunction)(*jsonData, *document3);
+			int code = (this->mObj->*mFunction)(jsonData->JsonObject(), *document3);
 			if (code != XCode::Ok)
 			{
 				return code;
@@ -217,18 +217,14 @@ namespace acs
 		int Invoke(const http::Request& request, http::Response& response) final
 		{
 			const http::Content* body = request.GetBody();
-			const http::JsonContent* jsonData = (const http::JsonContent*)(body);
-
-			if (jsonData == nullptr)
-			{
-				return XCode::CallArgsError;
-			}
 			if (body->GetContentType() != http::ContentType::JSON)
 			{
 				return XCode::ParseJsonFailure;
 			}
+
+			const http::JsonContent* jsonData = (const http::JsonContent*)body;
 			std::unique_ptr<json::w::Document> document2(new json::w::Document());
-			int code = (this->mObj->*mFunction)(*jsonData, *document2);
+			int code = (this->mObj->*mFunction)(jsonData->JsonObject(), *document2);
 			if (code != XCode::Ok)
 			{
 				return code;
@@ -257,17 +253,12 @@ namespace acs
 		int Invoke(const http::Request& request, http::Response& response) final
 		{
 			const http::Content* body = request.GetBody();
-			const http::JsonContent* jsonData = (const http::JsonContent*)(body);
-
-			if (jsonData == nullptr)
+			if (body->GetContentType() != http::ContentType::JSON)
 			{
 				return XCode::CallArgsError;
 			}
-			if (body->GetContentType() != http::ContentType::JSON)
-			{
-				return XCode::ParseJsonFailure;
-			}
-			return (this->mObj->*mFunction)(*jsonData, response);
+			const http::JsonContent* jsonData = (const http::JsonContent*)(body);
+			return (this->mObj->*mFunction)(jsonData->JsonObject(), response);
 		}
 
 	private:

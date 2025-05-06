@@ -55,7 +55,7 @@ namespace acs
 	{
 		++this->mSumCount;
 		int code = XCode::Ok;
-		const std::string& fullName = message->ConstHead().GetStr("func");
+		const std::string& fullName = message->ConstHead().GetStr(rpc::Header::func);
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
 
 		do

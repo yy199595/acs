@@ -4,6 +4,7 @@
 #include"Rpc/Method/MethodProxy.h"
 #include"Timer/Timer/TimeWheelLayer.h"
 #include"Entity/Component/Component.h"
+
 namespace acs
 {
 	class TimerComponent final : public Component, public ISystemUpdate, public IFrameUpdate, public IServerRecord
@@ -18,15 +19,16 @@ namespace acs
 		template<typename F, typename O, typename ... Args>
 		long long DelayCall(int ms, F&& f, O* o, Args&& ... args)
 		{
-			StaticMethod* methodProxy = NewMethodProxy(
+			std::unique_ptr<StaticMethod> methodProxy = NewMethodProxy(
 				std::forward<F>(f), o, std::forward<Args>(args)...);
-			return this->CreateTimer(ms, methodProxy);
+			return this->CreateTimer(ms, std::move(methodProxy));
 		}
 	public:
 		bool AddTimer(std::unique_ptr<TimerBase> timer);
 		void AddUpdateTimer(std::unique_ptr<TimerBase> timer);
-		long long CreateTimer(unsigned int ms, StaticMethod* func);
+		long long CreateTimer(unsigned int ms, std::unique_ptr<StaticMethod> func);
 	private:
+		void OnNewDay();
 		bool Awake() final;
 		void OnSystemUpdate() noexcept final;
 		void OnFrameUpdate(long long) noexcept final;
@@ -34,18 +36,13 @@ namespace acs
 		bool InvokeTimer(long long timerId);
 		bool AddTimerToWheel(long long timerId);
 		bool AddTimerToWheel(std::unique_ptr<TimerBase> timer);
-    private:
-		const int LayerCount = 5;
-		const int TimerPrecision = 20;
-		const int OtherLayerCount = 32;
-		const int FirstLayerCount = 256;
 	 private:
 		int mDoneCount;
 		int mCancelCount;
 		long long mNextUpdateTime;
 		std::list<long long> mUpdateTimer;
-		std::vector<TimeWheelLayer*> mTimerLayers;
 		std::queue<long long> mLastFrameTriggerTimers;
+		std::vector<std::unique_ptr<TimeWheelLayer>> mTimerLayers;
 		std::unordered_map<long long, std::unique_ptr<TimerBase>> mTimerMap;//所有timer的列表
 	};
 }// namespace Sentry

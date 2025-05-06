@@ -4,14 +4,8 @@
 
 #include"Message.h"
 
-#define NOUSER
 namespace acs
 {
-	MessageDecoder::MessageDecoder(lua_State* lua)
-	{
-		this->mLua = lua;
-		this->mMsgComponent = nullptr;
-	}
 	MessageDecoder::MessageDecoder(lua_State* lua, ProtoComponent* component)
 	{
 		this->mLua = lua;

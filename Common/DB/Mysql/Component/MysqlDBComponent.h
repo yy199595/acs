@@ -30,7 +30,7 @@ namespace acs
 
 namespace acs
 {
-	class MysqlDBComponent : public RpcComponent<mysql::Response>, public IServerRecord,
+	class MysqlDBComponent : public RpcComponent<mysql::Response>, public IServerRecord, public IStart,
 							 public IRpc<mysql::Request, mysql::Response>, public IDestroy, public ISecondUpdate
 	{
 	public:
@@ -47,6 +47,7 @@ namespace acs
 		static bool DecodeUrl(const std::string & url, mysql::Config & config);
 	private:
 		bool Awake() final;
+		void OnStart() final;
 		bool LateAwake() final;
 		void OnDestroy() final;
 		void OnConnectOK(int id) final;
@@ -60,7 +61,6 @@ namespace acs
 		int mRetryCount;
 		mysql::Cluster mConfig;
 		unsigned long long mCount; //总处理数量
-		class ThreadComponent * mThread;
 		custom::Queue<int> mFreeClients; //空闲的客户端
 		std::unordered_set<int> mRetryClients; //断开了 重试的客户端
 		std::queue<std::unique_ptr<mysql::Request>> mMessages;

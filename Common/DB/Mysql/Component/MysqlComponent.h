@@ -21,9 +21,9 @@ namespace acs
     private:
 		bool Awake() final;
 		bool LateAwake() final;
-		class Server * GetActor();
+		class Node * GetNode();
 	private:
 		std::string mServer;
-		class ActorComponent * mActor;
+		class NodeComponent * mActor;
 	};
 }

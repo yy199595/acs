@@ -6,7 +6,6 @@
 #include"Network/Tcp/Socket.h"
 #include"DispatchComponent.h"
 #include"Server/Component/ThreadComponent.h"
-#include"Server/Config/CodeConfig.h"
 #include"Core/Event/IEvent.h"
 namespace acs
 {
@@ -22,7 +21,7 @@ namespace acs
 
     bool InnerTcpComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
+		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<NodeComponent>())
 		LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
 		LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>())
 		return true;

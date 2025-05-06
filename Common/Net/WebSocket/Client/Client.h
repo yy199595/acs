@@ -19,7 +19,7 @@ namespace ws
 	class Client final : public tcp::Client
 	{
 	public:
-		Client(int id, Component * component, Asio::Context & main);
+		Client(int id, Component * component, Asio::Context & main, char msg);
 	public:
 		void Close();
 		void Send(ws::Message * message);
@@ -37,6 +37,7 @@ namespace ws
 		void SendFirstMessage();
 		void AddToSendQueue(std::unique_ptr<ws::Message> message);
 	private:
+		char mMsg;
 		int mSockId;
 		Component * mComponent;
 		std::stringstream mStream;

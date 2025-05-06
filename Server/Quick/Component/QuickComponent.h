@@ -5,11 +5,12 @@
 #ifndef APP_QUICKCOMPONENT_H
 #define APP_QUICKCOMPONENT_H
 #include "XML/Document/XDocument.h"
+#include "Yyjson/Object/JsonObject.h"
 #include "Entity/Component/Component.h"
 
 namespace quick
 {
-	struct Config
+	struct Config : public json::Object<Config>
 	{
 		std::string md5_key;
 		std::string callback_key;

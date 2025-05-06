@@ -21,7 +21,7 @@ namespace ws
 	class Session final : public tcp::Client
 	{
 	public:
-		Session(int id, Component * component, Asio::Context & main);
+		Session(int id, Component * component, Asio::Context & main, char msg);
 		~Session() final;
 	public:
 		void Stop();
@@ -45,6 +45,7 @@ namespace ws
 		void Close(int code);
 		void StartReceiveWebSocket();
 	private:
+		char mMsg;
 		bool mIsHttp;
 		int mSockId;
 		long long mPlayerId;

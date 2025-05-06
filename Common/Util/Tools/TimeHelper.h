@@ -15,6 +15,7 @@ namespace help
 			int Hour = 0;
 			int Minute = 0;
 			int Second = 0;
+			int Milliseconds = 0;
 			int Week = 0;
 		};
 
@@ -67,7 +68,13 @@ namespace help
 
 		extern void GetHourMinSecond(long long sec, int &hour, int &min, int &second);
 
-		extern void CalcHourMinSecond(long long sec, int &hour, int &min, int &second);
+		extern Time::Date CalcHourMinSecond(long long sec);
     }
+
+	namespace HighTime
+	{
+		extern long long NowMil();
+		extern long long NowSec();
+	}
 // namespace Helper::Time
 }

@@ -21,7 +21,7 @@ namespace mongo
 	public:
         void Stop();
 		bool Start(tcp::Socket * socket);
-		void SendMongoCommand(std::unique_ptr<Request> request);
+		void Send(std::unique_ptr<Request> request);
 		bool SyncSend(const std::unique_ptr<Request>& request, mongo::Response & response);
 		std::unique_ptr<mongo::Response> SyncMongoCommand(std::unique_ptr<Request> request);
 	private:

@@ -51,14 +51,14 @@ namespace acs
 		{
 			switch (response->GetProto())
 			{
-				case rpc::Porto::Json:
+				case rpc::Proto::Json:
 				{
 					++count;
 					const std::string& json = response->GetBody();
 					lua::yyjson::write(this->mLua, json.c_str(), json.size());
 					break;
 				}
-				case rpc::Porto::Protobuf:
+				case rpc::Proto::Protobuf:
 				{
 					std::string name;
 					if(response->TempHead().Del("res", name))
@@ -73,7 +73,7 @@ namespace acs
 					}
 					break;
 				}
-				case rpc::Porto::String:
+				case rpc::Proto::String:
 				{
 					++count;
 					const std::string& str = response->GetBody();

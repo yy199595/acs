@@ -9,8 +9,6 @@
 #include <string>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
-#include <openssl/conf.h>
-#include <openssl/err.h>
 #include <cstring>
 #include <vector>
 #include "Proto/Bson/base64.h"

@@ -44,6 +44,9 @@ namespace acs
 	template<typename T>
 	using ServiceMethodType9 = int(T::*)(const json::r::Document& request, json::w::Document & response);
 
+	template<typename T>
+	using ServiceMethodType10 = int(T::*)(json::w::Document & response);
+
 //    template<typename T, typename T1>
 //    using ServiceMethodType5 = int(T::*)(const Rpc::Head & head, const T1 &);
 //
@@ -69,10 +72,7 @@ namespace acs
 			virtual ~ServiceMethod() = default;
 	 public:
 		virtual int Invoke(rpc::Message & message) = 0;
-		const std::string& GetName()
-		{
-			return this->mName;
-		}
+		inline const std::string& GetName() { return this->mName; }
 	 private:
 		std::string mName;
 	};
@@ -355,6 +355,32 @@ namespace acs
 		T* _o;
 		std::string mKey;
 		ServiceMethodType9<T> _func;
+	};
+
+	template<typename T>
+	class ServiceMethod10 final : public ServiceMethod
+	{
+	public:
+		ServiceMethod10(const std::string name, T* o, ServiceMethodType10<T> func, std::string key)
+				: ServiceMethod(name), _o(o), mKey(std::move(key)), _func(func)
+		{
+
+		}
+
+	public:
+		int Invoke(rpc::Message& message) override
+		{
+			std::unique_ptr<json::w::Document> response = std::make_unique<json::w::Document>();
+			{
+				int code = (_o->*_func)(*response);
+				message.WriteMessage(response.get());
+				return code;
+			}
+		}
+	private:
+		T* _o;
+		std::string mKey;
+		ServiceMethodType10<T> _func;
 	};
 
 	template<typename T, typename T1>

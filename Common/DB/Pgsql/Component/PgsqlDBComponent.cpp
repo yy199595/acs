@@ -54,7 +54,6 @@ namespace acs
 	bool PgsqlDBComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(!this->mConfig.address.empty())
-		this->mThread = this->GetComponent<ThreadComponent>();
 		for (int x = 0; x < this->mConfig.address.size(); x++)
 		{
 			const std::string& address = this->mConfig.address[x];
@@ -71,7 +70,7 @@ namespace acs
 				config.script = this->mConfig.script;
 				config.conn_count = this->mConfig.conn_count;
 				Asio::Context& main = this->mApp->GetContext();
-				tcp::Socket* tcpSocket = this->mThread->CreateSocket(config.address);
+				tcp::Socket* tcpSocket = this->GetComponent<ThreadComponent>()->CreateSocket(config.address);
 				std::shared_ptr<pgsql::Client> client = std::make_shared<pgsql::Client>(id, this, config, main);
 				{
 					int code = client->Start(tcpSocket);
@@ -220,8 +219,8 @@ namespace acs
 		std::unique_ptr<pgsql::Response> resp(response);
 		if (!response->mError.empty())
 		{
-			LOG_ERROR("[request] {}", request->ToString());
-			LOG_ERROR("[response] {}", response->mError);
+			LOG_WARN("[request] {}", request->ToString());
+			LOG_WARN("[response] {}", response->mError);
 		}
 		else
 		{

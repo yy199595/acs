@@ -128,7 +128,6 @@ namespace mongo
 	Response::Response(const std::string & cmd)
 			: cmd(cmd)
 	{
-		this->mCode = 0;
 		this->mDecodeState = tcp::Decode::None;
 	}
 
@@ -167,6 +166,7 @@ namespace mongo
 		}
 		std::string json;
 		document1->Get("id", this->cursorID);
+		this->mResult.reserve(results.size());
 		for(std::unique_ptr<bson::Reader::Document> & document : results)
 		{
 			json.clear();

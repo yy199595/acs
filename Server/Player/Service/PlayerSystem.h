@@ -12,11 +12,11 @@ namespace acs
 	class PlayerSystem  final: public RpcService
 	{
 	public:
-		PlayerSystem() = default;
-
+		PlayerSystem();
 	private:
 		bool OnInit() final;
 	private:
+		class PlayerComponent * mPlayer;
 	};
 }
 

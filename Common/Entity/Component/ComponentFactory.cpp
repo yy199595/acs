@@ -2,8 +2,8 @@
 namespace acs
 {
 	std::string ComponentFactory::mEmpty;
-	std::unordered_map<size_t, Type*> ComponentFactory::mTypeInfoMap1;
 	std::unordered_map<std::string, Type*> ComponentFactory::mTypeInfoMap;
+	std::unordered_map<size_t, std::unique_ptr<Type>> ComponentFactory::mTypeInfoMap1;
 
 	acs::Type* ComponentFactory::GetType(const std::string& name)
 	{
@@ -18,7 +18,6 @@ namespace acs
 		{
 			return nullptr;
 		}
-		Type* type = iter->second;
-		return std::move(type->New());
+		return std::move(iter->second->New());
 	}
 }

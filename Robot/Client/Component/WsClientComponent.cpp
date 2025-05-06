@@ -10,6 +10,8 @@
 #include"Lua/Engine/ModuleClass.h"
 #include "Proto/Component/ProtoComponent.h"
 #include "Rpc/Component/DispatchComponent.h"
+
+constexpr char msg_format = rpc::msg::json;
 namespace acs
 {
 	WsClientComponent::WsClientComponent()
@@ -47,7 +49,7 @@ namespace acs
 		int id = ++this->mIndex;
 		Asio::Context & context = this->mApp->GetContext();
 		std::unique_ptr<tcp::Socket> tcpSocket = std::make_unique<tcp::Socket>(context);
-		std::shared_ptr<ws::Client> client = std::make_shared<ws::Client>(id, this, context);
+		std::shared_ptr<ws::Client> client = std::make_shared<ws::Client>(id, this, context, msg_format);
 		{
 			tcpSocket->Init(ip, port);
 			client->SetSocket(tcpSocket.release());
@@ -120,7 +122,7 @@ namespace acs
 
 	int WsClientComponent::OnRequest(rpc::Message* message)
 	{
-		const std::string & func = message->GetHead().GetStr("func");
+		const std::string & func = message->GetHead().GetStr(rpc::Header::func);
 		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
 		if(methodConfig == nullptr)
 		{
@@ -139,15 +141,15 @@ namespace acs
 		int count = 1;
 		switch(message->GetProto())
 		{
-			case rpc::Porto::String:
+			case rpc::Proto::String:
 				count++;
 				lua_pushlstring(lua, body.c_str(), body.size());
 				break;
-			case rpc::Porto::Json:
+			case rpc::Proto::Json:
 				count++;
 				lua::yyjson::write(lua, body.c_str(), body.size());
 				break;
-			case rpc::Porto::Protobuf:
+			case rpc::Proto::Protobuf:
 			{
 				pb::Message * request = this->mProto->Temp(methodConfig->request);
 				if(request != nullptr)

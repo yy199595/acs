@@ -2,10 +2,11 @@
 // Created by leyi on 2023/6/7.
 //
 
-#include"RouterComponent.h"
-#include"XCode/XCode.h"
-#include"Entity/Actor/App.h"
-#include"Rpc/Component/DispatchComponent.h"
+#include "RouterComponent.h"
+#include "XCode/XCode.h"
+#include "Lua/Lib/Lib.h"
+#include "Entity/Actor/App.h"
+#include "Rpc/Component/DispatchComponent.h"
 #include "Core/Singleton/Singleton.h"
 
 namespace acs
@@ -13,6 +14,14 @@ namespace acs
 	RouterComponent::RouterComponent()
 	{
         this->mDispatch = nullptr;
+	}
+
+	bool RouterComponent::Awake()
+	{
+		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
+			ccModule.Open("core.router", lua::lib::luaopen_lrouter);
+		});
+		return true;
 	}
 
 	bool RouterComponent::LateAwake()
@@ -31,7 +40,6 @@ namespace acs
 
 	int RouterComponent::LuaCall(lua_State* lua, int id, std::unique_ptr<rpc::Message> message)
 	{
-		int timeout = message->GetTimeout();
 		int rpcId = this->mDispatch->BuildRpcId();
 		{
 			message->SetRpcId(rpcId);
@@ -42,7 +50,7 @@ namespace acs
 				return 1;
 			}
 		}
-		return this->mDispatch->AddTask(new LuaRpcTaskSource(lua, rpcId), timeout)->Await();
+		return this->mDispatch->AddTask(new LuaRpcTaskSource(lua, rpcId))->Await();
 	}
 
 	void RouterComponent::OnSystemUpdate() noexcept
@@ -126,7 +134,6 @@ namespace acs
 
 	std::unique_ptr<rpc::Message> RouterComponent::Call(int id, std::unique_ptr<rpc::Message> message)
 	{
-		int timeout = message->GetTimeout();
 		int rpcId = this->mDispatch->BuildRpcId();
 		{
 			message->SetRpcId(rpcId);
@@ -136,6 +143,6 @@ namespace acs
 				return nullptr;
 			}
 		}
-		return this->mDispatch->BuildRpcTask<RpcTaskSource>(rpcId, timeout)->Await();
+		return this->mDispatch->BuildRpcTask<RpcTaskSource>(rpcId)->Await();
 	}
 }

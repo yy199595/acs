@@ -18,7 +18,7 @@ namespace acs
 	};
 
 	class LuaComponent final : public Component,
-							   public IStart, public IComplete, public IHotfix,
+							   public IStart, public IComplete, public IRefresh,
 							   public IServerRecord, public IAppStop, public ISecondUpdate
 	{
 	public:
@@ -33,7 +33,7 @@ namespace acs
 		bool LateAwake() final;
 		void OnAppStop() final;
 		void OnComplete() final;
-		bool OnHotFix() final;
+		bool OnRefresh() final;
 		void OnSecondUpdate(int tick) noexcept final;
 		void OnRecord(json::w::Document &document) final;
 	private:
@@ -42,7 +42,7 @@ namespace acs
 		void RegisterLuaClass();
 		void CollectCollectgarbage() const;
 		void AddRequire(const std::string & direct);
-		void CheckModuleHotfix(const std::string & module);
+		void RefreshLuaModule(const std::string & module);
 	private:
 		lua_State* mLuaEnv;
 		lua::Config mConfig;

@@ -83,14 +83,17 @@ namespace acs
 				lua_setfield(lua, -2, "head");
 			}
 
+			lua_pushinteger(lua, message.SockId());
+			lua_setfield(lua, -2, "socketId");
+
+			lua_push_table_field(head, rpc::Header::id, lua, "actorId");
 			lua_push_table_field(head, rpc::Header::app_id, lua, "appId");
-			lua_push_table_field(head, rpc::Header::player_id, lua, "playerId");
 
 			switch (message.GetProto())
 			{
-				case rpc::Porto::None:
+				case rpc::Proto::None:
 					return XCode::Ok;
-				case rpc::Porto::Json:
+				case rpc::Proto::Json:
 				{
 					const std::string& data = message.GetBody();
 					if (!data.empty() && !lua::yyjson::write(lua, data.c_str(), data.size()))
@@ -99,7 +102,7 @@ namespace acs
 					}
 					break;
 				}
-				case rpc::Porto::Lua:
+				case rpc::Proto::Lua:
 				{
 					const std::string& str = message.GetBody();
 					if(lua::lfmt::deserialize(lua, str) != LUA_OK)
@@ -108,13 +111,13 @@ namespace acs
 					}
 					break;
 				}
-				case rpc::Porto::String:
+				case rpc::Proto::String:
 				{
 					const std::string& str = message.GetBody();
 					lua_pushlstring(lua, str.c_str(), str.size());
 					break;
 				}
-				case rpc::Porto::Protobuf:
+				case rpc::Proto::Protobuf:
 				{
 					if (!config->request.empty())
 					{
@@ -159,7 +162,7 @@ namespace acs
 			LOG_ERROR("{} {}", config->fullname, err);
 			return XCode::CallLuaFunctionFail;
 		}
-		message.SetProto(rpc::Porto::None);
+		message.SetProto(rpc::Proto::None);
 		if (!lua_isinteger(lua, -2))
 		{
 			LOG_ERROR("invoke ({}) return code unknown", config->fullname);
@@ -173,7 +176,7 @@ namespace acs
 				if (message.TempHead().Del("pb", pb))
 				{
 					MessageEncoder messageEncoder(lua);
-					message.SetProto(rpc::Porto::Protobuf);
+					message.SetProto(rpc::Proto::Protobuf);
 					pb::Message* data = this->mProto->Temp(pb);
 					if (data == nullptr)
 					{
@@ -187,7 +190,7 @@ namespace acs
 				}
 				else
 				{
-					message.SetProto(rpc::Porto::Json);
+					message.SetProto(rpc::Proto::Json);
 					lua::yyjson::read(lua, -1, *message.Body());
 				}
 				break;
@@ -198,7 +201,7 @@ namespace acs
 				message.Body()->clear();
 				const char* str = lua_tolstring(lua, -1, &len);
 				message.Body()->append(str, len);
-				message.SetProto(rpc::Porto::String);
+				message.SetProto(rpc::Proto::String);
 				break;
 			}
 		}

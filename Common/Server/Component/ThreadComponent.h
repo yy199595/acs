@@ -4,10 +4,20 @@
 #include"Core/Queue/ThreadQueue.h"
 #include"Core/Thread/AsioThread.h"
 #include"Entity/Component/Component.h"
-
+#include "Yyjson/Object/JsonObject.h"
 #ifdef __ENABLE_OPEN_SSL__
 #include<asio/ssl.hpp>
 #endif
+
+namespace thread
+{
+	struct Config : json::Object<Config>
+	{
+	public:
+		int count = 1;
+		int monitor = 15;
+	};
+}
 
 namespace acs
 {
@@ -25,9 +35,13 @@ namespace acs
 		tcp::Socket * CreateSocket(Asio::ssl::Context & ssl);
 #endif
 	private:
-		bool Awake() final;
 		void CloseThread();
 		void OnRecord(json::w::Document &document) final;
+#ifndef ONLY_MAIN_THREAD
+		private:
+		bool Awake() final;
+		void OnMonitor();
+#endif
 	private:
 		std::mutex mLock;
 #ifdef ONLY_MAIN_THREAD
@@ -35,7 +49,9 @@ namespace acs
 		std::unique_ptr<Asio::ContextWork> mWork;
 #else
 		size_t mIndex = 0;
-		std::vector<std::shared_ptr<custom::AsioThread>> mNetThreads;
+		thread::Config mConfig;
+		std::unique_ptr<std::thread> mThread;
+		std::vector<std::unique_ptr<custom::AsioThread>> mNetThreads;
 #endif
 	};
 

@@ -8,6 +8,7 @@
 
 namespace LuaCore
 {
+	int Run(lua_State * L);
 	int GetSystemInfo(lua_State* L);
 }
 

@@ -16,7 +16,7 @@ namespace redis
             return 0;
         }
         readStream << "*" << this->mParameters.size() + 1 << CRLF;
-        readStream << "$" << this->mCommand.size() << "\r\n" << this->mCommand << CRLF;
+        readStream << "$" << this->mCommand.size() << CRLF << this->mCommand << CRLF;
         for(const std::string & parameter : this->mParameters)
         {
 			readStream << '$' << parameter.size() << CRLF << parameter << CRLF;

@@ -4,7 +4,9 @@
 
 #ifndef APP_WAITTASKSOURCEBASE_H
 #define APP_WAITTASKSOURCEBASE_H
-#include<memory>
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
 namespace acs
 {
     enum class TaskState
@@ -15,14 +17,21 @@ namespace acs
     };
 
     class WaitTaskSourceBase
+#ifdef __SHARE_PTR_COUNTER__
+        : public memory::Object<WaitTaskSourceBase>
+#endif
     {
     public:
         explicit WaitTaskSourceBase();
+#ifdef __SHARE_PTR_COUNTER__
+        ~WaitTaskSourceBase() override = default;
+#else
         virtual ~WaitTaskSourceBase() = default;
+#endif
     public:
 		void Clear();
-        TaskState GetState() const { return this->mState; }
-        bool IsComplete() { return this->mState == TaskState::TaskFinish;}
+        inline TaskState GetState() const { return this->mState; }
+        inline bool IsComplete() { return this->mState == TaskState::TaskFinish;}
     protected:
         bool YieldTask() noexcept;
         bool ResumeTask(TaskState state = TaskState::TaskFinish) noexcept;

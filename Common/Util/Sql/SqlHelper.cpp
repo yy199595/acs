@@ -1,5 +1,4 @@
 ﻿#include"SqlHelper.h"
-#include"Entity/Actor/App.h"
 #include"google/protobuf/util/json_util.h"
 
 namespace acs
@@ -440,13 +439,8 @@ namespace acs
 		return true;
 	}
 
-	bool SqlHelper::Create(const std::string& tab,const std::string & message, const std::vector<std::string>& keys, std::string& sql)
+	bool SqlHelper::Create(const std::string& tab, json::r::Value& document, const std::vector<std::string>& keys, std::string& sql)
 	{
-		json::r::Document document;
-		if(!document.Decode(message))
-		{
-			return false;
-		}
 		this->mSqlCommandStream.str("");
 		std::vector<const char *> fields = document.GetAllKey();
 		this->mSqlCommandStream << "CREATE TABLE IF NOT EXISTS " << tab  << "(" << '\n';
@@ -503,6 +497,16 @@ namespace acs
 		this->mSqlCommandStream << ")";
 		sql = this->mSqlCommandStream.str();
 		return true;
+	}
+
+	bool SqlHelper::Create(const std::string& tab,const std::string & message, const std::vector<std::string>& keys, std::string& sql)
+	{
+		json::r::Document document;
+		if(!document.Decode(message))
+		{
+			return false;
+		}
+		return this->Create(tab, document, keys, sql);
 	}
 
 	bool SqlHelper::CreateIndex(const db::sql::index & request, std::string & sql)

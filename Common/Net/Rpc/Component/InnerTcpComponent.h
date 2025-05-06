@@ -30,7 +30,7 @@ namespace acs
 		rpc::InnerTcpClient * GetClient(int id);
 	private:
 		unsigned long long mWaitCount;
-		class ActorComponent * mActor;
+		class NodeComponent * mActor;
 		math::NumberPool<int> mNumPool;
 		class ThreadComponent * mThread;
         class DispatchComponent* mDispatch;

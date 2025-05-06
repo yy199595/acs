@@ -59,18 +59,18 @@ namespace _bson {
         }
 
         /** @param initsize this is just a hint as to the final size of the object */
-        bsonobjbuilder(int initsize = 512) : _b(_buf), _buf(initsize + sizeof(unsigned)), _offset(0),_doneCalled(false) {
+        explicit bsonobjbuilder(int initsize = 512) : _b(_buf), _buf(initsize + sizeof(unsigned)), _offset(0),_doneCalled(false) {
             _b.skip(4); /*leave room for size field and ref-count*/
         }
 
         /** @param baseBuilder construct a bsonobjbuilder using an existing BufBuilder
         *  This is for more efficient adding of subobjects/arrays. See docs for subobjStart for example.
         */
-        bsonobjbuilder(BufBuilder &baseBuilder) : _b(baseBuilder), _buf(0), _offset(baseBuilder.len()), _doneCalled(false) {
+        explicit bsonobjbuilder(BufBuilder &baseBuilder) : _b(baseBuilder), _buf(0), _offset(baseBuilder.len()), _doneCalled(false) {
             _b.skip(4);
         }
 
-        ~bsonobjbuilder() {
+        virtual ~bsonobjbuilder() {
             if (!_doneCalled && _b.buf() && _buf.getSize() == 0) {
                 _done();
             }

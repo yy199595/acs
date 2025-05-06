@@ -10,6 +10,9 @@
 #include "WebSocket/Client/Session.h"
 #include "Server/Component/ThreadComponent.h"
 #include "Rpc/Component/DispatchComponent.h"
+
+constexpr char msg_format = rpc::msg::text;
+
 namespace acs
 {
 	InnerWebSocketComponent::InnerWebSocketComponent()
@@ -25,7 +28,7 @@ namespace acs
 		int id = this->mClientPool.BuildNumber();
 		Asio::Context & io = this->mApp->GetContext();
 		std::shared_ptr<ws::Session> sessionClient
-			= std::make_unique<ws::Session>(id, this, io);
+			= std::make_unique<ws::Session>(id, this, io, msg_format);
 		{
 			sessionClient->StartReceive(socket);
 			this->mSessions.emplace(id, sessionClient);
@@ -35,7 +38,7 @@ namespace acs
 
 	bool InnerWebSocketComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
+		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<NodeComponent>())
 		LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
 		LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>())
 		return true;
@@ -72,7 +75,7 @@ namespace acs
 		}
 		Asio::Context & context = this->mApp->GetContext();
 		tcp::Socket * tcpSocket = this->mThread->CreateSocket();
-		std::shared_ptr<ws::Client> requestClient = std::make_shared<ws::Client>(id, this, context);
+		std::shared_ptr<ws::Client> requestClient = std::make_shared<ws::Client>(id, this, context, msg_format);
 		{
 			tcpSocket->Init(address);
 			requestClient->SetSocket(tcpSocket);
@@ -105,7 +108,7 @@ namespace acs
 		int id = this->mClientPool.BuildNumber();
 		Asio::Context & context = this->mApp->GetContext();
 		tcp::Socket * tcpSocket = this->mThread->CreateSocket();
-		std::shared_ptr<ws::Client> requestClient = std::make_shared<ws::Client>(id, this, context);
+		std::shared_ptr<ws::Client> requestClient = std::make_shared<ws::Client>(id, this, context, msg_format);
 		{
 			tcpSocket->Init(address);
 			requestClient->SetSocket(tcpSocket);

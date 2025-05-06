@@ -51,7 +51,7 @@ namespace http
 
 namespace http
 {
-    class JsonContent final : public Content, public json::r::Document
+    class JsonContent final : public Content
     {
 	public:
 		explicit JsonContent() = default;
@@ -61,17 +61,25 @@ namespace http
     public:
 		void Write(const json::w::Document & document);
 		const std::string & JsonStr() const { return this->mJson;}
+		inline const json::r::Document & JsonObject() const { return this->mDocument; }
 		http::ContentType GetContentType() const final { return http::ContentType::JSON; }
+
+		template<typename T>
+		inline bool Get(const char * key, T & value) const
+		{
+			return this->mDocument.Get(key, value);
+		}
     private:
 		void WriteToLua(lua_State *l) final;
         void OnWriteHead(std::ostream &os) final;
         int OnWriteBody(std::ostream &os) final;
         int OnRecvMessage(std::istream & is, size_t size) final;
-		bool OnDecode() final { return this->Decode(this->mJson); }
-		std::string ToStr() const final { return this->mJson; }
-		int ContentLength() final { return (int)this->mJson.size(); }
+		inline std::string ToStr() const final { return this->mJson; }
+		inline int ContentLength() final { return (int)this->mJson.size(); }
+		inline bool OnDecode() final { return this->mDocument.Decode(this->mJson); }
 	private:
         std::string mJson;
+		json::r::Document mDocument;
 	};
 }
 

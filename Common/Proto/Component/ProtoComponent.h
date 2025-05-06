@@ -42,13 +42,14 @@ namespace acs
         bool mHasWarning;
     };
 
-	class ProtoComponent final : public Component, public IHotfix
+	class ProtoComponent final : public Component, public IRefresh
     {
     public:
         ProtoComponent();
         ~ProtoComponent() final = default;
     public:
 		bool Load(const char * path);
+		bool Has(const std::string& name);
 		pb::Message * Temp(const std::string & name);
 		bool Import(const char * proto, std::vector<std::string> & types);
 		bool New(const pb::Any & any, std::unique_ptr<pb::Message> & message);
@@ -62,7 +63,7 @@ namespace acs
 		pb::Message * Read(lua_State * lua, const std::string & name, int index);
 	 private:
 		bool Awake() final;
-		bool OnHotFix() final;
+		bool OnRefresh() final;
         const pb::Message * FindMessage(const std::string & name);
 		void LoopMessage(const pb::Descriptor * descriptor, std::vector<std::string> & protos);
 	private:

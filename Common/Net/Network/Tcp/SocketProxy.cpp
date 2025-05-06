@@ -30,11 +30,12 @@ namespace tcp
         const Asio::EndPoint endPoint = this->mSocket->remote_endpoint(code);
         if (!this->mSocket->is_open() || code.value() != Asio::OK)
         {
-			return true;
+			return false;
         }
 		this->mIsClient = false;
 		this->mPort = endPoint.port();
 		this->mIp = endPoint.address().to_string();
+		this->SetOption(tcp::OptionType::CloseLinger, true);
 		this->mAddress = fmt::format("{0}:{1}", this->mIp, this->mPort);
 		return true;
     }
@@ -112,51 +113,39 @@ namespace tcp
 
 	bool Socket::SetOption(tcp::OptionType type, bool val)
 	{
-		try
+		Asio::Code code;
+		switch (type)
 		{
-			switch (type)
-			{
-				case tcp::OptionType::NoDelay:
-					this->mSocket->set_option(asio::ip::tcp::no_delay(val));
-					return true;
-				case tcp::OptionType::KeepAlive:
-					this->mSocket->set_option(asio::ip::tcp::socket::keep_alive(val)); //保持连接
-					return true;
-				case tcp::OptionType::CloseLinger:
-					this->mSocket->set_option(asio::socket_base::linger(val, 0)); //立即关闭
-					return true;
-				case tcp::OptionType::ReuseAddress:
-					this->mSocket->set_option(asio::ip::tcp::socket::reuse_address(val)); //重用地址
-					return true;
-			}
-			return true;
+			case tcp::OptionType::NoDelay:
+				this->mSocket->set_option(asio::ip::tcp::no_delay(val), code);
+				break;
+			case tcp::OptionType::KeepAlive:
+				this->mSocket->set_option(asio::ip::tcp::socket::keep_alive(val), code); //保持连接
+				break;
+			case tcp::OptionType::CloseLinger:
+				this->mSocket->set_option(asio::socket_base::linger(val, 0), code); //立即关闭
+				break;
+			case tcp::OptionType::ReuseAddress:
+				this->mSocket->set_option(asio::ip::tcp::socket::reuse_address(val), code); //重用地址
+				break;
 		}
-		catch(const std::system_error &)
-		{
-			return false;
-		}
+		return code.value() == Asio::OK;
 	}
 
 
 	void Socket::Close()
 	{
-		try
-		{
-			this->mSocket->cancel();
-			this->mSocket->shutdown(asio::socket_base::shutdown_both);
-			this->mSocket->close();
+		Asio::Code code;
+		this->mSocket->cancel(code);
+		this->mSocket->shutdown(asio::socket_base::shutdown_both, code);
+		this->mSocket->close(code);
 
 #ifdef __ENABLE_OPEN_SSL__
-			if (this->mSslSocket != nullptr)
-			{
-				this->mSslSocket->shutdown();
-			}
-#endif
-		}
-		catch (const std::system_error & err)
+		if (this->mSslSocket != nullptr)
 		{
-
+			this->mSslSocket->shutdown(code);
 		}
+#endif
 	}
 
 	void Socket::Destroy()

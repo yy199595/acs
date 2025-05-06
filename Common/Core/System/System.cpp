@@ -3,11 +3,14 @@
 //
 
 #include"System.h"
+
 #ifdef __OS_WIN__
+
 #include<direct.h>
 #include<Windows.h>
 #include <psapi.h>
 #include<iostream>
+
 #pragma comment(lib, "psapi.lib")
 #pragma comment(lib, "kernel32.lib")
 #endif
@@ -38,15 +41,19 @@
 #include <dbghelp.h>
 #include <tchar.h>
 #include <Util/Tools/TimeHelper.h>
+
 #pragma comment(lib, "dbghelp.lib")
 
 namespace os
 {
-	bool CreateMiniDump(EXCEPTION_POINTERS* pep) {
+	bool CreateMiniDump(EXCEPTION_POINTERS* pep)
+	{
 		// 打开文件
 		std::string name = fmt::format("{}.dmp", help::Time::GetDateStr());
-		HANDLE hFile = CreateFile(_T(name.c_str()), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (hFile == INVALID_HANDLE_VALUE) {
+		HANDLE hFile = CreateFile(_T(name.c_str()), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
+				FILE_ATTRIBUTE_NORMAL, NULL);
+		if (hFile == INVALID_HANDLE_VALUE)
+		{
 			return false;
 		}
 
@@ -56,12 +63,14 @@ namespace os
 		mei.ExceptionPointers = pep;
 		mei.ClientPointers = FALSE;
 
-		BOOL result = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &mei, NULL, NULL);
+		BOOL result = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &mei, NULL,
+				NULL);
 		CloseHandle(hFile);
 		return result != 0;
 	}
 
-	LONG WINAPI MyUnhandledExceptionFilter(EXCEPTION_POINTERS* pExceptionPtrs) {
+	LONG WINAPI MyUnhandledExceptionFilter(EXCEPTION_POINTERS* pExceptionPtrs)
+	{
 		CreateMiniDump(pExceptionPtrs);
 		return EXCEPTION_EXECUTE_HANDLER;
 	}
@@ -74,16 +83,16 @@ namespace os
 	{
 		std::vector<std::string> commandLine;
 		commandLine.reserve(argc);
-        for(int index = 0; index < argc; index++)
+		for (int index = 0; index < argc; index++)
 		{
 			commandLine.emplace_back(argv[index]);
 		}
 		System::SetEnv("id", "1"); //服务器id
 		System::SetEnv("log", "1"); //日志等级
-		System::SetEnv("name", "server"); //集群名称
-		System::SetEnv("cluster", "debug");
+		System::SetEnv("name", "server");
+		System::SetEnv("node", "all");
 		System::SetEnv("db", "127.0.0.1"); //db地址
-		System::SetEnv("exe",  commandLine[0]);
+		System::SetEnv("exe", commandLine[0]);
 		System::SetEnv("config", "./config/run/all.json");
 		std::string work = fmt::format("{0}/", getcwd(nullptr, 0));
 		help::Str::ReplaceString(work, "\\", "/");
@@ -97,7 +106,7 @@ namespace os
 		{
 			result.clear();
 			std::string line(commandLine[index]);
-			if(line.find("--") == std::string::npos)
+			if (line.find("--") == std::string::npos)
 			{
 				CONSOLE_LOG_ERROR("args:{} format error", line);
 				return false;
@@ -147,8 +156,8 @@ namespace os
 	{
 		std::string str = fmt::format("APP_{}", k);
 		help::Str::Toupper(str);
-		const char * val = getenv(str.c_str());
-		if(val == nullptr)
+		const char* val = getenv(str.c_str());
+		if (val == nullptr)
 		{
 			return false;
 		}
@@ -174,6 +183,37 @@ namespace os
 		return false;
 	}
 
+	bool System::Run(const std::string& cmd, std::string& output)
+	{
+#ifdef __OS_WIN__
+		FILE* pipe = _popen(cmd.c_str(), "r");
+#else
+		FILE* pipe = popen(cmd.c_str(), "r");
+#endif
+		if (!pipe)
+		{
+			return false;
+		}
+		size_t count = 0;
+		char buffer[512] = { 0 };
+		while (!feof(pipe) && count <= 1000)
+		{
+			count++;
+			size_t len = fread(buffer, 1, sizeof(buffer), pipe);
+			if (len > 0)
+			{
+				output.append(buffer, len);
+			}
+		}
+#ifdef __OS_WIN__
+		_pclose(pipe);  // 关闭管道
+#else
+		pclose(pipe);  // 关闭管道
+#endif
+		return true;
+
+	}
+
 	bool System::HasEnv(const std::string& k)
 	{
 		return getenv(k.c_str()) != nullptr;
@@ -194,12 +234,12 @@ namespace os
 	bool System::ReadFile(const std::string& path, std::string& content)
 	{
 		std::ifstream fs(path);
-		if(!fs.is_open())
+		if (!fs.is_open())
 		{
 			return false;
 		}
 		std::string lineData;
-		while(std::getline(fs, lineData))
+		while (std::getline(fs, lineData))
 		{
 			System::SubValue(lineData);
 			content.append(lineData);
@@ -208,125 +248,200 @@ namespace os
 		return true;
 	}
 
-    std::string System::FormatPath(const std::string &path)
-    {
-		if(path[0] == '/')
+	std::string System::FormatPath(const std::string& path)
+	{
+		if (path[0] == '/')
 		{
 			return System::mWorkPath + path;
 		}
 		return fmt::format("{}/{}", mWorkPath, path);
-    }
-#ifdef __OS_WIN__
-	// 全局变量保存上一次的CPU时间
-	static ULONGLONG lastSysTime = 0;
-	static ULONGLONG lastProcTime = 0;
+	}
+
+#ifdef __OS_LINUX__
+	CPUUsage System::GetCPUUsage()
+	{
+		 CPUUsage usage = {0};
+    	// 获取系统总CPU时间
+    	std::ifstream stat("/proc/stat");
+    	std::string line;
+    	std::getline(stat, line);
+    	std::istringstream iss_sys(line);
+    	std::string label;
+    	iss_sys >> label;
+    	if (label == "cpu") {
+        	unsigned long val;
+        	while (iss_sys >> val) usage.total += val;
+    	}
+
+    	// 获取进程CPU时间
+    	std::ifstream proc("/proc/self/stat");
+    	std::getline(proc, line);
+    	size_t rparen = line.rfind(')');
+    	std::istringstream iss_proc(line.substr(rparen+2));
+
+    	std::vector<std::string> fields;
+    	std::string field;
+		while (iss_proc >> field) fields.push_back(field);
+
+    	if (fields.size() > 13) {
+        	usage.utime = stoul(fields[11]); // utime在字段14
+        	usage.stime = stoul(fields[12]); // stime在字段15
+    	}
+    	return usage;
+	}
 #endif
+
 	bool System::GetSystemInfo(SystemInfo& systemInfo)
 	{
-#ifdef __OS_MAC__
-		mach_task_basic_info_data_t info;
-		mach_msg_type_number_t count = MACH_TASK_BASIC_INFO_COUNT;
-		task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&info, &count);
-		systemInfo.use_memory = info.resident_size;
-
-		int mib[2];
-		size_t len;
-		mib[0] = CTL_HW;
-		mib[1] = HW_MEMSIZE;
-		uint64_t physicalMemorySize = 0;
-		len = sizeof(physicalMemorySize);
-		sysctl(mib, 2, &physicalMemorySize, &len, NULL, 0);
-		systemInfo.max_memory = physicalMemorySize;
-
-		thread_basic_info_data_t threadInfo;
-		mach_msg_type_number_t threadInfoCount = THREAD_BASIC_INFO_COUNT;
-		thread_info(mach_thread_self(), THREAD_BASIC_INFO, reinterpret_cast<thread_info_t>(&threadInfo), &threadInfoCount);
-		unsigned int cpuUsage = threadInfo.cpu_usage;
-		// 获取系统核数
-		host_basic_info_data_t hostInfo{};
-		mach_msg_type_number_t hostInfoCount = HOST_BASIC_INFO_COUNT;
-		host_info(mach_host_self(), HOST_BASIC_INFO, reinterpret_cast<host_info_t>(&hostInfo), &hostInfoCount);
-		unsigned int processorCount = hostInfo.max_cpus;
-		// 计算 CPU 使用率
-		systemInfo.cpu = static_cast<double>(cpuUsage) / (TH_USAGE_SCALE * processorCount) * 100.0;
-#elif __OS_LINUX__
-		struct rusage r_usage;
-		getrusage(RUSAGE_SELF, &r_usage);
-		constexpr double mb = 1024.f * 1024;
-
-		// 计算CPU使用率
-		double cpu_usage = (double)r_usage.ru_utime.tv_sec + (double)r_usage.ru_utime.tv_usec / 1e6;
-		double total_cpu_time = (double)r_usage.ru_stime.tv_sec + (double)r_usage.ru_stime.tv_usec / 1e6;
-		systemInfo.cpu = cpu_usage / total_cpu_time;
-		//systemInfo.use_memory = r_usage.ru_maxrss;
-
-		std::ifstream statm("/proc/self/statm");
-		if (!statm.is_open()) {
-			// 打开文件失败
-			return false;
-		}
-		std::string line;
-		std::getline(statm, line);
-		statm.close();
-		std::size_t total_pages, resident_pages, shared_pages;
-		std::sscanf(line.c_str(), "%zu %zu %zu", &total_pages, &resident_pages, &shared_pages);
-		std::size_t page_size = sysconf(_SC_PAGESIZE);
-		systemInfo.use_memory = (resident_pages * page_size);
-
-		struct sysinfo mem_info;
-    	if(sysinfo(&mem_info) != 0) {
-        	return false;
-    	}
-		systemInfo.max_memory = mem_info.totalram;
-#else
-		HANDLE hProcess = GetCurrentProcess();
-		FILETIME ftSysIdle, ftSysKernel, ftSysUser, ftProcCreation, ftProcExit, ftProcKernel, ftProcUser;
-
-		// 初始化默认值
+// 初始化默认值
 		systemInfo.cpu = 0.0;
 		systemInfo.use_memory = 0;
 		systemInfo.max_memory = 0;
 
+#ifdef __OS_MAC__
+		// 获取当前进程内存使用量
+	mach_task_basic_info_data_t taskInfo;
+	mach_msg_type_number_t taskInfoCount = MACH_TASK_BASIC_INFO_COUNT;
+	if (task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&taskInfo, &taskInfoCount) != KERN_SUCCESS) {
+		return false;
+	}
+	systemInfo.use_memory = taskInfo.resident_size;
+
+	// 获取系统总内存
+	int mib[2] = {CTL_HW, HW_MEMSIZE};
+	uint64_t physicalMemorySize = 0;
+	size_t len = sizeof(physicalMemorySize);
+	if (sysctl(mib, 2, &physicalMemorySize, &len, nullptr, 0) != 0) {
+		return false;
+	}
+	systemInfo.max_memory = physicalMemorySize;
+
+	// 获取 CPU 使用率（考虑所有线程）
+	thread_array_t threadList;
+	mach_msg_type_number_t threadCount;
+	if (task_threads(mach_task_self(), &threadList, &threadCount) != KERN_SUCCESS) {
+		return false;
+	}
+
+	double totalCpuUsage = 0.0;
+	for (mach_msg_type_number_t i = 0; i < threadCount; ++i) {
+		thread_basic_info_data_t threadInfo;
+		mach_msg_type_number_t threadInfoCount = THREAD_BASIC_INFO_COUNT;
+		if (thread_info(threadList[i], THREAD_BASIC_INFO, (thread_info_t)&threadInfo, &threadInfoCount) == KERN_SUCCESS) {
+			totalCpuUsage += static_cast<double>(threadInfo.cpu_usage);
+		}
+	}
+	// 释放线程列表
+	vm_deallocate(mach_task_self(), (vm_address_t)threadList, threadCount * sizeof(thread_t));
+
+	// 获取 CPU 核心数
+	host_basic_info_data_t hostInfo;
+	mach_msg_type_number_t hostInfoCount = HOST_BASIC_INFO_COUNT;
+	if (host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)&hostInfo, &hostInfoCount) != KERN_SUCCESS) {
+		return false;
+	}
+	unsigned int processorCount = hostInfo.max_cpus;
+
+	// 计算 CPU 使用率 (THREAD_USAGE_SCALE = 1000)
+	systemInfo.cpu = (totalCpuUsage / (1000.0 * processorCount)) * 100.0;
+
+#elif __OS_LINUX__
+
+		std::ifstream status("/proc/self/status");
+		std::string line;
+		while (std::getline(status, line)) {
+			if (line.compare(0, 6, "VmRSS:") == 0) {
+				size_t kb;
+				std::istringstream iss(line.substr(6));
+				iss >> kb;
+				systemInfo.use_memory = kb * 1024; // 转换为字节
+			}
+		}
+
+		std::ifstream meminfo("/proc/meminfo");
+		while (std::getline(meminfo, line)) {
+			if (line.compare(0, 9, "MemTotal:") == 0) {
+				size_t kb;
+				std::istringstream iss(line.substr(9));
+				iss >> kb;
+				systemInfo.max_memory = kb * 1024; // 转换为字节
+			}
+		}
+
+		static CPUUsage lateInfo = System::GetCPUUsage();
+
+		CPUUsage currInfo = System::GetCPUUsage();
+
+		 const unsigned long process_diff =
+        (currInfo.utime + currInfo.stime) - (lateInfo.utime + lateInfo.stime);
+    	const unsigned long total_diff = currInfo.total - lateInfo.total;
+
+    	if (total_diff > 0) {
+			systemInfo.cpu = (process_diff * 100.0f) / total_diff;
+		}
+		lateInfo = currInfo;
+#else // Windows
+		// 静态变量用于记录上一次时间
+		static ULONGLONG lastSysTime = 0;
+		static ULONGLONG lastProcTime = 0;
+
+		HANDLE hProcess = GetCurrentProcess();
+		if (hProcess == nullptr)
+		{
+			return false;
+		}
+
+		FILETIME ftSysIdle, ftSysKernel, ftSysUser, ftProcCreation, ftProcExit, ftProcKernel, ftProcUser;
+		bool success = false;
+
+		// 获取 CPU 使用率
 		if (GetSystemTimes(&ftSysIdle, &ftSysKernel, &ftSysUser) &&
 			GetProcessTimes(hProcess, &ftProcCreation, &ftProcExit, &ftProcKernel, &ftProcUser))
 		{
-			ULONGLONG sysKernel = (ULONGLONG(ftSysKernel.dwHighDateTime) << 32) | ftSysKernel.dwLowDateTime;
-			ULONGLONG sysUser = (ULONGLONG(ftSysUser.dwHighDateTime) << 32) | ftSysUser.dwLowDateTime;
-			ULONGLONG procKernel = (ULONGLONG(ftProcKernel.dwHighDateTime) << 32) | ftProcKernel.dwLowDateTime;
-			ULONGLONG procUser = (ULONGLONG(ftProcUser.dwHighDateTime) << 32) | ftProcUser.dwLowDateTime;
+			ULONGLONG sysKernel = ((ULONGLONG)ftSysKernel.dwHighDateTime << 32) | ftSysKernel.dwLowDateTime;
+			ULONGLONG sysUser = ((ULONGLONG)ftSysUser.dwHighDateTime << 32) | ftSysUser.dwLowDateTime;
+			ULONGLONG procKernel = ((ULONGLONG)ftProcKernel.dwHighDateTime << 32) | ftProcKernel.dwLowDateTime;
+			ULONGLONG procUser = ((ULONGLONG)ftProcUser.dwHighDateTime << 32) | ftProcUser.dwLowDateTime;
 
 			ULONGLONG sysTime = sysKernel + sysUser;
 			ULONGLONG procTime = procKernel + procUser;
 
-			if (lastSysTime > 0 && lastProcTime > 0) {
+			if (lastSysTime > 0 && sysTime > lastSysTime)
+			{
 				ULONGLONG sysTimeDiff = sysTime - lastSysTime;
 				ULONGLONG procTimeDiff = procTime - lastProcTime;
-
-				if (sysTimeDiff > 0) {
-					systemInfo.cpu = (procTimeDiff / double(sysTimeDiff)) * 100.0;
-				}
+				systemInfo.cpu = (procTimeDiff * 100.0) / sysTimeDiff;
 			}
-
 			lastSysTime = sysTime;
 			lastProcTime = procTime;
+			success = true;
 		}
 
-		PROCESS_MEMORY_COUNTERS pmc;
+		// 获取内存使用量
+		PROCESS_MEMORY_COUNTERS pmc = { 0 };
 		pmc.cb = sizeof(PROCESS_MEMORY_COUNTERS);
-		if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
-			systemInfo.use_memory = (long long)pmc.WorkingSetSize; // 单位：字节
+		if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
+		{
+			systemInfo.use_memory = pmc.WorkingSetSize;
+			success = true;
 		}
 
-		MEMORYSTATUSEX memStatus;
+		// 获取系统总内存
+		MEMORYSTATUSEX memStatus = { 0 };
 		memStatus.dwLength = sizeof(memStatus);
-		if (GlobalMemoryStatusEx(&memStatus)) {
-			systemInfo.max_memory = (long long)memStatus.ullTotalPhys; // 单位：字节
+		if (GlobalMemoryStatusEx(&memStatus))
+		{
+			systemInfo.max_memory = memStatus.ullTotalPhys;
+			success = true;
 		}
-        CloseHandle(hProcess);
+
+		CloseHandle(hProcess);
+		return success;
+
 #endif
 		return true;
 	}
 
-    std::string System::mWorkPath;
+	std::string System::mWorkPath;
 	std::unordered_map<std::string, std::string> System::mSubValues;
 }

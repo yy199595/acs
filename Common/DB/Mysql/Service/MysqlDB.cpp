@@ -21,15 +21,15 @@ namespace acs
 
 	bool MysqlDB::OnInit()
 	{
-		BIND_SERVER_RPC_METHOD(MysqlDB::Save);
-		BIND_SERVER_RPC_METHOD(MysqlDB::Exec);
-		BIND_SERVER_RPC_METHOD(MysqlDB::Query);
-		BIND_SERVER_RPC_METHOD(MysqlDB::Index);
-		BIND_SERVER_RPC_METHOD(MysqlDB::Update);
-		BIND_SERVER_RPC_METHOD(MysqlDB::Delete);
-		BIND_SERVER_RPC_METHOD(MysqlDB::Create);
-		BIND_SERVER_RPC_METHOD(MysqlDB::Insert);
-		BIND_SERVER_RPC_METHOD(MysqlDB::FindPage);
+		BIND_RPC_METHOD(MysqlDB::Save);
+		BIND_RPC_METHOD(MysqlDB::Exec);
+		BIND_RPC_METHOD(MysqlDB::Query);
+		BIND_RPC_METHOD(MysqlDB::Index);
+		BIND_RPC_METHOD(MysqlDB::Update);
+		BIND_RPC_METHOD(MysqlDB::Delete);
+		BIND_RPC_METHOD(MysqlDB::Create);
+		BIND_RPC_METHOD(MysqlDB::Insert);
+		BIND_RPC_METHOD(MysqlDB::FindPage);
 		LOG_CHECK_RET_FALSE(this->mProto = this->GetComponent<ProtoComponent>())
 		LOG_CHECK_RET_FALSE(this->mMysql = this->GetComponent<MysqlDBComponent>())
 		return true;

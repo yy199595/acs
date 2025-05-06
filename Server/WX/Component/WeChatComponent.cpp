@@ -705,7 +705,7 @@ namespace acs
 			std::unique_ptr<json::r::Value> amountObject;
 			if (!jsonObject->Get("amount", amountObject))
 			{
-				LOG_ERROR("{}", jsonObject->ToString());
+				LOG_ERROR("{}", jsonObject->JsonObject().ToString());
 				return nullptr;
 			}
 			amountObject->Get("total", response1->amount.total);

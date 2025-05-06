@@ -21,20 +21,20 @@ namespace kcp
 		void StartReceive() final;
 		void Update(long long ms) final;
 	private:
-		void OnReceive(const std::string & addr, const char * buf, int size);
+		void OnReceive(const std::string & addr, const std::string & buf, size_t size);
 	private:
 		ikcpcb * mKcp;
 		std::ostream mSendStream;
 		Component * mComponent;
 		asio_udp::socket mSocket;
 		asio::system_timer mTimer;
+		std::string mDecodeBuffer;
 		asio::io_context & mContext;
 		asio::streambuf mSendBuffer;
 		asio::streambuf mReceiveBuffer;
 		Asio::Context & mMainContext;
 		asio_udp::endpoint mRemoteEndpoint;
 		asio_udp::endpoint mLocalEndpoint;
-		std::array<char, kcp::BUFFER_COUNT> mDecodeBuffer;
 		//char mSendBuffer[std::numeric_limits<unsigned short>::max()] = { 0 };
 	};
 }

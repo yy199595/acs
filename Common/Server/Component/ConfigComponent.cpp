@@ -81,7 +81,7 @@ namespace acs
         return true;
     }
 
-    bool ConfigComponent::OnHotFix()
+    bool ConfigComponent::OnRefresh()
     {
 	    for(auto iter = this->mConfigs.begin(); iter != this->mConfigs.end(); ++iter)
         {

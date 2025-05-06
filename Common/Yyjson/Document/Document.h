@@ -46,8 +46,10 @@ namespace json
 			bool Push(const char *);
 			bool Push(const Value& value);
 			bool Push(const std::string& v);
-			bool PushObject(const std::string& str);
 			bool Push(const char* str, size_t size);
+		public:
+			bool PushObject(const std::string& str);
+			bool PushObject(const std::string& str, std::unique_ptr<Value> & value);
 
 			template<typename T>
 			inline std::enable_if_t<std::is_base_of<IObject, T>::value, bool> Push(T & object)
@@ -223,15 +225,17 @@ namespace json
 		public:
 			size_t MemberCount() const;
 			std::string ToString() const;
-			yyjson_val* GetValue() { return this->mValue; }
 			std::vector<const char *> GetAllKey() const;
 			size_t GetKeys(std::vector<const char*>& key) const;
+			inline yyjson_val* GetValue() { return this->mValue; }
 		public:
 			bool Get(const char* k, bool& v) const;
 			bool Get(const char* k, std::string& v) const;
 			bool GetValues(std::vector<std::unique_ptr<Value>> & value) const;
+		public:
 			bool Get(const char* key, std::unique_ptr<Value>& value) const;
 			bool Get(const char* key, std::vector<std::string>& value) const;
+			bool Get(const char * key, std::unordered_map<int, std::string> & value) const;
 			bool Get(const char * key, std::unordered_map<std::string, std::string> & value) const;
 
 			template<typename T>
@@ -300,6 +304,7 @@ namespace json
 				{
 					return false;
 				}
+				T newItem;
 				size_t size = yyjson_arr_size(jsonArr);
 				value.reserve(size);
 				for (size_t index = 0; index < size; index++)
@@ -309,7 +314,6 @@ namespace json
 					{
 						return false;
 					}
-					T newItem;
 					json::r::Value jsonVal(item);
 					if(!newItem.Decode(jsonVal))
 					{
@@ -353,14 +357,8 @@ namespace json
 		class Document : public Value
 		{
 		public:
-			explicit Document() : Value(nullptr), mDoc(nullptr)
-			{
-			}
-
-			~Document() override
-			{
-				yyjson_doc_free(this->mDoc);
-			}
+			explicit Document() : Value(nullptr), mDoc(nullptr) { }
+			~Document() override  { yyjson_doc_free(this->mDoc); }
 
 		public:
 			void SetDoc(yyjson_doc* doc);

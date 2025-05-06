@@ -21,6 +21,7 @@
 
 #include "Auth/Aes/Aes.h"
 #include "Auth/Jwt/Jwt.h"
+
 #else
 
 #include "Util/Crypt/Mask.h"
@@ -32,15 +33,18 @@
 #include "Http/Component/NotifyComponent.h"
 #endif
 
+//#include "vld.h"
+
 namespace acs
 {
-	App::App(int id, ServerConfig& config) :
-			Server(id, config.Name()), mSignal(mContext),
-			mContext(1), mStartTime(help::Time::NowMil()), mConfig(config)
+	App::App(int id, const std::string & name) :
+			Node(id, name), mSignal(mContext),
+			mContext(1), mStartTime(help::HighTime::NowMil())
 	{
 		this->mLogicFps = 0;
 		this->mTickCount = 0;
 		this->mGuidIndex = 0;
+		this->mEventCount = 0;
 		this->mLastGuidTime = 0;
 		this->mActor = nullptr;
 		this->mProto = nullptr;
@@ -48,7 +52,7 @@ namespace acs
 		this->mCoroutine = nullptr;
 		this->mStatus = ServerStatus::Init;
 #ifdef __OS_WIN__
-		Debug::Init();
+		//Debug::Init();
 #endif
 #ifdef __ENABLE_OPEN_SSL__
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
@@ -62,13 +66,12 @@ namespace acs
 #ifdef __ENABLE_OPEN_WOLF_SSL__
 
 #endif
-		this->mNextNewDayTime = help::Time::GetNewTime(1);
 	}
 
 	bool App::LoadComponent()
 	{
 		std::string path, cluster;
-		if (!this->mConfig.GetPath("cluster", path)) //加载集群配置
+		if (!this->mConfig.GetPath("node", path)) //加载集群配置
 		{
 			return false;
 		}
@@ -84,7 +87,7 @@ namespace acs
 		LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
 		LOG_CHECK_RET_FALSE(this->AddComponent<CoroutineComponent>());
 
-		this->mActor = this->GetComponent<ActorComponent>();
+		this->mActor = this->GetComponent<NodeComponent>();
 		this->mProto = this->GetComponent<ProtoComponent>();
 		this->mCoroutine = this->GetComponent<CoroutineComponent>();
 
@@ -103,7 +106,7 @@ namespace acs
 			return true;
 		}
 		LOG_CHECK_RET_FALSE(this->LateAwake())
-		return this->mActor->AddGroup(this->mConfig.Name(), this->GetId());
+		return this->mActor->AddCluster(this->mConfig.Name(), this->GetNodeId());
 	}
 
 	bool App::LoadLang() const
@@ -116,13 +119,13 @@ namespace acs
 		return (new LangConfig())->LoadConfig(path);
 	}
 
-	bool App::Hotfix()
+	bool App::Refresh()
 	{
-		std::vector<IHotfix*> hotfixComponents;
-		this->GetComponents<IHotfix>(hotfixComponents);
-		for (IHotfix* hotfixComponent: hotfixComponents)
+		std::vector<IRefresh*> hotfixComponents;
+		this->GetComponents<IRefresh>(hotfixComponents);
+		for (IRefresh* hotfixComponent: hotfixComponents)
 		{
-			if (!hotfixComponent->OnHotFix())
+			if (!hotfixComponent->OnRefresh())
 			{
 				Component* component = dynamic_cast<Component*>(hotfixComponent);
 				LOG_ERROR("{} invoke hotfix failure", component->GetName());
@@ -159,15 +162,15 @@ namespace acs
 		return true;
 	}
 
-	void App::Sleep(int ms)
-	{
-		this->mCoroutine->Sleep(ms);
-	}
-
 	int App::Run() noexcept
 	{
-		srand(help::Time::NowMil());
-		if (!this->LoadLang())
+		std::string path;
+		srand(help::HighTime::NowMil());
+		if(!os::System::GetEnv("CONFIG", path))
+		{
+			return XServerCode::ConfError;
+		}
+		if (!this->mConfig.LoadConfig(path) || !this->LoadLang())
 		{
 			return XServerCode::ConfError;
 		}
@@ -181,8 +184,8 @@ namespace acs
 		}
 
 		long long logicStartTime = 0;
-		long long logicSecondTime = help::Time::NowMil();
-		long long logicLastUpdateTime = help::Time::NowMil();
+		long long logicSecondTime = help::HighTime::NowMil();
+		long long logicLastUpdateTime = help::HighTime::NowMil();
 
 		std::vector<IFrameUpdate*> frameUpdateComponents;
 		std::vector<ISystemUpdate*> systemUpdateComponents;
@@ -196,34 +199,41 @@ namespace acs
 
 		int fps = 15;
 		Asio::Code code;
+		int eventCount = 100;
 		long long logicRunCount = 0;
-		Asio::ContextWork work(this->mContext);
 		std::unique_ptr<json::r::Value> jsonObject;
 		if (this->mConfig.Get("core", jsonObject))
 		{
 			jsonObject->Get("fps", fps);
+			jsonObject->Get("event", eventCount);
 		}
 		std::chrono::milliseconds sleepTime(1);
 		long long logicUpdateInterval = 1000 / fps;
+		auto work = asio::make_work_guard(this->mContext);
 
 		while (!this->mContext.stopped())
 		{
+			int count = 0;
 			logicRunCount++;
-			this->mContext.poll(code);
+			while(this->mContext.poll_one(code) > 0 && count <= eventCount)
+			{
+				count++;
+				this->mEventCount++;
+			}
 			for (ISystemUpdate* component: systemUpdateComponents)
 			{
 				component->OnSystemUpdate();
 			}
 			if (this->mStatus >= ServerStatus::Start && this->mStatus < ServerStatus::Closing)
 			{
-				logicStartTime = help::Time::NowMil();
+				logicStartTime = help::HighTime::NowMil();
 				if (logicStartTime - logicLastUpdateTime >= logicUpdateInterval)
 				{
 					for (IFrameUpdate* component: frameUpdateComponents)
 					{
 						component->OnFrameUpdate(logicStartTime);
 					}
-					long long nowTime = help::Time::NowMil();
+					long long nowTime = help::HighTime::NowMil();
 					logicUpdateInterval = (1000 / fps) - (nowTime - logicStartTime);
 
 					if (logicStartTime - logicSecondTime >= 1000)
@@ -232,11 +242,11 @@ namespace acs
 						os::SystemInfo systemInfo;
 						constexpr double MB = 1024 * 1024.0f;
 						os::System::GetSystemInfo(systemInfo);
-						double mb = (double)(systemInfo.use_memory - this->mStartMemory) / MB;
-						SetConsoleTitle(fmt::format("{:.3f}MB", mb).c_str());
+						double mb = systemInfo.use_memory / MB;
+						SetConsoleTitle(fmt::format("[{:.2f}%] {:.3f}MB", systemInfo.cpu * 100, mb).c_str());
 #endif
 #if defined(__OS_WIN__) || defined(__OS_MAC__)
-						this->Hotfix();
+						this->Refresh();
 #endif
 						this->mTickCount++;
 						long long costTime = nowTime - logicSecondTime;
@@ -246,28 +256,16 @@ namespace acs
 						{
 							component->OnSecondUpdate(this->mTickCount);
 						}
-
-						if ((nowTime / 1000) >= this->mNextNewDayTime)
-						{
-							std::vector<ISystemNewDay*> systemNewDays;
-							this->GetComponents<ISystemNewDay>(systemNewDays);
-							for (ISystemNewDay* systemNewDay: systemNewDays)
-							{
-								systemNewDay->OnNewDay();
-							}
-							this->mNextNewDayTime = help::Time::GetNewTime(1);
-						}
 						logicRunCount = 0;
-						logicSecondTime = help::Time::NowMil();
+						logicSecondTime = help::HighTime::NowMil();
 					}
 
 					for (ILastFrameUpdate* component: lastFrameUpdateComponents)
 					{
 						component->OnLastFrameUpdate(logicStartTime);
 					}
-					logicLastUpdateTime = help::Time::NowMil();
+					logicLastUpdateTime = help::HighTime::NowMil();
 				}
-
 			}
 			std::this_thread::sleep_for(sleepTime);
 		}
@@ -277,7 +275,7 @@ namespace acs
 
 	long long App::MakeGuid()
 	{
-		long long nowTime = help::Time::NowSec();
+		long long nowTime = help::HighTime::NowSec();
 		if (nowTime != this->mLastGuidTime)
 		{
 			this->mGuidIndex = 0;
@@ -291,8 +289,8 @@ namespace acs
 			this->mGuidIndex = 0;
 			std::this_thread::sleep_for(std::chrono::seconds(1));
 		}
-		int serverId = this->GetSrvId();
-		return nowTime << 31 | (int)serverId << 16 | index;
+		int nodeId = this->GetNodeId();
+		return nowTime << 31 | (int)nodeId << 16 | index;
 	}
 
 	std::string App::NewUuid()
@@ -343,7 +341,7 @@ namespace acs
 #ifdef __DEBUG__
 		CONSOLE_LOG_ERROR("start close {}", this->Name());
 #else
-		long long t1 = help::Time::NowMil();
+		long long t1 = help::HighTime::NowMil();
 #endif
 		std::vector<IAppStop*> stopComponent;
 		this->GetComponents<IAppStop>(stopComponent);
@@ -423,7 +421,14 @@ namespace acs
 		completeComponents.clear();
 		this->mStatus = ServerStatus::Ready;
 		this->mStartMemory = systemInfo.use_memory;
-		long long t = help::Time::NowMil() - this->mStartTime;
+		long long t = help::HighTime::NowMil() - this->mStartTime;
 		LOG_INFO("  ===== start {} ok [{:.3f}s] =======", this->Name(), t / 1000.0f);
+
+		//VLDEnable();
+	}
+
+	int App::Run(const std::string& cmd)
+	{
+		return XServerCode::Ok;
 	}
 }

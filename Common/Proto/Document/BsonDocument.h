@@ -39,11 +39,11 @@ namespace bson
 		{
 		public:
 			Document() = default;
-			~Document() = default;
+			~Document() final = default;
 		public:
 			std::string ToString();
             bool FromByJson(const std::string& json);
-			bool FromByJson(const json::r::Document & json);
+			bool FromByJson(const json::r::Value & json);
 		public:
 			const char* Serialize(int& length);
 
@@ -79,6 +79,9 @@ namespace bson
 
 
 			bool WriterToJson(std::string * json);
+
+			bool WriterToJson(json::w::Document & document);
+
 
 			_bson::BSONType Type(const char* key) const;
 

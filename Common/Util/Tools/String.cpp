@@ -25,8 +25,12 @@ namespace help
 
 	size_t Str::Hash(const std::string& str)
 	{
-		std::hash<std::string> hash;
-		return hash(str);
+		size_t hash = 14695981039346656037ULL;
+		for (char c : str) {
+			hash ^= static_cast<size_t>(c);
+			hash *= 1099511628211ULL;
+		}
+		return hash;
 	}
 
 	bool Str::IsRegex(const std::string& pattern)

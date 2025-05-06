@@ -43,6 +43,7 @@ namespace acs
 		bool auth;
 		int limit;
 		bool open;
+		int timeout;
 		int permission;
 		std::string path;
 		std::string type;
