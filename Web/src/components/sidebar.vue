@@ -82,6 +82,7 @@ onMounted(async () => {
     try {
         const response = await RequestGetMenus()
         const result = response.data
+        console.log(result)
         if (result.code != 0) {
             await router.push("/login")
             ElMessage.error("获取菜单失败，请检查网络")

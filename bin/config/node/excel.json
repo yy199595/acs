@@ -1,0 +1,26 @@
+{
+    "include": [
+        "com/com.json"
+    ],
+    "core": {
+        "name": "excel"
+    },
+    "lua": {
+        "main": "Excel"
+    },
+    "excel": {
+        "dir": "配置表路径",
+        "output": [
+            {
+                "type": "json",
+                "ext": ".json",
+                "path": "导出路径"
+            }
+        ],
+        "ignore": [
+            "@",
+            "#",
+            "Sheet"
+        ]
+    }
+}

@@ -12,7 +12,7 @@
 	"lua": {
 		"main": "${lua}",
 		"modules" : [
-
+			"RegistryComponent"
 		]
 	},
 	"listen": {
@@ -21,11 +21,8 @@
 			"component" : "OuterWebSocketComponent"
 		}
 	},
-	"master": {
-		"host": "http://127.0.0.1:8088"
-	},
 	"http": {
-		"auth": true,
+		"auth": false,
 		"index": "index.html",
 		"domain": "https://www.huwai.pro",
 		"root": "${WORK_DIR}/www/dist",
@@ -34,11 +31,13 @@
 		"header": {
 			"Access-Control-Allow-Origin": "*"
 		},
+		"pool" : 100,
+		"send_timeout" : 5,
+		"read_timeout" : 5,
 		"range-name" : "https://www.mocklib.com/mock/random/name"
 	},
 	"path": {
-		"machine": "",
-		"home": "${WORK_DIR}/config/card/home.json",
-		"cluster": "${WORK_DIR}/config/cluster/debug.json"
+		"node": "${WORK_DIR}/config/node/all.json",
+		"machine": "${WORK_DIR}/config/run/node/machine.json"
 	}
 }

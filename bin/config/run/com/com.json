@@ -3,6 +3,10 @@
         "wx" : "微信通知的url",
         "ding" : "钉钉通知的url"
     },
+    "coroutine" : {
+        "pool" : 0,
+        "share" : 8
+    },
     "net" : {
         "http" : "HttpWebComponent",
         "https" : "HttpWebComponent",
@@ -18,7 +22,7 @@
             "address": "tcp://127.0.0.1:${rpc}"
         },
         "gate" : {
-            "component" : "OuterTcpComponent",
+            "component" : "OuterWebSocketComponent",
             "address": "tcp://127.0.0.1:${gate}"
         },
         "http" : {
@@ -57,9 +61,13 @@
         "inner": 500,
         "outer": 1000
     },
+    "thread" : {
+        "count" : 2,
+        "monitor" : 0
+    },
     "core": {
         "fps": 60,
-        "event": 1000,
+        "event": 500,
         "name": "test",
         "host" : "127.0.0.1",
         "start" : "2025-01-01 00:00:00",
@@ -91,8 +99,7 @@
         "code": "${WORK_DIR}/XCode/XCode.csv",
         "rpc": "${WORK_DIR}/config/service/rpc",
         "http": "${WORK_DIR}/config/service/http",
-        "client": "${WORK_DIR}/config/service/client.json",
-        "machine" : "${WORK_DIR}/config/cluster/machine.json"
+        "client": "${WORK_DIR}/config/service/client.json"
     },
     "lua": {
         "require": [
@@ -107,11 +114,7 @@
         "main" : "${lua}"
     },
     "ssl": {
-        "https": {
-            "ca": "${WORK_DIR}/ssl/ca.pem",
-            "client.pem" : "",
-            "client.key" : ""
-        }
+        "pem": "${WORK_DIR}/ssl/ca.pem"
     },
     "whcbqhn": {
         "app_id": "",

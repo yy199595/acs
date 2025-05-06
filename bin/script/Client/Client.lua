@@ -1,19 +1,18 @@
-
 require("XCode")
+require("Coroutine")
 local random = math.random
 local log = require("Log")
 local str_format = string.format
 local timer = require("core.timer")
 local Module = require("Module")
-local Session = require("Session")
+local Session = require("Common.Session")
 local http = require("HttpComponent")
 
 local tab_insert = table.insert
 local coroutine_sleep = coroutine.sleep
 local coroutine_create = coroutine.create
 local coroutine_resume = coroutine.resume
---local HOST = "http://43.143.239.75:80"
-local HOST = "http://127.0.0.1:8088"
+
 local COUNT = os.getenv("APP_COUNT") or 1
 local Main = Module()
 
@@ -32,58 +31,104 @@ function Main:Awake()
     end
 end
 
-function Main:Login(info)
-    if info.count == 0 then
-        --log.Debug("user(%s) start login", info.account)
-        local response = http:Post(str_format("%s/account/login", HOST), info)
-        if response == nil or response.data == nil then
-            log.Error("account login failure")
-            return
-        end
-        http_count = http_count + 1
-        local result = response.data
-        local client = Session(result.address)
-        local code = client:Call("GateSystem.Login", result.token)
-        if code == XCode.Ok then
-            info.client = client
-            info.count = info.count + 1
-            info.max_count = random(100, 500)
+function Main:OnStart()
 
-            tab_insert(self.sessions, info)
-            self.login_count = self.login_count + 1
-            log.Info("[%s] user(%s) login [%s] ok rpc:%s http:%s",
-                    self.login_count, info.account, result.address, rpc_count, http_count)
-        else
-            log.Error("user(%s) login [%s] fail", info.account, result.address)
-            return
+end
+
+local info = {
+    user_id = 4,
+    create_time = 8,
+    player_name = "",
+    level = 4,
+    login_time = 8
+}
+
+local count = 0
+local host = "http://127.0.0.1:8088"
+--local host = "http://43.143.239.75:8080"
+
+local start_redis = function()
+    local url = str_format("%s/db/redis", host)
+    while true do
+        count = count + 1
+        http:Post(url, { "SET", "now_time", os.time() })
+        http:Post(url, { "GET", "now_time" })
+        http:Post(url, { "INFO"})
+    end
+end
+
+local start_ping = function()
+    while true do
+        count = count + 1
+        http:Get(str_format("%s/admin/ping", host))
+    end
+end
+
+local start_hello = function()
+    while true do
+        count = count + 1
+        http:Get(str_format("%s/hello", host))
+    end
+end
+
+local start_mysql = function()
+    local tab = "demo"
+    local sqlHelper = require("SqlHelper")
+    local url = str_format("%s/db/mysql", host)
+    while true do
+        count = count + 1
+
+        local res2 = http:Post(url, sqlHelper.CreateSql(tab, info))
+        local res3 = http:Post(url, sqlHelper.InsertSql(tab, info))
+        local res4 = http:Post(url, sqlHelper.QuerySql(tab, { user_id = info.user_id }))
+        local res5 = http:Post(url, sqlHelper.DeleteSql(tab, { user_id = info.user_id }))
+
+    end
+end
+
+local start_mongo = function()
+    local tab = "demo"
+    local url = str_format("%s/db/mongo", host)
+    while true do
+        count = count + 1
+
+        http:Post(url, { cmd = "InsertOnce", documents = { tab, info } })
+        http:Post(url, { cmd = "FindOne", documents = { tab, { user_id = info.user_id } } })
+        http:Post(url, { cmd = "Delete", documents = { tab, { user_id = info.user_id }, 1 } })
+
+    end
+end
+
+local start = 0
+
+local start_run_info = function()
+    local url = str_format("%s/admin/info", host)
+    while true do
+        count = count + 1
+        local response = http:Get(url).data
+        local value = response.const_memory_b - start
+        if value ~= 0 then
+            print("value = ", value)
+            start = response.const_memory_b
         end
     end
-   -- http:Get(str_format("%s/admin/info", HOST))
-    info.client:Call("GateSystem.Ping")
-    info.client:Call("ChatSystem.Ping")
-    info.client:Call("ChatSystem.OnPing")
-    info.client:Call("ChatSystem.OnChat", {
-        msg_type = math.random(0, 3),
-        message = "hello world"
-    })
-    rpc_count = rpc_count + 4
-    info.count = info.count + 4
-    if info.count >= info.max_count then
-        info.client:Close()
-        info.count = 0
-    end
-    coroutine_sleep(200)
-    local co = coroutine_create(self.Login)
-    coroutine_resume(co, self, info)
 end
 
 function Main:OnComplete()
+    for i = 1, 5 do
+        coroutine.start(start_ping)
+        coroutine.start(start_hello)
 
-    for i, info in ipairs(self.accounts) do
-        timer.Add(100 * i, function()
-            local co = coroutine_create(self.Login)
-            coroutine_resume(co, self, info)
-        end)
+        coroutine.start(start_redis)
+        coroutine.start(start_mysql)
+        coroutine.start(start_mongo)
+        coroutine.start(start_run_info)
+    end
+end
+
+function Main:OnUpdate(tick)
+    if tick % 5 == 0 then
+        log.Debug("count = {}", count)
     end
 end
 

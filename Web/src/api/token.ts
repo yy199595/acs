@@ -25,6 +25,7 @@ export namespace app {
 
     export function get_user_info(): AdminInfo | null {
         const value = localStorage.getItem("user_info")
+        console.log(value)
         if (value == null || value.length == 0) {
             return null;
         }

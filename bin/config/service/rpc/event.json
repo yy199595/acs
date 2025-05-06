@@ -1,5 +1,14 @@
 {
-    "EventSystem.Publish": {
-        "async": false
+    "PubSubSystem.Publish": {
+        "async": false,
+        "proto" : "json"
+    },
+    "PubSubSystem.Subscribe": {
+        "async": false,
+        "proto" : "string"
+    },
+    "PubSubSystem.UbSubscribe": {
+        "async": false,
+        "proto" : "string"
     }
 }

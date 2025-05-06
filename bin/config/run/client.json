@@ -7,12 +7,8 @@
         "ding" : ""
     },
     "include" : [
-        "db.json",
-        "com.json"
+        "com/com.json"
     ],
-    "lua": {
-        "main": "Client"
-    },
     "path" : {
         "cluster": "${WORK_DIR}/config/cluster/client.json"
     }

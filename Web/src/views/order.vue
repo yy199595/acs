@@ -144,6 +144,10 @@ export default {
                 {
                     name : "活动订单",
                     value: 2
+                },
+                {
+                    name : "搭子订单",
+                    value: 3
                 }
             ],
             user_info_list : { }

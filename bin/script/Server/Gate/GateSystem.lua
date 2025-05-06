@@ -1,8 +1,9 @@
 
 
-local app = require("App")
-local log = require("Log")
-local RpcService = require("RpcService")
+local log = assert(require("Log"))
+local node = assert(require("Node"))
+local redis = assert(require("RedisComponent"))
+local RpcService = assert(require("RpcService"))
 
 local GateSystem = RpcService()
 
@@ -12,10 +13,7 @@ function GateSystem:OnAwake()
 end
 
 function GateSystem:OnComplete()
-    app:Publish(nil, "GateSystem.OnPlayerLogin", {
-        user_id = 10002,
-        time = os.time()
-    })
+
 end
 
 

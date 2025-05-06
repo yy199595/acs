@@ -104,7 +104,7 @@ function SqlHelper.UpdateSql(name, update, where, limit)
     return string_format("UPDATE %s SET %s %s LIMIT %s;", name, updateString, whereString, limit)
 end
 
-function SqlHelper.QuerySql(name, fields, where, limit)
+function SqlHelper.QuerySql(name, where, fields, limit)
     local whereString
     if where and next(where) then
         local wheres = { }

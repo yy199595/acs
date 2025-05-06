@@ -8,37 +8,14 @@ else ()
     #add_compile_options(-fno-exceptions) # 添加全局编译选项
 endif ()
 
-#if(WIN32)
-#    # 通过执行 chcp 命令获取当前代码页
-#    execute_process(
-#            COMMAND chcp
-#            OUTPUT_VARIABLE CHCP_OUTPUT
-#            OUTPUT_STRIP_TRAILING_WHITESPACE
-#    )
-#    string(REGEX MATCH "([0-9]+)" _ ${CHCP_OUTPUT})
-#    if(CMAKE_MATCH_1)
-#        set(CODE_PAGE ${CMAKE_MATCH_1})
-#        # 简单的代码页到编码的映射
-#        if(CODE_PAGE STREQUAL "65001")
-#            set(SYSTEM_ENCODING "UTF-8")
-#        elseif(CODE_PAGE STREQUAL "936")
-#            set(SYSTEM_ENCODING "GBK")
-#        else()
-#            set(SYSTEM_ENCODING "Unknown (Code Page: ${CODE_PAGE})")
-#        endif()
-#        message(STATUS "System encoding (from chcp): ${SYSTEM_ENCODING}")
-#    else()
-#        message(STATUS "Could not determine code page from chcp output: ${CHCP_OUTPUT}")
-#    endif()
-#endif()
-
-
 add_definitions(-w) #忽略警告
 add_definitions(-D ASIO_HAS_CHRONO)
 add_definitions(-D ASIO_STANDALONE)
 add_definitions(-D ASIO_HAS_MOVE)
-add_definitions(-D ASIO_HAS_THREADS)
+
 add_definitions(-D ASIO_HAS_STD_THREAD)
+
+#add_definitions(-D ASIO_HAS_THREADS)
 
 if (MSVC)
     add_definitions(-D _WIN32_WINNT=0x0601)
@@ -73,12 +50,9 @@ option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 option(__CONSOLE_LOG__ "控制台打印日志" ON)
 option(__ENABLE_SYSTEM_DEBUG "打印系统日志" ON)
 option(__ENABLE_OPEN_SSL__ "开启openssl" ON)
-option(__MEMOEY_CHECK__ "开启内存检查" OFF)
-
-option(__ENABLE_MEMORY_CHECK__ "开启内存检查" OFF)
 
 option(__SHARE_PTR_COUNTER__ "开启指针计算查询" OFF)
-option(__MEMORY_POOL_OPERATOR__ "使用重载对象内存池" OFF)
+option(__MEMORY_POOL_OPERATOR__ "使用重载对象内存池" ON)
 
 if (APPLE)
     option(__ENABLE_DING_DING_PUSH "开启钉钉通知" OFF)
@@ -108,10 +82,6 @@ endif ()
 
 if (__SHARE_PTR_COUNTER__)
     add_definitions(-D __SHARE_PTR_COUNTER__)
-endif ()
-
-if(__ENABLE_MEMORY_CHECK__)
-    add_definitions(-D __ENABLE_MEMORY_CHECK__)
 endif ()
 
 if (__CONSOLE_LOG__)
@@ -144,6 +114,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-D __DEBUG__)
     add_definitions(-D __APP_HOTFIX__)
     add_definitions(-DSET_LOG_LEVEL=1)
+    set(CMAKE_CXX_FLAGS_RELEASE "-O0") #禁用所有优化
 else ()
     add_definitions(-DSET_LOG_LEVEL=2)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
@@ -158,6 +129,8 @@ endif ()
 if (ONLY_MAIN_THREAD)
     message("当前网络为单线程模型")
     add_definitions(-D ONLY_MAIN_THREAD)
+    #add_definitions(-D ASIO_DISABLE_THREADS)
+    add_definitions(-D ASIO_CONCURRENCY_HINT_UNSAFE)
 else ()
     message("当前网络为多线程模型")
 endif ()
@@ -171,6 +144,7 @@ if (WIN32)
     add_definitions(-D NOMINMAX)
     remove_definitions(Yield ())
     remove_definitions(GetMessage)
+    add_definitions(-D ASIO_HAS_IOCP) #win上使用iocp
     add_definitions(-D WIN32_LEAN_AND_MEAN)
 elseif (APPLE)
     message("当前为mac平台")

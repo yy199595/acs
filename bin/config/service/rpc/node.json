@@ -1,9 +1,11 @@
 {
     "NodeSystem.Add": {
-        "request": "com.type.json"
+        "async" : false,
+        "proto" : "json"
     },
     "NodeSystem.Del": {
-        "request": "com.type.json"
+        "async" : false,
+        "proto" : "string"
     },
     "NodeSystem.Find": {
         "response": "com.type.json"

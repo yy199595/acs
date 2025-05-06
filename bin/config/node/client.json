@@ -2,10 +2,10 @@
     "client": {
         "component" : [
             "HttpComponent",
-            "ClientComponent",
-            "ActorComponent",
+            "NodeComponent",
             "ProtoComponent",
-            "ConfigComponent"
+            "ConfigComponent",
+            "WsClientComponent"
         ]
     }
 }

@@ -2,7 +2,7 @@
     <div>
         <el-row :gutter="20">
             <el-col :span="6">
-                <el-card shadow="hover" class="mgb20" style="height: 45%">
+                <el-card shadow="hover" class="mgb20" style="height: 42%">
                     <el-descriptions title="用户信息" border column="1">
                         <el-descriptions-item label="昵称">{{ user.name }}</el-descriptions-item>
                         <el-descriptions-item label="权限">{{ format_permiss(null, null, user.permission) }}
@@ -12,7 +12,6 @@
                         </el-descriptions-item>
                         <el-descriptions-item label="登录时间">{{ timeToStrTime(user.login_time * 1000) }}
                         </el-descriptions-item>
-                        <el-descriptions-item label="登录地点">{{ user.city_name }}</el-descriptions-item>
                     </el-descriptions>
                 </el-card>
                 <el-card shadow="hover" class="mgb20" style="height: 55%">
@@ -26,23 +25,12 @@
                     </el-form>
                     <el-descriptions border column="1">
                         <el-descriptions-item label="名字">{{ run_info.name }}</el-descriptions-item>
-                        <el-descriptions-item label="CPU使用率">{{
-                                run_info.cpu.toFixed(2) + "%"
-                            }}
-                        </el-descriptions-item>
-
-                        <el-descriptions-item label="使用内存">
-                            {{ (run_info.use_memory / (1024 * 1024)).toFixed(2) + "MB" }}
-                        </el-descriptions-item>
-                        <el-descriptions-item label="物理内存">
-                            {{ (run_info.max_memory / (1024 * 1024 * 1024)).toFixed(2) + "G" }}
-                        </el-descriptions-item>
+                        <el-descriptions-item label="CPU使用率">{{run_info.cpu}}</el-descriptions-item>
+                        <el-descriptions-item label="物理内存">{{run_info.max_memory }}</el-descriptions-item>
+                        <el-descriptions-item label="使用内存">{{run_info.use_memory }}</el-descriptions-item>
                         <el-descriptions-item label="http总处理">{{ run_info.web.sum }}</el-descriptions-item>
                         <el-descriptions-item label="Mongo总处理">{{ run_info.mongo.sum }}</el-descriptions-item>
-                        <el-descriptions-item label="启动时间">{{
-                                new Date(run_info.time).toLocaleString()
-                            }}
-                        </el-descriptions-item>
+                        <el-descriptions-item label="启动时间">{{run_info.start_time}}</el-descriptions-item>
                     </el-descriptions>
                 </el-card>
             </el-col>
@@ -51,6 +39,7 @@
                     <h4>操作记录</h4>
                     <el-table :data="tab.list" border style="margin-top: 20px">
                         <el-table-column min-width="100" label="用户" prop="name"></el-table-column>
+                        <el-table-column min-width="100" label="操作ip" prop="ip"></el-table-column>
                         <el-table-column min-width="100" label="方法" prop="method"></el-table-column>
                         <el-table-column min-width="150" label="路径" prop="url" show-overflow-tooltip></el-table-column>
                         <el-table-column min-width="100" label="描述" prop="desc" show-overflow-tooltip></el-table-column>
@@ -195,15 +184,14 @@ export default {
             if (response.data.code === 0) {
                 this.run_info = response.data.data
             }
+            console.log(this.run_info)
         }
     },
     async mounted() {
         const user_json = localStorage.getItem("user_info")
         if (user_json && user_json.length > 0) {
-            this.user = JSON.parse(user_json)
             try {
-                const response = await axios.get(`https://ip-api.com/json/${this.user.login_ip}?lang=zh-CN`)
-                this.user.city_name = response.data.city
+                this.user = JSON.parse(user_json)
             } catch (e) {
                 this.user.city_name = "未知"
             }

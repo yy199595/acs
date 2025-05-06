@@ -51,7 +51,7 @@ function SqliteComponent:Query(tab, filter)
 end
 
 function SqliteComponent:FindOne(name, filter, fields)
-    local response = sqlite.query(helper.QuerySql(name, fields, filter, 1))
+    local response = sqlite.query(helper.QuerySql(name, filter, fields, 1))
     if response == nil or not next(response) then
         return nil
     end

@@ -1,17 +1,25 @@
 
-local this = _G.Timer
 local TimerComponent = { }
+
+local timer = require("core.timer")
 
 ---@param ms number
 ---@param func function
 ---@return number
-function TimerComponent:AddTimer(ms, func)
-    return this.Add(ms, func)
+function TimerComponent:Add(ms, func)
+    return timer.Add(ms, func)
 end
 
 ---@param timerId number
-function TimerComponent:DelTimer(timerId)
-    return this.Remove(timerId)
+function TimerComponent:Del(timerId)
+    return timer.Remove(timerId)
+end
+
+---@param ms number
+---@param func function
+---@return number
+function TimerComponent:AddUpdate(ms, func)
+    return timer.AddUpdate(timerId)
 end
 
 return TimerComponent

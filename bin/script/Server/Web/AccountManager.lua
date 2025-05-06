@@ -53,7 +53,7 @@ end
 
 function AccountManager:Change(request)
     local user_id = request.data.user_id
-    return mongo:Update(USER_LIST, { user_id = user_id}, {
+    return mongo:UpdateOne(USER_LIST, { user_id = user_id}, {
         sex = request.data.sex,
         nick = request.data.nick,
         permission = request.data.permission

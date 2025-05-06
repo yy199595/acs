@@ -73,8 +73,11 @@ const submitForm = async () => {
     try {
         app.remove_user_info()
         const response = await RequestLogin(login_req)
+        console.log(response)
+        const info = response.data.info
+        info.token = response.data.data.token
         if (response.data.code == 0) {
-            localStorage.setItem("user_info", JSON.stringify(response.data.data))
+            localStorage.setItem("user_info", JSON.stringify(info))
             await router.push('/');
         } else {
             ElMessage.error(response.data.error)

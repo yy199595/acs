@@ -20,7 +20,7 @@
 			"id": 1
 		}
 	},
-	"/admin/all_info": {
+	"/admin/all": {
 		"type": "GET",
 		"async": true,
 		"auth": false,

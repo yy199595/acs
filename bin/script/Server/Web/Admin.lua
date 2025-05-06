@@ -46,6 +46,7 @@ function Admin:OnComplete()
 
 end
 
+
 function Admin:Menu(request)
     package.loaded["Http.Menu"] = nil
     return XCode.Ok, require("Http.Menu")
@@ -62,9 +63,9 @@ function Admin:Login(request)
     if userInfo.password ~= password then
         return XCode.AccountPasswordError
     end
-    userInfo.login_ip = request.head:Get("X-Forwarded-For")
+    userInfo.login_ip = request.head:Get("x-forwarded-for")
     if userInfo.login_ip == nil then
-        userInfo.login_ip = request.head:Get("X-Real-IP")
+        userInfo.login_ip = request.head:Get("x-real-ip")
     end
     local token = jwd.Create({
         t = 0,

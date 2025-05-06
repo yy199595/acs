@@ -1,8 +1,8 @@
 
-local app = require("App")
+local node = require("Node")
 local json = require("util.json")
 
-local Component = require("Component")
+local Component = { }
 
 local MYSQL_DB = "MysqlDB"
 local MYSQL_Exec = "MysqlDB.Exec"
@@ -18,13 +18,10 @@ local json_encode = json.encode
 local json_decode = json.decode
 local table_insert = table.insert
 
-local MysqlComponent = Component()
+local MysqlComponent = { }
 
 function MysqlComponent:GetActorId()
-    if app:HasComponent(MYSQL_DB) then
-        return nil
-    end
-    return app:Allot(MYSQL_DB)
+    return node:Allot(MYSQL_DB)
 end
 
 ---@param tab string
@@ -32,7 +29,7 @@ end
 ---@return number
 function MysqlComponent:Insert(tab, data)
     local actorId = self:GetActorId()
-    return app:Call(actorId, MYSQL_INSERT, {
+    return node:Call(actorId, MYSQL_INSERT, {
         table = tab,
         document = json_encode(data)
     })
@@ -43,7 +40,7 @@ end
 ---@return number
 function MysqlComponent:Delete(tab, filter, limit)
     local actorId = self:GetActorId()
-    return app:Call(actorId, MYSQL_DELETE, {
+    return node:Call(actorId, MYSQL_DELETE, {
         table = tab,
         limit = limit or 1,
         filter = json_encode(filter)
@@ -64,11 +61,11 @@ function MysqlComponent:FindOne(tab, filter, fields)
         request.fields = fields
     end
     local actorId = self:GetActorId()
-    local code, results = app:Call(actorId, MYSQL_QUERY, request)
-    if code ~= XCode.Ok or #results == 0 then
+    local code, response = node:Call(actorId, MYSQL_QUERY, request)
+    if code ~= XCode.Ok or #response.documents == 0 then
         return nil
     end
-    return json_decode(results[1])
+    return json_decode(response.documents[1])
 end
 
 ---@param tab string
@@ -88,7 +85,7 @@ function MysqlComponent:Find(tab, filter, fields, limit)
         request.filter = json_encode(filter)
     end
     local actorId = self:GetActorId()
-    local code, response = app:Call(actorId, MYSQL_QUERY, request)
+    local code, response = node:Call(actorId, MYSQL_QUERY, request)
     if code ~= XCode.Ok or #response.documents == 0 then
         return nil
     end
@@ -105,7 +102,7 @@ end
 ---@return number
 function MysqlComponent:Update(tab, filter, update, limit)
     local actorId = self:GetActorId()
-    return app:Call(actorId, MYSQL_UPDATE, {
+    return node:Call(actorId, MYSQL_UPDATE, {
         table = tab,
         limit = limit or 1,
         filter = json_encode(filter),
@@ -118,7 +115,7 @@ end
 ---@param unique boolean
 function MysqlComponent:CreateIndex(tab, field, unique)
     local actorId = self:GetActorId()
-    return app:Call(actorId, MYSQL_INDEX, {
+    return node:Call(actorId, MYSQL_INDEX, {
         tab = tab,
         name = field,
         unique = unique,
@@ -143,7 +140,7 @@ function MysqlComponent:FindPage(tab, filter, fields, page, count)
         request.filter = json_encode(filter)
     end
     local actorId = self:GetActorId()
-    local code, response = app:Call(actorId, MYSQL_FIND_PAGE, request)
+    local code, response = node:Call(actorId, MYSQL_FIND_PAGE, request)
     if code ~= XCode.Ok or #response.documents == 0 then
         return nil
     end
@@ -161,7 +158,7 @@ end
 ---@param sql string
 function MysqlComponent:Exec(sql)
     local actorId = self:GetActorId()
-    local code, response = app:Call(actorId, MYSQL_Exec, {
+    local code, response = node:Call(actorId, MYSQL_Exec, {
         sql = sql
     })
     if code ~= XCode.Ok or #response.documents == 0 then
@@ -169,7 +166,7 @@ function MysqlComponent:Exec(sql)
     end
     local documents = { }
     for _, str in ipairs(response.documents) do
-        table_insert(jsons, json_decode(str))
+        table_insert(documents, json_decode(str))
     end
     return documents
 end

@@ -14,4 +14,9 @@ function Demo:Ping(request)
     return XCode.Ok, "Pong"
 end
 
+function Demo:Regex(request)
+    table.print(request)
+    return XCode.Ok
+end
+
 return Demo

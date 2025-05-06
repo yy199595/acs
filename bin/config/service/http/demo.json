@@ -5,5 +5,12 @@
 		"auth": false,
 		"bind": "Demo.Ping",
 		"desc": "http服务测试"
+	},
+	"/demo/.*": {
+		"type": "GET",
+		"async": true,
+		"auth": false,
+		"bind": "Demo.Regex",
+		"desc": "正则表达式测试"
 	}
 }

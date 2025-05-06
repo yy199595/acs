@@ -30,7 +30,7 @@ function HttpComponent:Get(url, query, sync)
     local full_url = self:FormatUrl(url, query)
     local response = this.Get(full_url, sync)
     if response.code ~= 200 then
-        log.Error("[GET] %s error : %s", full_url, response.status)
+        log.Error("[GET] {} error : {}", full_url, response.status)
         return response
     end
     return response.body
@@ -43,7 +43,7 @@ end
 function HttpComponent:Post(url, data, sync)
     local response = this.Post(url, data, sync)
     if response.code ~= 200 then
-        log.Error("[POST] %s error : %s", url, response.status)
+        log.Error("[POST] {} error : {}", url, response.status)
         return
     end
     return response.body

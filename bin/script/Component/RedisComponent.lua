@@ -3,11 +3,10 @@ local type = _G.type
 local tab_pack = table.pack
 local tab_insert = table.insert
 local str_format = string.format
-local json = require("util.json")
-local Component = require("Component")
-local redis = require("db.redis")
+local json = assert(require("util.json"))
+local redis = assert(require("db.redis"))
 
-local RedisComponent = Component()
+local RedisComponent = { }
 
 ---@param cmd string
 function RedisComponent:Run(cmd, ...)
@@ -18,7 +17,7 @@ end
 ---@param cmd string
 function RedisComponent:Send(cmd, ...)
     local parameter = tab_pack(...)
-    return redis.sedn(cmd, parameter)
+    return redis.send(cmd, parameter)
 end
 
 ---@param key string
@@ -174,18 +173,6 @@ function RedisComponent:Publish(channel, message)
         data = json.encode(message)
     end
     return self:Run("PUBLISH", channel, data)
-end
-
-
----@param channel string
----@return boolean
-function RedisComponent:Sub(channel)
-    return redis.sub(channel)
-end
-
----@param channel string
-function RedisComponent:UnSub(channel)
-    return redis.unsub(channel)
 end
 
 return RedisComponent

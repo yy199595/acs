@@ -1,6 +1,7 @@
 Name,Desc
 Ok,成功
 Failure,失败
+ConfigError,配置错误
 NetTimeout,网络超时
 NetReadFailure,接收网络消息失败
 NetSendFailure,发送网络消息失败

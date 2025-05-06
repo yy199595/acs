@@ -54,11 +54,18 @@
     },
     "MongoDB.Update": {
         "async": true,
-        "request": "db.mongo.update"
+        "request": "db.mongo.update",
+        "response" : "db.mongo.response"
+    },
+    "MongoDB.UpdateOne": {
+        "async": true,
+        "request": "db.mongo.update",
+        "response" : "db.mongo.response"
     },
     "MongoDB.Updates": {
         "async": true,
-        "request": "db.mongo.updates"
+        "request": "db.mongo.updates",
+        "response" : "db.mongo.response"
     },
     "MongoDB.SetIndex": {
         "async": true,
@@ -82,5 +89,139 @@
         "async": true,
         "request": "com.type.string",
         "response": "com.array.string"
+    },
+    "MongoReadProxy.Find" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "xxx",
+            "filter" : { },
+            "fields" : []
+        },
+        "response" : {
+            "list" : []
+        }
+    },
+    "MongoReadProxy.Count" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "xxx",
+            "filter" : { }
+        },
+        "response": {
+            "count" : 0
+        }
+    },
+    "MongoReadProxy.FindOne" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "xxx",
+            "fields" : [],
+            "filter" : { }
+        },
+        "response" : {
+            "data" : { }
+        }
+    },
+    "MongoReadProxy.GetMore" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "xxx",
+            "cursor" : 0,
+            "batchSize" : 0
+        },
+        "response" : {
+            "cursor": 0,
+            "list" : []
+        }
+    },
+    "MongoReadProxy.FindPage" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "xxx",
+            "page" : 1,
+            "sort" : { },
+            "filter" : { }
+        },
+        "response" : {
+            "list" : []
+        }
+    },
+    "MongoWriteProxy.Inc" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "xxx",
+            "key" : "xxx"
+        },
+        "response" : {
+            "value" : 0
+        }
+    },
+    "MongoWriteProxy.Update" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "xxx",
+            "cmd" : "$set",
+            "filter" : { },
+            "document" : { }
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "MongoWriteProxy.Insert" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "xxx",
+            "list" : []
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "MongoWriteProxy.Delete" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "xxx",
+            "filter" : { }
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "MongoWriteProxy.Updates" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "xxx",
+            "list" : [
+                {
+                    "cmd" : "$set",
+                    "filter" : { },
+                    "document" : { }
+                }
+            ]
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "MongoWriteProxy.SetIndex" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "xxx",
+            "key" : "xxx",
+            "sort" : 1,
+            "unique" : false
+        }
     }
 }

@@ -3,6 +3,7 @@ local ipairs = _G.ipairs
 local assert = _G.assert
 local log = require("Log")
 local app = require("App")
+local node = require("Node")
 local json = require("util.json")
 
 local MONGO_DB = "MongoDB"
@@ -29,7 +30,7 @@ function MongoComponent:InsertOnce(tab, data)
         document = json_encode(data)
     end
     local session = self:GetActorId()
-    return app:Call(session, "MongoDB.Insert", {
+    return node:Call(session, "MongoDB.Insert", {
         tab = tab,
         documents = { document },
     })
@@ -41,7 +42,7 @@ function MongoComponent:Insert(tab, documents)
         table_insert(results, json_encode(document))
     end
     local session = self:GetActorId()
-    return app:Call(session, "MongoDB.Insert", {
+    return node:Call(session, "MongoDB.Insert", {
         tab = tab,
         documents = results
     })
@@ -57,7 +58,7 @@ end
 ---@return number
 function MongoComponent:Delete(tab, data, limit)
     local session = self:GetActorId()
-    return app:Call(session, "MongoDB.Delete", {
+    return node:Call(session, "MongoDB.Delete", {
         tab = tab,
         limit = limit or 1,
         filter = json_encode(data)
@@ -84,7 +85,7 @@ function MongoComponent:FindOne(tab, filter, fields)
         request.filter = json_encode(filter)
     end
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.FindOne", request)
+    local code, response = node:Call(session, "MongoDB.FindOne", request)
 
     if code ~= XCode.Ok then
         log_error("query from [{}] filter => {} code:{}", tab, filter, code)
@@ -119,7 +120,7 @@ function MongoComponent:FindPage(tab, select, page, count, fields, sort)
     end
 
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.FindPage", request)
+    local code, response = node:Call(session, "MongoDB.FindPage", request)
     if code ~= XCode.Ok then
         log_error("query from %s filter:%s code:%s", tab, request.filter, code)
         return nil
@@ -148,7 +149,7 @@ function MongoComponent:Find(tab, filter, fields, limit)
         request.fields = fields
     end
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Find", request)
+    local code, response = node:Call(session, "MongoDB.Find", request)
     if code ~= XCode.Ok or response == nil then
         return nil
     end
@@ -182,7 +183,7 @@ function MongoComponent:FindIn(tab, wheres, fields, field)
         request.fields = fields
     end
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Find", request)
+    local code, response = node:Call(session, "MongoDB.Find", request)
     if code ~= XCode.Ok or response == nil then
         return nil
     end
@@ -201,7 +202,7 @@ end
 function MongoComponent:SetIndex(tab, name, sort, unique)
     assert(type(tab) == "string")
     local session = self:GetActorId()
-    return app:Call(session, "MongoDB.SetIndex", {
+    return node:Call(session, "MongoDB.SetIndex", {
         tab = tab,
         key = name,
         sort = sort or 1,
@@ -230,7 +231,7 @@ function MongoComponent:Update(tab, filter, update, cmd, upsert)
         upsert = upsert or false,
     }
     local session = self:GetActorId()
-    return app:Call(session, "MongoDB.Update", request)
+    return node:Call(session, "MongoDB.Update", request)
 end
 
 ---@param tab string
@@ -254,7 +255,7 @@ function MongoComponent:UpdateOne(tab, filter, update, cmd, upsert)
         upsert = upsert or false,
     }
     local session = self:GetActorId()
-    return app:Call(session, "MongoDB.Update", request)
+    return node:Call(session, "MongoDB.Update", request)
 end
 
 function MongoComponent:Updates(tab, documents, cmd)
@@ -273,7 +274,7 @@ function MongoComponent:Updates(tab, documents, cmd)
         })
     end
     local session = self:GetActorId()
-    return app:Call(session, "MongoDB.Updates", request)
+    return node:Call(session, "MongoDB.Updates", request)
 end
 
 function MongoComponent:UpdateById(tab, id, update, tag)
@@ -317,7 +318,7 @@ function MongoComponent:Count(tab, select)
         request.filter = json_encode(select)
     end
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Count", request)
+    local code, response = node:Call(session, "MongoDB.Count", request)
     if code ~= XCode.Ok then
         log.Error("tab: %s select: %s", tab, json_encode(select))
     end
@@ -329,7 +330,7 @@ end
 ---@return number,table
 function MongoComponent:Run(tab, cmd, document)
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Run", {
+    local code, response = node:Call(session, "MongoDB.Run", {
         tab = tab,
         cmd = cmd,
         document = document and json_encode(document) or ""
@@ -344,7 +345,7 @@ end
 ---@return number
 function MongoComponent:Inc(key)
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Inc", {
+    local code, response = node:Call(session, "MongoDB.Inc", {
         key = key
     })
     if code ~= XCode.Ok or response == nil then
@@ -377,7 +378,7 @@ end
 
 function MongoComponent:Databases()
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Databases")
+    local code, response = node:Call(session, "MongoDB.Databases")
     if code ~= XCode.Ok or response == nil then
         return nil
     end
@@ -386,7 +387,7 @@ end
 
 function MongoComponent:Collections(name)
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Collections", {
+    local code, response = node:Call(session, "MongoDB.Collections", {
         str = name
     })
     if code ~= XCode.Ok or response == nil then
@@ -416,7 +417,7 @@ function MongoComponent:FindAndModify(tab, query, update, fields)
     end
 
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.FindAndModify", request)
+    local code, response = node:Call(session, "MongoDB.FindAndModify", request)
     if code ~= XCode.Ok then
         return nil
     end
@@ -428,7 +429,7 @@ end
 ---@param batchSize number
 function MongoComponent:GetMore(tab, cursor, batchSize)
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.GetMore", {
+    local code, response = node:Call(session, "MongoDB.GetMore", {
         tab = tab,
         cursor = cursor,
         batchSize = batchSize
@@ -464,7 +465,7 @@ function MongoComponent:Facet(tab, _id, filters, group, batchSize)
         table_insert(request.match, json_encode(filter))
     end
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Facet", request)
+    local code, response = node:Call(session, "MongoDB.Facet", request)
     if code ~= XCode.Ok then
         return nil
     end
@@ -489,7 +490,7 @@ function MongoComponent:Aggregate(tab, cmd, field, filter, by, batchSize)
     end
 
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Aggregate", request)
+    local code, response = node:Call(session, "MongoDB.Aggregate", request)
     if code ~= XCode.Ok then
         return nil
     end
@@ -509,7 +510,7 @@ function MongoComponent:Distinct(tab, key, filter)
         request.filter = json_encode(filter)
     end
     local session = self:GetActorId()
-    local code, response = app:Call(session, "MongoDB.Distinct", request)
+    local code, response = node:Call(session, "MongoDB.Distinct", request)
     if code ~= XCode.Ok or not response then
         return nil
     end

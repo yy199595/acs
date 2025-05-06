@@ -1,17 +1,19 @@
 {
     "redis": {
-        "ping": 15,
+        "ping": 5,
         "count": 1,
+        "retry" : 5,
         "debug": false,
         "address": [
-            "redis://${db}:6379/?password=199595yjz."
+            "redis://${db}:6379/1?password=199595yjz."
         ],
         "script": "${WORK_DIR}/config/db/redis",
         "sub" : "redis://${db}:6379/?password=199595yjz."
     },
     "mysql": {
-        "ping": 30,
+        "ping": 5,
         "count": 1,
+        "retry" : 3,
         "debug" : false,
         "address" : [
             "mysql://${db}:3306/yjz?user=root&password=199595yjz."
@@ -26,8 +28,9 @@
         }
     },
     "pgsql": {
-        "ping": 30,
+        "ping": 5,
         "count": 1,
+        "retry" : 3,
         "debug" : false,
         "address" : [
             "pgsql://${db}:5432/yjz?user=postgres&password=199595yjz."
@@ -43,9 +46,10 @@
     },
 
     "mongo": {
-        "ping": 15,
+        "ping": 5,
         "count": 1,
-        "debug": true,
+        "retry" : 3,
+        "debug": false,
         "address" : [
             "mongodb://${db}:27017/yjz?mechanism=SCRAM-SHA-1"
         ],
