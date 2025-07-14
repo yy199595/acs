@@ -18,20 +18,19 @@ namespace rpc
 		~InnerTcpClient() final;
 	public:
 		void Close();
-		bool Send(rpc::Message * message);
 		void StartReceive(tcp::Socket * socket);
+		bool Send(std::unique_ptr<rpc::Message> & message);
 	 private:
 		void CloseSocket();
 		void CloseSocket(int code);
 		void OnSendMessage(size_t size) final;
-		void AddToSendQueue(rpc::Message * message);
 		bool MakeMessage(const rpc::ProtoHead & header);
 		void OnReadError(const Asio::Code &code) final;
 		void OnSendMessage(const Asio::Code & code) final;
 		void OnConnect(const Asio::Code &code, int count) final;
+		void AddToSendQueue(std::unique_ptr<rpc::Message> & message);
 		void OnReceiveMessage(std::istream & is, size_t, const Asio::Code & code) final;
 	private:
-		bool mClose;
 		const int mSockId;
 		int mDecodeStatus;
 		const bool mIsClient;
@@ -39,7 +38,7 @@ namespace rpc
 		rpc::ProtoHead mProtoHead;
 		Asio::Context & mMainContext;
 		std::unique_ptr<rpc::Message> mMessage;
-		std::queue<rpc::Message *> mSendMessages;
-		std::unordered_map<int, rpc::Message *> mWaitResMessages; //等待返回的服务器消息
+		std::queue<std::unique_ptr<rpc::Message>> mSendMessages;
+		std::unordered_map<int, std::unique_ptr<rpc::Message>> mWaitResMessages; //等待返回的服务器消息
 	};
 }// namespace Sentry

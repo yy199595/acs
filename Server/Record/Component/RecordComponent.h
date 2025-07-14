@@ -15,18 +15,18 @@ namespace http
 namespace acs
 {
 	class HttpMethodConfig;
-	class RecordComponent : public Component, public IComplete, public IRequest<HttpMethodConfig, http::Request, http::Response>
+	class RecordComponent : public Component,
+			public IRequest<HttpMethodConfig, http::Request, http::Response>
 	{
 	public:
 		RecordComponent();
 		~RecordComponent() final = default;
 	private:
 		bool LateAwake() final;
-		void OnComplete() final;
 	public:
 		void OnRequestDone(const acs::HttpMethodConfig &c, const http::Request &t1, const http::Response &t2) final;
 	private:
-		class MongoComponent * mMongo;
+		class SqliteComponent * mSqlite;
 	};
 }
 

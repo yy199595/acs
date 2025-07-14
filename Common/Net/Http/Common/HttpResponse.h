@@ -36,6 +36,7 @@ namespace http
 		template<typename T>
 		inline const T * To() const;
 		inline const Content * GetBody() const { return this->mBody.get(); }
+		inline std::unique_ptr<Content> MoveBody() { return std::move(this->mBody); }
 	public:
 		void SetCode(HttpStatus code);
 		void Json(const std::string & json);
@@ -45,7 +46,8 @@ namespace http
 		bool OpenOrCreateFile(const std::string & path);
 		bool File(const std::string & type, const std::string & path);
 		void SetContent(const std::string & type, const std::string& str);
-		inline void SetContent(std::unique_ptr<Content> data) { this->mBody = std::move(data); }
+		template<typename T>
+		inline void SetContent(std::unique_ptr<T>& data) { this->mBody = std::move(data); }
 	public:
 		std::string ToString() final;
 		int WriteToLua(lua_State *lua) const final;

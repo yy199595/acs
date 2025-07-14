@@ -72,6 +72,10 @@ namespace http
 				{
 					return tcp::read::decode_error;
 				}
+				if(this->mBody != nullptr)
+				{
+					this->mBody->SetContentLength(this->mConeSize);
+				}
 			}
 			return tcp::read::pause;
 		}
@@ -209,7 +213,7 @@ namespace http
 			jsonWriter.Add("data", this->mBody->ToStr());
 		}
 		std::string json;
-		jsonWriter.Encode(&json, true);
+		jsonWriter.Serialize(&json, true);
 		return json;
 	}
 

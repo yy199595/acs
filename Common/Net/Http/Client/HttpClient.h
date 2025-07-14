@@ -24,7 +24,7 @@ namespace http
 	 public:
 		bool SyncSend(const std::unique_ptr<http::Request>& request);
 		bool SyncSend(const std::unique_ptr<http::Request>& request, http::Response & response);
-		void Do(std::unique_ptr<http::Request> request, std::unique_ptr<http::Response> response, int taskId);
+		void Do(std::unique_ptr<http::Request>& request, std::unique_ptr<http::Response>& response, int taskId);
 	 private:
         void OnComplete(HttpStatus code);
 		void OnReadError(const Asio::Code &code) final;

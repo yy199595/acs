@@ -195,8 +195,8 @@ namespace acs
 			size_t length = 0;
 			const char* bytes = luaL_checklstring(this->mLua, index, &length);
 			reflection->AddString(&message, field, std::string(bytes, length));
-		}
 			break;
+		}
 		case pb::FieldDescriptor::CPPTYPE_MESSAGE:
 		{
 			pb::Message* submessage = reflection->AddMessage(&message, field);

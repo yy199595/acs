@@ -3,23 +3,14 @@
         "wx" : "微信通知的url",
         "ding" : "钉钉通知的url"
     },
-    "coroutine" : {
-        "pool" : 0,
-        "share" : 8
-    },
-    "net" : {
-        "http" : "HttpWebComponent",
-        "https" : "HttpWebComponent",
-        "rpc" : "InnerTcpComponent",
-        "gate" : "OuterTcpComponent",
-        "master" : "HttpWebComponent",
-        "ws" : "InnerWebSocketComponent",
-        "telnet" : "TelnetComponent"
-    },
     "listen" : {
         "rpc" : {
             "component" : "InnerTcpComponent",
             "address": "tcp://127.0.0.1:${rpc}"
+        },
+        "ws" : {
+            "address": "tcp://127.0.0.1:${ws}",
+            "component" : "InnerWebSocketComponent"
         },
         "gate" : {
             "component" : "OuterWebSocketComponent",
@@ -32,12 +23,8 @@
         "https" : {
             "component" : "HttpWebComponent",
             "address": "https://127.0.0.1:${https}",
-            "key": "${WORK_DIR}/ssl/www.huanhu999.com.key",
-            "cert": "${WORK_DIR}/ssl/www.huanhu999.com.pem"
-        },
-        "master" : {
-            "component" : "HttpWebComponent",
-            "address": "tcp://127.0.0.1:${master}"
+            "key": "",
+            "cert": ""
         },
         "udp" : {
             "component" : "UdpComponent",
@@ -46,10 +33,6 @@
         "kcp" : {
             "port": "udp://127.0.0.1:${kcp}",
             "component" : "KcpComponent"
-        },
-        "ws" : {
-            "port": "tcp://127.0.0.1:${ws}",
-            "component" : "InnerWebSocketComponent"
         },
         "telnet" : {
             "max_conn" : 10,
@@ -71,7 +54,7 @@
         "name": "test",
         "host" : "127.0.0.1",
         "start" : "2025-01-01 00:00:00",
-        "secret" : "4437c3f2f3ec17e796467fa1b3288f9b"
+        "secret" : ""
     },
     "master": {
         "auth": true,
@@ -120,8 +103,9 @@
         "app_id": "",
         "app_secret" : ""
     },
-    "quick" : {
-        "md5_key" : "",
+    "quick": {
+        "shop": "",
+        "md5_key": "",
         "callback_key": ""
     }
 }

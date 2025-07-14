@@ -25,11 +25,11 @@ namespace acs
 		bool LateAwake() final;
 		void OnClientError(int id, int code) final;
 		bool OnListen(tcp::Socket *socket) noexcept final;
-		void OnMessage(int, rpc::Message *request, rpc::Message *response) noexcept final;
+		void OnMessage(rpc::Message *request, rpc::Message *response) noexcept final;
 	public:
-		void Broadcast(rpc::Message *message) noexcept final;
-		int Send(int id, rpc::Message *message) noexcept final;
-		char GetNet() const noexcept final { return rpc::Net::Ws; }
+		void Broadcast(std::unique_ptr<rpc::Message> &message) noexcept final;
+		int Send(int id, std::unique_ptr<rpc::Message> &message) noexcept final;
+		inline char GetNet() const noexcept final { return rpc::net::ws; }
 	private:
 		void OnRecord(json::w::Document &document) final;
 		void OnPlayerLogin(long long userId, int sockId);

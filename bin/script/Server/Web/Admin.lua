@@ -14,23 +14,8 @@ function Admin:OnAwake()
 
     --table.print(sqlite:Query("sqlite_master"))
 
-    if not sqlite:IsExist(ADMIN_LIST) then
-        sqlite:Create(ADMIN_LIST, {
-            name = "",
-            user_id = 4,
-            account = "",
-            password = "",
-            login_time = 8,
-            permission = 4,
-            create_time = 8
-        }, { "user_id", "account" })
-
-        sqlite:SetIndex(ADMIN_LIST, "user_id", true)
-        sqlite:SetIndex(ADMIN_LIST, "account", true)
-    end
-
     if sqlite:FindOne(ADMIN_LIST, { account = "root" }) == nil then
-        sqlite:Insert(ADMIN_LIST, {
+        sqlite:InsertOne(ADMIN_LIST, {
             user_id = 1000,
             account = "root",
             password = "root123",
@@ -75,19 +60,32 @@ function Admin:Login(request)
     userInfo.login_time = os.time()
 
     sqlite:UpdateOne(ADMIN_LIST, filter, {
+        login_ip = userInfo.login_ip,
         login_time = userInfo.login_time
     })
 
     return XCode.Ok, {
+        info = {
+            exp_time = 0,
+            name = userInfo.name,
+            user_id = userInfo.use_id,
+            login_ip = userInfo.login_ip,
+            login_time = userInfo.login_time,
+            permission = userInfo.permission,
+            create_time = userInfo.create_time
+        },
         token = token,
-        exp_time = 0,
-        name = userInfo.name,
-        user_id = userInfo.use_id,
-        login_ip = userInfo.login_ip,
-        login_time = userInfo.login_time,
-        permission = userInfo.permission,
-        create_time = userInfo.create_time
     }
+end
+
+function Admin:FindUserInfo(request)
+    local userId = request.query.userId
+    local fields = { "user_id", "permission", "name", "login_ip", "create_time"}
+    local response = sqlite:FindOne(ADMIN_LIST, { user_id = userId}, fields)
+    if response == nil then
+        return XCode.NotFoundData
+    end
+    return XCode.Ok
 end
 
 function Admin:List(request)

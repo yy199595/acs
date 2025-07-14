@@ -28,9 +28,9 @@ namespace acs
 		void StartClose(int id, int code) final;
 	private:
 		bool LateAwake() final;
-		void Broadcast(rpc::Message * message) noexcept final;
-		int Send(int id, rpc::Message * message) noexcept final;
-		inline char GetNet() const noexcept final { return rpc::Net::Tcp; }
+		void Broadcast(std::unique_ptr<rpc::Message> & message) noexcept final;
+		int Send(int id, std::unique_ptr<rpc::Message> & message) noexcept final;
+		inline char GetNet() const noexcept final { return rpc::net::tcp; }
 	private:
 		void OnClientError(int id, int code) final;
 		void OnSendFailure(int id, rpc::Message *message) final;

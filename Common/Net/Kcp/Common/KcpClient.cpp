@@ -36,11 +36,12 @@ namespace kcp
 		//this->mSocket.send_to(asio::buffer(buf, len), this->mRemoteEndpoint, 0, code);
 	}
 
-	void Client::Send(tcp::IProto* message)
+	void Client::Send(std::unique_ptr<rpc::Message> & message)
 	{
 		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(this->mContext, [self, message]()
+		asio::post(this->mContext, [self, req = message.release()]()
 		{
+			std::unique_ptr<rpc::Message> message(req);
 			message->OnSendMessage(self->mSendStream);
 			const int len = (int)self->mSendBuffer.size();
 			const char* msg = asio::buffer_cast<const char*>(self->mSendBuffer.data());
@@ -48,7 +49,6 @@ namespace kcp
 				ikcp_send(self->mKcp, msg, len);
 				self->mSendBuffer.consume(len);
 			}
-			delete message;
 		});
 	}
 
@@ -99,7 +99,7 @@ namespace kcp
 			if(rpcPacket->OnRecvMessage(buffer, size) == 0)
 			{
 				rpcPacket->Init(protoHead);
-				rpcPacket->SetNet(rpc::Net::Kcp);
+				rpcPacket->SetNet(rpc::net::kcp);
 				rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 				asio::post(this->mMainContext, [this, msg = rpcPacket.release()] {
 					this->mComponent->OnMessage(msg, nullptr);

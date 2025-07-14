@@ -104,9 +104,9 @@ namespace acs
 					code = XCode::MakeTcpRequestFailure;
 					break;
 				}
-				document.Encode(rpcMessage->Body());
+				document.Serialize(rpcMessage->Body());
 				int nodeId = this->mApp->GetNodeId();
-				std::unique_ptr<rpc::Message> rpcResponse = this->mRouter->Call(nodeId, std::move(rpcMessage));
+				std::unique_ptr<rpc::Message> rpcResponse = this->mRouter->Call(nodeId, rpcMessage);
 				if(rpcResponse == nullptr)
 				{
 					code = XCode::Failure;

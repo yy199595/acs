@@ -28,29 +28,23 @@ namespace acs
 		BIND_RPC_METHOD(RegistryService::Ping)
 		LOG_CHECK_RET_FALSE(this->mSqlite = this->GetComponent<SqliteComponent>())
 		LOG_CHECK_RET_FALSE(this->mRouter = this->GetComponent<RouterComponent>())
-		std::string sql = fmt::format("CREATE TABLE IF NOT EXISTS {}(", node::REGISTRY_LIST);
-		sql.append("id INT NOT NULL DEFAULT 0,");
-		sql.append("name VARCHAR(64) NOT NULL DEFAULT '',");
-		sql.append("listen JSON,");
-		sql.append("last_time BIGINT NOT NULL DEFAULT 0");
-		sql.append(")");
-		return this->mSqlite->Exec(sql.c_str());
+		this->mSqlite->Build("register_delete", fmt::format("DELETE FROM {} WHERE id=?", node::REGISTRY_LIST));
+		this->mSqlite->Build("register_update", fmt::format("UPDATE {} SET last_time=? WHERE id=?", node::REGISTRY_LIST));
+		this->mSqlite->Build("register_replace", fmt::format("REPLACE INTO {}(id,name,listen,last_time)VALUES(?,?,?,?)", node::REGISTRY_LIST));
+		return true;
 	}
 
 	void RegistryService::OnStart()
 	{
-		std::vector<std::string> result;
 		std::string sql = fmt::format("SELECT * FROM {}", node::REGISTRY_LIST);
-		if(this->mSqlite->Query(sql.c_str(), result))
+		std::unique_ptr<sqlite::Response> response = this->mSqlite->Run(sql);
+
+		for (const std::unique_ptr<json::r::Document>& document: response->result)
 		{
-			for(const std::string & message : result)
+			node::Info nodeInfo;
+			if (nodeInfo.Decode(*document))
 			{
-				node::Info nodeInfo;
-				json::r::Document document;
-				if(document.Decode(message) && nodeInfo.Decode(document))
-				{
-					this->mNodeList.emplace(nodeInfo.id, nodeInfo);
-				}
+				this->mNodeList.emplace(nodeInfo.id, nodeInfo);
 			}
 		}
 	}
@@ -76,22 +70,20 @@ namespace acs
 	{
 		json::r::Document document;
 		const std::string & message = request.GetBody();
-		if(!document.Decode(message))
+		if(!document.Decode(message, YYJSON_READ_INSITU))
 		{
 			return XCode::CallArgsError;
 		}
 		node::Info nodeInfo;
+		json::r::Value listenObject;
 		nodeInfo.sockId = request.SockId();
 		nodeInfo.last_time = help::Time::NowSec();
-		std::unique_ptr<json::r::Value> listenObject;
 		LOG_ERROR_CHECK_ARGS(document.Get("id", nodeInfo.id))
 		LOG_ERROR_CHECK_ARGS(document.Get("name", nodeInfo.name))
 		LOG_ERROR_CHECK_ARGS(document.Get("listen", listenObject))
 
-		nodeInfo.listen = listenObject->ToString();
-		const std::string sql = fmt::format("REPLACE INTO {}(id,name,listen,last_time)VALUES({},'{}','{}',{})",
-				node::REGISTRY_LIST, nodeInfo.id, nodeInfo.name, nodeInfo.listen, nodeInfo.last_time);
-		if(!this->mSqlite->Exec(sql.c_str()))
+		nodeInfo.listen = listenObject.ToString();
+		if(!this->mSqlite->Invoke("register_replace", nodeInfo.id, nodeInfo.name, nodeInfo.listen, nodeInfo.last_time))
 		{
 			return XCode::Failure;
 		}
@@ -115,8 +107,7 @@ namespace acs
 		{
 			return XCode::Failure;
 		}
-		const std::string sql = fmt::format("DELETE FROM {} WHERE id={}", node::REGISTRY_LIST, id);
-		if(!this->mSqlite->Exec(sql.c_str()))
+		if(!this->mSqlite->Invoke("register_delete", id))
 		{
 			return XCode::Failure;
 		}
@@ -145,7 +136,7 @@ namespace acs
 				}
 			}
 		}
-		response.SetProto(rpc::Proto::Json);
+		response.SetProto(rpc::proto::json);
 		response.SetContent(document.JsonString());
 		return XCode::Ok;
 	}
@@ -164,8 +155,7 @@ namespace acs
 		}
 		iter->second.sockId = request.SockId();
 		iter->second.last_time = help::Time::NowSec();
-		const std::string sql = fmt::format("UPDATE {} SET last_time={}", node::REGISTRY_LIST, iter->second.last_time);
-		if(!this->mSqlite->Exec(sql.c_str()))
+		if(!this->mSqlite->Invoke("register_update", iter->second.last_time, actorId))
 		{
 			return XCode::Ok;
 		}
@@ -202,8 +192,8 @@ namespace acs
 					if (request != nullptr)
 					{
 						request->SetSockId(sockId);
-						request->SetContent(rpc::Proto::Json, document.JsonString());
-						if (this->mRouter->Send(sockId, std::move(request)) == XCode::Ok)
+						request->SetContent(document);
+						if (this->mRouter->Send(sockId, request) == XCode::Ok)
 						{
 							doneMessages.emplace(id);
 						}
@@ -229,7 +219,7 @@ namespace acs
 				{
 					request->SetSockId(sockId);
 					request->SetContent(std::to_string(id));
-					if (this->mRouter->Send(sockId, std::move(request)) == XCode::Ok)
+					if (this->mRouter->Send(sockId, request) == XCode::Ok)
 					{
 						doneMessages.emplace(id);
 					}

@@ -4,8 +4,8 @@
 
 #ifndef APP_TCPCLIENT_H
 #define APP_TCPCLIENT_H
-#include"Socket.h"
-#include"Core/Queue/Queue.h"
+#include "Socket.h"
+#include "Core/Queue/Queue.h"
 #include "Rpc/Common/Message.h"
 namespace tcp
 {
@@ -37,16 +37,18 @@ namespace tcp
 		virtual ~Client() = default;
 	public:
 		void SetSocket(Socket * socket);
-		const std::string & GetAddress() { return this->mSocket->GetAddress();}
 		inline size_t SendBufferBytes() const { return this->mRecvBuffer.capacity() * sizeof(std::streambuf::char_type); }
 		inline size_t RecvBufferBytes() const { return this->mRecvBuffer.capacity() * sizeof(std::streambuf::char_type); }
+		inline std::string GetAddress() const { return fmt::format("{}:{}", this->mSocket->GetIp(), this->mSocket->GetPort()); }
 	protected:
 		bool ReadAll(int timeout = 0);
 		bool Connect(int timeout = 0);
-		bool ReadLine(int timeout = 0);
 		bool ReadSome(int timeout = 0);
 		bool ReadLength(size_t size, int timeout = 0);
 		void Connect(const std::string & host, const std::string & port, int timeout = 0);
+	protected:
+		bool ReadLine(int timeout = 0);
+		bool ReadLine(const std::string & delim, int timeout = 0);
 	protected:
 		void ClearBuffer();
 		bool SendSync(tcp::IProto & message); //同步发送
@@ -56,11 +58,12 @@ namespace tcp
 		void ClearSendStream();
 		void ClearRecvStream();
 		bool ConnectSync(Asio::Code & code);
-		bool RecvLineSync(size_t & size); //同步读一行
 		bool RecvSomeSync(size_t & size); //同步读取数据
 		bool RecvSync(size_t read, size_t & size); //同步读取数据
 		bool ConnectSync(const std::string & host, const std::string & port);
-
+	protected:
+		bool RecvLineSync(size_t & size); //同步读一行
+		bool RecvLineSync(size_t & size, const std::string & delim); //同步读一行
 	protected:
 		void StopTimer();
 		void StopUpdate();

@@ -4,9 +4,9 @@
 
 #ifndef APP_MONGOBACKUP_H
 #define APP_MONGOBACKUP_H
-#include"Yyjson/Object/JsonObject.h"
-#include"Http/Service/HttpService.h"
-#include "Oss/Config/Config.h"
+#include "Yyjson/Object/JsonObject.h"
+#include "Http/Service/HttpService.h"
+#include "AliCloud/Config/Config.h"
 namespace mongo
 {
 	struct BackupConfig : public json::Object<BackupConfig>
@@ -14,7 +14,6 @@ namespace mongo
 		int batchSize;
 		oss::Config oss;
 		std::string path;
-		std::string upload; //上传路径
 		std::vector<std::string> collections;
 	};
 }

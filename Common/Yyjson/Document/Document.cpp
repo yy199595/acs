@@ -46,6 +46,33 @@ namespace json
 		return yyjson_mut_arr_add_val(this->mValue, v.mValue);
 	}
 
+	bool w::Value::Push(r::Value& value)
+	{
+		if (!this->IsArray())
+		{
+			return false;
+		}
+		yyjson_val * val = value.GetValue();
+		yyjson_mut_val * mutVal = yyjson_val_mut_copy(this->mDoc, val);
+		return yyjson_mut_arr_add_val(this->mValue, mutVal);
+	}
+
+	bool w::Value::PushObject(r::Value& value, std::unique_ptr<w::Value>& result)
+	{
+		if (!this->IsArray())
+		{
+			return false;
+		}
+		yyjson_val * val = value.GetValue();
+		yyjson_mut_val * mutValue = yyjson_val_mut_copy(this->mDoc, val);
+		if(!yyjson_mut_arr_add_val(this->mValue, mutValue))
+		{
+			return false;
+		}
+		result = std::make_unique<w::Value>(this->mDoc, mutValue);
+		return true;
+	}
+
 	bool w::Value::Push(const char* v, size_t size)
 	{
 		if (!this->IsArray())
@@ -62,7 +89,8 @@ namespace json
 		{
 			return false;
 		}
-		yyjson_doc* doc = yyjson_read(json.c_str(), json.size(), YYJSON_WRITE_ALLOW_INVALID_UNICODE);
+		int flag = YYJSON_READ_INSITU | YYJSON_READ_ALLOW_INVALID_UNICODE;
+		yyjson_doc* doc = yyjson_read(json.c_str(), json.size(), flag);
 		if (doc == nullptr)
 		{
 			return false;
@@ -76,7 +104,28 @@ namespace json
 		return result;
 	}
 
-	bool w::Value::PushObject(const std::string& json, std::unique_ptr<Value> & value)
+	bool w::Value::PushObject(const std::list<std::string>& list)
+	{
+		for(const std::string & json : list)
+		{
+			int flag = YYJSON_READ_INSITU | YYJSON_READ_ALLOW_INVALID_UNICODE;
+			yyjson_doc* doc = yyjson_read(json.c_str(), json.size(), flag);
+			if (doc == nullptr)
+			{
+				return false;
+			}
+
+			yyjson_mut_val* obj = yyjson_val_mut_copy(this->mDoc, doc->root);
+			bool result = obj != nullptr && yyjson_mut_arr_add_val(this->mValue, obj);
+			{
+				yyjson_doc_free(doc);
+				if(!result) { return false; }
+			}
+		}
+		return true;
+	}
+
+	bool w::Value::PushObject(const std::string& json, std::unique_ptr<Value>& value)
 	{
 		if (!this->IsArray())
 		{
@@ -106,15 +155,15 @@ namespace json
 		{
 			return false;
 		}
-		yyjson_mut_val * val = yyjson_mut_bool(this->mDoc, v);
-		yyjson_mut_val * key = yyjson_mut_strcpy(this->mDoc, k);
+		yyjson_mut_val* val = yyjson_mut_bool(this->mDoc, v);
+		yyjson_mut_val* key = yyjson_mut_strcpy(this->mDoc, k);
 		return yyjson_mut_obj_add(this->mValue, key, val);
 	}
 
 	bool w::Value::Add(const char* k, const char* v)
 	{
-		yyjson_mut_val * val = yyjson_mut_strcpy(this->mDoc, v);
-		yyjson_mut_val * key = yyjson_mut_strcpy(this->mDoc, k);
+		yyjson_mut_val* val = yyjson_mut_strcpy(this->mDoc, v);
+		yyjson_mut_val* key = yyjson_mut_strcpy(this->mDoc, k);
 		return yyjson_mut_obj_add(this->mValue, key, val);
 	}
 
@@ -124,8 +173,8 @@ namespace json
 		{
 			return false;
 		}
-		yyjson_mut_val * val = yyjson_mut_null(this->mDoc);
-		yyjson_mut_val * key = yyjson_mut_strcpy(this->mDoc, k);
+		yyjson_mut_val* val = yyjson_mut_null(this->mDoc);
+		yyjson_mut_val* key = yyjson_mut_strcpy(this->mDoc, k);
 		return yyjson_mut_obj_add(this->mValue, key, val);
 	}
 
@@ -137,6 +186,15 @@ namespace json
 		}
 		yyjson_mut_val* key = yyjson_mut_strcpy(this->mDoc, k);
 		unsafe_yyjson_mut_obj_add(this->mValue, key, v.mValue, unsafe_yyjson_get_len(this->mValue));
+		return true;
+	}
+
+	bool w::Value::Add(const char* k, r::Value& value)
+	{
+		yyjson_val * val = value.GetValue();
+		yyjson_mut_val* key = yyjson_mut_strcpy(this->mDoc, k);
+		yyjson_mut_val * mutVal = yyjson_val_mut_copy(this->mDoc, val);
+		unsafe_yyjson_mut_obj_add(this->mValue, key, mutVal, unsafe_yyjson_get_len(this->mValue));
 		return true;
 	}
 
@@ -184,10 +242,31 @@ namespace json
 		{
 			return false;
 		}
-		yyjson_mut_val * key = yyjson_mut_strcpy(this->mDoc, k);
-		yyjson_mut_val * val = yyjson_mut_strncpy(this->mDoc, v, size);
+		yyjson_mut_val* key = yyjson_mut_strcpy(this->mDoc, k);
+		yyjson_mut_val* val = yyjson_mut_strncpy(this->mDoc, v, size);
 		return yyjson_mut_obj_add(this->mValue, key, val);
 	}
+
+	bool w::Value::Add(const char* k, const std::list<std::string>& value)
+	{
+		if (!this->IsObject())
+		{
+			return false;
+		}
+		std::unique_ptr<json::w::Value> jsonArray = this->AddArray(k);
+		{
+			for(const std::string & item : value)
+			{
+				yyjson_mut_val* val = yyjson_mut_strncpy(this->mDoc, item.c_str(), item.size());
+				if(!yyjson_mut_arr_add_val(jsonArray->mValue, val))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 
 	bool w::Value::AddObject(const char* k, const std::string& json)
 	{
@@ -319,13 +398,28 @@ namespace json
 		{
 			this->mDoc = nullptr;
 			this->mValue = nullptr;
-			yyjson_doc* doc = yyjson_read(json.c_str(), json.size(), YYJSON_WRITE_ALLOW_INVALID_UNICODE);
+			yyjson_read_flag flag = YYJSON_READ_ALLOW_INVALID_UNICODE;
+			yyjson_doc* doc = yyjson_read(json.c_str(), json.size(), flag);
 			if (doc != nullptr)
 			{
 				this->mDoc = yyjson_doc_mut_copy(doc, nullptr);
 				this->mValue = yyjson_mut_doc_get_root(this->mDoc);
 				yyjson_doc_free(doc);
 			}
+		}
+
+		bool Document::Deserialization(const char* json, size_t size)
+		{
+			yyjson_read_flag flag = YYJSON_READ_ALLOW_INVALID_UNICODE;
+			yyjson_doc* doc = yyjson_read(json, size, flag);
+			if (doc == nullptr)
+			{
+				return false;
+			}
+			this->mDoc = yyjson_doc_mut_copy(doc, nullptr);
+			this->mValue = yyjson_mut_doc_get_root(this->mDoc);
+			yyjson_doc_free(doc);
+			return true;
 		}
 
 		Document::Document(yyjson_mut_doc* doc, yyjson_mut_val* val)
@@ -337,16 +431,16 @@ namespace json
 		std::string Document::JsonString(bool pretty) const
 		{
 			std::string result;
-			this->Encode(&result, pretty);
+			this->Serialize(&result, pretty);
 			return result;
 		}
 
-		bool Document::Encode(std::string* json, bool pretty) const noexcept
+		bool Document::Serialize(std::string * json, bool pretty, yyjson_write_flag flag) const noexcept
 		{
 			size_t data_len;
 			bool result = true;
 			yyjson_write_err err;
-			yyjson_write_flag flag = YYJSON_WRITE_ALLOW_INVALID_UNICODE;
+			flag |= YYJSON_WRITE_ALLOW_INVALID_UNICODE;
 			if (pretty)
 			{
 				flag = flag | YYJSON_WRITE_PRETTY;
@@ -354,16 +448,30 @@ namespace json
 			char* str = yyjson_mut_write(this->mDoc, flag, &data_len);
 			if (str == nullptr)
 			{
-				result = false;
-				json->assign(err.msg);
+				return false;
 			}
-			else
-			{
-				json->assign(str, data_len);
-				free(str);
-			}
+			json->assign(str, data_len);
+			free(str);
 			return result;
 		}
+
+		bool Document::Serialize(std::unique_ptr<char>& json, size_t& size, bool pretty, yyjson_write_flag flag) const noexcept
+		{
+			yyjson_write_err err;
+			flag |= YYJSON_WRITE_ALLOW_INVALID_UNICODE;
+			if (pretty)
+			{
+				flag = flag | YYJSON_WRITE_PRETTY;
+			}
+			char* str = yyjson_mut_write(this->mDoc, flag, &size);
+			if (str == nullptr)
+			{
+				return false;
+			}
+			json.reset(str);
+			return true;
+		}
+
 	}
 }
 
@@ -371,14 +479,25 @@ namespace json
 {
 	namespace r
 	{
-		bool Value::Get(const char* key, std::unique_ptr<r::Value>& value) const
+		bool Value::Get(const char* key, r::Value& value) const
+		{
+			value.mValue = yyjson_obj_get(this->mValue, key);
+			return value.mValue != nullptr;
+		}
+
+		bool Value::Get(const char* key, std::vector<r::Value> & value) const
 		{
 			yyjson_val* val = yyjson_obj_get(this->mValue, key);
-			if (val == nullptr)
+			if (!yyjson_is_arr(val))
 			{
 				return false;
 			}
-			value = std::make_unique<r::Value>(val);
+			size_t size = yyjson_arr_size(val);
+			for (size_t index = 0; index < size; index++)
+			{
+				yyjson_val* item = yyjson_arr_get(val, index);
+				value.emplace_back(item);
+			}
 			return true;
 		}
 
@@ -403,23 +522,54 @@ namespace json
 			return yyjson_get_int(val);
 		}
 
+		bool Value::GetBool(const char* key, bool defaultVal) const
+		{
+			yyjson_val* val = yyjson_obj_get(this->mValue, key);
+			if (!yyjson_is_bool(val))
+			{
+				return defaultVal;
+			}
+			return yyjson_get_bool(val);
+		}
+
 		bool Value::Get(const char* k, std::string& v) const
 		{
 			yyjson_val* val = yyjson_obj_get(this->mValue, k);
 			if (!yyjson_is_str(val))
 			{
+				if(yyjson_is_raw(val))
+				{
+					size_t  size = yyjson_get_len(val);
+					v.assign(yyjson_get_raw(val), size);
+					return true;
+				}
 				return false;
 			}
-			const char* str = yyjson_get_str(val);
-			const size_t size = yyjson_get_len(val);
-			v.assign(str, size);
+			size_t size = yyjson_get_len(val);
+			v.assign(yyjson_get_str(val), size);
 			return true;
+		}
+
+		const char* Value::GetString(const char* key, size_t& size) const
+		{
+			yyjson_val* val = yyjson_obj_get(this->mValue, key);
+			if (!yyjson_is_str(val))
+			{
+				if(yyjson_is_raw(val))
+				{
+					size = yyjson_get_len(val);
+					return yyjson_get_raw(val);
+				}
+				return nullptr;
+			}
+			size = yyjson_get_len(val);
+			return yyjson_get_str(val);
 		}
 
 		bool Value::Get(const char* key, std::unordered_map<std::string, std::string>& value) const
 		{
-			yyjson_val * object = yyjson_obj_get(this->mValue, key);
-			if(object == nullptr || yyjson_get_type(object) != YYJSON_TYPE_OBJ)
+			yyjson_val* object = yyjson_obj_get(this->mValue, key);
+			if (object == nullptr || yyjson_get_type(object) != YYJSON_TYPE_OBJ)
 			{
 				return false;
 			}
@@ -428,8 +578,8 @@ namespace json
 			value.reserve(yyjson_obj_size(object));
 			while (yyjson_val* k = yyjson_obj_iter_next(&iter))
 			{
-				yyjson_val * val = yyjson_obj_iter_get_val(k);
-				if(val == nullptr || yyjson_get_type(object) != YYJSON_TYPE_STR)
+				yyjson_val* val = yyjson_obj_iter_get_val(k);
+				if (val == nullptr || yyjson_get_type(object) != YYJSON_TYPE_STR)
 				{
 					return false;
 				}
@@ -440,10 +590,27 @@ namespace json
 			return true;
 		}
 
+		bool Value::Foreach(std::function<void(const char* key, r::Value&)>&& callback)
+		{
+			if (yyjson_get_type(this->mValue) != YYJSON_TYPE_OBJ)
+			{
+				return false;
+			}
+			yyjson_obj_iter iter;
+			yyjson_obj_iter_init(this->mValue, &iter);
+			while (yyjson_val* k = yyjson_obj_iter_next(&iter))
+			{
+				const char * key = yyjson_get_str(k);
+				Value value(yyjson_obj_iter_get_val(k));
+				callback(key, value);
+			}
+			return true;
+		}
+
 		bool Value::Get(const char* key, std::unordered_map<int, std::string>& value) const
 		{
-			yyjson_val * object = yyjson_obj_get(this->mValue, key);
-			if(object == nullptr || yyjson_get_type(object) != YYJSON_TYPE_OBJ)
+			yyjson_val* object = yyjson_obj_get(this->mValue, key);
+			if (object == nullptr || yyjson_get_type(object) != YYJSON_TYPE_OBJ)
 			{
 				return false;
 			}
@@ -452,15 +619,15 @@ namespace json
 			value.reserve(yyjson_obj_size(object));
 			while (yyjson_val* k = yyjson_obj_iter_next(&iter))
 			{
-				yyjson_val * val = yyjson_obj_iter_get_val(k);
-				if(val == nullptr || yyjson_get_type(object) != YYJSON_TYPE_STR)
+				yyjson_val* val = yyjson_obj_iter_get_val(k);
+				if (val == nullptr || yyjson_get_type(object) != YYJSON_TYPE_STR)
 				{
 					return false;
 				}
 				int keyNumber = 0;
 				std::string key1(yyjson_get_str(k));
 				std::string val1(yyjson_get_str(val));
-				if(!help::Math::ToNumber(key1, keyNumber))
+				if (!help::Math::ToNumber(key1, keyNumber))
 				{
 					return false;
 				}
@@ -510,12 +677,29 @@ namespace json
 
 		bool Value::Get(std::string& v) const
 		{
-			if (!yyjson_is_str(this->mValue))
+			size_t count = 0;
+			const char * str = this->GetString(count);
+			if(str == nullptr)
 			{
 				return false;
 			}
-			v.assign(yyjson_get_str(this->mValue), yyjson_get_len(this->mValue));
+			v.assign(str, count);
 			return true;
+		}
+
+		const char* Value::GetString(size_t& size) const
+		{
+			if (!yyjson_is_str(this->mValue))
+			{
+				if(yyjson_is_raw(this->mValue))
+				{
+					size = yyjson_get_len(this->mValue);
+					return yyjson_get_raw(this->mValue);
+				}
+				return nullptr;
+			}
+			size = yyjson_get_len(this->mValue);
+			return yyjson_get_str(this->mValue);
 		}
 	}
 	namespace r
@@ -552,18 +736,34 @@ namespace json
 			return true;
 		}
 
-		bool Value::Get(size_t index, std::unique_ptr<Value>& value) const
+		const char* Value::GetString(size_t index, size_t& size) const
+		{
+			if (!yyjson_is_arr(this->mValue))
+			{
+				return nullptr;
+			}
+			yyjson_val* val = yyjson_arr_get(this->mValue, index);
+			if (!yyjson_is_str(val))
+			{
+				if(yyjson_is_raw(val))
+				{
+					size = yyjson_get_len(val);
+					return yyjson_get_raw(val);
+				}
+				return nullptr;
+			}
+			size = yyjson_get_len(val);
+			return yyjson_get_str(val);
+		}
+
+		bool Value::Get(size_t index, Value & value) const
 		{
 			if (!yyjson_is_arr(this->mValue))
 			{
 				return false;
 			}
-			yyjson_val* val = yyjson_arr_get(this->mValue, index);
-			if (val != nullptr)
-			{
-				value = std::make_unique<Value>(val);
-			}
-			return val != nullptr && value != nullptr;
+			value.mValue = yyjson_arr_get(this->mValue, index);
+			return value.mValue != nullptr;
 		}
 	}
 	namespace r
@@ -595,20 +795,34 @@ namespace json
 			if (str != nullptr)
 			{
 				result.assign(str, size);
+				free(str);
 			}
-			free(str);
 			return result;
+		}
+
+		bool Value::ToCString(std::unique_ptr<char> & json, size_t& size)
+		{
+			if(!yyjson_is_obj(this->mValue) && !yyjson_is_arr(this->mValue))
+			{
+				return false;
+			}
+			char* str = yyjson_val_write(this->mValue, YYJSON_WRITE_ALLOW_INVALID_UNICODE, &size);
+			if(str == nullptr || size == 0)
+			{
+				return false;
+			}
+			json.reset(str);
+			return true;
 		}
 
 		std::vector<const char*> Value::GetAllKey() const
 		{
-			std::vector<const char *> keys;
+			std::vector<const char*> keys;
 			keys.reserve(yyjson_get_len(this->mValue));
-			if(yyjson_is_obj(this->mValue))
+			if (yyjson_is_obj(this->mValue))
 			{
 				yyjson_obj_iter iter;
 				yyjson_obj_iter_init(this->mValue, &iter);
-				keys.reserve(yyjson_obj_size(this->mValue));
 				while (yyjson_val* k = yyjson_obj_iter_next(&iter))
 				{
 					keys.emplace_back(yyjson_get_str(k));
@@ -617,15 +831,38 @@ namespace json
 			return keys;
 		}
 
-		bool Value::GetValues(std::vector<std::unique_ptr<Value>>& value) const
+		bool Value::GetFirst(std::string& key, json::r::Value& value) const
 		{
-			if(yyjson_is_obj(this->mValue))
+			if (!yyjson_is_obj(this->mValue))
+			{
+				return false;
+			}
+			yyjson_obj_iter iter;
+			if(!yyjson_obj_iter_init(this->mValue, &iter))
+			{
+				return false;
+			}
+			yyjson_val* k = yyjson_obj_iter_next(&iter);
+			if (k == nullptr)
+			{
+				return false;
+			}
+			size_t count = yyjson_get_len(k);
+			key.assign(yyjson_get_str(k), count);
+			value.mValue = yyjson_obj_get(this->mValue, key.c_str());
+			return value.mValue != nullptr;
+		}
+
+		bool Value::GetValues(std::vector<r::Value>& value) const
+		{
+			if (yyjson_is_obj(this->mValue))
 			{
 				yyjson_obj_iter iter;
 				yyjson_obj_iter_init(this->mValue, &iter);
 				while (yyjson_val* k = yyjson_obj_iter_next(&iter))
 				{
-					value.emplace_back(std::make_unique<Value>(yyjson_obj_iter_get_val(k)));
+					r::Value jsonVal(yyjson_obj_iter_get_val(k));
+					value.emplace_back(jsonVal);
 				}
 			}
 			else
@@ -634,7 +871,8 @@ namespace json
 				yyjson_arr_iter_init(this->mValue, &iter);
 				while (yyjson_val* val = yyjson_arr_iter_next(&iter))
 				{
-					value.emplace_back(std::make_unique<Value>(val));
+					r::Value jsonVal(yyjson_obj_iter_get_val(val));
+					value.emplace_back(jsonVal);
 				}
 			}
 			return !value.empty();
@@ -662,6 +900,24 @@ namespace json
 {
 	namespace r
 	{
+
+		Document::Document(w::Value& document)
+		{
+			this->mDoc = nullptr;
+			this->mValue = nullptr;
+			if(document.IsArray() || document.IsObject())
+			{
+				size_t count = 0;
+				yyjson_mut_doc* doc = document.GetDocument();
+				char* json = yyjson_mut_write(doc, YYJSON_WRITE_ALLOW_INVALID_UNICODE, &count);
+				if (json != nullptr && count > 0)
+				{
+					this->Decode(json, count);
+					free(json);
+				}
+			}
+		}
+
 		bool Document::FromFile(const std::string& path) noexcept
 		{
 			yyjson_read_err readErr;
@@ -679,15 +935,14 @@ namespace json
 			return true;
 		}
 
-		bool Document::Decode(const std::string& json) noexcept
+		bool Document::Decode(const std::string& json, yyjson_read_flag flag) noexcept
 		{
 			if (json.empty())
 			{
 				return false;
 			}
-			return this->Decode(json.c_str(), json.size());
+			return this->Decode(json.c_str(), json.size(), flag);
 		}
-
 
 		void Document::SetDoc(yyjson_doc* doc)
 		{
@@ -699,7 +954,7 @@ namespace json
 			this->mDoc = doc;
 		}
 
-		bool Document::Decode(const char* str, size_t size) noexcept
+		bool Document::Decode(const char* str, size_t size, yyjson_read_flag flag) noexcept
 		{
 			yyjson_read_err err;
 			if (this->mDoc != nullptr)
@@ -707,7 +962,8 @@ namespace json
 				yyjson_doc_free(this->mDoc);
 				this->mDoc = nullptr;
 			}
-			this->mDoc = yyjson_read_opts((char*)str, size, YYJSON_READ_ALLOW_INVALID_UNICODE, nullptr, &err);
+			flag |= YYJSON_READ_ALLOW_INVALID_UNICODE;
+			this->mDoc = yyjson_read_opts((char*)str, size, flag, nullptr, &err);
 			if (this->mDoc == nullptr)
 			{
 				this->mError.assign(err.msg);
@@ -724,7 +980,8 @@ namespace json
 				return false;
 			}
 			yyjson_read_err err;
-			this->mDoc = yyjson_read_file(path.c_str(), YYJSON_READ_ALLOW_INVALID_UNICODE, nullptr, &err);
+			yyjson_read_flag flag = YYJSON_READ_ALLOW_INVALID_UNICODE;
+			this->mDoc = yyjson_read_file(path.c_str(), flag, nullptr, &err);
 			if (this->mDoc == nullptr)
 			{
 				this->mError.assign(err.msg);
@@ -742,10 +999,10 @@ namespace json
 		{
 			for (const char* key: keys)
 			{
-				std::unique_ptr<json::r::Value> jsonValue;
+				json::r::Value jsonValue;
 				if (source.Get(key, jsonValue))
 				{
-					target.Add(key, jsonValue->GetValue());
+					target.Add(key, jsonValue.GetValue());
 				}
 			}
 		}

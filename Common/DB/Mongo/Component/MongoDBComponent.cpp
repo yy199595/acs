@@ -87,6 +87,27 @@ namespace acs
 
 	}
 
+	bool MongoDBComponent::FormatUri(std::string& uri)
+	{
+		if(this->mConfig.address.empty())
+		{
+			return false;
+		}
+		mongo::Config config;
+		const std::string& address = this->mConfig.address[0];
+		if (!MongoDBComponent::DecodeUrl(address, config))
+		{
+			return false;
+		}
+		if(!config.user.empty() && !config.password.empty())
+		{
+			uri = fmt::format("mongodb://{}:{}@{}/{}", config.user, config.password, config.address, config.db);
+			return true;
+		}
+		uri = fmt::format("mongodb://{}/{}", config.address, config.db);
+		return true;
+	}
+
 	bool MongoDBComponent::Awake()
 	{
 		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
@@ -116,16 +137,17 @@ namespace acs
 				config.conn_count = this->mConfig.conn_count;
 				Asio::Context& io = this->mApp->GetContext();
 				tcp::Socket* socketProxy = this->GetComponent<ThreadComponent>()->CreateSocket(config.address);
-				std::shared_ptr<mongo::Client> mongoClientContext = std::make_unique<mongo::Client>(id, this, config, io);
+				std::shared_ptr<mongo::Client> mongoClient = std::make_unique<mongo::Client>(id, this, config, io);
 				{
-					if (!mongoClientContext->Start(socketProxy))
+					if (!mongoClient->Start(socketProxy))
 					{
 						LOG_ERROR("connect {} fail", address);
 						return false;
 					}
 				}
-				this->mClients.emplace(id, mongoClientContext);
-				LOG_INFO("[{}ms] connect {} ok", timer1.GetMs(), address);
+				this->mClients.emplace(id, mongoClient);
+				const std::string & version = mongoClient->GetVersion();
+				LOG_INFO("[{}ms] ({}) connect {} ok", timer1.GetMs(),version, address);
 
 			}
 		}
@@ -140,6 +162,7 @@ namespace acs
 		}
 		config.Get("user", config.user);
 		config.Get("address", config.address);
+		config.Get("password", config.password);
 		LOG_CHECK_RET_FALSE(config.Get("db", config.db))
 		LOG_CHECK_RET_FALSE(config.Get("address", config.address))
 		if(!config.Get("mechanism", config.mechanism))
@@ -198,11 +221,12 @@ namespace acs
 		this->mClients.clear();
 	}
 
-	void MongoDBComponent::OnMessage(int id, mongo::Request * request, mongo::Response * response) noexcept
+	void MongoDBComponent::OnMessage(int id, mongo::Request * req, mongo::Response * res) noexcept
 	{
 		this->mSumCount++;
 		this->AddFreeClient(id);
-		std::unique_ptr<mongo::Response> resp(response);
+		std::unique_ptr<mongo::Request> request(req);
+		std::unique_ptr<mongo::Response> response(res);
 		if (response == nullptr)
 		{
 			LOG_FATAL("send mongo cmd = {}", request->ToString());
@@ -210,12 +234,11 @@ namespace acs
 		}
 
 		int rpcId = response->RpcId();
-
-		if (!response->Document().IsOk())
+		if (!response->document.IsOk())
 		{
 			std::string errmsg;
 			LOG_WARN("request => {}", request->ToString());
-			if (response->Document().Get("errmsg", errmsg))
+			if (response->document.Get("errmsg", errmsg))
 			{
 				LOG_WARN("response => {}", errmsg);
 			}
@@ -230,10 +253,8 @@ namespace acs
 				newRequest->document.Add("explain", request->document);
 			}
 			long long ms = request->GetCostTime();
-			this->mApp->StartCoroutine([req = newRequest.release(), ms, this]
-			{
-				this->OnExplain(std::unique_ptr<mongo::Request>(req), ms);
-			});
+			CoroutineComponent * coroutine = acs::App::Coroutine();
+			coroutine->Start(&MongoDBComponent::OnExplain, this, std::move(newRequest), ms);
 		}
 		if (this->mConfig.debug)
 		{
@@ -243,7 +264,7 @@ namespace acs
 
 		if (rpcId > 0)
 		{
-			this->OnResponse(rpcId, std::move(resp));
+			this->OnResponse(rpcId, std::move(response));
 		}
 	}
 
@@ -278,24 +299,24 @@ namespace acs
 		}
 	}
 
-	void MongoDBComponent::OnExplain(std::unique_ptr<mongo::Request> request, long long ms) noexcept
+	void MongoDBComponent::OnExplain(std::unique_ptr<mongo::Request> & request, long long ms) noexcept
 	{
 		std::unique_ptr<custom::LogInfo> sqlLog = std::make_unique<custom::LogInfo>();
 		{
 			json::r::Document readDocument;
-			if (readDocument.Decode(request->document.ToString()))
+			if (readDocument.Decode(request->document.ToString(), YYJSON_READ_INSITU))
 			{
-				std::unique_ptr<json::r::Value> jsonValue;
+				json::r::Value jsonValue;
 				if (readDocument.Get("explain", jsonValue))
 				{
 					sqlLog->Content.assign(fmt::format("[{}ms] ", ms));
-					sqlLog->Content.append(jsonValue->ToString());
+					sqlLog->Content.append(jsonValue.ToString());
 					sqlLog->Content.append("\n");
 				}
 			}
 		}
 		LoggerComponent * logger = this->GetComponent<LoggerComponent>();
-		std::unique_ptr<mongo::Response> response = this->Run(std::move(request));
+		std::unique_ptr<mongo::Response> response = this->Run(request);
 		if (response != nullptr)
 		{
 			sqlLog->Level = custom::LogLevel::None;
@@ -304,22 +325,22 @@ namespace acs
 		}
 	}
 
-	std::unique_ptr<mongo::Response> MongoDBComponent::Run(std::unique_ptr<mongo::Request> request)
+	std::unique_ptr<mongo::Response> MongoDBComponent::Run(std::unique_ptr<mongo::Request>& request)
 	{
 		int rpcId = 0;
-		this->Send(std::move(request), rpcId);
+		this->Send(request, rpcId);
 		return this->BuildRpcTask<MongoTask>(rpcId)->Await();
 	}
 
-	std::unique_ptr<mongo::Response> MongoDBComponent::Run(const std::string & db, std::unique_ptr<mongo::Request> request)
+	std::unique_ptr<mongo::Response> MongoDBComponent::Run(const std::string & db, std::unique_ptr<mongo::Request>& request)
 	{
 		int rpcId = 0;
 		request->dataBase = db;
-		this->Send(std::move(request), rpcId);
+		this->Send(request, rpcId);
 		return this->BuildRpcTask<MongoTask>(rpcId)->Await();
 	}
 
-	void MongoDBComponent::Send(std::unique_ptr<mongo::Request> request, int& rpcId)
+	void MongoDBComponent::Send(std::unique_ptr<mongo::Request>& request, int& rpcId)
 	{
 		rpcId = this->BuildRpcId();
 		{
@@ -359,7 +380,7 @@ namespace acs
 			LOG_ERROR("mongo[{}] request:{}", id, request->ToString());
 			return;
 		}
-		iter->second->Send(std::move(request));
+		iter->second->Send(request);
 	}
 
 	void MongoDBComponent::OnRecord(json::w::Document& document)
@@ -371,7 +392,7 @@ namespace acs
 			request->header.requestID = this->BuildRpcId();
 			request->document.Add("ping", 1);
 		}
-		this->Run(std::move(request));
+		this->Run(request);
 		std::unique_ptr<json::w::Value> data = document.AddObject("mongo");
 		{
 			size_t sendByteCount = 0;
@@ -382,8 +403,6 @@ namespace acs
 				recvByteCount += iter->second->RecvBufferBytes();
 			}
 
-			data->Add("send_memory", sendByteCount);
-			data->Add("recv_memory", recvByteCount);
 
 			data->Add("retry", this->mRetryCount);
 			data->Add("sum", this->CurrentRpcCount());
@@ -391,6 +410,9 @@ namespace acs
 			data->Add("client", this->mClients.size());
 			data->Add("ping", fmt::format("{}ms", timer1.GetMs()));
 			data->Add("wait", this->AwaitCount() + this->mRequests.size());
+
+			data->Add("send_memory", sendByteCount);
+			data->Add("recv_memory", recvByteCount);
 		}
 	}
 }

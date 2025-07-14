@@ -3,32 +3,32 @@
 #include <string>
 #include <typeinfo>
 #include <unordered_map>
+#include <utility>
 #include <vector>
-
+#include <memory>
 namespace Lua
 {
 	namespace ClassNameProxy
 	{
 		struct ClassRegisterInfo
 		{
+		public:
+			explicit ClassRegisterInfo(std::string str) : mName(std::move(str)) { }
 		 public:
 			std::string mName;
 			std::vector<std::string> mParentNames;
 		};
 
-		extern std::unordered_map<size_t, ClassRegisterInfo*> classNameMap;
-		typedef std::unordered_map<size_t, ClassRegisterInfo*>::iterator ClassNameMapIter;
+		extern std::unordered_map<size_t, std::unique_ptr<ClassRegisterInfo>> classNameMap;
 
 		template<typename T>
-		inline void OnClassRegister(const std::string name)
+		inline void OnClassRegister(const std::string & name)
 		{
 			size_t hash = typeid(T).hash_code();
 			auto iter = classNameMap.find(hash);
 			if (iter == classNameMap.end())
 			{
-				auto info = new ClassRegisterInfo();
-				info->mName = name;
-				classNameMap.emplace(hash, info);
+				classNameMap.emplace(hash, std::make_unique<ClassRegisterInfo>(name));
 			}
 		}
 
@@ -37,12 +37,11 @@ namespace Lua
 		{
 			size_t hash = typeid(T).hash_code();
 			auto iter = classNameMap.find(hash);
-			if (iter != classNameMap.end())
+			if (iter == classNameMap.end())
 			{
-				ClassRegisterInfo* info = iter->second;
-				return info->mName.c_str();
+				return nullptr;
 			}
-			return nullptr;
+			return iter->second->mName.c_str();
 		}
 
 		template<typename T, typename BC>
@@ -52,9 +51,8 @@ namespace Lua
 			auto iter = classNameMap.find(hash);
 			if (iter != classNameMap.end())
 			{
-				ClassRegisterInfo* info = iter->second;
 				const char* name = GetLuaClassName<BC>();
-				info->mParentNames.emplace_back(name);
+				iter->second->mParentNames.emplace_back(name);
 				return true;
 			}
 			return false;
@@ -75,8 +73,7 @@ namespace Lua
 			auto iter = classNameMap.find(hash);
 			if (iter != classNameMap.end())
 			{
-				ClassRegisterInfo* info = iter->second;
-				return &info->mParentNames;
+				return &iter->second->mParentNames;
 			}
 			return nullptr;
 		}

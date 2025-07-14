@@ -26,8 +26,8 @@ namespace acs
 		RedisComponent();
     public:
 		bool Ping();
-		void Send(std::unique_ptr<redis::Request> request);
-		void Send(std::unique_ptr<redis::Request> request, int & id);
+		void Send(std::unique_ptr<redis::Request>& request);
+		void Send(std::unique_ptr<redis::Request>& request, int & id);
 	public:
 		bool UnLock(const std::string & key);
 		bool Lock(const std::string & key, int timeout = 5);
@@ -44,10 +44,10 @@ namespace acs
 	public:
 		bool Del(const std::string & key);
 		bool LoadRedisScript(const std::string & dir);
-		std::unique_ptr<redis::Response> Run(std::unique_ptr<redis::Request> request) noexcept;
+		std::unique_ptr<redis::Response> Run(std::unique_ptr<redis::Request> & request) noexcept;
 		bool MakeLuaRequest(const RedisLuaData & data, std::unique_ptr<redis::Request>& request);
 	private:
-		void Send(int id, std::unique_ptr<redis::Request> request) noexcept;
+		void Send(int id, std::unique_ptr<redis::Request> & request) noexcept;
 		void OnMessage(int id, redis::Request * request, redis::Response * response) noexcept final;
 	private:
 		void AddFreeClient(int id);
@@ -67,7 +67,6 @@ namespace acs
 		int mRetryCount;
 		redis::Cluster mConfig;
 		unsigned long long mSumCount;
-		class ThreadComponent * mThread;
 		custom::Queue<int> mFreeClients; //空闲客户端
 		std::shared_ptr<redis::Client> mSubClient;
 		std::unordered_set<int> mRetryClients;
@@ -84,15 +83,17 @@ namespace acs
 			request->SetCommand(cmd);
 			redis::Request::InitParameter(request.get(), std::forward<Args>(args)...);
 		}
-        return this->Run(std::move(request));
+        return this->Run(request);
     }
 
     template<typename ... Args>
 	void RedisComponent::Send(const std::string &cmd, Args &&...args) noexcept
     {
-		std::unique_ptr<redis::Request> request = redis::Request::Make(cmd, std::forward<Args>(args)...);
+		std::unique_ptr<redis::Request> request = std::make_unique<redis::Request>();
 		{
-			this->Send(std::move(request));
+			request->SetCommand(cmd);
+			redis::Request::InitParameter(request.get(), std::forward<Args>(args)...);
 		}
+		this->Send(request);
     }
 }

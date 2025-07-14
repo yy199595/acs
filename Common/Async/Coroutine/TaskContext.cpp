@@ -1,22 +1,26 @@
 #include"TaskContext.h"
-#include<memory>
+#include<cstring>
+#ifndef __OS_WIN__
+#include <sys/mman.h>
+#endif
 namespace acs
 {
 	TaskContext::TaskContext()
 	{
 		this->id = 0;
-        this->sid = 0;
+#ifdef __ENABLE_SHARE_STACK__
+		this->sid = 0;
+#endif
 		this->timerId = 0;
-		this->mContext = nullptr;
-        this->callback = nullptr;
+		this->ctx = nullptr;
+		this->cb = nullptr;
 		this->status = CorState::Ready;
-        memset(&this->stack, 0, sizeof(Stack));
+		std::memset(&this->stack, 0, sizeof(Stack));
 	}
 
 	void TaskContext::Invoke()
 	{
-		this->callback->run();
-		this->callback = nullptr;
+		this->cb->run();
 		this->status = CorState::Finish;
 	}
 
@@ -24,8 +28,16 @@ namespace acs
 	{
 		if (this->stack.p)
 		{
+#ifdef __ENABLE_SHARE_STACK__
 			std::free(this->stack.p);
-			memset(&this->stack, 0, sizeof(Stack));
+#else
+#ifndef __OS_WIN__
+			munmap(this->stack.p, this->stack.size);
+#else
+			std::free(this->stack.p);
+#endif
+#endif
+			std::memset(&this->stack, 0, sizeof(Stack));
 		}
 	}
 }

@@ -34,7 +34,7 @@ namespace acs
 	private:
 		std::string mDoMain;
 #ifdef __ENABLE_OPEN_SSL__
-		class OssComponent * mOss;
+		class AliOssComponent * mOss;
 #endif
 	};
 }

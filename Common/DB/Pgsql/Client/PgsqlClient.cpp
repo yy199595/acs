@@ -2,7 +2,8 @@
 // Created by 64658 on 2025/2/18.
 //
 
-#include <iomanip>
+
+
 #include "PgsqlClient.h"
 #include "Proto/Bson/base64.h"
 #include "Util/Tools/String.h"
@@ -10,6 +11,8 @@
 #include "Core/Thread/ThreadSync.h"
 #include "Pgsql/Common/PgsqlCommon.h"
 #include "XCode/XCode.h"
+#include "Util/File/FileHelper.h"
+#include "Util/File/DirectoryHelper.h"
 
 #ifdef __ENABLE_OPEN_SSL__
 #include <openssl/sha.h>
@@ -101,7 +104,27 @@ namespace pgsql
 
 	}
 
-	void Client::Send(std::unique_ptr<pgsql::Request> request)
+	bool Client::InvokeCompileSql()
+	{
+		if(this->mRequest != nullptr)
+		{
+			return false;
+		}
+#ifdef ONLY_MAIN_THREAD
+		return this->OnCompileSql();
+#else
+		custom::ThreadSync<bool> threadSync;
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [self = this->shared_from_this(), &threadSync, this]()
+		{
+			threadSync.SetResult(this->OnCompileSql());
+		});
+		return threadSync.Wait();
+#endif
+
+	}
+
+	void Client::Send(std::unique_ptr<pgsql::Request>& request)
 	{
 #ifdef ONLY_MAIN_THREAD
 		assert(this->mRequest == nullptr);
@@ -138,7 +161,7 @@ namespace pgsql
 			Asio::Code code;
 			if(!this->ConnectSync(code))
 			{
-				return XCode::ConnectDatabaseFail;
+				return XCode::NetConnectFailure;
 			}
 		}
 		pgsql::StartRequest request;
@@ -171,6 +194,34 @@ namespace pgsql
 			});
 		}
 		return code;
+	}
+
+	bool Client::OnCompileSql()
+	{
+		std::vector<std::string> filePaths;
+		const std::string& dir = this->mConfig.table;
+		if (help::dir::GetFilePaths(dir, ".sql", filePaths) > 0)
+		{
+			for (const std::string& path: filePaths)
+			{
+				std::vector<std::string> compileSql;
+				if (!help::fs::ReadTxtFile(path, compileSql))
+				{
+					return false;
+				}
+				for (const std::string& sql: compileSql)
+				{
+					pgsql::Result result;
+					this->ReadResponse(sql, result);
+					if(!result.mError.empty())
+					{
+						LOG_ERROR("{}", result.mError);
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	int Client::Auth(unsigned int type, const std::string & message)
@@ -213,6 +264,7 @@ namespace pgsql
 		pgsql::Result response;
 		if(!this->ReadResponse(response))
 		{
+			CONSOLE_LOG_ERROR("{}", response.mError);
 			return XCode::NetReadFailure;
 		}
 		if(!response.mError.empty())
@@ -220,6 +272,10 @@ namespace pgsql
 			CONSOLE_LOG_ERROR("{}", response.mError);
 			return XCode::PasswordAuthFail;
 		}
+		response.GetStatus("TimeZone", this->mServerInfo.timeZone);
+		response.GetStatus("server_version", this->mServerInfo.serverVersion);
+		response.GetStatus("client_encoding", this->mServerInfo.clientEncoding);
+		response.GetStatus("server_encoding", this->mServerInfo.serverEncoding);
 		return XCode::Ok;
 	}
 #ifdef __ENABLE_OPEN_SSL__
@@ -437,6 +493,7 @@ namespace pgsql
 		}
 		else if(this->Auth(false) == XCode::Ok)
 		{
+			this->OnCompileSql();
 			if(this->mRequest != nullptr)
 			{
 				this->Write(*this->mRequest);
@@ -449,7 +506,7 @@ namespace pgsql
 		{
 			this->mComponent->OnSendFailure(id, this->mRequest.release());
 		}
-		this->mComponent->OnClientError(id, XCode::ConnectDatabaseFail);
+		this->mComponent->OnClientError(id, XCode::NetConnectFailure);
 #else
 		int id = this->mClientId;
 		asio::post(this->mMain, [id, this, self = this->shared_from_this()]()
@@ -458,7 +515,7 @@ namespace pgsql
 			{
 				this->mComponent->OnSendFailure(id, this->mRequest.release());
 			}
-			this->mComponent->OnClientError(id, XCode::ConnectDatabaseFail);
+			this->mComponent->OnClientError(id, XCode::NetConnectFailure);
 		});
 #endif
 	}
@@ -470,24 +527,38 @@ namespace pgsql
 
 	void Client::OnReceiveMessage(std::istream& , size_t size, const asio::error_code& code)
 	{
-		this->ReadResponse(this->mResponse);
+		unsigned int errorCount = 0;
 		std::unique_ptr<pgsql::Response> response = std::make_unique<pgsql::Response>();
+		for (size_t index = 0; index < this->mRequest->Count(); index++)
 		{
-			this->mResponse.DecodeData(*response);
-#ifdef ONLY_MAIN_THREAD
-			int id = this->mClientId;
-			std::unique_ptr<pgsql::Request> request = std::move(this->mRequest);
-			this->mComponent->OnMessage(id, request.get(), response.release());
-#else
-			pgsql::Request * request = this->mRequest.release();
-			std::shared_ptr<tcp::Client> self = this->shared_from_this();
-			asio::post(this->mMain, [self, this, request, res = response.release()]
+			if (this->ReadResponse(this->mResponse))
 			{
-				int id = this->mClientId;
-				this->mComponent->OnMessage(id, request, res);
-				delete request;
-			});
-#endif
+				this->mResponse.DecodeData(*response);
+				if(this->mResponse.mType == pgsql::type::error)
+				{
+					++errorCount;
+				}
+			}
+			response->okCount += response->count;
 		}
+
+		if(this->mRequest->IsEnableCommit())
+		{
+			std::string sql = response->error.empty()
+							  ? "COMMIT" : "ROLLBACK";
+			this->ReadResponse(sql, this->mResponse); //有错误就回滚事务
+		}
+		pgsql::Request* request = this->mRequest.release();
+#ifdef ONLY_MAIN_THREAD
+		int id = this->mClientId;
+		this->mComponent->OnMessage(id, request, response.release());
+#else
+		std::shared_ptr<tcp::Client> self = this->shared_from_this();
+		asio::post(this->mMain, [self, this, request, res = response.release()]
+		{
+			int id = this->mClientId;
+			this->mComponent->OnMessage(id, request, res);
+		});
+#endif
 	}
 }

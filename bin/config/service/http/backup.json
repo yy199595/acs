@@ -1,0 +1,24 @@
+{
+	"/mongo/backup": {
+		"type": "GET",
+		"async": true,
+		"auth": false,
+		"desc": "备份一个表的数据",
+		"bind": "MongoBackup.Backup",
+		"request" : {
+			"tab" : "表名",
+			"name" : "文件夹"
+		}
+	},
+	"/mongo/recover": {
+		"type": "GET",
+		"async": true,
+		"auth": false,
+		"desc": "恢复文件夹数据到一个库",
+		"bind": "MongoBackup.Recover",
+		"request" : {
+			"db" : "库名",
+			"name" : "文件夹"
+		}
+	}
+}

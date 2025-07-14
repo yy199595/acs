@@ -2,12 +2,12 @@
 // Created by leyi on 2023/5/23.
 //
 
-#include"Node.h"
-#include"XCode/XCode.h"
-#include"Entity/Actor/App.h"
-#include"Http/Common/HttpResponse.h"
-#include"Util/Tools/String.h"
-#include"Router/Component/RouterComponent.h"
+#include "Node.h"
+#include "Entity/Actor/App.h"
+#include "Http/Common/HttpResponse.h"
+#include "Util/Tools/String.h"
+#include "Rpc/Config/ServiceConfig.h"
+#include "Router/Component/RouterComponent.h"
 namespace acs
 {
 	Node::Node(int id, const std::string & name)
@@ -32,10 +32,10 @@ namespace acs
 	{
 		std::unique_ptr<rpc::Message> message = std::make_unique<rpc::Message>();
 		{
-			message->SetNet(rpc::Net::Tcp);
-			message->SetType(rpc::Type::Logout);
+			message->SetNet(rpc::net::tcp);
+			message->SetType(rpc::type::logout);
 		}
-		return this->mRouter->Send(this->GetNodeId(), std::move(message));
+		return this->mRouter->Send(this->GetNodeId(), message);
 	}
 
 	bool Node::AddListen(const std::string& name, const std::string& addr)
@@ -84,7 +84,8 @@ namespace acs
 
 	int Node::SendMsg(std::unique_ptr<rpc::Message> message)
 	{
-		return this->mRouter->Send(this->GetNodeId(), std::move(message));
+		int id = this->GetNodeId();
+		return this->mRouter->Send(id, message);
 	}
 
 	std::unique_ptr<rpc::Message> Node::Make(const std::string& func) const
@@ -98,7 +99,7 @@ namespace acs
 		std::unique_ptr<rpc::Message> message = std::make_unique<rpc::Message>();
 		{
 			message->SetNet(methodConfig->net);
-			message->SetType(rpc::Type::Request);
+			message->SetType(rpc::type::request);
 			message->SetProto(methodConfig->proto);
 			message->GetHead().Add(rpc::Header::func, func);
 			message->GetHead().Add(rpc::Header::id, this->mAppId);

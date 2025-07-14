@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2022/9/22.
 //
 #include"Debug.h"
-
+#include "Rang.h"
 #ifdef __OS_LINUX__
 #include<execinfo.h>
 #endif
@@ -12,7 +12,6 @@
 #else
 #include <windows.h>
 #include <dbghelp.h>
-#include <codecvt>
 #include "Util/File/FileHelper.h"
 
 #endif
@@ -50,19 +49,16 @@ void Debug::Log(std::unique_ptr<custom::LogInfo> log)
 	if (logComponent == nullptr)
 	{
 		logComponent = App::Get<LoggerComponent>();
+		if (logComponent == nullptr)
+		{
+			return;
+		}
 	}
-#ifdef __DEBUG__
-	if (log->Level >= custom::LogLevel::Error)
-#else
-#endif
 	if (log->Level >= custom::LogLevel::Fatal)
 	{
 		Debug::Backtrace(log->Stack);
 	}
-	if (logComponent != nullptr)
-	{
-		logComponent->PushLog(std::move(log));
-	}
+	logComponent->PushLog(std::move(log));
 }
 
 #ifndef __OS_WIN__
@@ -243,68 +239,26 @@ void Debug::Console(const custom::LogInfo& logInfo)
 	switch (logInfo.Level)
 	{
 	case custom::LogLevel::Info:
-	{
-#ifdef __OS_WIN__
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-				FOREGROUND_BLUE | FOREGROUND_GREEN |
-				FOREGROUND_INTENSITY);
-		std::cout << time << " [Info   ] " << file << empty << log << std::endl;
-#else
-		printf("%s%s [Info   ] %s %s\e[34m\n", "\e[1m", time.c_str(), file.c_str(),  log.c_str());
-#endif
-	}
+		std::cout << rang::fg::cyan << time << " [Info   ] " << file << empty << log << std::endl;
 		break;
 	case custom::LogLevel::Debug:
-	{
-#ifdef __OS_WIN__
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-				FOREGROUND_INTENSITY | 2);
-		std::cout << time << " [Debug  ] " << file << empty << log << std::endl;
-#else
-		printf("%s%s [Debug  ] %s %s\e[0m\n", "\e[32m", time.c_str(), file.c_str(), log.c_str());
-#endif
-	}
+		std::cout << rang::fg::green << time << " [Debug  ] " << file << empty << log << std::endl;
 		break;
 	case custom::LogLevel::Warn:
-	{
-#ifdef __OS_WIN__
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-				FOREGROUND_INTENSITY | 6);
-		std::cout << time << " [Warning] " << file << empty << log << std::endl;
-#else
-		printf("%s%s [Warning] %s %s\e[0m\n", "\e[33m", time.c_str(), file.c_str(), log.c_str());
-#endif
-	}
+		std::cout << rang::fg::yellow << time << " [Warning] " << file << empty << log << std::endl;
 		break;
 	case custom::LogLevel::Error:
-	{
-#ifdef __OS_WIN__
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-				FOREGROUND_INTENSITY | 4);
-		std::cout << time << " [Error  ] " << file << empty << log << std::endl;
-#else
-		printf("%s%s [Error  ] %s %s\e[0m\n", "\e[31m", time.c_str(), file.c_str(), log.c_str());
-#endif
-	}
+		std::cout << rang::fg::red << time << " [Error  ] " << file << empty << log << std::endl;
 		break;
 	case custom::LogLevel::Fatal:
-	{
-#ifdef __OS_WIN__
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-				FOREGROUND_INTENSITY | FOREGROUND_BLUE |
-				FOREGROUND_RED);
-		std::cout << time << " [Fatal  ] " << file << empty << log << std::endl;
-#else
-		printf("%s%s [Fatal  ] %s %s\e[0m\n", "\e[35m", time.c_str(), file.c_str(), log.c_str());
-#endif
-	}
+		std::cout << rang::fg::magenta << time << " [Fatal  ] " << file << empty << log << std::endl;
 		break;
 	default:
 		break;
 	}
 	if (!logInfo.Stack.empty())
 	{
-		printf("%s\n", logInfo.Stack.c_str());
+		std::cout << rang::fgB::magenta << logInfo.Stack << std::endl;
 	}
 }
 
@@ -313,61 +267,19 @@ void Debug::Print(custom::LogLevel level, const std::string& log)
 	switch (level)
 	{
 	case custom::LogLevel::Info:
-	{
-#ifdef _WIN32
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-				FOREGROUND_BLUE | FOREGROUND_GREEN |
-				FOREGROUND_INTENSITY);
-		printf("%s\n", log.c_str());
-#else
-		printf("%s%s\e[34m\n", "\e[1m", log.c_str());
-#endif
-	}
+		std::cout << rang::fgB::cyan << log << std::endl;
 		break;
 	case custom::LogLevel::Debug:
-	{
-#ifdef _WIN32
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-				FOREGROUND_INTENSITY | 2);
-		printf("%s\n", log.c_str());
-#else
-		printf("%s%s\e[0m\n", "\e[32m", log.c_str());
-#endif
-	}
+		std::cout << rang::fgB::green << log << std::endl;
 		break;
 	case custom::LogLevel::Warn:
-	{
-#ifdef _WIN32
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-				FOREGROUND_INTENSITY | 6);
-		printf("%s\n", log.c_str());
-#else
-		printf("%s%s\e[0m\n", "\e[33m", log.c_str());
-#endif
-	}
+		std::cout << rang::fgB::yellow << log << std::endl;
 		break;
 	case custom::LogLevel::Error:
-	{
-#ifdef _WIN32
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-				FOREGROUND_INTENSITY | 4);
-		printf("%s\n", log.c_str());
-#else
-		printf("%s%s\e[0m\n", "\e[31m", log.c_str());
-#endif
-	}
+		std::cout << rang::fgB::red << log << std::endl;
 		break;
 	case custom::LogLevel::Fatal:
-	{
-#ifdef _WIN32
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-				FOREGROUND_INTENSITY | FOREGROUND_BLUE |
-				FOREGROUND_RED);
-		printf("%s\n", log.c_str());
-#else
-		printf("%s%s\e[0m\n", "\e[35m", log.c_str());
-#endif
-	}
+		std::cout << rang::fgB::magenta << log << std::endl;
 		break;
 	default:
 		break;

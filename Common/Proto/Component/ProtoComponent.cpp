@@ -108,7 +108,7 @@ namespace acs
 			LOG_ERROR("import {} fail", fileName);
 			return false;
 		}
-		LOG_DEBUG("import {} successful", fileName);
+		LOG_DEBUG("import [{}] ok", fileName);
 		this->mDynamicMessageFactory = std::make_unique<pb::DynamicMessageFactory>(fileDescriptor->pool());
 		for(int x = 0; x < fileDescriptor->message_type_count(); x++)
 		{
@@ -287,8 +287,7 @@ namespace acs
 	bool ProtoComponent::OnRefresh()
 	{
 		std::queue<std::string> files;
-		auto iter = this->mFiles.begin();
-		for(; iter != this->mFiles.end(); ++iter)
+		for(auto iter = this->mFiles.begin(); iter != this->mFiles.end(); ++iter)
 		{
 			files.push(iter->first);
 		}
@@ -302,6 +301,15 @@ namespace acs
 			}
 			files.pop();
 		}
+		for(auto iter1 = this->mTempMessages.begin(); iter1 != this->mTempMessages.end(); iter1++)
+		{
+			iter1->second->Clear();
+		}
 		return true;
+	}
+
+	void ProtoComponent::OnDestroy()
+	{
+		google::protobuf::ShutdownProtobufLibrary();
 	}
 }

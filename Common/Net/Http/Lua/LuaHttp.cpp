@@ -99,15 +99,19 @@ namespace lua
 		}
 		else if (lua_istable(lua, 4))
 		{
-			static std::string json;
-			lua::yyjson::read(lua, 4, json);
-			request->SetContent(http::Header::JSON, json);
+			size_t count = 0;
+			std::unique_ptr<char> json;
+			if(!lua::yyjson::read(lua, 4, json, count))
+			{
+				return false;
+			}
+			request->SetContent(http::Header::JSON, json.get(), count);
 		}
 		int taskId = 0;
 		lua_pushthread(lua);
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 
-		httpComponent->Send(std::move(request), std::move(response), taskId);
+		httpComponent->Send(request, response, taskId);
 		return httpComponent->AddTask(new LuaHttpRequestTask(taskId, lua))->Await();
 	}
 
@@ -135,7 +139,7 @@ namespace lua
 			return 0;
 		}
 		int taskId = 0;
-		httpComponent->Send(std::move(request), std::move(response), taskId);
+		httpComponent->Send(request, response, taskId);
 		return httpComponent->AddTask(new LuaHttpRequestTask(taskId, lua))->Await();
 	}
 
@@ -172,9 +176,13 @@ namespace lua
         }
         else if (lua_istable(lua, 2))
         {
-            std::string json;
-			lua::yyjson::read(lua, 2, json);
-			request->SetContent(http::Header::JSON, json);
+			size_t count = 0;
+			std::unique_ptr<char> json;
+			if(!lua::yyjson::read(lua, 2, json, count))
+			{
+				return false;
+			}
+			request->SetContent(http::Header::JSON, json.get(), count);
 		}
         else
         {
@@ -187,7 +195,7 @@ namespace lua
         //LOG_DEBUG("[http POST] url = " << std::string(str, size) << " data = " << postRequest->Content());
 #endif
 		int taskId = 0;
-		httpComponent->Send(std::move(request), std::move(response), taskId);
+		httpComponent->Send(request, response, taskId);
         return httpComponent->AddTask(new LuaHttpRequestTask(taskId, lua))->Await();
     }
 
@@ -227,7 +235,7 @@ namespace lua
 		int taskId = 0;
 		lua_pushthread(lua);
 		//request->Header().SetKeepAlive(false);
-		httpComponent->Send(std::move(request), std::move(response), taskId);
+		httpComponent->Send(request, response, taskId);
 		return httpComponent->AddTask(new LuaHttpRequestTask(taskId, lua))->Await();
 	}
 
@@ -260,7 +268,7 @@ namespace lua
 		request->Header().Add("Accept", "*/*");
 		//request->Header().Add("User-Agent", "Chrome");
 		//request->Header().Add("Accept-Encoding", "gzip, deflate, br");
-        httpComponent->Send(std::move(request), std::move(response), taskId);
+        httpComponent->Send(request, response, taskId);
         return httpComponent->AddTask(new LuaHttpRequestTask(taskId, lua))->Await();
 	}
 }

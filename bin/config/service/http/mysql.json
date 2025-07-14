@@ -1,0 +1,40 @@
+{
+	"/mysql_mgr/backup": {
+		"type": "GET",
+		"async": true,
+		"auth": false,
+		"Record" : true,
+		"permission": 100,
+		"desc": "备份一个表的数据",
+		"bind": "MysqlBackup.Backup",
+		"request" : {
+			"tab" : "表名",
+			"name" : "文件夹"
+		}
+	},
+	"/mysql_mgr/recover": {
+		"type": "GET",
+		"async": true,
+		"auth": false,
+		"Record" : true,
+		"permission": 100,
+		"desc": "恢复文件夹数据到一个库",
+		"bind": "MysqlBackup.Recover",
+		"request" : {
+			"db" : "库名",
+			"name" : "文件夹"
+		}
+	},
+	"/mysql_mgr/upload": {
+		"type": "GET",
+		"async": true,
+		"auth": true,
+		"permission": 100,
+		"Record" : true,
+		"desc": "压缩备份数据并上传阿里云",
+		"bind": "MysqlBackup.Upload",
+		"request" : {
+			"name" : "文件夹"
+		}
+	}
+}

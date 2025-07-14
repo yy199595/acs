@@ -63,9 +63,10 @@ namespace acs
 		MongoDBComponent();
 		~MongoDBComponent() final = default;
 	public:
-		void Send(std::unique_ptr<mongo::Request> request, int & taskId);
-		std::unique_ptr<mongo::Response> Run(std::unique_ptr<mongo::Request> request);
-		std::unique_ptr<mongo::Response> Run(const std::string & db, std::unique_ptr<mongo::Request> request);
+		bool FormatUri(std::string & uri);
+		void Send(std::unique_ptr<mongo::Request> & request, int & taskId);
+		std::unique_ptr<mongo::Response> Run(std::unique_ptr<mongo::Request> & request);
+		std::unique_ptr<mongo::Response> Run(const std::string & db, std::unique_ptr<mongo::Request> & request);
 	private:
 		bool Awake() final;
 		bool LateAwake() final;
@@ -75,7 +76,7 @@ namespace acs
 		void OnSecondUpdate(int tick) noexcept final;
 		void OnRecord(json::w::Document &document) final;
 		void OnSendFailure(int id, mongo::Request *message) final;
-		void OnExplain(std::unique_ptr<mongo::Request> request, long long ms) noexcept;
+		void OnExplain(std::unique_ptr<mongo::Request> & request, long long ms) noexcept;
 		void OnMessage(int id, mongo::Request * request, mongo::Response * message) noexcept final;
 	private:
 		void AddFreeClient(int id);

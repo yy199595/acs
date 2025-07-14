@@ -25,11 +25,23 @@ namespace mysql
 		int retry = 5; //重试时间
 		int conn_count = 3; //重试次数
 		bool debug = false;
-		std::string script;
+		std::string table;
 		std::string binlog;
 		db::Explain explain;
 		std::vector<std::string> address;
 	public:
+		inline static void RegisterFields()
+		{
+			REGISTER_JSON_CLASS_FIELD(mysql::Cluster, ping);
+			REGISTER_JSON_CLASS_FIELD(mysql::Cluster, count);
+			REGISTER_JSON_CLASS_FIELD(mysql::Cluster, retry);
+			REGISTER_JSON_CLASS_FIELD(mysql::Cluster, table);
+			REGISTER_JSON_CLASS_FIELD(mysql::Cluster, debug);
+			REGISTER_JSON_CLASS_FIELD(mysql::Cluster, explain);
+			REGISTER_JSON_CLASS_FIELD(mysql::Cluster, binlog);
+			REGISTER_JSON_CLASS_FIELD(mysql::Cluster, conn_count);
+			REGISTER_JSON_CLASS_MUST_FIELD(mysql::Cluster, address);
+		}
 	};
 
 	class Config : public db::Url
@@ -84,6 +96,22 @@ namespace mysql
 
 		std::string possible_keys; // 可能适用的索引列表（逗号分隔），为空表示无合适索引。
 		// 示例：`idx_a,idx_b` 表示优化器在 `idx_a` 和 `idx_b` 之间选择。
+
+	public:
+		inline static void RegisterFields()
+		{
+			REGISTER_JSON_CLASS_FIELD(mysql::Explain, id);
+			REGISTER_JSON_CLASS_FIELD(mysql::Explain, ref);
+			REGISTER_JSON_CLASS_FIELD(mysql::Explain, table);
+			REGISTER_JSON_CLASS_FIELD(mysql::Explain, key);
+			REGISTER_JSON_CLASS_FIELD(mysql::Explain, select_type);
+			REGISTER_JSON_CLASS_FIELD(mysql::Explain, Extra);
+			REGISTER_JSON_CLASS_FIELD(mysql::Explain, type);
+			REGISTER_JSON_CLASS_FIELD(mysql::Explain, rows);
+			REGISTER_JSON_CLASS_FIELD(mysql::Explain, filtered);
+			REGISTER_JSON_CLASS_FIELD(mysql::Explain, key_len);
+			REGISTER_JSON_CLASS_FIELD(mysql::Explain, possible_keys);
+		}
 	};
 }
 

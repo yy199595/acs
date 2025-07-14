@@ -47,35 +47,84 @@ namespace pgsql
 
 namespace pgsql
 {
+	Request::Request()
+	{
+		this->mRpcId = 0;
+		this->mType = pgsql::type::query;
+	}
+
+	Request::Request(const std::string& sql)
+	{
+		this->mRpcId = 0;
+		this->mSql.emplace_back(sql);
+		this->mType = pgsql::type::query;
+	}
+
+	Request::Request(const char* sql, size_t size)
+	{
+		this->mRpcId = 0;
+		this->mType = pgsql::type::query;
+		this->mSql.emplace_back(sql, size);
+	}
+
+	Request::Request(unsigned char t, const std::string& sql)
+	{
+		this->mType = t;
+		this->mRpcId = 0;
+		this->mSql.emplace_back(sql);
+	}
+
 	void Request::Clear()
 	{
-
+		this->mRpcId = 0;
+		this->mSql.clear();
 	}
 
 	int Request::OnSendMessage(std::ostream& os)
 	{
-		if(this->mMessage.back() != '\0')
+		if(this->mEnableCommit)
 		{
-			this->mMessage += '\0';
+			const static std::string begin("START TRANSACTION");
+			Request::WriteCommand(os, begin);
 		}
-		unsigned int len = this->mMessage.size() + 4;
+		for(const std::string & sql : this->mSql)
+		{
+			Request::WriteCommand(os, sql);
+		}
+		return 0;
+	}
+
+	void Request::WriteCommand(std::ostream &os, const std::string& sql) const
+	{
+		unsigned int len = sql.size() + 4;
+		if(sql.back() != '\0')
+		{
+			++len;
+		}
+		char buffer[sizeof(len)] = { 0};
 
 		os << this->mType;
-		char buffer[sizeof(len)] = { 0};
 		tcp::Data::Write(buffer, len);
 		os.write(buffer, sizeof(buffer));
-		os.write(this->mMessage.c_str(), this->mMessage.size());
-		return 0;
+		os.write(sql.c_str(), (std::streamsize)sql.size());
+		if(sql.back() != '\0')
+		{
+			os << '\0';
+		}
 	}
 
 	bool Request::GetCommand(std::string& cmd) const
 	{
-		size_t pos = this->mMessage.find(' ');
+		if(this->mSql.empty())
+		{
+			return false;
+		}
+		size_t pos = this->mSql.back().find(' ');
 		if(pos == std::string::npos)
 		{
 			return false;
 		}
-		cmd = this->mMessage.substr(0, pos);
+		cmd = this->mSql.back().substr(0, pos);
 		help::Str::Toupper(cmd);
 		return true;
 	}
@@ -141,7 +190,7 @@ namespace pgsql
 						const std::string& value = result[index + 1];
 						document.Add(key.c_str(), value);
 					}
-					document.Encode(&this->mError);
+					document.Serialize(&this->mError);
 				}
 				break;
 			}
@@ -201,13 +250,16 @@ namespace pgsql
 
 	void Result::DecodeData(pgsql::Response& response)
 	{
-		response.mError = this->mError;
+		if(!this->mError.empty())
+		{
+			response.error.emplace_back(this->mError);
+		}
 		if(!this->mResult.empty())
 		{
 			std::vector<std::string> list;
 			if(help::Str::Split(this->mResult, ' ', list) > 0)
 			{
-				response.mCmd = list.at(0);
+				response.cmd = list.at(0);
 				if (list.size() == 2)
 				{
 					std::string& val = list.at(1);
@@ -234,44 +286,80 @@ namespace pgsql
 				offset += 4;
 				if(length > 0)
 				{
-					std::string value = message.substr(offset, length);
+					const char * value = message.data() + offset;
 					offset += length;
 					switch(fieldInfo.type)
 					{
 						case pgsql::field::BOOL:
 						{
+							bool result = false;
+							if(length > 0)
+							{
+								result = value[0] == 't';
+							}
+							document.Add(fieldInfo.name.c_str(), result);
 							break;
 						}
 						case pgsql::field::NUMBER_INT16:
 						case pgsql::field::NUMBER_INT32:
 						case pgsql::field::NUMBER_INT64:
+						case pgsql::field::NUMBER_SERIAL:
+						case pgsql::field::NUMBER_BIG_SERIAL:
+						case pgsql::field::NUMBER_SMALL_SERIAL:
 						{
-							long long number = std::stoll(value);
+							std::string val(value, length);
+							long long number = std::stoll(val);
 							document.Add(fieldInfo.name.c_str(), number);
 							break;
 						}
 						case pgsql::field::NUMBER_FLOAT32:
 						case pgsql::field::NUMBER_FLOAT64:
+						case pgsql::field::NUMBER_NUMERIC:
 						{
-							double number = std::stod(value);
+							std::string val(value, length);
+							double number = std::stod(val);
 							document.Add(fieldInfo.name.c_str(), number);
 							break;
 						}
 						case pgsql::field::STRING_JSON:
+						case pgsql::field::STRING_JSONB:
+						case pgsql::field::ARRAY_INT2:
+						case pgsql::field::ARRAY_INT4:
+						case pgsql::field::ARRAY_INT8:
+						case pgsql::field::ARRAY_TEXT:
+						case pgsql::field::ARRAY_VARCHAR:
+						case pgsql::field::ARRAY_FLOAT:
+						case pgsql::field::ARRAY_DOUBLE:
+						case pgsql::field::ARRAY_ANY:
 						{
-							document.AddObject(fieldInfo.name.c_str(), value);
+							document.AddObject(fieldInfo.name.c_str(), value, length);
 							break;
 						}
 						default:
 						{
-							document.Add(fieldInfo.name.c_str(), value);
+							document.Add(fieldInfo.name.c_str(), value, length);
 							break;
 						}
 					}
 				}
 			}
-			response.mResults.emplace_back(document.JsonString());
+			size_t count = 0;
+			std::unique_ptr<char> json;
+			if(document.Serialize(json, count))
+			{
+				response.results.emplace_back(json.get(), count);
+			}
 		}
+	}
 
+	bool Result::GetStatus(const std::string& key, std::string& value)
+	{
+		auto iter = this->mStatus.find(key);
+		if(iter == this->mStatus.end())
+		{
+			return false;
+		}
+		value = iter->second;
+		return true;
 	}
 }

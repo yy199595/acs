@@ -2,20 +2,27 @@
 // Created by 64658 on 2024/11/21.
 //
 
+#include <list>
 #include "LuaOs.h"
 #include "Core/System/System.h"
 namespace LuaCore
 {
 	int Run(lua_State* L)
 	{
-		std::string output;
+		std::list<std::string> output;
 		const char * cmd = luaL_checkstring(L, 1);
 		if(!os::System::Run(cmd, output))
 		{
 			luaL_error(L, cmd);
 			return 0;
 		}
-		lua_pushlstring(L, output.c_str(), output.size());
+		int index = 1;
+		lua_newtable(L);
+		for(const std::string & str : output)
+		{
+			lua_pushlstring(L, str.c_str(), str.size());
+			lua_seti(L, -2, index++);
+		}
 		return 1;
 	}
 

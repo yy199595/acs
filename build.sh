@@ -12,6 +12,7 @@ if [ ! -n "$1" ] ;then
   echo "*           debug        build server type=debug          *"
   echo "*           release      build server type=release        *"
   echo "*           lib          build protobuf and lua           *"
+  echo "*           all          build all cmake project          *"
   echo "*           jemalloc     download jemalloc and build      *"
   echo "*           openssl      download openssl and build       *"
   echo "*                                                         *"
@@ -34,6 +35,16 @@ for arg in $cmd; do
         make
     fi
 
+    if [[ $arg == "all" ]]; then
+        cd "$current_path" || exit
+        make protoc
+        make libprotobuf
+        make lua-share
+        make lua-static
+        cmake -DCMAKE_BUILD_TYPE=Debug ./CMakeLists.txt
+        make app
+    fi
+
     if [[ $arg == "openssl" ]]; then
         cd ./Libs/bin || exit
         if [ -d "./Libs/bin/openssl" ]; then
@@ -44,7 +55,7 @@ for arg in $cmd; do
         cd ./openssl || exit
             chmod -R 777 ./
             ./config
-        make
+        make -j
          if [ -d "../../openssl/lib" ]; then
             mkdir -p "../../openssl/lib"
         fi

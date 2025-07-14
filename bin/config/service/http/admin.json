@@ -23,14 +23,14 @@
 	"/admin/all": {
 		"type": "GET",
 		"async": true,
-		"auth": false,
-		"permission": 20,
+		"auth": true,
+		"permission": 100,
 		"bind": "Admin.AllInfo",
 		"desc": "查看所有服务器进程信息"
 	},
 	"/admin/info": {
 		"type": "GET",
-		"auth": false,
+		"auth": true,
 		"async": true,
 		"permission": 20,
 		"bind": "Admin.Info",
@@ -97,6 +97,12 @@
 			"permission" : 0
 		}
 	},
+	"/admin/find" : {
+		"type" : "GET",
+		"async" : true,
+		"bind" : "Admin.FindUserInfo",
+		"desc" : "查找用户账号信息"
+	},
 	"/admin/update": {
 		"type": "POST",
 		"async": true,
@@ -140,7 +146,7 @@
 	"/oss/request": {
 		"type": "GET",
 		"permission": 10,
-		"Record": true,
+		"record": false,
 		"bind": "Oss.request",
 		"desc": "申请oss信息"
 	},

@@ -210,7 +210,8 @@ namespace acs
 	public:
 		std::unique_ptr<wx::PayResponse> DecodeResponse(const wx::PayMessage & message) const;
 		std::unique_ptr<wx::ComplainInfo> DecodeComplain(const wx::ComplainRequest & message);
-		std::unique_ptr<wx::LinkInfo> GetLink(const std::string & path, const std::string & query);
+		std::unique_ptr<wx::LinkInfo> GetLinkUrl(const std::string & path, const std::string & query);
+		std::unique_ptr<wx::LinkInfo> GetSchemeUrl(const std::string & path, const std::string & query);
 	public:
 		const http::JsonContent * Get(const std::string & url, http::FromContent & fromData);
 	public:

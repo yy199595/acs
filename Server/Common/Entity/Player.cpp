@@ -3,7 +3,7 @@
 //
 
 #include"Player.h"
-#include"XCode/XCode.h"
+#include "Rpc/Config/ServiceConfig.h"
 #include"Entity/Actor/App.h"
 #include"Server/Config/ServerConfig.h"
 #include "Util/Tools/TimeHelper.h"
@@ -123,13 +123,13 @@ namespace acs
 			{
 				serverId = this->mGateId;
 				message->SetNet(methodConfig->net);
-				message->SetType(rpc::Type::Client);
+				message->SetType(rpc::type::client);
 				message->GetHead().Add(rpc::Header::client_sock_id, this->mSockId);
 			}
 			else if(this->GetServerId(methodConfig->server, serverId))
 			{
 				message->SetNet(methodConfig->net);
-				message->SetType(rpc::Type::Request);
+				message->SetType(rpc::type::request);
 			}
 			message->SetSockId(serverId);
 			message->SetProto(methodConfig->proto);

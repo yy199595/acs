@@ -18,12 +18,12 @@ namespace ws
 
 	namespace header
 	{
-		constexpr char * Upgrade = "Upgrade";
-		constexpr char * WebSocket = "websocket";
-		constexpr char * Connection = "Connection";
-		constexpr char * SecWebSocketKey = "Sec-WebSocket-Key";
-		constexpr char * SecWebSocketVersion = "Sec-WebSocket-Version";
-		constexpr char * SecWebSocketAccept = "Sec-WebSocket-Accept";
+		constexpr const char * Upgrade = "Upgrade";
+		constexpr const char * WebSocket = "websocket";
+		constexpr const char * Connection = "Connection";
+		constexpr const char * SecWebSocketKey = "Sec-WebSocket-Key";
+		constexpr const char * SecWebSocketAccept = "Sec-WebSocket-Accept";
+		constexpr const char * SecWebSocketVersion = "Sec-WebSocket-Version";
 	}
 }
 

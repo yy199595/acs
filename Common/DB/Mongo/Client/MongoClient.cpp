@@ -150,7 +150,7 @@ namespace mongo
 
 		int conversationId = 0;
 		std::string server_first;
-		const bson::Reader::Document & document1 = response1->Document();
+		const bson::r::Document & document1 = response1->document;
 		if (!document1.Get("payload", server_first) || !document1.Get("conversationId", conversationId))
 		{
 			return false;
@@ -196,13 +196,12 @@ namespace mongo
 			return false;
 		}
 		parsedSource.clear();
-		const bson::Reader::Document & document2 = response2->Document();
+		const bson::r::Document & document2 = response2->document;
 		if (!document2.Get("payload", parsedSource))
 		{
 			return false;
 		}
-		bool done = false;
-		if (document2.Get("done", done) && done)
+		if(document2.GetBool("done"))
 		{
 			return true;
 		}
@@ -221,13 +220,7 @@ namespace mongo
 		{
 			return false;
 		}
-
-		const bson::Reader::Document & document3 = response3->Document();
-		if (document3.IsOk() && document3.Get("done", done) && done)
-		{
-			return true;
-		}
-		return false;
+		return response3->document.IsOk() && response3->document.GetBool("done");
 	}
 
 #ifdef __ENABLE_OPEN_SSL__
@@ -255,7 +248,7 @@ namespace mongo
 
 		int conversationId = 0;
 		std::string server_first;
-		const bson::Reader::Document & document1 = response1->Document();
+		const bson::r::Document & document1 = response1->document;
 		if (!document1.Get("payload", server_first) || !document1.Get("conversationId", conversationId))
 		{
 			return false;
@@ -321,18 +314,15 @@ namespace mongo
 		}
 
 		std::string parsedSource2;
-		const bson::Reader::Document & document2 = response2->Document();
+		const bson::r::Document & document2 = response2->document;
 		if (!document2.Get("payload", parsedSource2))
 		{
 			return false;
 		}
-
-		bool done = false;
-		if (document2.Get("done", done) && done)
+		if(document2.GetBool("done"))
 		{
 			return true;
 		}
-
 		std::unique_ptr<Request> request3 = std::make_unique<Request>();
 		{
 			request3->dataBase = db;
@@ -347,13 +337,7 @@ namespace mongo
 		{
 			return false;
 		}
-
-		const bson::Reader::Document & document3 = response3->Document();
-		if (document3.IsOk() && document3.Get("done", done) && done)
-		{
-			return true;
-		}
-		return false;
+		return response3->document.IsOk() && response3->document.GetBool("done");
 	}
 
 #endif
@@ -375,7 +359,7 @@ namespace mongo
 			this->ReadLength(length);
 			return;
 		}
-		this->OnResponse(XCode::Ok, std::move(this->mRequest), std::move(this->mResponse));
+		this->OnResponse(XCode::Ok, this->mRequest, this->mResponse);
 	}
 
 	void Client::OnResponse(int code)
@@ -386,11 +370,11 @@ namespace mongo
 		{
 			int id = this->mRequest->header.requestID;
 			this->mResponse = std::make_unique<mongo::Response>(id, this->mRequest->cmd);
-			this->OnResponse(code, std::move(this->mRequest), std::move(this->mResponse));
+			this->OnResponse(code, this->mRequest, this->mResponse);
 		}
 	}
 
-	void Client::OnResponse(int code, std::unique_ptr<Request> request, std::unique_ptr<Response> response)
+	void Client::OnResponse(int code, std::unique_ptr<Request>& request, std::unique_ptr<Response>& response)
 	{
 		this->StopTimer();
 		this->ClearBuffer();
@@ -404,21 +388,21 @@ namespace mongo
 		{
 			response->SetRpcId(request->GetRpcId());
 		}
-#ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnMessage(this->mClientId, request.get(), response.release());
-#else
 		mongo::Request* req = request.release();
 		mongo::Response* resp = response.release();
+#ifdef ONLY_MAIN_THREAD
+		this->mComponent->OnMessage(this->mClientId, req, resp);
+#else
+
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
 		asio::post(this->mMainContext, [this, self, req, id = this->mClientId, resp]
 		{
 			this->mComponent->OnMessage(id, req, resp);
-			delete req;
 		});
 #endif
 	}
 
-	void Client::Send(std::unique_ptr<Request> request)
+	void Client::Send(std::unique_ptr<Request>& request)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->mRequest = std::move(request);
@@ -465,7 +449,7 @@ namespace mongo
 		return true;
 	}
 
-	std::unique_ptr<mongo::Response> Client::SyncMongoCommand(std::unique_ptr<Request> request)
+	std::unique_ptr<mongo::Response> Client::SyncMongoCommand(std::unique_ptr<Request>& request)
 	{
 #ifdef ONLY_MAIN_THREAD
 		return this->SyncSendMongoCommand(request);
@@ -552,7 +536,6 @@ namespace mongo
 			Asio::Code code;
 			if (!this->ConnectSync(code))
 			{
-				const std::string& addr = this->mConfig.address;
 				return false;
 			}
 		}
@@ -580,7 +563,17 @@ namespace mongo
 				result = false;
 			}
 		}
-
+		std::unique_ptr<mongo::Request> request = std::make_unique<mongo::Request>();
+		{
+			request->dataBase = "admin";
+			request->document.Add("serverStatus", 1);
+		}
+		std::unique_ptr<mongo::Response> response = this->SyncSendMongoCommand(request);
+		{
+			response->document.Get("host", this->mInfo.host);
+			response->document.Get("version", this->mInfo.version);
+		}
+		std::string res = response->ToString();
 		if (result && this->mRequest == nullptr && this->mComponent != nullptr)
 		{
 			std::shared_ptr<tcp::Client> self = this->shared_from_this();

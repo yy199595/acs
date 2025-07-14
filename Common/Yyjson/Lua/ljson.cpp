@@ -86,6 +86,23 @@ namespace lua
 		free(json);
 		return true;
 	}
+
+	bool yyjson::read(lua_State* L, int idx, std::unique_ptr<char>& json, size_t& count)
+	{
+		yyjson_write_err err;
+		yyjson_mut_doc* doc = yyjson_mut_doc_new(nullptr);
+		yyjson_mut_val* val = encode_one(L, doc, false, idx, 0);
+		yyjson_write_flag flag = YYJSON_WRITE_ALLOW_INVALID_UNICODE;
+		char* str = yyjson_mut_val_write_opts(val, flag, nullptr, &count, &err);
+		if (str == nullptr || count == 0)
+		{
+			yyjson_mut_doc_free(doc);
+			return false;
+		}
+		json.reset(str);
+		yyjson_mut_doc_free(doc);
+		return true;
+	}
 }
 
 namespace lua
@@ -102,7 +119,8 @@ namespace lua
 	{
 		bool result = true;
 		yyjson_read_err err;
-		yyjson_doc* doc = yyjson_read_opts((char*)buf, len, YYJSON_READ_ALLOW_INVALID_UNICODE, nullptr, &err);
+		yyjson_read_flag flag = YYJSON_READ_INSITU | YYJSON_READ_ALLOW_INVALID_UNICODE;
+		yyjson_doc* doc = yyjson_read_opts((char*)buf, len, flag, nullptr, &err);
 		if (!doc)
 		{
 			result = false;
@@ -294,30 +312,41 @@ namespace lua
 	{
 		switch (yyjson_get_type(val))
 		{
-			case YYJSON_TYPE_NULL:
-			case YYJSON_TYPE_NONE:
-				lua_pushnil(L);
+		case YYJSON_TYPE_NULL:
+		case YYJSON_TYPE_NONE:
+			lua_pushnil(L);
+			break;
+		case YYJSON_TYPE_BOOL:
+			lua_pushboolean(L, unsafe_yyjson_get_bool(val));
+			break;
+		case YYJSON_TYPE_STR:
+			lua_pushlstring(L, unsafe_yyjson_get_str(val), unsafe_yyjson_get_len(val));
+			break;
+		case YYJSON_TYPE_NUM:
+			number_decode(L, val);
+			break;
+		case YYJSON_TYPE_ARR:
+			array_decode(L, val, numkeyable);
+			break;
+		case YYJSON_TYPE_OBJ:
+			table_decode(L, val, numkeyable);
+			break;
+		case YYJSON_TYPE_RAW:
+			{
+				size_t size = unsafe_yyjson_get_len(val);
+				const char * str = unsafe_yyjson_get_raw(val);
+				if(str != nullptr && size > 0)
+				{
+					lua_pushlstring(L, str, size);
+				}
 				break;
-			case YYJSON_TYPE_BOOL:
-				lua_pushboolean(L, unsafe_yyjson_get_bool(val));
-				break;
-			case YYJSON_TYPE_STR:
-				lua_pushlstring(L, unsafe_yyjson_get_str(val), unsafe_yyjson_get_len(val));
-				break;
-			case YYJSON_TYPE_NUM:
-				number_decode(L, val);
-				break;
-			case YYJSON_TYPE_ARR:
-				array_decode(L, val, numkeyable);
-				break;
-			case YYJSON_TYPE_OBJ:
-				table_decode(L, val, numkeyable);
-				break;
-			default:
-				lua_pushnil(L);
-				break;
+			}
+		default:
+			lua_pushnil(L);
+			break;
 		}
 	}
+
 
 	int ljson::create(lua_State* L)
 	{

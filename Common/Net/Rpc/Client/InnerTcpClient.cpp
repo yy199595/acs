@@ -8,8 +8,8 @@
 namespace rpc
 {
 	InnerTcpClient::InnerTcpClient(int id, Component* component, bool client, Asio::Context & io)
-			: Client(rpc::InnerBufferMaxSize), mSockId(id), mComponent(component),
-			  mIsClient(client), mDecodeStatus(tcp::Decode::None), mMainContext(io), mClose(false)
+			: Client(rpc::INNER_RPC_BODY_MAX_LENGTH), mSockId(id), mComponent(component),
+			  mIsClient(client), mDecodeStatus(tcp::Decode::None), mMainContext(io)
 	{
 
 	}
@@ -18,28 +18,25 @@ namespace rpc
 	{
 		while (!this->mSendMessages.empty())
 		{
-			delete this->mSendMessages.front();
 			this->mSendMessages.pop();
 		}
 	}
 
-	bool InnerTcpClient::Send(rpc::Message* message)
+	bool InnerTcpClient::Send(std::unique_ptr<rpc::Message> & message)
 	{
 		LOG_CHECK_RET_FALSE(message);
-		if (message->GetType() == rpc::Type::Response)
+		if (message->GetType() == rpc::type::response)
 		{
 			assert(message->GetRpcId() > 0);
 		}
 #ifdef ONLY_MAIN_THREAD
-		this->mSendMessages.emplace(message);
-		if (this->mSendMessages.size() == 1)
-		{
-			this->Write(*message);
-		}
+		this->AddToSendQueue(message);
 #else
+		auto self = this->shared_from_this();
 		Asio::Context & context = this->mSocket->GetContext();
-		asio::post(context, [this, self = this->shared_from_this(), message]
+		asio::post(context, [this, self, req = message.release()]
 		{
+			std::unique_ptr<rpc::Message> message(req);
 			this->AddToSendQueue(message);
 		});
 #endif
@@ -50,16 +47,12 @@ namespace rpc
 	{
 		if (!this->mSendMessages.empty())
 		{
-			rpc::Message* waitMessage = this->mSendMessages.front();
+			std::unique_ptr<rpc::Message> & waitMessage = this->mSendMessages.front();
 			{
-				if (waitMessage->GetType() == rpc::Type::Request && waitMessage->GetRpcId() != 0)
+				if (waitMessage->GetType() == rpc::type::request && waitMessage->GetRpcId() != 0)
 				{
 					int rpcId = waitMessage->GetRpcId();
-					this->mWaitResMessages.emplace(rpcId, waitMessage);
-				}
-				else
-				{
-					delete waitMessage;
+					this->mWaitResMessages.emplace(rpcId, std::move(waitMessage));
 				}
 				this->mSendMessages.pop();
 			}
@@ -91,7 +84,7 @@ namespace rpc
 	void InnerTcpClient::OnSendMessage(const Asio::Code& code)
 	{
 		if (code != asio::error::operation_aborted
-			&& this->mIsClient && !this->mClose)
+			&& this->mIsClient && this->mSocket->IsActive())
 		{
 			this->Connect(5);
 			return;
@@ -101,21 +94,16 @@ namespace rpc
 
 	void InnerTcpClient::CloseSocket()
 	{
-		if(this->mClose) {
+		if(!this->mSocket->IsActive())
+		{
 			return;
 		}
 		this->mDecodeStatus = tcp::Decode::None;
 		if (this->mComponent == nullptr)
 		{
-			auto iter = this->mWaitResMessages.begin();
-			for (; iter != this->mWaitResMessages.end(); iter++)
-			{
-				delete iter->second;
-			}
 			this->mWaitResMessages.clear();
 			while (!this->mSendMessages.empty())
 			{
-				delete this->mSendMessages.front();
 				this->mSendMessages.pop();
 			}
 			return;
@@ -123,27 +111,28 @@ namespace rpc
 		auto iter = this->mWaitResMessages.begin();
 		for (; iter != this->mWaitResMessages.end(); iter++) //发出去没有返回的数据
 		{
-			this->mSendMessages.emplace(iter->second);
+			this->mSendMessages.emplace(std::move(iter->second));
 		}
 		this->mWaitResMessages.clear();
 
-		asio::post(this->mMainContext, [this, self = this->shared_from_this()]
+		auto self = this->shared_from_this();
+		while (!this->mSendMessages.empty())
 		{
-			while (!this->mSendMessages.empty())
+			std::unique_ptr<rpc::Message> & message = this->mSendMessages.front();
 			{
-				rpc::Message* data = this->mSendMessages.front();
-				this->mComponent->OnSendFailure(this->mSockId, data);
+				asio::post(this->mMainContext, [this, self, req = message.release()]
+				{
+					this->mComponent->OnSendFailure(this->mSockId, req);
+				});
 				this->mSendMessages.pop();
 			}
-		});
-
-		this->mClose = true;
+		}
 		this->mSocket->Close();
 	}
 
 	void InnerTcpClient::CloseSocket(int code)
 	{
-		if(!this->mClose)
+		if(this->mSocket->IsActive())
 		{
 			this->CloseSocket();
 			std::shared_ptr<Client> self = this->shared_from_this();
@@ -164,19 +153,20 @@ namespace rpc
 
 	bool InnerTcpClient::MakeMessage(const rpc::ProtoHead& header)
 	{
-		if (header.Type != rpc::Type::Response)
+		if (header.type != rpc::type::response)
 		{
 			this->mMessage = std::make_unique<rpc::Message>();
 			return true;
 		}
 
-		int rpcId = header.RpcId;
+		int rpcId = header.rpcId;
 		auto iter = this->mWaitResMessages.find(rpcId);
 		if (iter == this->mWaitResMessages.end())
 		{
 			return false;
 		}
-		this->mMessage.reset(iter->second);
+		this->mMessage = std::move(iter->second);
+		this->mMessage->SetMsg(rpc::msg::bin);
 		this->mWaitResMessages.erase(iter);
 		return true;
 	}
@@ -187,34 +177,31 @@ namespace rpc
 		{
 			return;
 		}
-		switch (this->mDecodeStatus)
+		if(this->mDecodeStatus == tcp::Decode::None)
 		{
-			case tcp::Decode::None:
-			{
-				tcp::Data::ReadHead(readStream, this->mProtoHead, true);
+			tcp::Data::ReadHead(readStream, this->mProtoHead, true);
 
-				if (this->mProtoHead.Len >= this->mMaxCount)
-				{
-					this->CloseSocket(XCode::NetBigDataShutdown);
-					return;
-				}
-				if (!this->MakeMessage(this->mProtoHead))
-				{
-					this->CloseSocket(XCode::UnKnowPacket);
-					return;
-				}
-				this->mMessage->Init(this->mProtoHead);
-				this->mDecodeStatus = tcp::Decode::MessageBody;
-				this->ReadLength(this->mProtoHead.Len);
+			if (this->mProtoHead.Len >= this->mMaxCount)
+			{
+				this->CloseSocket(XCode::NetBigDataShutdown);
 				return;
 			}
-			case tcp::Decode::MessageBody:
+			if (!this->MakeMessage(this->mProtoHead))
 			{
-				if (this->mMessage->OnRecvMessage(readStream, size) != 0)
-				{
-					this->CloseSocket(XCode::UnKnowPacket);
-					return;
-				}
+				this->CloseSocket(XCode::UnKnowPacket);
+				return;
+			}
+			this->mMessage->Init(this->mProtoHead);
+			this->mDecodeStatus = tcp::Decode::MessageBody;
+			this->ReadLength(this->mProtoHead.Len);
+			return;
+		}
+		else if(this->mDecodeStatus == tcp::Decode::MessageBody)
+		{
+			if (this->mMessage->OnRecvMessage(readStream, size) != 0)
+			{
+				this->CloseSocket(XCode::UnKnowPacket);
+				return;
 			}
 		}
 		do
@@ -226,16 +213,16 @@ namespace rpc
 			}
 			switch(this->mMessage->GetType())
 			{
-				case rpc::Type::Ping:
+				case rpc::type::ping:
 				{
 					std::unique_ptr<rpc::Message> pingMessage = std::make_unique<rpc::Message>();
 					{
-						pingMessage->SetType(rpc::Type::Pong);
-						this->AddToSendQueue(pingMessage.release());
+						pingMessage->SetType(rpc::type::pong);
+						this->AddToSendQueue(pingMessage);
 					}
 					break;
 				}
-				case rpc::Type::Pong:
+				case rpc::type::pong:
 					break;
 				default:
 				{
@@ -245,7 +232,8 @@ namespace rpc
 						request->SetSockId(this->mSockId);
 					}
 #ifdef __DEBUG__
-					request->TempHead().Add(rpc::Header::from_addr, this->mSocket->GetAddress());
+					std::string address = this->GetAddress();
+					request->TempHead().Add(rpc::Header::from_addr, address);
 #endif
 					asio::post(this->mMainContext, [this, request] { this->mComponent->OnMessage(request, nullptr); });
 					break;
@@ -259,12 +247,13 @@ namespace rpc
 		asio::post(context, [this, self]() { this->ReadLength(rpc::RPC_PACK_HEAD_LEN); });
 	}
 
-	void InnerTcpClient::AddToSendQueue(rpc::Message* message)
+	void InnerTcpClient::AddToSendQueue(std::unique_ptr<rpc::Message> & message)
 	{
-		this->mSendMessages.emplace(message);
+		message->SetMsg(rpc::msg::bin);
+		this->mSendMessages.emplace(std::move(message));
 		if(this->mSendMessages.size() == 1)
 		{
-			this->Write(*message);
+			this->Write(*this->mSendMessages.front());
 		}
 	}
 

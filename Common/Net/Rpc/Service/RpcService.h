@@ -27,7 +27,7 @@ namespace acs
 	public:
 		Lua::LuaModule * GetLuaModule() { return this->mLuaModule; }
 		const std::string& GetServer() const { return this->mCluster; }
-		int Invoke(const RpcMethodConfig * config, rpc::Message * message) noexcept;
+		int Invoke(const RpcMethodConfig * config, std::unique_ptr<rpc::Message> & message) noexcept;
 	private:
 		int CallLua(const RpcMethodConfig * config, rpc::Message & message) noexcept;
 		int WriterToLua(const RpcMethodConfig * config, rpc::Message & message) noexcept;

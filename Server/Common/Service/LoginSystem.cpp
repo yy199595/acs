@@ -35,7 +35,7 @@ namespace acs
 			{
 				for (int index = 0; index < request.list_size(); index++)
 				{
-					const auto& serverInfo = request.list(index);
+					const s2s::server_info & serverInfo = request.list(index);
 					player->AddServer(serverInfo.name(), serverInfo.id());
 				}
 			}

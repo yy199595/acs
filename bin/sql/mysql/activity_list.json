@@ -1,0 +1,77 @@
+{
+	"name": "activity_list",
+	"fields": {
+		"_id": {
+			"type": "INT",
+			"unique": true,
+			"notnull": true,
+			"comment": "活动ID",
+			"primary_key": true
+		},
+		"city": {
+			"type": "INT",
+			"index" : true,
+			"notnull": true,
+			"comment": "城市ID"
+		},
+		"type": {
+			"type": "INT",
+			"index" : true,
+			"notnull": true,
+			"comment": "订单类型"
+		},
+		"price": {
+			"type": "INT",
+			"default" : 0,
+			"notnull": true,
+			"comment": "订单金额"
+		},
+		"status": {
+			"type": "INT",
+			"index" : true,
+			"default" : 0,
+			"notnull": true,
+			"comment": "订单状态"
+		},
+		"club_id": {
+			"type": "INT",
+			"index" : true,
+			"default" : 0,
+			"notnull": true,
+			"comment": "部落ID"
+		},
+		"content": {
+			"type": "TEXT",
+			"notnull": true,
+			"comment": "订单金额"
+		},
+		"users" : {
+			"type" : "JSON",
+			"comment" : "报名人ID"
+		},
+		"refund_time" : {
+			"type": "BIGINT",
+			"comment" : "退款时间限制"
+		},
+		"target_id" : {
+			"type" : "INT",
+			"index" : true,
+			"comment" : "活动结算人"
+		},
+		"stop_time" : {
+			"type": "BIGINT",
+			"index" : true,
+			"comment" : "结束时间"
+		},
+		"start_time" : {
+			"type": "BIGINT",
+			"index" : true,
+			"comment" : "开始时间"
+		},
+		"create_time" : {
+			"type": "BIGINT",
+			"index" : true,
+			"comment" : "创建时间"
+		}
+	}
+}

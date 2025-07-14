@@ -319,7 +319,7 @@ namespace _bson {
         }
         /** Append a string element.
             @param sz size includes terminating null character */
-        bsonobjbuilder& append(const StringData& fieldName, const char *str, int sz) {
+        bsonobjbuilder& append(const StringData& fieldName, const char *str, size_t sz) {
             _b.appendNum((char) String);
             _b.appendStr(fieldName);
             _b.appendNum((int)sz);

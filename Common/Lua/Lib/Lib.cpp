@@ -15,7 +15,7 @@
 #include "Log/Lua/LuaLogger.h"
 #include "Http/Lua/LuaHttp.h"
 #include "Proto/Lua/Message.h"
-#include "Oss/Lua/LuaOss.h"
+#include "AliCloud/Lua/LuaOss.h"
 #include "Net/Lua/LuaSocket.h"
 #include "Util/Ssl/LuaRsa.h"
 #include "Auth/Lua/LuaAes.h"
@@ -26,6 +26,7 @@
 #include "Pgsql/Lua/LuaPgsql.h"
 #include "Node/Lua/LuaNode.h"
 #include "Router/Lua/LuaRouter.h"
+#include "Util/Censor/LuaCensor.h"
 namespace lua
 {
 
@@ -328,8 +329,9 @@ namespace lua
             {"set", lua::Sqlite::Set},
             {"get", lua::Sqlite::Get},
             {"del", lua::Sqlite::Del},
-            {"exec", lua::Sqlite::Exec},
-            {"query", lua::Sqlite::Query},
+            {"run", lua::Sqlite::Run},
+			{"build", lua::Sqlite::Build},
+			{"invoke", lua::Sqlite::Invoke},
             {"set_timeout", lua::Sqlite::SetTimeout},
             {nullptr, nullptr}
         };
@@ -368,6 +370,18 @@ namespace lua
     }
 }
 
+namespace lua
+{
+	int lib::luaopen_lcensor(lua_State * L)
+	{
+		luaL_Reg l[] = {
+				{"new", censor::New},
+				{nullptr, nullptr}
+		};
+		luaL_newlib(L, l);
+		return 1;
+	}
+}
 
 namespace lua
 {

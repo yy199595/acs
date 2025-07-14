@@ -1,9 +1,7 @@
 ﻿#pragma once
 #include"Network/Tcp/Asio.h"
-#include<Core/Queue/TaskQueue.h>
 #include"Core/Singleton/Singleton.h"
 #include"Server/Config/ServerConfig.h"
-#include"Rpc/Config/ServiceConfig.h"
 #include"Async/Component/CoroutineComponent.h"
 #include"Node/Component/NodeComponent.h"
 #include"Node/Actor/Node.h"
@@ -16,13 +14,6 @@ namespace acs
 		Ready, //启动完成
 		Running, // 正在运行
 		Closing	 //正在关闭
-	};
-
-	namespace XServerCode
-	{
-		constexpr int Ok = 0;
-		constexpr int ConfError = 1; //配置错误
-		constexpr int InitError = 2; //加载错误
 	};
 }
 
@@ -54,6 +45,7 @@ namespace acs
         bool OnDelComponent(Component *component) final { return false; }
 		inline size_t GetEventCount() const { return this->mEventCount; }
 		inline long long GetStartUseMemory() const { return this->mStartMemory; }
+		inline bool IsMainThread() const { return this->mMainId == std::this_thread::get_id(); }
 	public:
 		template<typename T>
 		static inline T * Get() { return App::Inst()->GetComponent<T>(); }
@@ -69,6 +61,9 @@ namespace acs
 		bool InitComponent();
 		void StartAllComponent();
 	 private:
+#ifdef __DEBUG__
+		std::thread::id mMainId;
+#endif
 		int mGuidIndex;
         int mTickCount;
 		float mLogicFps;

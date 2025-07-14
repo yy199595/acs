@@ -17,16 +17,16 @@ namespace acs
 		void OnSendFailure(int id, rpc::Message * message) final;
 		void OnMessage(rpc::Message * message, rpc::Message *) noexcept final ;
 	private:
-		int Send(int id, rpc::Message * message) noexcept final;
-		char GetNet()  const noexcept final { return rpc::Net::Tcp; }
+		char GetNet()  const noexcept final { return rpc::net::tcp; }
+		int Send(int id, std::unique_ptr<rpc::Message> & message) noexcept final;
 	protected:
         bool LateAwake() final;
 		void OnClientError(int id, int code) final;
 		void OnRecord(json::w::Document & document) final;
 		bool OnListen(tcp::Socket * socket) noexcept final;
 	private:
-		int OnRequest(rpc::Message * message) noexcept;
-		int OnForward(rpc::Message * message) noexcept;
+		int OnRequest(std::unique_ptr<rpc::Message> & message) noexcept;
+		int OnForward(std::unique_ptr<rpc::Message> & message) noexcept;
 		rpc::InnerTcpClient * GetClient(int id);
 	private:
 		unsigned long long mWaitCount;

@@ -4,7 +4,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     add_compile_options(-flto)
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
-find_program(CLANG_EXECUTABLE clang)
+#find_program(CLANG_EXECUTABLE clang)
 #if(CLANG_EXECUTABLE)
 #    message("当前使用编译器为clang")
 #    set(CMAKE_C_COMPILER ${CLANG_EXECUTABLE})
@@ -14,10 +14,12 @@ find_program(CLANG_EXECUTABLE clang)
 PROJECT(app)
 set(CMAKE_CXX_STANDARD 14)
 
-include(CMake/url.cmake)
-include(CMake/code.cmake)
-include(CMake/define.cmake)
-include(CMake/function.cmake)
+message(${PROJECT_SOURCE_DIR})
+message(${CMAKE_CURRENT_SOURCE_DIR})
+include(${PROJECT_SOURCE_DIR}/CMake/url.cmake)
+include(${PROJECT_SOURCE_DIR}/CMake/code.cmake)
+include(${PROJECT_SOURCE_DIR}/CMake/define.cmake)
+include(${PROJECT_SOURCE_DIR}/CMake/function.cmake)
 
 
 find_program(CCACHE_PROGRAM ccache)
@@ -41,6 +43,7 @@ if (WIN32)
         set(asm_file ${ContextPath}/context.S)
     endif ()
 else ()
+    add_compile_options("-Wa,--noexecstack")
     SET(asm_file ${ContextPath}/context.S)
 endif ()
 
@@ -49,11 +52,12 @@ endif ()
 #第三方库包含
 
 
-include_directories(Libs/protobuf/src)
-include_directories(Libs/asio/include)
-include_directories(Libs/fmt/include)
-include_directories(Libs/lua5.4.6/src)
+include_directories(${PROJECT_SOURCE_DIR}/Libs/protobuf/src)
+include_directories(${PROJECT_SOURCE_DIR}/Libs/asio/include)
+include_directories(${PROJECT_SOURCE_DIR}/Libs/fmt/include)
+include_directories(${PROJECT_SOURCE_DIR}/Libs/lua5.4.6/src)
 
+#include_directories(Libs/vld/include)
 #公共组件
 include_directories(${PROJECT_SOURCE_DIR}/Gen)
 include_directories(${PROJECT_SOURCE_DIR}/Robot)
@@ -68,11 +72,16 @@ include_directories(${PROJECT_SOURCE_DIR}/Common/Lua/Src)
 
 
 if (__ENABLE_OPEN_SSL__)
-    include_directories(Libs/openssl/include)
+    include_directories(${PROJECT_SOURCE_DIR}/Libs/openssl/include)
 endif ()
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/lua5.4.6 ${PROJECT_SOURCE_DIR}/Libs/bin/lua)
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/protobuf/cmake ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf)
+
+if (__ENABLE_LEVEL_DB__)
+    include_directories(${PROJECT_SOURCE_DIR}/Libs/leveldb/include)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/leveldb ${PROJECT_SOURCE_DIR}/Libs/bin/leveldb)
+endif ()
 
 file(GLOB_RECURSE src_proto "Gen/*.cpp" "Gen/*.cc")
 file(GLOB_RECURSE src_common "Common/*.cpp" "Common/*.c")
@@ -81,6 +90,7 @@ file(GLOB_RECURSE src_client "Robot/*.c" "Robot/*.cpp")
 
 list(APPEND build_files ${asm_file} ${src_common})
 list(APPEND build_files ${src_proto} ${src_server} ${src_client})
+
 
 if (MSVC) #创建vs目录
 
@@ -109,20 +119,27 @@ if (MSVC) #创建vs目录
     endforeach ()
 endif ()
 
+
 ADD_EXECUTABLE(app ${build_files})
+include(${PROJECT_SOURCE_DIR}/CMake/3rd.cmake)
 
-include(CMake/3rd.cmake)
-
-if (__MEMOEY_CHECK__)
-    target_link_options(app PRIVATE -fsanitize=address)
-    target_compile_options(app PRIVATE -fsanitize=address)
-endif ()
 
 
 if (WIN32)
     if (MSVC)
-        target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/lua/Debug/lua.lib)
-        target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/Debug/libprotobufd.lib)
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+            target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/lua/Debug/lua.lib)
+            #target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/vld/lib/Win64/vld.lib)
+            target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/Debug/libprotobufd.lib)
+            if (__ENABLE_LEVEL_DB__)
+                target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/leveldb/Debug/leveldb.lib)
+            endif ()
+        else ()
+            target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/lua/Release/lua.lib)
+            target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/Release/libprotobuf.lib)
+
+        endif ()
+
         if (__ENABLE_OPEN_SSL__)
             target_link_libraries(app Crypt32)
             target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/lib/libssl.lib)
@@ -135,6 +152,7 @@ if (WIN32)
         #target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/libprotobufd.dll)
     endif ()
 elseif (APPLE)
+    include(${PROJECT_SOURCE_DIR}/CMake/ascan.cmake)
     target_link_libraries(app ${CMAKE_THREAD_LIBS_INIT})
 
     if (__ENABLE_OPEN_SSL__)
@@ -144,6 +162,7 @@ elseif (APPLE)
     target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/lua/liblua.a)
     target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/libprotobufd.a)
 elseif (UNIX)
+    include(${PROJECT_SOURCE_DIR}/CMake/ascan.cmake)
     target_link_libraries(app pthread dl)
     if (__ENABLE_OPEN_SSL__)
         message("链接openssl库")

@@ -1,7 +1,7 @@
 {
     "redis": {
         "ping": 5,
-        "count": 1,
+        "count": 5,
         "retry" : 5,
         "debug": false,
         "address": [
@@ -12,13 +12,13 @@
     },
     "mysql": {
         "ping": 5,
-        "count": 1,
+        "count": 5,
         "retry" : 3,
         "debug" : false,
         "address" : [
-            "mysql://${db}:3306/yjz?user=root&password=199595yjz."
+            "mysql://${db}:3306/yy?user=yjz&password=199595yjz."
         ],
-        "script": "${WORK_DIR}/sql/mysql.sql",
+        "table": "${WORK_DIR}/sql/mysql",
         "explain" : {
             "open" : false,
             "command" : [
@@ -29,13 +29,13 @@
     },
     "pgsql": {
         "ping": 5,
-        "count": 1,
+        "count": 5,
         "retry" : 3,
         "debug" : false,
         "address" : [
             "pgsql://${db}:5432/yjz?user=postgres&password=199595yjz."
         ],
-        "script": "${WORK_DIR}/sql/pgsql.sql",
+        "table": "${WORK_DIR}/sql/pgsql",
         "explain" : {
             "open" : false,
             "command" : [
@@ -47,11 +47,11 @@
 
     "mongo": {
         "ping": 5,
-        "count": 1,
+        "count": 5,
         "retry" : 3,
         "debug": false,
         "address" : [
-            "mongodb://${db}:27017/yjz?mechanism=SCRAM-SHA-1"
+            "mongodb://${db}:27017/yjz?mechanism=SCRAM-SHA-1&user=root&password=199595yjz."
         ],
         "log": "${WORK_DIR}/mongo",
         "explain" : {
@@ -65,8 +65,12 @@
         }
     },
     "sqlite": {
-        "db": "yy",
-        "dir": "${WORK_DIR}/sqlite",
-        "script": "${WORK_DIR}/sql/sqlite.sql"
+        "mode" : "rwc",
+        "file": "sqlite.db",
+        "table": "${WORK_DIR}/sql/sqlite"
+    },
+    "ms" : {
+        "address" : "http://127.0.0.1:7700",
+        "key" : "gLmca2qwEVAFgfRsF3wt9KPHAofcsgE4jL6N_k4VWZs"
     }
 }

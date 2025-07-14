@@ -10,16 +10,18 @@ namespace http
 	Client::Client(Component* httpComponent, Asio::Context & io)
 			: tcp::Client(0), mComponent(httpComponent), mMainContext(io)
 	{
+		this->mSockId = 0;
 	}
 
 	Client::Client(http::Client::Component* component, tcp::Socket* socket, Asio::Context& io)
 			: tcp::Client(0), mComponent(component), mMainContext(io)
 	{
+		this->mSockId = 0;
 		this->SetSocket(socket);
 	}
 
-	void Client::Do(std::unique_ptr<http::Request> request,
-			std::unique_ptr<http::Response> response, int taskId)
+	void Client::Do(std::unique_ptr<http::Request>& request,
+			std::unique_ptr<http::Response>& response, int taskId)
 	{
 		this->mSockId = taskId;
 		this->mRequest = std::move(request);
@@ -106,7 +108,7 @@ namespace http
 //				this->Connect(3);
 //				return;
 //			}
-			this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
+			this->OnComplete(HttpStatus::SERVICE_UNAVAILABLE);
 		}
 		else
 		{
@@ -121,7 +123,10 @@ namespace http
 
 	void Client::OnSendMessage(size_t size)
 	{
-		this->ReadLine(this->mRequest->Timeout());
+		if(this->mSocket->IsActive())
+		{
+			this->ReadLine(this->mRequest->Timeout());
+		}
 	}
 
 	void Client::OnSendMessage(const asio::error_code &code)
@@ -131,7 +136,7 @@ namespace http
 
 	void Client::OnComplete(HttpStatus code)
 	{
-		if (this->mRequest == nullptr || this->mResponse == nullptr)
+		if(!this->mSocket->IsActive())
 		{
 			return;
 		}
@@ -150,13 +155,12 @@ namespace http
 		http::Request* request = this->mRequest.release();
 		http::Response* response = this->mResponse.release();
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnMessage(request, response);
+		this->mComponent->OnMessage(this->mSockId, request, response);
 #else
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
 		asio::post(this->mMainContext, [this, self, request, response]
 		{
 			this->mComponent->OnMessage(this->mSockId, request, response);
-			delete request;
 		});
 #endif
 	}
@@ -177,8 +181,11 @@ namespace http
 
 	void Client::OnReceiveLine(std::istream &is, size_t size)
 	{
-		asio::error_code code;
-		this->OnReceiveMessage(is, size, code);
+		if(this->mSocket->IsActive())
+		{
+			asio::error_code code;
+			this->OnReceiveMessage(is, size, code);
+		}
 	}
 
 	void Client::OnReceiveMessage(std::istream &is, size_t size, const Asio::Code &)

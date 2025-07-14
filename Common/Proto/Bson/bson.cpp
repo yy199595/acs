@@ -4,11 +4,11 @@
 
 using namespace std;
 
-namespace _bson
-{
+#define q(x)
 
-	namespace iter
-	{
+namespace _bson {
+
+	namespace iter {
 		// values herein represent size of the element of the corresponding type.
 		// if >= 0x80, size is in the next dword + the value herein & 0x7f
 		// 0xff = fall back to full code in BSONElement::_size()
@@ -53,52 +53,49 @@ namespace _bson
 
 		// helper function to skip over the BSON element's value and thus find the next
 		// element's start.
-		const char* skipValue(const char* elem, const char* valueStart)
-		{
-			const char* p = valueStart;
+		const char * skipValue(const char *elem, const char *valueStart) {
+			const char *p = valueStart;
 			unsigned char type = (unsigned char)*elem;
 			unsigned z = sizeForBsonType[type];
-			if (z < 0x80)
-			{
+			q(log() << "skipping ahead z:" << z << " type:" << (unsigned)type << endl;)
+			if (z < 0x80) {
 				p += z;
+				q(log() << "simple advance of " << z << endl;);
+				q(log() << "next will be:" << (p  1) << '\n' << endl;);
 			}
-			else
-			{
-				if (z == 0xff)
-				{
+			else {
+				if (z == 0xff) {
+					q(log() << "backcompat" << endl;);
 					bsonelement e(elem);
 					p += e.size();
 				}
-				else
-				{
-					int len = *((int*)p);
+				else {
+					int len = *((int *)p);
 					int extra = (z & 0x7f);
 					len += extra;
+					q(log() << "will skip:" << len << " extra was:" << extra << endl;)
 					p += len;
 				}
+				q(if (*p) log() << "next will be:" << (p  1) << '\n' << endl;)
 			}
 			return p;
 		}
 	}
 
-	int bsonelement::_valuesize() const
-	{
+	int bsonelement::_valuesize() const {
 		unsigned char tp = (unsigned char)type();
-		unsigned z = iter::sizeForBsonType[tp];
+		unsigned z = iter::sizeForBsonType[tp ];
 		unsigned sz = 0;
-		if (z < 0x80)
-		{
+		if (z < 0x80) {
 			sz += z;
 		}
-		else
-		{
-			if (z == 0xff)
-			{
+		else {
+			if (z == 0xff) {
+				q(log() << "backcompat" << endl;);
 				sz += sizeOld() - fieldNameSize() - 1;
 			}
-			else
-			{
-				int len = *((int*)value());
+			else {
+				int len = *((int *)value());
 				int extra = (z & 0x7f);
 				len += extra;
 				sz += len;
@@ -107,15 +104,13 @@ namespace _bson
 		return sz;
 	}
 
-	bsonobjiterator bsonobjbuilder::iterator() const
-	{
-		const char* s = _b.buf() + _offset;
-		const char* e = _b.buf() + _b.len();
+	bsonobjiterator bsonobjbuilder::iterator() const {
+		const char * s = _b.buf() + _offset;
+		const char * e = _b.buf() + _b.len();
 		return bsonobjiterator(s, e);
 	}
 
-	int bsonelement::size() const
-	{
+	int bsonelement::size() const {
 		if (totalSize >= 0)
 			return totalSize;
 		int x = _valuesize();
@@ -123,14 +118,12 @@ namespace _bson
 		return totalSize;
 	}
 
-	int bsonelement::sizeOld() const
-	{
+	int bsonelement::sizeOld() const {
 		if (totalSize >= 0)
 			return totalSize;
 
 		int x = 0;
-		switch (type())
-		{
+		switch (type()) {
 			case EOO:
 			case Undefined:
 			case jstNULL:
@@ -170,7 +163,7 @@ namespace _bson
 				break;
 			case RegEx:
 			{
-				const char* p = value();
+				const char *p = value();
 				size_t len1 = strlen(p);
 				p = p + len1 + 1;
 				size_t len2;
@@ -191,32 +184,37 @@ namespace _bson
 		return totalSize;
 	}
 
-	bsonelement bsonobj::getField(const StringData& name) const
-	{
-		const char* _name = name.begin();
+	bsonelement bsonobj::getField(const StringData& name) const {
+		const char *_name = name.begin();
 		unsigned name_sz = (unsigned)name.size();
-		const char* p = objdata();
+		q(log() << _name << ' ' << name_sz << endl;);
+		const char *p = objdata();
 		int sz = objsize();
-		const char* end = p + sz - 1;
+		q(log() << sz << endl);
+		const char *end = p + sz - 1;
 		p += 4;
-		while (true)
-		{
-			const char* elem = p;
-			const char* nul = ++p + name_sz;
-			if (nul >= end)
-			{
+		while (true) {
+			const char *elem = p;
+			const char *nul = ++p + name_sz;
+			q(log() << "type " << (int)*elem << endl;)
+			if (nul >= end) {
+				q(log() << "end" << endl;)
 				break;
 
 			}
-			if (*nul == 0)
-			{
-				if (memcmp(_name, p, name_sz) == 0)
-				{
-					return bsonelement(name_sz + 1, elem);
+			if (*nul == 0) {
+				// potential match
+				q(log() << "memcmp check " << *p << endl;)
+				if (memcmp(_name, p, name_sz) == 0) {
+					q(log() << "match!" << endl;)
+					bsonelement e = bsonelement(name_sz + 1, elem);
+					q(log() << e.toString() << endl;)
+					return e;
 				}
 			}
-			while (true)
-			{
+			// else, mismatch.  skip to next
+			q(log() << "skip ahead:" << p << endl;)
+			while (true) {
 				if ((*p++ == 0))   // both the loop unwinding here, and the use of
 					break;                          // unlikely(), made a measurable difference in a
 				if ((*p++ == 0))   // quick ad hoc test (gcc 4.2.1)
@@ -225,12 +223,13 @@ namespace _bson
 			}
 			// skip the item's data
 			p = iter::skipValue(elem, p);
-			if (*p == 0)
-			{
+			if (*p == 0) {
+				q(log() << "*p==EOO" << endl;)
 				break;
 			}
 
 		}
+		q(log() << "returning BSONElement() (mismatch)" << endl;)
 		return bsonelement();
 	}
 
@@ -247,10 +246,7 @@ namespace _bson
 			"90", "91", "92", "93", "94", "95", "96", "97", "98", "99",
 	};
 
-	std::string OID::str() const
-	{
-		return toHexLower(data, kOIDSize);
-	}
+	std::string OID::str() const { return toHexLower(data, kOIDSize); }
 
 	// This is to ensure that bsonobjbuilder doesn't try to use numStrs before the strings have been constructed
 	// I've tested just making numStrs a char[][], but the overhead of constructing the strings each time was too high
@@ -258,23 +254,19 @@ namespace _bson
 	bool bsonobjbuilder::numStrsReady = (numStrs[0].size() > 0);
 
 	// wrap this element up as a singleton object.
-	bsonobj bsonelement::wrap() const
-	{
+	bsonobj bsonelement::wrap() const {
 		bsonobjbuilder b(size() + 6);
 		b.append(*this);
 		return b.obj();
 	}
 
-	bsonobj bsonelement::wrap(const StringData& newName) const
-	{
+	bsonobj bsonelement::wrap(const StringData& newName) const {
 		bsonobjbuilder b(size() + 6 + newName.size());
 		b.appendAs(*this, newName);
 		return b.obj();
 	}
-
 	/* add all the fields from the object specified to this object */
-	bsonobjbuilder& bsonobjbuilder::appendElements(bsonobj x)
-	{
+	bsonobjbuilder& bsonobjbuilder::appendElements(bsonobj x) {
 		if (!x.isEmpty())
 			_b.appendBuf(
 					x.objdata() + 4,   // skip over leading length
@@ -282,21 +274,16 @@ namespace _bson
 		return *this;
 	}
 
-	std::string bsonelement::toString(bool includeFieldName, bool full) const
-	{
+	std::string bsonelement::toString(bool includeFieldName, bool full) const {
 		StringBuilder s;
 		toString(s, includeFieldName, full);
 		return s.str();
 	}
+	void bsonelement::toString(StringBuilder& s, bool includeFieldName, bool full, int depth) const {
 
-	void bsonelement::toString(StringBuilder& s, bool includeFieldName, bool full, int depth) const
-	{
-
-		if (depth > bsonobj::maxToStringRecursionDepth)
-		{
+		if (depth > bsonobj::maxToStringRecursionDepth) {
 			// check if we want the full/complete string
-			if (full)
-			{
+			if (full) {
 				StringBuilder s;
 				s << "Reached maximum recursion depth of ";
 				s << bsonobj::maxToStringRecursionDepth;
@@ -307,9 +294,8 @@ namespace _bson
 		}
 
 		if (includeFieldName && type() != EOO)
-			s << "\"" << fieldName() << "\"" << ": ";
-		switch (type())
-		{
+			s << fieldName() << ": ";
+		switch (type()) {
 			case EOO:
 				//  ??
 				s << "EOO";
@@ -320,10 +306,9 @@ namespace _bson
 				s << (long long)date();
 				s << '}';
 				break;
-			case RegEx:
-			{
+			case RegEx: {
 				s << "/" << regex() << '/';
-				const char* p = regexFlags();
+				const char *p = regexFlags();
 				if (p) s << p;
 			}
 				break;
@@ -362,26 +347,22 @@ namespace _bson
 				  << codeWScopeCode() << ", " << codeWScopeObject().toString(false, full) << ")";
 				break;
 			case Code:
-				if (!full && valuestrsize() > 80)
-				{
+				if (!full &&  valuestrsize() > 80) {
 					s.write(valuestr(), 70);
 					s << "...";
 				}
-				else
-				{
+				else {
 					s.write(valuestr(), valuestrsize() - 1);
 				}
 				break;
 			case Symbol:
 			case _bson::String:
 				s << '"';
-				if (!full && valuestrsize() > 160)
-				{
+				if (!full &&  valuestrsize() > 160) {
 					s.write(valuestr(), 150);
 					s << "...\"";
 				}
-				else
-				{
+				else {
 					s.write(valuestr(), valuestrsize() - 1);
 					s << '"';
 				}
@@ -389,7 +370,7 @@ namespace _bson
 			case DBRef:
 				s << "DBRef('" << valuestr() << "',";
 				{
-					_bson::OID* x = (_bson::OID*)(valuestr() + valuestrsize());
+					_bson::OID *x = (_bson::OID *) (valuestr() + valuestrsize());
 					s << x->toString() << ')';
 				}
 				break;
@@ -401,13 +382,11 @@ namespace _bson
 				s << "BinData(" << binDataType() << ", ";
 				{
 					int len;
-					const char* data = binDataClean(len);
-					if (!full && len > 80)
-					{
+					const char *data = binDataClean(len);
+					if (!full && len > 80) {
 						s << toHex(data, 70) << "...)";
 					}
-					else
-					{
+					else {
 						s << toHex(data, len) << ")";
 					}
 				}
@@ -424,14 +403,11 @@ namespace _bson
 	/* return has eoo() true if no match
 	supports "." notation to reach into embedded objects
 	*/
-	bsonelement bsonobj::getFieldDotted(const StringData& name) const
-	{
+	bsonelement bsonobj::getFieldDotted(const StringData& name) const {
 		bsonelement e = getField(name);
-		if (e.eoo())
-		{
+		if (e.eoo()) {
 			size_t dot_offset = name.find('.');
-			if (dot_offset != std::string::npos)
-			{
+			if (dot_offset != std::string::npos) {
 				StringData left = name.substr(0, dot_offset);
 				StringData right = name.substr(dot_offset + 1);
 				bsonobj sub = getObjectField(left);
@@ -442,10 +418,8 @@ namespace _bson
 		return e;
 	}
 
-	void bsonobj::toString(StringBuilder& s, bool isArray, bool full, int depth) const
-	{
-		if (isEmpty())
-		{
+	void bsonobj::toString(StringBuilder& s, bool isArray, bool full, int depth) const {
+		if (isEmpty()) {
 			s << (isArray ? "[]" : "{}");
 			return;
 		}
@@ -453,8 +427,7 @@ namespace _bson
 		s << (isArray ? "[ " : "{ ");
 		bsonobjiterator i(*this);
 		bool first = true;
-		while (true)
-		{
+		while (true) {
 			massert(10327, "Object does not end with EOO", i.moreWithEOO());
 			bsonelement e = i.next(true);
 			massert(10328, "Invalid element size", e.size() > 0);
@@ -463,8 +436,7 @@ namespace _bson
 			massert(10330, "Element extends past end of object",
 					e.size() + offset <= this->objsize());
 			bool end = (e.size() + offset == this->objsize());
-			if (e.eoo())
-			{
+			if (e.eoo()) {
 				massert(10331, "EOO Before end of object", end);
 				break;
 			}
@@ -478,16 +450,14 @@ namespace _bson
 	}
 
 	// version with bound checking (maxLen param)
-	int bsonelement::size(int maxLen) const
-	{
+	int bsonelement::size(int maxLen) const {
 		if (totalSize >= 0)
 			return totalSize;
 
 		int remain = maxLen - fieldNameSize() - 1;
 
 		int x = 0;
-		switch (type())
-		{
+		switch (type()) {
 			case EOO:
 			case Undefined:
 			case jstNULL:
@@ -533,17 +503,15 @@ namespace _bson
 				massert(10317, "Insufficient bytes to calculate element size", maxLen == -1 || remain > 3);
 				x = valuestrsize() + 4 + 1/*subtype*/;
 				break;
-			case RegEx:
-			{
-				const char* p = value();
+			case RegEx: {
+				const char *p = value();
 				size_t len1 = (maxLen == -1) ? strlen(p) : (size_t)strnlen(p, remain);
 				//massert( 10318 ,  "Invalid regex string", len1 != -1 ); // ERH - 4/28/10 - don't think this does anything
 				p = p + len1 + 1;
 				size_t len2;
 				if (maxLen == -1)
 					len2 = strlen(p);
-				else
-				{
+				else {
 					size_t x = remain - len1 - 1;
 					verify(x <= 0x7fffffff);
 					len2 = strnlen(p, (int)x);
@@ -552,8 +520,7 @@ namespace _bson
 				x = (int)(len1 + 1 + len2 + 1);
 			}
 				break;
-			default:
-			{
+			default: {
 				StringBuilder ss;
 				ss << "bsonelement: bad type " << (int)type();
 				std::string msg = ss.str();
@@ -565,8 +532,7 @@ namespace _bson
 		return totalSize;
 	}
 
-	bsonobjbuilder& bsonobjbuilder::appendElementsUnique(bsonobj x)
-	{
+	bsonobjbuilder& bsonobjbuilder::appendElementsUnique(bsonobj x) {
 		std::set<std::string> have;
 		{
 			bsonobjiterator i = iterator();
@@ -575,8 +541,7 @@ namespace _bson
 		}
 
 		bsonobjiterator it(x);
-		while (it.more())
-		{
+		while (it.more()) {
 			bsonelement e = it.next();
 			if (have.count(e.fieldName()))
 				continue;
@@ -588,19 +553,17 @@ namespace _bson
 	/* must be same type when called, unless both sides are #s
 	this large function is in header to facilitate inline-only use of bson
 	*/
-	inline int compareElementValues(const bsonelement& l, const bsonelement& r)
-	{
+	inline int compareElementValues(const bsonelement& l, const bsonelement& r) {
 		int f;
 
-		switch (l.type())
-		{
+		switch (l.type()) {
 			case EOO:
 			case Undefined: // EOO and Undefined are same canonicalType
 			case jstNULL:
 			case MaxKey:
 			case MinKey:
 				f = l.canonicalType() - r.canonicalType();
-				if (f < 0) return -1;
+				if (f<0) return -1;
 				return f == 0 ? 0 : 1;
 			case Bool:
 				return *l.value() - *r.value();
@@ -618,8 +581,7 @@ namespace _bson
 				return a == b ? 0 : 1;
 			}
 			case NumberLong:
-				if (r.type() == NumberLong)
-				{
+				if (r.type() == NumberLong) {
 					long long L = l._numberLong();
 					long long R = r._numberLong();
 					if (L < R) return -1;
@@ -628,8 +590,7 @@ namespace _bson
 				}
 				goto dodouble;
 			case NumberInt:
-				if (r.type() == NumberInt)
-				{
+				if (r.type() == NumberInt) {
 					int L = l._numberInt();
 					int R = r._numberInt();
 					if (L < R) return -1;
@@ -669,29 +630,25 @@ namespace _bson
 			case Object:
 			case Array:
 				return l.object().woCompare(r.object());
-			case DBRef:
-			{
+			case DBRef: {
 				int lsz = l.valuesize();
 				int rsz = r.valuesize();
 				if (lsz - rsz != 0) return lsz - rsz;
 				return memcmp(l.value(), r.value(), lsz);
 			}
-			case BinData:
-			{
+			case BinData: {
 				int lsz = l.objsize(); // our bin data size in bytes, not including the subtype byte
 				int rsz = r.objsize();
 				if (lsz - rsz != 0) return lsz - rsz;
 				return memcmp(l.value() + 4, r.value() + 4, lsz + 1 /*+1 for subtype byte*/);
 			}
-			case RegEx:
-			{
+			case RegEx: {
 				int c = strcmp(l.regex(), r.regex());
 				if (c)
 					return c;
 				return strcmp(l.regexFlags(), r.regexFlags());
 			}
-			case CodeWScope:
-			{
+			case CodeWScope: {
 				f = l.canonicalType() - r.canonicalType();
 				if (f)
 					return f;

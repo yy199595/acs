@@ -27,7 +27,7 @@ namespace acs
 				break;
 			}
 			message->SetSockId(id);
-			code = routerComponent->Send(id, std::move(message));
+			code = routerComponent->Send(id, message);
 		}
 		while(false);
 		lua_pushinteger(L, code);
@@ -54,7 +54,7 @@ namespace acs
 				break;
 			}
 			message->SetSockId(id);
-			return routerComponent->LuaCall(L, id, std::move(message));
+			return routerComponent->LuaCall(L, id, message);
 		}
 		while(false);
 		lua_pushinteger(L, code);

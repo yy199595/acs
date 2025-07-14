@@ -20,10 +20,11 @@ namespace acs
 		int Shutdown();
 		int LoadConfig();
 		int Ping(long long id);
-		int Add(const rpc::Message& request); //新服务器加入
-        int Del(const rpc::Message& request); //服务器退出
-        int RunInfo(com::type::json & response); // 获取运行信息
 		int Find(const rpc::Message & request); //查找新加入的节点
+		int RunInfo(json::w::Document & response); // 获取运行信息
+	private:
+		int Del(const rpc::Message & request); //服务器退出
+		int Add(const json::r::Document & request); //新服务器加入
 	private:
 		bool OnInit() final;
 	private:

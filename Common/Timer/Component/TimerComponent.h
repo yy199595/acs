@@ -14,10 +14,10 @@ namespace acs
 	 public:
 		bool CancelTimer(long long id);
 
-		long long DelayCall(int ms, std::function<void(void)> && callback);
+		long long Timeout(unsigned int ms, std::function<void(void)> && callback);
 
 		template<typename F, typename O, typename ... Args>
-		long long DelayCall(int ms, F&& f, O* o, Args&& ... args)
+		long long Timeout(unsigned int ms, F&& f, O* o, Args&& ... args)
 		{
 			std::unique_ptr<StaticMethod> methodProxy = NewMethodProxy(
 				std::forward<F>(f), o, std::forward<Args>(args)...);

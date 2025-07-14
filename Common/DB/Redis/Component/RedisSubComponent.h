@@ -20,7 +20,7 @@ namespace acs
 	public:
 		bool Sub(const std::string & chanel);
 		bool UnSub(const std::string & chanel);
-		void Send(std::unique_ptr<redis::Request> request, int & rpcId);
+		void Send(std::unique_ptr<redis::Request>& request, int & rpcId);
 	private:
 		bool Awake() final;
 		bool LateAwake() final;

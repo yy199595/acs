@@ -10,7 +10,7 @@
 #include "Server/Config/ServerConfig.h"
 #include "Util/File/DirectoryHelper.h"
 #include "Util/File/FileHelper.h"
-#include "Oss/Component/OssComponent.h"
+#include "AliCloud/Component/AliOssComponent.h"
 #include "Async/Component/CoroutineComponent.h"
 #include "Mongo/Component/MongoDBComponent.h"
 #include "Util/Tools/TimeHelper.h"
@@ -53,7 +53,7 @@ namespace acs
 		{
 			return XCode::Failure;
 		}
-		OssComponent* oss = this->GetComponent<OssComponent>();
+		AliOssComponent* oss = this->GetComponent<AliOssComponent>();
 		if (oss == nullptr)
 		{
 			return XCode::Failure;
@@ -81,14 +81,34 @@ namespace acs
 	int MongoBackup::Backup(const http::FromContent& request, json::w::Document& response)
 	{
 		std::string name;
-		LOG_ERROR_CHECK_ARGS(request.Get("name", name))
+		if(!request.Get("name", name))
+		{
+			name = help::Time::GetYearMonthDayString();
+		}
 		std::string dir = fmt::format("{}/{}", this->mConfig.path, name);
 		if(!help::dir::DirectorIsExist(dir))
 		{
 			help::dir::MakeDir(dir);
 		}
-		unsigned int doneCount = 0;
 		long long t1 = help::Time::NowMil();
+#ifdef __OS_LINUX__
+		std::string uri;
+		if(!this->mMongo->FormatUri(uri))
+		{
+			return XCode::Failure;
+		}
+		//mongodump --uri=mongodb://127.0.0.1:27017/yjz --out=./backup
+		std::string cmd = fmt::format("mongodump --uri={} --out={}", uri, dir);
+		{
+			std::list<std::string> output;
+			if(!os::System::Run(cmd, output))
+			{
+				return XCode::Failure;
+			}
+			response.Add("result", output);
+		}
+#else
+		unsigned int doneCount = 0;
 		std::unique_ptr<json::w::Value> jsonValue = response.AddObject("data");
 		for(const std::string & tab : this->mConfig.collections)
 		{
@@ -101,16 +121,16 @@ namespace acs
 			}
 			unsigned int count = 0;
 			std::string jsonString;
-			std::unique_ptr<bson::Reader::Document> document1;
+			std::unique_ptr<bson::r::Document> document1;
 			std::unique_ptr<mongo::Request> mongoRequest = std::make_unique<mongo::Request>();
 			{
-				bson::Writer::Document document;
+				bson::w::Document document;
 				mongoRequest->GetCollection("find", tab);
 			}
-			std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
+			std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(mongoRequest);
 			while(mongoResponse != nullptr && !mongoResponse->IsEmpty())
 			{
-				for (const std::string& json: mongoResponse->GetResults())
+				for (const std::string& json: mongoResponse->result)
 				{
 					count++;
 					doneCount++;
@@ -130,12 +150,12 @@ namespace acs
 						mongoRequest->document.Add("batchSize", this->mConfig.batchSize);
 					}
 				}
-				mongoResponse = this->mMongo->Run(std::move(mongoRequest));
+				mongoResponse = this->mMongo->Run(mongoRequest);
 			}
 			jsonValue->Add(tab.c_str(), count);
 			ofs.close();
 		}
-
+#endif
 		long long t2 = help::Time::NowMil();
 		Asio::Context & main = this->mApp->GetContext();
 		std::string zipPath = fmt::format("{}/{}.zip", this->mConfig.path, name);
@@ -155,11 +175,9 @@ namespace acs
 		long long t3 = help::Time::NowMil();
 		std::unique_ptr<json::w::Value> timeObject = response.AddObject("time");
 		{
-			timeObject->Add("pull", fmt::format("{}ms", t2 - t1));
+			timeObject->Add("backup", fmt::format("{}ms", t2 - t1));
 			timeObject->Add("zip", fmt::format("{}ms", t3 - t2));
 		}
-		LOG_INFO("压缩时间 [{}ms]", t3 - t2);
-		LOG_INFO("[{:.2f}s]备份数据成功 => {}", (t2 - t1) / 1000.0f, doneCount)
 		return XCode::Ok;
 	}
 
@@ -174,7 +192,7 @@ namespace acs
 		std::string zipPath = fmt::format("{}/{}.zip", this->mConfig.path, name);
 		if(!help::fs::FileIsExist(zipPath))
 		{
-			OssComponent* oss = this->GetComponent<OssComponent>();
+			AliOssComponent* oss = this->GetComponent<AliOssComponent>();
 			if(oss == nullptr)
 			{
 				return XCode::Failure;
@@ -202,23 +220,23 @@ namespace acs
 				{
 					std::unique_ptr<mongo::Request> mongoRequest = std::make_unique<mongo::Request>();
 					{
-						bson::Writer::Array documents;
+						bson::w::Document documents(false);
 						for (size_t x = index; x < index + 100 && x < fileLines.size(); x++)
 						{
-							bson::Writer::Document document;
+							bson::w::Document document;
 							if (!document.FromByJson(fileLines[x]))
 							{
 								return XCode::Failure;
 							}
-							documents.Add(document);
+							documents.Push(document);
 						}
 						mongoRequest->GetCollection("insert", targetTable).Insert(documents);
 					}
-					std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
+					std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(mongoRequest);
 					if (mongoResponse)
 					{
 						int count = 0;
-						if (mongoResponse->Document().Get("n", count))
+						if (mongoResponse->document.Get("n", count))
 						{
 							sumCount += count;
 						}

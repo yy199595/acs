@@ -6,34 +6,26 @@
 #include "Lua/Lib/Lib.h"
 #include "Entity/Actor/App.h"
 #include "PgsqlDBComponent.h"
-#include "Util/File/FileHelper.h"
+
 #include "Server/Config/CodeConfig.h"
 #include "Server/Config/ServerConfig.h"
+#include "Util/File/DirectoryHelper.h"
 #include "Server/Component/ThreadComponent.h"
 
 #include "Timer/Timer/ElapsedTimer.h"
 #include "Log/Component/LoggerComponent.h"
-
+#include "DB/Common/SqlFactory.h"
+#include "Util/Tools/String.h"
 namespace acs
 {
 	PgsqlDBComponent::PgsqlDBComponent()
 	{
 		this->mSumCount = 0;
 		this->mRetryCount = 0;
-		this->mThread = nullptr;
 		this->mConfig.count = 1;
 		this->mConfig.debug = false;
-
-		REGISTER_JSON_CLASS_FIELD(db::Explain, open);
-		REGISTER_JSON_CLASS_FIELD(db::Explain, command);
-		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, ping);
-		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, count);
-		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, retry);
-		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, debug);
-		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, script);
-		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, explain);
-		REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, conn_count);
-		REGISTER_JSON_CLASS_MUST_FIELD(pgsql::Cluster, address);
+		db::Explain::RegisterFields();
+		pgsql::Cluster::RegisterFields();
 	}
 
 	bool PgsqlDBComponent::Awake()
@@ -43,11 +35,6 @@ namespace acs
 			ccModule.Open("db.pgsql", lua::lib::luaopen_lpgsqldb);
 		});
 		LOG_CHECK_RET_FALSE(ServerConfig::Inst()->Get("pgsql", this->mConfig))
-		if(!this->mConfig.script.empty())
-		{
-			std::string path = this->mConfig.script;
-			return help::fs::ReadTxtFile(path, this->mConfig.script);
-		}
 		return true;
 	}
 
@@ -67,7 +54,7 @@ namespace acs
 				}
 				this->mRetryCount++;
 				int id = (x + 1) * 100 + index + 1;
-				config.script = this->mConfig.script;
+				config.table = this->mConfig.table;
 				config.conn_count = this->mConfig.conn_count;
 				Asio::Context& main = this->mApp->GetContext();
 				tcp::Socket* tcpSocket = this->GetComponent<ThreadComponent>()->CreateSocket(config.address);
@@ -81,7 +68,8 @@ namespace acs
 						return false;
 					}
 					this->mClients.emplace(id, client);
-					LOG_INFO("[{}ms] connect {} ok", timer1.GetMs(), address);
+					const pgsql::ServerInfo & info = client->GetInfo();
+					LOG_INFO("[{}ms] ({}) connect {} ok", timer1.GetMs(), info.serverVersion, address);
 				}
 			}
 		}
@@ -90,10 +78,195 @@ namespace acs
 
 	void PgsqlDBComponent::OnStart()
 	{
-		if(!this->mConfig.script.empty())
+		this->InitDataBase();
+	}
+
+	bool PgsqlDBComponent::InitDataBase()
+	{
+		std::vector<std::string> filePaths;
+		const std::string& dir = this->mConfig.table;
+		if (help::dir::GetFilePaths(dir, ".json", filePaths) > 0)
 		{
-			this->Run(this->mConfig.script);
+			for (const std::string& path: filePaths)
+			{
+				if(!this->mFileFactory.IsChange(path))
+				{
+					continue;
+				}
+				sql::Table mysqlTable;
+				json::r::Document document;
+				if (!this->mFileFactory.Read(path, document, mysqlTable))
+				{
+					LOG_ERROR("decode json fail => {}", path);
+					return false;
+				}
+
+				std::vector<std::string> tables;
+				tables.emplace_back(mysqlTable.name);
+				if(mysqlTable.count > 0)
+				{
+					tables.clear();
+					for (int index = 0; index < mysqlTable.count; index++)
+					{
+						int idx = index + 1;
+						tables.emplace_back(fmt::format("{}{}", mysqlTable.name, idx));
+					}
+				}
+				for (const std::string& tab: tables)
+				{
+					timer::ElapsedTimer timer1;
+					if (this->InitTable(tab, mysqlTable))
+					{
+						LOG_DEBUG("[{}ms] init pgsql table [{}] ok", timer1.GetMs(), tab);
+					}
+				}
+			}
 		}
+		assert(this->mFreeClients.Size() == this->mClients.size());
+		for(auto iter = this->mClients.begin(); iter != this->mClients.end(); iter++)
+		{
+			if(!iter->second->InvokeCompileSql())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	bool PgsqlDBComponent::InitTable(const std::string& name, const sql::Table& tableInfo)
+	{
+		std::string table = name;
+		if(!tableInfo.schema.empty())
+		{
+			const std::string &schema = tableInfo.schema;
+			std::string sql = fmt::format("CREATE SCHEMA IF NOT EXISTS {}", schema);
+			std::unique_ptr<pgsql::Response> response1 = this->Run(sql);
+			if(response1 == nullptr || !response1->IsOk())
+			{
+				LOG_ERROR("[pgsql] create schema:{} fail", schema)
+				return false;
+			}
+			table = fmt::format("{}.{}", schema, name);
+		}
+		sql::Factory sqlFactory;
+		sqlFactory.GetTable("information_schema.columns");
+		if(!tableInfo.schema.empty())
+		{
+			const std::string &schema = tableInfo.schema;
+			std::string filter = fmt::format("table_schema='{}' AND table_name='{}'", schema, name);
+			sqlFactory.Select({ "column_name", "data_type"}).Filter(filter);
+		}
+		else
+		{
+			std::string filter = fmt::format("table_name='{}'", name);
+			sqlFactory.Select({ "column_name", "data_type"}).Filter(filter);
+		}
+
+		std::unique_ptr<pgsql::Response> response = this->Run(sqlFactory.ToString());
+		if (response == nullptr || !response->IsOk() || response->results.empty())
+		{
+			if(!this->CreateTable(table, tableInfo))
+			{
+				return false;
+			}
+			LOG_INFO("create mysql table [{}] ok", table);
+			return true;
+		}
+		std::unordered_map<std::string, std::string> fields;
+		for(const std::string & json : response->results)
+		{
+			json::r::Document document1;
+			if(document1.Decode(json))
+			{
+				std::string field, type;
+				document1.Get("data_type", type);
+				document1.Get("column_name", field);
+				fields.emplace(field, help::Str::Toupper(type));
+			}
+		}
+
+		for(auto iter = tableInfo.fields.begin(); iter != tableInfo.fields.end(); iter++)
+		{
+			const std::string & field = iter->first;
+			if(fields.find(field) == fields.end())
+			{
+				sqlFactory.GetTable(table);
+				const sql::Field & fieldInfo = iter->second;
+				sqlFactory.AlterColumn(field.c_str(), fieldInfo.type);
+				if(fieldInfo.notnull)
+				{
+					sqlFactory.NotNull();
+				}
+				sqlFactory.Default(fieldInfo.default_val);
+				const std::string sql = sqlFactory.ToString();
+				std::unique_ptr<pgsql::Response> pgsqlResponse = this->Run(sql);
+				if(pgsqlResponse != nullptr && pgsqlResponse->IsOk())
+				{
+					LOG_DEBUG("[{}] add column ({}) ok", table, field);
+				}
+				if(fieldInfo.index)
+				{
+					sqlFactory.GetTable(table).SetIndex(field, false);
+					const std::string sql2 = sqlFactory.ToString();
+					std::unique_ptr<pgsql::Response> mysqlResponse1 = this->Run(sql2);
+					if(mysqlResponse1 != nullptr && mysqlResponse1->IsOk())
+					{
+						LOG_DEBUG("[{}] set index ({}) ok", table, field);
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	bool PgsqlDBComponent::CreateTable(const std::string& name, const sql::Table& tableInfo)
+	{
+		sql::Factory sqlFactory;
+		json::r::Value jsonFields;
+		std::vector<std::string> indexes;
+		std::vector<std::string> primary;
+		sqlFactory.GetTable(name).Begin();
+		for (auto iter = tableInfo.fields.begin(); iter != tableInfo.fields.end(); iter++)
+		{
+			const sql::Field& fieldInfo = iter->second;
+			sqlFactory.AppendColumn(fieldInfo.name.c_str(), fieldInfo.type.c_str());
+			if (fieldInfo.notnull)
+			{
+				sqlFactory.NotNull();
+			}
+			sqlFactory.Default(fieldInfo.default_val);
+			if (fieldInfo.unique)
+			{
+				sqlFactory.Unique();
+			}
+			if (fieldInfo.index)
+			{
+				indexes.emplace_back(fieldInfo.name);
+			}
+			if (fieldInfo.primary_key)
+			{
+				primary.emplace_back(fieldInfo.name);
+			}
+			sqlFactory.Next();
+		}
+		sqlFactory.PrimaryKey(primary).End();
+		const std::string sql = sqlFactory.ToString();
+		std::unique_ptr<pgsql::Response> response = this->Run(sql);
+		if(response == nullptr || !response->IsOk())
+		{
+			return false;
+		}
+		LOG_INFO("create pgsql [{}] ok", name);
+		for(const std::string & field : indexes)
+		{
+			sqlFactory.GetTable(name).SetIndex(field, false);
+			std::unique_ptr<pgsql::Response> response = this->Run(sqlFactory.ToString());
+			if(response != nullptr && response->IsOk())
+			{
+				LOG_INFO("[{}] create pgsql index [{}] ok", name, field);
+			}
+		}
+		return true;
 	}
 
 	void PgsqlDBComponent::OnDestroy()
@@ -150,8 +323,9 @@ namespace acs
 			std::string sql("SELECT 1");
 			while (this->mFreeClients.Pop(id))
 			{
-				//CONSOLE_LOG_WARN("pgsql client:{} ping", id)
-				this->Send(id, std::make_unique<pgsql::Request>(sql));
+				std::unique_ptr<pgsql::Request> request
+					= std::make_unique<pgsql::Request>(sql);
+				this->Send(id, request);
 			}
 		}
 		if (this->mConfig.retry > 0 && tick % this->mConfig.retry == 0)
@@ -185,8 +359,11 @@ namespace acs
 
 	void PgsqlDBComponent::OnSendFailure(int id, pgsql::Request* message)
 	{
-		this->Send(std::unique_ptr<pgsql::Request>(message));
-		LOG_WARN("[{}] resend pgsql => {}", id, message->ToString())
+		std::unique_ptr<pgsql::Request> request(message);
+		LOG_WARN("[{}] resend pgsql => {}", id, request->ToString())
+		{
+			this->Send(request);
+		}
 	}
 
 	void PgsqlDBComponent::OnExplain(const std::string& sql, long long ms) noexcept
@@ -195,9 +372,9 @@ namespace acs
 		std::unique_ptr<pgsql::Response> response1 = this->Run(newSql);
 		LoggerComponent* logger = this->GetComponent<LoggerComponent>();
 		{
-			if (!response1->mResults.empty())
+			if (!response1->results.empty())
 			{
-				const std::string& result = response1->mResults.front();
+				const std::string& result = response1->results.front();
 				std::unique_ptr<custom::LogInfo> sqlLog = std::make_unique<custom::LogInfo>();
 				{
 					sqlLog->Level = custom::LogLevel::None;
@@ -211,16 +388,21 @@ namespace acs
 		}
 	}
 
-	void PgsqlDBComponent::OnMessage(int id, pgsql::Request* request, pgsql::Response* response) noexcept
+	void PgsqlDBComponent::OnMessage(int id, pgsql::Request* req, pgsql::Response* res) noexcept
 	{
 		this->mSumCount++;
 		this->AddFreeClient(id);
+		std::unique_ptr<pgsql::Request> request(req);
+		std::unique_ptr<pgsql::Response> response(res);
+
 		int rpcId = request->GetRpcId();
-		std::unique_ptr<pgsql::Response> resp(response);
-		if (!response->mError.empty())
+		if (!response->error.empty())
 		{
 			LOG_WARN("[request] {}", request->ToString());
-			LOG_WARN("[response] {}", response->mError);
+			for(const std::string & error : response->error)
+			{
+				LOG_ERROR("[response] {}", error);
+			}
 		}
 		else
 		{
@@ -231,54 +413,54 @@ namespace acs
 				{
 					long long ms = request->GetCostTime();
 					std::string sql = request->ToString();
-					this->mApp->StartCoroutine([sql, this, ms]
-					{
-						this->OnExplain(sql, ms);
-					});
+					CoroutineComponent * coroutine = acs::App::Coroutine();
+					coroutine->Start(&PgsqlDBComponent::OnExplain, this, sql, ms);
 				}
 			}
 
 			if (this->mConfig.debug)
 			{
-				LOG_DEBUG("[{}ms] ({}) {}", request->GetCostTime(), response->mResults.size(), request->ToString())
+				LOG_DEBUG("[{}ms] ({}) {}", request->GetCostTime(), response->results.size(), request->ToString())
 			}
 		}
 		if (rpcId > 0)
 		{
-			this->OnResponse(rpcId, std::move(resp));
+			this->OnResponse(rpcId, std::move(response));
 		}
 	}
 
 	std::unique_ptr<pgsql::Response> PgsqlDBComponent::Run(const std::string& sql)
 	{
-		return this->Run(std::make_unique<pgsql::Request>(sql));
+		std::unique_ptr<pgsql::Request> request
+			= std::make_unique<pgsql::Request>(sql);
+		return this->Run(request);
 	}
 
-	std::unique_ptr<pgsql::Response> PgsqlDBComponent::Run(std::unique_ptr<pgsql::Request> request)
+	std::unique_ptr<pgsql::Response> PgsqlDBComponent::Run(std::unique_ptr<pgsql::Request>& request)
 	{
 		int rpcId = 0;
-		this->Send(std::move(request), rpcId);
+		this->Send(request, rpcId);
 		return this->BuildRpcTask<PgsqlTask>(rpcId)->Await();
 	}
 
-	void PgsqlDBComponent::Send(std::unique_ptr<pgsql::Request> request)
+	void PgsqlDBComponent::Send(std::unique_ptr<pgsql::Request>& request)
 	{
 		int rpcId = 0;
-		this->Send(std::move(request), rpcId);
+		this->Send(request, rpcId);
 	}
 
 	void PgsqlDBComponent::AddFreeClient(int id)
 	{
 		if(!this->mMessages.empty())
 		{
-			this->Send(id, std::move(this->mMessages.front()));
+			this->Send(id, this->mMessages.front());
 			this->mMessages.pop();
 			return;
 		}
 		this->mFreeClients.Push(id);
 	}
 
-	void PgsqlDBComponent::Send(std::unique_ptr<pgsql::Request> request, int& rpcId)
+	void PgsqlDBComponent::Send(std::unique_ptr<pgsql::Request>& request, int& rpcId)
 	{
 		int id = 0;
 		rpcId = this->BuildRpcId();
@@ -288,15 +470,15 @@ namespace acs
 			this->mMessages.emplace(std::move(request));
 			return;
 		}
-		this->Send(id, std::move(request));
+		this->Send(id, request);
 	}
 
-	void PgsqlDBComponent::Send(int id, std::unique_ptr<pgsql::Request> request)
+	void PgsqlDBComponent::Send(int id, std::unique_ptr<pgsql::Request>& request)
 	{
 		auto iter = this->mClients.find(id);
 		if (iter != this->mClients.end())
 		{
-			iter->second->Send(std::move(request));
+			iter->second->Send(request);
 			return;
 		}
 		LOG_ERROR("not find client:{} {}", id, request->ToString())

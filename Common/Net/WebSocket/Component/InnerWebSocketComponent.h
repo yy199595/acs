@@ -25,12 +25,12 @@ namespace acs
 		bool LateAwake() final;
 		void OnClientError(int id, int code) final;
 		bool OnListen(tcp::Socket *socket) noexcept final;
-		void OnMessage(int, rpc::Message *request, rpc::Message *response) noexcept final;
+		inline char GetNet() const noexcept final { return rpc::net::ws; }
+		void OnMessage(rpc::Message *request, rpc::Message *response) noexcept final;
 	public:
 		int Create(const std::string & address);
-		int Send(int id, ws::Message * message) noexcept;
-		int Send(int id, rpc::Message *message) noexcept final;
-		char GetNet() const noexcept final { return rpc::Net::Ws; }
+		int Send(int id, std::unique_ptr<ws::Message>& message) noexcept;
+		int Send(int id, std::unique_ptr<rpc::Message> &message) noexcept final;
 	private:
 		class NodeComponent * mActor;
 		class ThreadComponent * mThread;

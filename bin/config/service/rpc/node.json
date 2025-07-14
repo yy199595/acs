@@ -21,7 +21,10 @@
     },
     "NodeSystem.RunInfo": {
         "async":true,
-        "response": "com.type.json"
+        "proto" : "json",
+        "response": {
+            
+        }
     },
     "NodeSystem.Shutdown": {
         "async":true

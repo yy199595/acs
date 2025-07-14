@@ -48,15 +48,15 @@ namespace kcp
 		this->mSocket.async_receive_from(this->mRecvBuf, this->mSenderPoint, callback);
 	}
 
-	bool Server::Send(const std::string& addr, tcp::IProto* message)
+	bool Server::Send(const std::string& addr, std::unique_ptr<rpc::Message> & message)
 	{
 		auto self = this->shared_from_this();
-		asio::post(this->mContext, [this, addr, message, self]()
+		asio::post(this->mContext, [this, addr, req = message.release(), self]()
 		{
+			std::unique_ptr<rpc::Message> message(req);
 			auto iter = this->mClients.find(addr);
 			if (iter == this->mClients.end())
 			{
-				delete message;
 				return;
 			}
 			iter->second->Send(message);
@@ -139,7 +139,7 @@ namespace kcp
 				CONSOLE_LOG_ERROR("{}", std::string(this->mRecvBuffer, len))
 				return;
 			}
-			rpcPacket->SetNet(rpc::Net::Kcp);
+			rpcPacket->SetNet(rpc::net::kcp);
 			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 		}
 		auto self = this->shared_from_this();

@@ -29,8 +29,8 @@ namespace lua
 			lua_pushinteger(l, XCode::NetWorkError);
 			return 1;
 		}
-		message->SetNet(rpc::Net::Client);
-		lua_pushinteger(l, router->Send(sessionId, std::move(message)));
+		message->SetNet(rpc::net::client);
+		lua_pushinteger(l, router->Send(sessionId, message));
 		return 1;
 	}
 
@@ -52,8 +52,8 @@ namespace lua
 		}
 
 		lua_pushthread(l);
-		message->SetNet(rpc::Net::Client);
-		return router->LuaCall(l, sessionId, std::move(message));
+		message->SetNet(rpc::net::client);
+		return router->LuaCall(l, sessionId, message);
 	}
 
 	int Client::Connect(lua_State* lua)
@@ -65,7 +65,7 @@ namespace lua
 			lua_pushinteger(lua, XCode::NetWorkError);
 			return 1;
 		}
-		rpc::IInnerSender* clientSender = router->GetSender(rpc::Net::Client);
+		rpc::IInnerSender* clientSender = router->GetSender(rpc::net::client);
 		if(clientSender == nullptr)
 		{
 			luaL_error(lua, "not find client sender");
@@ -85,7 +85,7 @@ namespace lua
 			lua_pushinteger(L, XCode::NetWorkError);
 			return 1;
 		}
-		rpc::IInnerSender* clientSender = router->GetSender(rpc::Net::Client);
+		rpc::IInnerSender* clientSender = router->GetSender(rpc::net::client);
 		if(clientSender == nullptr)
 		{
 			luaL_error(L, "not find client sender");

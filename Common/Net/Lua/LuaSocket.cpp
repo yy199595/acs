@@ -163,8 +163,8 @@ namespace lua
 			{
 				case LUA_TSTRING:
 				{
-					const char * tag = lua_tostring(L, 2);
-					asio::async_read_until(tcpClient->mSocket->Get(), tcpClient->mBuffer, tag, callback);
+					const char * delim = lua_tostring(L, 2);
+					asio::async_read_until(tcpClient->mSocket->Get(), tcpClient->mBuffer, delim, callback);
 					break;
 				}
 				case LUA_TNUMBER:

@@ -93,7 +93,7 @@ namespace acs
 							   "\n"
 							   "</html>");
 		}
-		response.SetContent(std::move(customData));
+		response.SetContent(customData);
 		return XCode::Ok;
 	}
 
@@ -110,7 +110,7 @@ namespace acs
 		{
 			fileData->OpenFile(path, http::Header::TEXT);
 		}
-		response.SetContent(std::move(fileData));
+		response.SetContent(fileData);
 		return XCode::Ok;
 	}
 
@@ -208,7 +208,7 @@ namespace acs
 			customData->Append("</body>");
 			customData->Append("</html>");
 		}
-		response.SetContent(std::move(customData));
+		response.SetContent(customData);
 		return XCode::Ok;
 	}
 

@@ -25,8 +25,10 @@ namespace acs
 	template<typename T>
 	T WaitLuaTaskSource::Await()
 	{
-		this->YieldTask();
-		lua_rawgeti(mLua, LUA_REGISTRYINDEX, ref);
+		if(this->YieldTask())
+		{
+			lua_rawgeti(mLua, LUA_REGISTRYINDEX, ref);
+		}
 		return Lua::Parameter::Read<T>(this->mLua, -1);
 	}
 }

@@ -4,6 +4,8 @@
 
 #ifndef APP_PGSQLDBCOMPONENT_H
 #define APP_PGSQLDBCOMPONENT_H
+#include "DB/Common/TableInfo.h"
+#include "Util/File/FileFactory.h"
 #include "Pgsql/Client/PgsqlClient.h"
 #include "Rpc/Component/RpcComponent.h"
 
@@ -39,15 +41,19 @@ namespace acs
 	public:
 		PgsqlDBComponent();
 	public:
-		void Send(std::unique_ptr<pgsql::Request> request);
-		void Send(std::unique_ptr<pgsql::Request> request, int & rpcId);
+		void Send(std::unique_ptr<pgsql::Request>& request);
+		void Send(std::unique_ptr<pgsql::Request>& request, int & rpcId);
 	public:
 		std::unique_ptr<pgsql::Response> Run(const std::string & sql);
-		std::unique_ptr<pgsql::Response> Run(std::unique_ptr<pgsql::Request> request);
+		std::unique_ptr<pgsql::Response> Run(std::unique_ptr<pgsql::Request>& request);
 	private:
 		void AddFreeClient(int id);
-		void Send(int id, std::unique_ptr<pgsql::Request> request);
+		void Send(int id, std::unique_ptr<pgsql::Request>& request);
 		static bool DecodeUrl(const std::string & url, pgsql::Config & config);
+	private:
+		bool InitDataBase();
+		bool InitTable(const std::string & name, const sql::Table & tableInfo);
+		bool CreateTable(const std::string & name, const sql::Table & tableInfo);
 	private:
 		bool Awake() final;
 		void OnStart() final;
@@ -64,7 +70,7 @@ namespace acs
 		int mRetryCount;
 		pgsql::Cluster mConfig;
 		unsigned long long mSumCount;
-		class ThreadComponent * mThread;
+		help::FileFactory mFileFactory;
 		custom::Queue<int> mFreeClients;
 		std::unordered_set<int> mRetryClients; //断开了 重试的客户端
 		std::queue<std::unique_ptr<pgsql::Request>> mMessages;

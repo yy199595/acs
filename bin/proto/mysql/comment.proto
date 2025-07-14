@@ -12,3 +12,32 @@ message comment
     int64 create_time = 6;  //创建时间
     repeated int64 likes = 7; //点赞人
 }
+
+
+//extend google.protobuf.FieldOptions {
+//    bool mysql_index = 50001;
+//    bool mysql_unique_index = 50002;
+//    string mysql_type = 50003;
+//    int32 mysql_string_len = 50004;
+//}
+
+message user_info_list
+{
+    string _id = 1;
+    int32 sex = 2;
+    string icon = 3;
+    uint32 user_id = 4;
+    string public_id = 5;
+    int32 city = 6;
+    int32 amount = 7;
+    int32 club_id = 8;
+    int32 card_id = 9;
+    string unionid = 10;
+    string city_name = 11;
+    int32 permission = 12;
+    int64 vip_time = 13;
+    int64 create_time = 14;
+    repeated int32 activity_list = 15;
+    string user_desc = 16;
+    string nick = 17;
+}

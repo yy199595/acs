@@ -1,8 +1,8 @@
 ﻿#pragma once
-#include"XCode/XCode.h"
-#include"Rpc/Common/Message.h"
+#include "XCode/XCode.h"
+#include "Rpc/Common/Message.h"
+#include "Proto/Document/BsonDocument.h"
 
-using namespace google::protobuf;
 namespace acs
 {
 	template<typename T>
@@ -42,10 +42,25 @@ namespace acs
 	using ServiceMethodType8 = int(T::*)(const json::r::Document& request);
 
 	template<typename T>
+	using ServiceMethodType88 = int(T::*)(long long id, const json::r::Document& request);
+
+	template<typename T>
 	using ServiceMethodType9 = int(T::*)(const json::r::Document& request, json::w::Document & response);
 
 	template<typename T>
+	using ServiceMethodType99 = int(T::*)(const json::r::Document& request, rpc::Message & response);
+
+	template<typename T>
 	using ServiceMethodType10 = int(T::*)(json::w::Document & response);
+
+	template<typename T>
+	using ServiceMethodType12 = int(T::*)(const std::string & request, json::w::Document & response);
+
+	template<typename T>
+	using ServiceMethodType101 = int(T::*)(const bson::r::Document& request);
+
+	template<typename T>
+	using ServiceMethodType102 = int(T::*)(const bson::r::Document& request, bson::w::Document & response);
 
 //    template<typename T, typename T1>
 //    using ServiceMethodType5 = int(T::*)(const Rpc::Head & head, const T1 &);
@@ -92,7 +107,7 @@ namespace acs
 		}
 	 public:
 
-		int Invoke(rpc::Message & message) final
+		inline int Invoke(rpc::Message & message) final
 		{
 			if (!this->mHasUserId)
 			{
@@ -124,13 +139,13 @@ namespace acs
 		ServiceMethod2(const std::string name, T* o, ServiceMethodType22<T, T1> func, std::string key)
 			: ServiceMethod(name), _o(o), mHasUserId(true), mKey(std::move(key)), _objfunc(func) { }
 	 public:
-		int Invoke(rpc::Message & message) override
+		inline int Invoke(rpc::Message & message) final
 		{
             std::unique_ptr<T1> request = std::make_unique<T1>();
-            if(!message.ParseMessage(request.get()))
-            {
-                return XCode::CallArgsError;
-            }
+			if(!request->ParsePartialFromString(message.GetBody()))
+			{
+				return XCode::ParseMessageError;
+			}
             message.Body()->clear();
             if (!this->mHasUserId)
 			{
@@ -166,14 +181,14 @@ namespace acs
 		{
 		}
 	 public:
-		int Invoke(rpc::Message & message) override
+		inline int Invoke(rpc::Message & message) final
 		{
             std::unique_ptr<T1> request = std::make_unique<T1>();
             std::unique_ptr<T2> response = std::make_unique<T2>();
-            if(!message.ParseMessage(request.get()))
-            {
-                return XCode::CallArgsError;
-            }
+			if(!request->ParsePartialFromString(message.GetBody()))
+			{
+				return XCode::ParseMessageError;
+			}
             message.Body()->clear();
             if (this->mHasUserId)
             {
@@ -183,25 +198,19 @@ namespace acs
                     return XCode::CallArgsError;
                 }
                 int code = (_o->*_objfunc)(userId, *request, *response);
-                if (code == XCode::Ok)
+                if (code == XCode::Ok && !response->SerializePartialToString(message.Body()))
                 {
-                    if (!message.WriteMessage(response.get()))
-                    {
-                        return XCode::SerializationFailure;
-                    }
-                    return XCode::Ok;
+					return XCode::SerializationFailure;
                 }
+				message.SetProto(rpc::proto::pb);
                 return code;
             }
 			int code = (_o->*_func)(*request, *response);
-			if (code == XCode::Ok)
+			if (code == XCode::Ok && !response->SerializePartialToString(message.Body()))
 			{
-                if(!message.WriteMessage(response.get()))
-                {
-                    return XCode::SerializationFailure;
-                }
-                return XCode::Ok;
+				return XCode::SerializationFailure;
 			}
+			message.SetProto(rpc::proto::pb);
 			return code;
 		}
 	 private:
@@ -226,7 +235,7 @@ namespace acs
 		{
 		}
 	 public:
-		int Invoke(rpc::Message & message) override
+		inline int Invoke(rpc::Message & message) final
 		{
 			std::unique_ptr<T1> response = std::make_unique<T1>();
             if (this->mHasUserId)
@@ -237,19 +246,19 @@ namespace acs
                     return XCode::CallArgsError;
                 }
 				int code = (_o->*_objfunc)(userId, *response);
-				if(code == XCode::Ok)
+				if(code == XCode::Ok && !response->SerializePartialToString(message.Body()))
 				{
-					message.WriteMessage(response.get());
-					return XCode::Ok;
+					return XCode::SerializationFailure;
 				}
+				message.SetProto(rpc::proto::pb);
 				return code;
 			}
 			int code = (_o->*_func)(*response);
-			if(code == XCode::Ok)
+			if(code == XCode::Ok && !response->SerializePartialToString(message.Body()))
 			{
-				message.WriteMessage(response.get());
-				return XCode::Ok;
+				return XCode::SerializationFailure;
 			}
+			message.SetProto(rpc::proto::pb);
 			return code;
 		}
 	 private:
@@ -271,7 +280,7 @@ namespace acs
 		}
 
 	 public:
-		int Invoke(rpc::Message & message) override
+		inline int Invoke(rpc::Message & message) final
 		{
 			return (_o->*_func)(message);
 		}
@@ -292,7 +301,7 @@ namespace acs
 		}
 
 	public:
-		int Invoke(rpc::Message& message) override
+		inline int Invoke(rpc::Message& message) final
 		{
 			return (_o->*_func)(message, message);
 		}
@@ -313,10 +322,10 @@ namespace acs
 		}
 
 	public:
-		int Invoke(rpc::Message& message) override
+		inline int Invoke(rpc::Message& message) final
 		{
 			std::unique_ptr<json::r::Document> request = std::make_unique<json::r::Document>();
-			if(!request->Decode(message.GetBody()))
+			if(!request->Decode(message.GetBody(), YYJSON_READ_INSITU))
 			{
 				return XCode::ParseJsonFailure;
 			}
@@ -326,6 +335,63 @@ namespace acs
 		T* _o;
 		std::string mKey;
 		ServiceMethodType8<T> _func;
+	};
+
+	template<typename T>
+	class ServiceMethod88 final : public ServiceMethod
+	{
+	public:
+		ServiceMethod88(const std::string name, T* o, ServiceMethodType88<T> func, std::string key)
+				: ServiceMethod(name), _o(o), mKey(std::move(key)), _func(func)
+		{
+
+		}
+
+	public:
+		inline int Invoke(rpc::Message& message) final
+		{
+			std::unique_ptr<json::r::Document> request = std::make_unique<json::r::Document>();
+			if(!request->Decode(message.GetBody(), YYJSON_READ_INSITU))
+			{
+				return XCode::ParseJsonFailure;
+			}
+			long long userId = 0;
+			if(!message.GetHead().Get(this->mKey, userId))
+			{
+				return XCode::CallArgsError;
+			}
+			return (_o->*_func)(userId, *request);
+		}
+	private:
+		T* _o;
+		std::string mKey;
+		ServiceMethodType88<T> _func;
+	};
+
+	template<typename T>
+	class ServiceMethod101 final : public ServiceMethod
+	{
+	public:
+		ServiceMethod101(const std::string name, T* o, ServiceMethodType101<T> func, std::string key)
+				: ServiceMethod(name), _o(o), mKey(std::move(key)), _func(func)
+		{
+
+		}
+
+	public:
+		inline int Invoke(rpc::Message& message) final
+		{
+			const std::string & body = message.GetBody();
+			std::unique_ptr<bson::r::Document> request = std::make_unique<bson::r::Document>();
+			{
+				request->Init(body.c_str());
+			}
+			return (_o->*_func)(*request);
+		}
+	private:
+		T* _o;
+		std::string mKey;
+		ServiceMethodType101<T> _func;
 	};
 
 	template<typename T>
@@ -339,22 +405,84 @@ namespace acs
 		}
 
 	public:
-		int Invoke(rpc::Message& message) override
+		inline int Invoke(rpc::Message& message) final
 		{
 			std::unique_ptr<json::r::Document> request = std::make_unique<json::r::Document>();
 			std::unique_ptr<json::w::Document> response = std::make_unique<json::w::Document>();
-			if(!request->Decode(message.GetBody()))
+			if(!request->Decode(message.GetBody(), YYJSON_READ_INSITU))
 			{
 				return XCode::ParseJsonFailure;
 			}
 			int code = (_o->*_func)(*request, *response);
-			message.WriteMessage(response.get());
+			if(code == XCode::Ok && !response->Serialize(message.Body()))
+			{
+				return XCode::SerializationFailure;
+			}
+			message.SetProto(rpc::proto::json);
 			return code;
 		}
 	private:
 		T* _o;
 		std::string mKey;
 		ServiceMethodType9<T> _func;
+	};
+
+	template<typename T>
+	class ServiceMethod99 final : public ServiceMethod
+	{
+	public:
+		ServiceMethod99(const std::string name, T* o, ServiceMethodType99<T> func, std::string key)
+				: ServiceMethod(name), _o(o), mKey(std::move(key)), _func(func)
+		{
+
+		}
+
+	public:
+		inline int Invoke(rpc::Message& message) final
+		{
+			std::unique_ptr<json::r::Document> request = std::make_unique<json::r::Document>();
+			if(!request->Decode(message.GetBody(), YYJSON_READ_INSITU))
+			{
+				return XCode::ParseJsonFailure;
+			}
+			return (_o->*_func)(*request, message);
+		}
+	private:
+		T* _o;
+		std::string mKey;
+		ServiceMethodType99<T> _func;
+	};
+
+	template<typename T>
+	class ServiceMethod102 final : public ServiceMethod
+	{
+	public:
+		ServiceMethod102(const std::string name, T* o, ServiceMethodType102<T> func, std::string key)
+				: ServiceMethod(name), _o(o), mKey(std::move(key)), _func(func)
+		{
+
+		}
+
+	public:
+		inline int Invoke(rpc::Message& message) final
+		{
+			int code = 0;
+			int count = 0;
+			const std::string& body = message.GetBody();
+			std::unique_ptr<bson::r::Document> request = std::make_unique<bson::r::Document>();
+			std::unique_ptr<bson::w::Document> response = std::make_unique<bson::w::Document>();
+			{
+				request->Init(body.c_str());
+				code = (_o->*_func)(*request, *response);
+				const char * bson = response->Serialize(count);
+				message.SetContent(rpc::proto::bson, bson, count);
+			}
+			return code;
+		}
+	private:
+		T* _o;
+		std::string mKey;
+		ServiceMethodType102<T> _func;
 	};
 
 	template<typename T>
@@ -368,12 +496,16 @@ namespace acs
 		}
 
 	public:
-		int Invoke(rpc::Message& message) override
+		inline int Invoke(rpc::Message& message) final
 		{
 			std::unique_ptr<json::w::Document> response = std::make_unique<json::w::Document>();
 			{
 				int code = (_o->*_func)(*response);
-				message.WriteMessage(response.get());
+				if(code == XCode::Ok && !response->Serialize(message.Body()))
+				{
+					return XCode::SerializationFailure;
+				}
+				message.SetProto(rpc::proto::json);
 				return code;
 			}
 		}
@@ -381,6 +513,36 @@ namespace acs
 		T* _o;
 		std::string mKey;
 		ServiceMethodType10<T> _func;
+	};
+
+	template<typename T>
+	class ServiceMethod12 final : public ServiceMethod
+	{
+	public:
+		ServiceMethod12(const std::string name, T* o, ServiceMethodType12<T> func, std::string key)
+				: ServiceMethod(name), _o(o), mKey(std::move(key)), _func(func)
+		{
+
+		}
+
+	public:
+		inline int Invoke(rpc::Message& message) final
+		{
+			std::unique_ptr<json::w::Document> response = std::make_unique<json::w::Document>();
+			{
+				int code = (_o->*_func)(message.GetBody(), *response);
+				if(code == XCode::Ok && !response->Serialize(message.Body()))
+				{
+					return XCode::SerializationFailure;
+				}
+				message.SetProto(rpc::proto::json);
+				return code;
+			}
+		}
+	private:
+		T* _o;
+		std::string mKey;
+		ServiceMethodType12<T> _func;
 	};
 
 	template<typename T, typename T1>
@@ -394,12 +556,12 @@ namespace acs
 		}
 
 	public:
-		int Invoke(rpc::Message& message) override
+		inline int Invoke(rpc::Message& message) final
 		{
 			std::unique_ptr<T1> request = std::make_unique<T1>();
-			if(!message.ParseMessage(request.get()))
+			if(!request->ParsePartialFromString(message.GetBody()))
 			{
-				return XCode::CallArgsError;
+				return XCode::ParseMessageError;
 			}
 			message.Body()->clear();
 			return (_o->*_func)(*request, message);

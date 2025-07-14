@@ -30,7 +30,7 @@ namespace kcp
 		return ikcp_recv(this->mKcp, buffer, kcp::BUFFER_COUNT);
 	}
 
-	void Session::Send(tcp::IProto* message)
+	void Session::Send(std::unique_ptr<rpc::Message> & message)
 	{
 		message->OnSendMessage(this->mSendStream);
 
@@ -40,7 +40,6 @@ namespace kcp
 			ikcp_send(this->mKcp, msg, len);
 			this->mSendBuffer.consume(len);
 		}
-		delete message;
 	}
 
 	void Session::Update(long long t)

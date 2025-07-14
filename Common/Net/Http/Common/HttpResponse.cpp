@@ -79,10 +79,6 @@ namespace http
 				{
 					return tcp::read::line;
 				}
-				return tcp::read::decode_error;
-			}
-			else if(this->mContSize == 0)
-			{
 				return tcp::read::done;
 			}
 		}
@@ -231,7 +227,7 @@ namespace http
 		{
 			js.Add("data", this->mBody->ToStr());
 		}
-		js.Encode(&json, true);
+		js.Serialize(&json, true);
 		return json;
 	}
 

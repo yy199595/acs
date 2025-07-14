@@ -8,6 +8,7 @@ local log = require("Log")
 local log_err = log.Error
 local file = require("util.fs")
 local cor_new = coroutine.create
+local cor_status = coroutine.status
 local cor_resume = coroutine.resume
 
 local context = function(class, func, task, ...)
@@ -24,6 +25,8 @@ function Module:Await(name, taskSource, ...)
     local co = cor_new(context)
     cor_resume(co, self, func, taskSource, ...)
     return true
+    --print(self.__name, name, cor_status(co))
+    --return cor_status(co) == "suspended"
 end
 
 return function(...)

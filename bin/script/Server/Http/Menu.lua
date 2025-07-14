@@ -1,6 +1,6 @@
 return {
     {
-        icon = 'Odometer',
+        icon = 'document',
         index = 'welcome',
         title = '系统首页',
         admin = false,
@@ -22,15 +22,11 @@ return {
             {
                 index = 'http',
                 title = 'http接口',
-            },
-            {
-                index = "mongodb",
-                title = "MongoDB管理"
             }
         }
     },
     {
-        icon = 'Odometer',
+        icon = 'tickets',
         index = '2',
         title = '用户管理',
         admin = false,
@@ -46,16 +42,6 @@ return {
                 admin = false
             },
             {
-                index = "mch_list",
-                title = "商户列表",
-                admin = true,
-            },
-            {
-                index = "order",
-                title = "订单管理",
-                admin = false,
-            },
-            {
                 index = "admin",
                 title = "后台账号",
                 admin = false,
@@ -63,25 +49,26 @@ return {
         }
     },
     {
-        icon = "Setting",
+        icon = "menu",
         index = '3',
-        title = "活动管理",
-        admin = false,
+        title = "数据库",
+        admin = true,
         subs = {
             {
-                index = "city",
-                admin = true,
-                title = "城市管理"
+                index = "mongodb",
+                title = "MongoDB"
             },
             {
-                index = "pub_activity",
-                title = "发布活动",
-                admin = false,
+                index = "mysql",
+                title = "MySql"
             },
             {
-                index = "activity",
-                title = "活动列表",
-                admin = false,
+                index = "pgsql",
+                title = "PostgreSQL"
+            },
+            {
+                index = "sqlite",
+                title = "Sqlite"
             }
         }
     }

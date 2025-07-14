@@ -15,12 +15,6 @@
 			"RegistryComponent"
 		]
 	},
-	"listen": {
-		"gate": {
-			"address": "tcp://127.0.0.1:${gate}",
-			"component" : "OuterWebSocketComponent"
-		}
-	},
 	"http": {
 		"auth": false,
 		"index": "index.html",

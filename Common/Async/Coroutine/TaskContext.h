@@ -25,17 +25,19 @@ namespace acs
 	struct Stack
 	{
 		char* p = nullptr;
-		char* top = nullptr;
 		size_t size = 0;
+#ifdef __ENABLE_SHARE_STACK__
 		unsigned int co = 0;
+		const char* top = nullptr;
+#endif
 	};
 
 	class TaskContext final
 #ifdef __SHARE_PTR_COUNTER__
-	: public memory::Object<TaskContext>
+		: public memory::Object<TaskContext>
 #endif
 	{
-	 public:
+	public:
 		explicit TaskContext();
 #ifdef __SHARE_PTR_COUNTER__
 		~TaskContext() final;
@@ -43,15 +45,17 @@ namespace acs
 		~TaskContext();
 #endif
 
-	 public:
+	public:
 		void Invoke();
-	 public:
-        Stack stack;
+	public:
+		Stack stack;
 		unsigned int id;
+#ifdef __ENABLE_SHARE_STACK__
 		unsigned int sid;
-        CorState status;
+#endif
+		CorState status;
 		long long timerId;
-        tb_context_t mContext;
-		std::unique_ptr<StaticMethod> callback;
-    };
+		tb_context_t ctx;
+		std::unique_ptr<StaticMethod> cb;
+	};
 }

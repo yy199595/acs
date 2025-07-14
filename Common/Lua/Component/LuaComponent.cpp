@@ -19,7 +19,8 @@
 #include "Core/Lua/LuaOs.h"
 #include "Lua/Lib/Lib.h"
 #include "Lua/Socket/LuaTcpSocket.h"
-
+#include "Util/Censor/LuaCensor.h"
+#include "Util/Censor/CensorFactory.h"
 #ifdef __ENABLE_OPEN_SSL__
 
 #include "Util/Ssl/rsa.h"
@@ -80,6 +81,7 @@ namespace acs
 
 		moduleRegistry.Open("net.tcp", lua::lib::luaopen_ltcp);
 		moduleRegistry.Open("util.lxlsx", lua::lib::luaopen_lexcel);
+		moduleRegistry.Open("util.censor", lua::lib::luaopen_lcensor);
 
 		LuaCCModuleRegister::Trigger(moduleRegistry);
 	}
@@ -89,7 +91,7 @@ namespace acs
 		Lua::ClassProxyHelper os(this->mLuaEnv, "os");
 
 		os.PushMember("dir", os::System::WorkPath());
-		os.PushStaticFunction("setenv", os::System::LuaSetEnv);
+		//os.PushStaticFunction("setappenv", os::System::LuaSetEnv);
 		os.PushExtensionFunction("run", LuaCore::Run);
 		os.PushExtensionFunction("get_system_info", LuaCore::GetSystemInfo);
 #ifdef __OS_MAC__
@@ -164,6 +166,15 @@ namespace acs
 		classProxyHelper44.BeginRegister<Asio::Acceptor>();
 		classProxyHelper44.PushExtensionFunction("accept", lua::TcpSock::Accept);
 
+
+		Lua::ClassProxyHelper classProxyHelper5(this->mLuaEnv, "CensorFactory");
+		classProxyHelper5.BeginRegister<censor::Factory>();
+		classProxyHelper5.PushExtensionFunction("load", censor::Load);
+		classProxyHelper5.PushExtensionFunction("mask", censor::Mask);
+		classProxyHelper5.PushExtensionFunction("build", censor::Build);
+		classProxyHelper5.PushExtensionFunction("check", censor::Check);
+		classProxyHelper5.PushExtensionFunction("insert", censor::Insert);
+
 #ifdef __ENABLE_OPEN_SSL__
 		Lua::ClassProxyHelper classProxyHelper7(this->mLuaEnv, "RSAEncryptor");
 		classProxyHelper7.BeginRegister<ssl::RSAEncryptor>();
@@ -182,9 +193,9 @@ namespace acs
 		Lua::ClassProxyHelper classProxyHelper10(this->mLuaEnv, "JsonValue");
 		classProxyHelper10.BeginRegister<lua::JsonValue>();
 		classProxyHelper10.PushExtensionFunction("encode", lua::ljson::encode);
+		classProxyHelper10.PushExtensionFunction("add_array", lua::ljson::add_array);
 		classProxyHelper10.PushExtensionFunction("add_member", lua::ljson::add_member);
 		classProxyHelper10.PushExtensionFunction("add_object", lua::ljson::add_object);
-		classProxyHelper10.PushExtensionFunction("add_array", lua::ljson::add_array);
 
 	}
 
@@ -266,7 +277,7 @@ namespace acs
 		for (const std::string& path: this->mConfig.require)
 		{
 			std::vector<std::string> files;
-			help::dir::GetFilePaths(path, "*.lua", files);
+			help::dir::GetFilePaths(path, ".lua", files);
 			for (const std::string& filePath: files)
 			{
 				std::string moduleName;
@@ -370,6 +381,11 @@ namespace acs
 			LOG_INFO("close {}", iter->first);
 			iter->second->Await("OnDestroy");
 		}
+	}
+
+	void LuaComponent::OnDestroy()
+	{
+		lua_close(this->mLuaEnv);
 	}
 
 	void LuaComponent::AddRequire(const std::string& path)

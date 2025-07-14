@@ -1,5 +1,8 @@
 
 #pragma once
+
+#include "DB/Common/TableInfo.h"
+#include "Util/File/FileFactory.h"
 #include "Mysql/Client/MysqlClient.h"
 #include "Mysql/Common/MysqlProto.h"
 #include "Rpc/Component/RpcComponent.h"
@@ -36,15 +39,20 @@ namespace acs
 	public:
 		MysqlDBComponent();
 	public:
-		void Send(std::unique_ptr<mysql::Request> request);
-		void Send(std::unique_ptr<mysql::Request> request, int & rpcId);
+		void Send(std::unique_ptr<mysql::Request>& request);
+		void Send(std::unique_ptr<mysql::Request>& request, int & rpcId);
 	public:
 		std::unique_ptr<mysql::Response> Run(const std::string & sql);
-		std::unique_ptr<mysql::Response> Run(std::unique_ptr<mysql::Request> request);
+		std::unique_ptr<json::r::Document> Invoke(const std::string & sql);
+		std::unique_ptr<mysql::Response> Run(std::unique_ptr<mysql::Request> & request);
 	private:
 		void AddFreeClient(int id);
-		void Send(int id, std::unique_ptr<mysql::Request> request);
+		void Send(int id, std::unique_ptr<mysql::Request>& request);
 		static bool DecodeUrl(const std::string & url, mysql::Config & config);
+	private:
+		bool InitDataBaseAndSession();
+		bool InitTable(const std::string & name, const sql::Table & tableInfo);
+		bool CreateTable(const std::string & name, const sql::Table & tableInfo);
 	private:
 		bool Awake() final;
 		void OnStart() final;
@@ -61,9 +69,11 @@ namespace acs
 		int mRetryCount;
 		mysql::Cluster mConfig;
 		unsigned long long mCount; //总处理数量
+		help::FileFactory mFileFactory;
 		custom::Queue<int> mFreeClients; //空闲的客户端
 		std::unordered_set<int> mRetryClients; //断开了 重试的客户端
 		std::queue<std::unique_ptr<mysql::Request>> mMessages;
+		std::unordered_map<std::string, sql::Table> mTableInfos;
 		std::unordered_map<int, std::shared_ptr<mysql::Client>> mClients;
 	};
 }

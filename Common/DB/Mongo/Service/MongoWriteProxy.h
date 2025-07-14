@@ -16,10 +16,13 @@ namespace acs
 	private:
 		int SetIndex(const json::r::Document & request);
 		int Inc(const json::r::Document & request, json::w::Document & response);
+		int Save(const json::r::Document & request, json::w::Document & response);
 		int Update(const json::r::Document & request, json::w::Document & response);
 		int Insert(const json::r::Document & request, json::w::Document & response);
 		int Delete(const json::r::Document & request, json::w::Document & response);
+		int Deletes(const json::r::Document & request, json::w::Document & response);
 		int Updates(const json::r::Document & request, json::w::Document & response);
+		int FindModify(const json::r::Document & request, json::w::Document & response);
 	private:
 		class MongoDBComponent * mMongo;
 	};

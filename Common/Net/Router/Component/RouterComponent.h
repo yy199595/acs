@@ -17,10 +17,10 @@ namespace acs
 		RouterComponent();
 	public:
 		rpc::IInnerSender * GetSender(char net);
-		int Send(int id, int code, rpc::Message * message);
-		int Send(int id, std::unique_ptr<rpc::Message> message);
-		int LuaCall(lua_State * lua, int id, std::unique_ptr<rpc::Message> message);
-		std::unique_ptr<rpc::Message> Call(int id, std::unique_ptr<rpc::Message> message);
+		int Send(int id, std::unique_ptr<rpc::Message> & message);
+		int Send(int id, int code, std::unique_ptr<rpc::Message> & message);
+		int LuaCall(lua_State * lua, int id, std::unique_ptr<rpc::Message> & message);
+		std::unique_ptr<rpc::Message> Call(int id, std::unique_ptr<rpc::Message> & message);
 	private:
 		bool Awake() final;
 		bool LateAwake() final;
@@ -28,8 +28,8 @@ namespace acs
 		void OnRecord(json::w::Document &document) final;
 	private:
 		class DispatchComponent * mDispatch;
-		std::queue<rpc::Message *> mLocalMessages;
 		std::unordered_map<char, rpc::IInnerSender *> mSenders;
+		std::queue<std::unique_ptr<rpc::Message>> mLocalMessages;
 	};
 }
 

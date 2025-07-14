@@ -54,29 +54,30 @@ namespace acs
 		{
 			return false;
 		}
-		std::unique_ptr<json::r::Value> value;
+		json::r::Value value;
 
 		std::unordered_map<std::string, char> NetMap{
-				{ "ws",   rpc::Net::Ws },
-				{ "tcp",   rpc::Net::Tcp },
-				{ "udp",   rpc::Net::Udp },
-				{ "kcp",   rpc::Net::Kcp },
-				{ "http",  rpc::Net::Http },
-				{ "redis", rpc::Net::Redis },
+				{ "ws",    rpc::net::ws },
+				{ "tcp",   rpc::net::tcp },
+				{ "udp",   rpc::net::udp },
+				{ "kcp",   rpc::net::kcp },
+				{ "http",  rpc::net::http },
+				{ "redis", rpc::net::redis },
 		};
 
 		std::unordered_map<std::string, char> ForwardMap{
-				{ "next",   rpc::Forward::Next },
-				{ "hash",   rpc::Forward::Hash },
-				{ "fixed",  rpc::Forward::Fixed },
-				{ "random", rpc::Forward::Random },
+				{ "next",   rpc::forward::next },
+				{ "hash",   rpc::forward::hash },
+				{ "fixed",  rpc::forward::fixed },
+				{ "random", rpc::forward::random },
 		};
 
 		std::unordered_map<std::string, char> ProtoMap{
-				{ "lua",     rpc::Proto::Lua },
-				{ "pb", rpc::Proto::Protobuf },
-				{ "json",     rpc::Proto::Json },
-				{ "string",   rpc::Proto::String },
+				{ "lua",    rpc::proto::lua },
+				{ "pb",     rpc::proto::pb },
+				{ "json",   rpc::proto::json },
+				{ "bson",   rpc::proto::bson },
+				{ "string", rpc::proto::string },
 		};
 
 		for (const char* key: keys)
@@ -105,15 +106,15 @@ namespace acs
 				methodConfig->NetName = "rpc";
 				methodConfig->fullname = method;
 				methodConfig->service = service;
-				methodConfig->net = rpc::Net::Tcp;
+				methodConfig->net = rpc::net::tcp;
 				methodConfig->to_client = false;
 				methodConfig->ProtoName = "pb";
-				methodConfig->proto = rpc::Proto::Protobuf;
-				methodConfig->forward = rpc::Forward::Fixed;
+				methodConfig->proto = rpc::proto::pb;
+				methodConfig->forward = rpc::forward::fixed;
 			}
 			this->mAllServices.insert(methodConfig->service);
 
-			if (value->Get("net", methodConfig->NetName))
+			if (value.Get("net", methodConfig->NetName))
 			{
 				auto iter = NetMap.find(methodConfig->NetName);
 				if (iter == NetMap.end())
@@ -123,7 +124,7 @@ namespace acs
 				methodConfig->net = iter->second;
 			}
 
-			if (value->Get("forward", methodConfig->ForwardName))
+			if (value.Get("forward", methodConfig->ForwardName))
 			{
 				auto iter = ForwardMap.find(methodConfig->ForwardName);
 				if (iter == ForwardMap.end())
@@ -133,7 +134,7 @@ namespace acs
 				methodConfig->forward = iter->second;
 			}
 
-			if (value->Get("proto", methodConfig->ProtoName))
+			if (value.Get("proto", methodConfig->ProtoName))
 			{
 				auto iter = ProtoMap.find(methodConfig->ProtoName);
 				if (iter == ProtoMap.end())
@@ -143,23 +144,23 @@ namespace acs
 				methodConfig->proto = iter->second;
 			}
 
-			if (value->Get("request", methodConfig->request))
+			if (value.Get("request", methodConfig->request))
 			{
-				std::unique_ptr<json::r::Value> jsonValue;
-				if(value->Get("request", jsonValue) && jsonValue->IsObject())
+				json::r::Value jsonValue;
+				if (value.Get("request", jsonValue) && jsonValue.IsObject())
 				{
-					methodConfig->proto = rpc::Proto::Json;
+					methodConfig->proto = rpc::proto::json;
 				}
 			}
-			value->Get("auth", methodConfig->auth);
-			value->Get("async", methodConfig->async);
-			value->Get("open", methodConfig->open);
-			value->Get("record", methodConfig->record);
-			value->Get("timeout", methodConfig->timeout);
-			value->Get("response", methodConfig->response);
-			value->Get("debug", methodConfig->debug);
-			value->Get("client", methodConfig->client);
-			value->Get("to_client", methodConfig->to_client);
+			value.Get("auth", methodConfig->auth);
+			value.Get("async", methodConfig->async);
+			value.Get("open", methodConfig->open);
+			value.Get("record", methodConfig->record);
+			value.Get("timeout", methodConfig->timeout);
+			value.Get("response", methodConfig->response);
+			value.Get("debug", methodConfig->debug);
+			value.Get("client", methodConfig->client);
+			value.Get("to_client", methodConfig->to_client);
 
 			ClusterConfig::Inst()->GetServerName(service, methodConfig->server);
 		}
@@ -252,7 +253,7 @@ namespace acs
 {
 	bool HttpConfig::OnLoadJson()
 	{
-		std::unique_ptr<json::r::Value> value;
+		json::r::Value value;
 		for (const char* key: this->GetAllKey())
 		{
 			std::string url(key);
@@ -260,7 +261,7 @@ namespace acs
 			HttpMethodConfig* methodConfig = this->MakeConfig(url);
 			{
 				std::string bindMethod;
-				LOG_CHECK_RET_FALSE(value->Get("bind", bindMethod));
+				LOG_CHECK_RET_FALSE(value.Get("bind", bindMethod));
 				if (help::Str::Split(bindMethod, '.', methodConfig->service, methodConfig->method) != 0)
 				{
 					LOG_ERROR("bind function : {}", bindMethod);
@@ -275,23 +276,23 @@ namespace acs
 				methodConfig->limit = 1024 * 1024;
 				methodConfig->headers.clear();
 				methodConfig->WhiteList.clear();
-				value->Get("type", methodConfig->type);
-				value->Get("auth", methodConfig->auth);
-				value->Get("desc", methodConfig->desc);
-				value->Get("limit", methodConfig->limit);
-				value->Get("lock", methodConfig->lock);
-				value->Get("async", methodConfig->async);
-				value->Get("token", methodConfig->token);
-				value->Get("record", methodConfig->record);
-				value->Get("timeout", methodConfig->timeout);
-				value->Get("permission", methodConfig->permission);
-				value->Get("content-type", methodConfig->content);
+				value.Get("type", methodConfig->type);
+				value.Get("auth", methodConfig->auth);
+				value.Get("desc", methodConfig->desc);
+				value.Get("limit", methodConfig->limit);
+				value.Get("lock", methodConfig->lock);
+				value.Get("async", methodConfig->async);
+				value.Get("token", methodConfig->token);
+				value.Get("record", methodConfig->record);
+				value.Get("timeout", methodConfig->timeout);
+				value.Get("permission", methodConfig->permission);
+				value.Get("content-type", methodConfig->content);
 				std::vector<std::string> headers;
 
 				std::vector<std::string> whiteList;
-				value->Get("white-list", whiteList);
+				value.Get("white-list", whiteList);
 
-				for(const std::string & ip : whiteList)
+				for (const std::string& ip: whiteList)
 				{
 					methodConfig->WhiteList.emplace(ip);
 				}
@@ -304,21 +305,21 @@ namespace acs
 				{
 					headers.emplace_back("Authorization");
 				}
-				std::unique_ptr<json::r::Value> jsonArray;
-				if (value->Get("WhiteList", jsonArray))
+				json::r::Value jsonArray;
+				if (value.Get("WhiteList", jsonArray))
 				{
 					size_t index = 0;
 					std::string value;
-					while (jsonArray->Get(index, value))
+					while (jsonArray.Get(index, value))
 					{
 						index++;
 						methodConfig->WhiteList.emplace(value);
 					}
 				}
-				std::unique_ptr<json::r::Value> doc;
-				if (value->Get("request", doc))
+				json::r::Value doc;
+				if (value.Get("request", doc))
 				{
-					methodConfig->request = doc->ToString();
+					methodConfig->request = doc.ToString();
 				}
 				size_t index = 0;
 				for (const std::string& header: headers)
@@ -347,11 +348,11 @@ namespace acs
 		auto iter = this->mMethodConfigs.find(path);
 		if (iter == this->mMethodConfigs.end())
 		{
-			if(url.find('*') != std::string::npos) //正则表达式
+			if (url.find('*') != std::string::npos) //正则表达式
 			{
-				for(std::unique_ptr<HttpMethodConfig> & config : this->mRegexConfigs)
+				for (std::unique_ptr<HttpMethodConfig>& config: this->mRegexConfigs)
 				{
-					if(config->path == path)
+					if (config->path == path)
 					{
 						return config.get();
 					}
@@ -388,14 +389,14 @@ namespace acs
 	const HttpMethodConfig* HttpConfig::GetMethodConfig(const std::string& path) const
 	{
 		auto iter = this->mMethodConfigs.find(path);
-		if(iter != this->mMethodConfigs.end())
+		if (iter != this->mMethodConfigs.end())
 		{
 			return iter->second.get();
 		}
-		for(const std::unique_ptr<HttpMethodConfig> & config : this->mRegexConfigs)
+		for (const std::unique_ptr<HttpMethodConfig>& config: this->mRegexConfigs)
 		{
 			std::regex re(config->path);
-			if(std::regex_match(path, re))
+			if (std::regex_match(path, re))
 			{
 				return config.get();
 			}

@@ -1,8 +1,8 @@
 <template>
     <div>
         <el-row :gutter="20">
-            <el-col :span="6">
-                <el-card shadow="hover" class="mgb20" style="height: 42%">
+            <el-col :span="7">
+                <el-card shadow="hover" class="mgb20" style="height: 40%">
                     <el-descriptions title="用户信息" border column="1">
                         <el-descriptions-item label="昵称">{{ user.name }}</el-descriptions-item>
                         <el-descriptions-item label="权限">{{ format_permiss(null, null, user.permission) }}
@@ -22,24 +22,40 @@
                         <el-form-item>
                             <el-button icon="refresh" @click="refresh_sever_info"></el-button>
                         </el-form-item>
+                        <el-form-item>
+                            <el-button icon="search" @click="show_view=true"></el-button>
+                        </el-form-item>
                     </el-form>
                     <el-descriptions border column="1">
                         <el-descriptions-item label="名字">{{ run_info.name }}</el-descriptions-item>
-                        <el-descriptions-item label="CPU使用率">{{run_info.cpu}}</el-descriptions-item>
-                        <el-descriptions-item label="物理内存">{{run_info.max_memory }}</el-descriptions-item>
-                        <el-descriptions-item label="使用内存">{{run_info.use_memory }}</el-descriptions-item>
+                        <el-descriptions-item label="CPU使用率">{{
+                                run_info.cpu
+                            }}
+                        </el-descriptions-item>
+
+                        <el-descriptions-item label="使用内存">
+                            {{ run_info.use_memory }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="物理内存">
+                            {{ run_info.max_memory }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="Lua内存">{{ run_info.lua.memory }}</el-descriptions-item>
+
+                        <el-descriptions-item label="增长内存">{{ run_info.cost_memory }}</el-descriptions-item>
                         <el-descriptions-item label="http总处理">{{ run_info.web.sum }}</el-descriptions-item>
-                        <el-descriptions-item label="Mongo总处理">{{ run_info.mongo.sum }}</el-descriptions-item>
-                        <el-descriptions-item label="启动时间">{{run_info.start_time}}</el-descriptions-item>
+                        <el-descriptions-item label="启动时间">{{
+                                run_info.start_time
+                            }}
+                        </el-descriptions-item>
                     </el-descriptions>
                 </el-card>
             </el-col>
-            <el-col :span="18">
+            <el-col :span="17">
                 <el-card shadow="hover" style="height: 100%">
                     <h4>操作记录</h4>
-                    <el-table :data="tab.list" border style="margin-top: 20px">
+                    <el-table :data="tab.list" v-loading="loading" border style="margin-top: 20px">
                         <el-table-column min-width="100" label="用户" prop="name"></el-table-column>
-                        <el-table-column min-width="100" label="操作ip" prop="ip"></el-table-column>
+                        <el-table-column min-width="100" label="IP" show-overflow-tooltip prop="ip"></el-table-column>
                         <el-table-column min-width="100" label="方法" prop="method"></el-table-column>
                         <el-table-column min-width="150" label="路径" prop="url" show-overflow-tooltip></el-table-column>
                         <el-table-column min-width="100" label="描述" prop="desc" show-overflow-tooltip></el-table-column>
@@ -70,6 +86,10 @@
         </el-row>
         <el-dialog v-model="view.show">
             <json-viewer style="max-width: 100%" :data="view.data" :key="view.index"></json-viewer>
+        </el-dialog>
+
+        <el-dialog v-model="show_view" title="服务器运行信息">
+            <json-viewer style="max-width: 100%" :data="run_info" :key="index"></json-viewer>
         </el-dialog>
     </div>
 </template>
@@ -103,6 +123,7 @@ export default {
                 },
             },
             index: 1,
+            loading : false,
             show_view: false,
             run_info: {
                 name: "",
@@ -111,11 +132,15 @@ export default {
                 cpu: 0,
                 use_memory: 0,
                 max_memory: 0,
+                cost_memory : "",
                 web: {
                     sum: 0
                 },
                 mongo: {
                     sum: 0
+                },
+                lua : {
+                    memory : ""
                 }
             },
             user: {
@@ -165,11 +190,18 @@ export default {
             }
         },
 
-        handlePageChange(page) {
-            this.tab.page.index = page
-            this.query_operator_record().then(() => {
+        async handlePageChange(page) {
+            this.loading = true
+            try {
+                this.tab.list = []
+                this.tab.page.index = page
+                await this.query_operator_record();
+            }
+            catch (e) {
+                ElMessage.error("拉取操作记录失败")
+            }
 
-            })
+            this.loading = false
         },
         async query_operator_record() {
             const response = await RequestOptRecord(this.tab.page.index)
@@ -182,24 +214,24 @@ export default {
         async refresh_sever_info() {
             const response = await httpRequest.GET("/admin/info")
             if (response.data.code === 0) {
+                this.index++
                 this.run_info = response.data.data
             }
-            console.log(this.run_info)
         }
     },
     async mounted() {
         const user_json = localStorage.getItem("user_info")
         if (user_json && user_json.length > 0) {
+            this.user = JSON.parse(user_json)
             try {
-                this.user = JSON.parse(user_json)
+                const response = await axios.get(`https://ip-api.com/json/${this.user.login_ip}?lang=zh-CN`)
+                this.user.city_name = response.data.city
             } catch (e) {
                 this.user.city_name = "未知"
             }
         }
         await this.refresh_sever_info();
-        this.query_operator_record().then(() => {
-
-        })
+        await this.handlePageChange(1)
     }
 }
 </script>

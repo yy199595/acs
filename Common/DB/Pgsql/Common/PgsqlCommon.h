@@ -4,6 +4,7 @@
 
 #ifndef APP_PGSQLCOMMON_H
 #define APP_PGSQLCOMMON_H
+#include <list>
 #include "DB/Common/Url.h"
 #include "DB/Common/Explain.h"
 #include "Proto/Message/IProto.h"
@@ -23,8 +24,20 @@ namespace pgsql
 		bool debug = false;
 		db::Explain explain;
 		int conn_count = 3;
-		std::string script;
+		std::string table;
 		std::vector<std::string> address;
+	public:
+		inline static void RegisterFields()
+		{
+			REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, ping);
+			REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, count);
+			REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, retry);
+			REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, debug);
+			REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, table);
+			REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, explain);
+			REGISTER_JSON_CLASS_FIELD(pgsql::Cluster, conn_count);
+			REGISTER_JSON_CLASS_MUST_FIELD(pgsql::Cluster, address);
+		}
 	};
 
 	struct Config : public db::Url
@@ -35,7 +48,7 @@ namespace pgsql
 		std::string db;
 		std::string user;
 		int conn_count = 3;
-		std::string script;
+		std::string table;
 		std::string address;
 		std::string password;
 	};
@@ -62,6 +75,9 @@ namespace pgsql
 		constexpr unsigned int NUMBER_INT16 = 21; //16 位有符号整数
 		constexpr unsigned int NUMBER_INT32 = 23; //32 位有符号整数
 		constexpr unsigned int NUMBER_INT64 = 20; //64 位有符号整数
+		constexpr unsigned int NUMBER_SERIAL = 2179; //自增整数
+		constexpr unsigned int NUMBER_SMALL_SERIAL = 2180; //自增小整数
+		constexpr unsigned int NUMBER_BIG_SERIAL = 2182; //自增大整数
 
 
 		constexpr unsigned int NUMBER_FLOAT32 = 700; //单精度浮点数
@@ -74,6 +90,19 @@ namespace pgsql
 		constexpr unsigned int STRING_BYTES = 17; //二进制
 
 		constexpr unsigned int STRING_JSON = 114; //json
+		constexpr unsigned int STRING_JSONB = 3802; //jsonb
+
+		constexpr unsigned int ARRAY_INT2 = 1005; //int2[]
+		constexpr unsigned int ARRAY_INT4 = 1007; //int4[]
+		constexpr unsigned int ARRAY_INT8 = 1016; //int4[]
+
+		constexpr unsigned int ARRAY_TEXT = 1009;
+		constexpr unsigned int ARRAY_VARCHAR = 1015;
+
+		constexpr unsigned int ARRAY_FLOAT = 1021;
+		constexpr unsigned int ARRAY_DOUBLE = 1022;
+
+		constexpr unsigned int ARRAY_ANY = 2277;
 
 	}
 
@@ -133,6 +162,15 @@ namespace pgsql
 		std::string db;
 		std::string user;
 	};
+
+	struct ServerInfo
+	{
+	public:
+		std::string timeZone;
+		std::string serverVersion;
+		std::string clientEncoding;
+		std::string serverEncoding;
+	};
 }
 
 namespace pgsql
@@ -143,19 +181,30 @@ namespace pgsql
 #endif
 	{
 	public:
-		explicit Request(std::string sql) :  mRpcId(0), mType(pgsql::type::query), mMessage(std::move(sql)) { }
-		Request(unsigned char t, std::string message) : mRpcId(0), mType(t), mMessage(std::move(message)) { }
+		explicit Request();
+		explicit Request(const std::string& sql);
+		explicit Request(const char * sql, size_t  size);
+		Request(unsigned char t, const std::string& message);
 	public:
 		void Clear() final;
 		bool GetCommand(std::string & cmd) const;
 		int OnSendMessage(std::ostream &os) final;
 		void SetRpcId(int id) { this->mRpcId = id; }
 		inline int GetRpcId() const { return this->mRpcId; }
-		std::string ToString() final { return this->mMessage; }
+		std::string ToString() final { return this->mSql.back(); }
+	public:
+		inline void EnableCommit() { this->mEnableCommit = true; } //开启事务执行
+		inline bool IsEnableCommit() const { return this->mEnableCommit; }
+		inline void AddBatch(const std::string & sql) { this->mSql.emplace_back(sql); }
+		inline void AddBatch(const char * sql, size_t size) { this->mSql.emplace_back(sql, size); }
+		inline size_t Count() const { return this->mEnableCommit ? this->mSql.size() + 1 : this->mSql.size(); }
+	private:
+		void WriteCommand(std::ostream &os, const std::string & sql) const;
 	private:
 		int mRpcId;
 		unsigned char mType;
-		std::string mMessage;
+		bool mEnableCommit = false;
+		std::list<std::string> mSql;
 	};
 }
 
@@ -168,11 +217,12 @@ namespace pgsql
 	{
 	public:
 		int count = 0;
-		std::string mCmd;
-		std::string mError;
-		std::vector<std::string> mResults;
+		int okCount = 0;
+		std::string cmd;
+		std::list<std::string> error;
+		std::list<std::string> results;
 	public:
-		inline bool IsOk() const { return this->mError.empty(); }
+		inline bool IsOk() const { return this->error.empty(); }
 	};
 }
 
@@ -191,6 +241,7 @@ namespace pgsql
 		int OnRecvMessage(std::istream &os, size_t size) final;
 	public:
 		void DecodeData(Response & response);
+		bool GetStatus(const std::string & key, std::string & value);
 	public:
 		char mType;
 		std::string mError;

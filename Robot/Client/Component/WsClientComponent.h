@@ -24,10 +24,10 @@ namespace acs
 	private:
 		void Remove(int id) final;
 		int Connect(const std::string & address) final;
-		int Send(int id, rpc::Message * message) noexcept final;
-		char GetNet() const noexcept final { return rpc::Net::Client; }
+		inline char GetNet() const noexcept final { return rpc::net::client; }
+		int Send(int id, std::unique_ptr<rpc::Message> & message) noexcept final;
 	private:
-		int OnRequest(rpc::Message * request);
+		int OnRequest(std::unique_ptr<rpc::Message> & request);
 	private:
 		int mIndex;
 		class ProtoComponent * mProto;

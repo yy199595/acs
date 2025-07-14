@@ -28,8 +28,7 @@ namespace http
 		bool StartWriter(HttpStatus status, int timeout);
 		bool StartWriter(HttpStatus status, std::unique_ptr<Content> data, int timeout);
 	public:
-		void StartReceiveBody(int timeout);
-		inline int GetClientId() const { return this->mId; }
+		inline int GetClientId() const { return this->mSockId; }
 		void StartReceive(int id, tcp::Socket * socket, int timeout = 5);
 		void StartReceiveBody(std::unique_ptr<http::Content> content, int timeout);
 	private:
@@ -44,11 +43,14 @@ namespace http
 		void OnSendMessage(size_t size) final;
         void OnSendMessage(const asio::error_code &code) final;
 	 private:
-		int mId;
+		int mSockId;
+#ifdef __DEBUG__
+		long long mStartTime;
+#endif
 		Component * mComponent;
-		http::Request mRequest;
-		http::Response mResponse;
 		Asio::Context & mMainContext;
+		std::unique_ptr<http::Request> mRequest;
+		std::unique_ptr<http::Response> mResponse;
 	};
 }
 #endif //APP_HTTPSESSION_H

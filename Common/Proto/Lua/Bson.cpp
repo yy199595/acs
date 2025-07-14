@@ -9,11 +9,11 @@
 namespace lua
 {
 
-	bool LuaToBson(lua_State* L, int index, bson::Writer::Document& document);
+	bool LuaToBson(lua_State* L, int index, bson::w::Document& document);
 
-	bool LuaArrayToBson(lua_State* L, int index, bson::Writer::Array& array);
+	bool LuaArrayToBson(lua_State* L, int index, bson::w::Document& array);
 
-	bool LuaToBson(lua_State* L, int index, bson::Writer::Document& document)
+	bool LuaToBson(lua_State* L, int index, bson::w::Document& document)
 	{
 		if (index < 0)
 		{
@@ -78,7 +78,7 @@ namespace lua
 				{
 					if (lua_rawlen(L, valueIndex) > 0)
 					{
-						bson::Writer::Array array;
+						bson::w::Document array(false);
 						if (LuaArrayToBson(L, valueIndex, array))
 						{
 							document.Add(key.c_str(), array);
@@ -87,7 +87,7 @@ namespace lua
 					else
 					{
 						// 是嵌套表
-						bson::Writer::Document subDocument;
+						bson::w::Document subDocument;
 						if (LuaToBson(L, valueIndex, subDocument))
 						{
 							document.Add(key.c_str(), subDocument);
@@ -112,7 +112,7 @@ namespace lua
 		return true;
 	}
 
-	bool LuaArrayToBson(lua_State* L, int index, bson::Writer::Array& array)
+	bool LuaArrayToBson(lua_State* L, int index, bson::w::Document& array)
 	{
 		if (index < 0)
 		{
@@ -133,45 +133,52 @@ namespace lua
 			{
 				case LUA_TBOOLEAN:
 				{
-					bool value = lua_toboolean(L, -1);
-					array.Add(value);
+					array.Push(lua_toboolean(L, -1));
 					break;
 				}
 				case LUA_TNUMBER:
 				{
-					lua_Number value = lua_tonumber(L, -1);
-					if (value == static_cast<lua_Integer>(value))
+					if(lua_isinteger(L, index))
 					{
-						array.Add(static_cast<lua_Integer>(value));
+						long long value = lua_tointeger(L, -1);
+						if(value >= std::numeric_limits<int>::max())
+						{
+							array.Push(value);
+						}
+						else
+						{
+							array.Push((int)value);
+						}
 					}
 					else
 					{
-						array.Add(static_cast<double>(value));
+						array.Push(lua_tonumber(L, -1));
 					}
 					break;
 				}
 				case LUA_TSTRING:
 				{
-					const char* value = lua_tostring(L, -1);
-					array.Add(std::string(value));
+					size_t count = 0;
+					const char* value = luaL_tolstring(L, -1, &count);
+					array.Push(std::string(value, count));
 					break;
 				}
 				case LUA_TTABLE:
 				{
 					if (lua_rawlen(L, -1) > 0)
 					{
-						bson::Writer::Array subArray;
+						bson::w::Document subArray(false);
 						if (LuaArrayToBson(L, -1, subArray))
 						{
-							array.Add(subArray);
+							array.Push(subArray);
 						}
 					}
 					else
 					{
-						bson::Writer::Document subDocument;
+						bson::w::Document subDocument;
 						if (LuaToBson(L, -1, subDocument))
 						{
-							array.Add(subDocument);
+							array.Push(subDocument);
 						}
 					}
 					break;
@@ -196,7 +203,7 @@ namespace lua
 			luaL_error(L, "must type table");
 			return 0;
 		}
-		bson::Writer::Document document;
+		bson::w::Document document;
 		{
 			int length = 0;
 			LuaToBson(L, 1, document);
@@ -327,7 +334,7 @@ namespace lua
 
 	bool lbson::read(lua_State* L, int index, std::string& bson)
 	{
-		bson::Writer::Document document;
+		bson::w::Document document;
 		{
 			int length = 0;
 			if(!LuaToBson(L, index, document))

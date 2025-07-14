@@ -36,11 +36,6 @@ namespace tcp
 		~Socket() { }
 #endif
 
-#ifdef __MEMORY_POOL_OPERATOR__
-	public:
-		 void * operator new(size_t size);
-		 void operator delete (void * ptr);
-#endif
 	 public:
 		bool Init();
 		void MakeNewSocket();
@@ -61,22 +56,16 @@ namespace tcp
 		inline std::string & GetIp() { return this->mIp;}
 		unsigned short GetPort() const { return this->mPort;}
 		inline bool IsClient() const { return this->mIsClient; }
-		inline const std::string& GetAddress() { return this->mAddress; }
-		void Clear() { this->mPort = 0; this->mAddress.clear(); this->mIp.clear(); }
+		inline bool IsActive() const { return this->mIsActive; }
 	private:
+		bool mIsActive;
 		bool mIsClient;
 		std::string mIp;
 		unsigned short mPort;
-		std::string mAddress;
 		Asio::Context & mContext;
 		std::unique_ptr<Asio::Socket> mSocket;
 #ifdef __ENABLE_OPEN_SSL__
 		std::unique_ptr<Asio::ssl::Socket> mSslSocket;
-#endif
-#ifdef __MEMORY_POOL_OPERATOR__
-	private:
-		static std::mutex sMutex;
-		static std::vector<void *> sAllocArray;
 #endif
     };
 }

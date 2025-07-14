@@ -10,12 +10,12 @@ namespace help
 	namespace bit
 	{
 		template<typename T>
-		inline std::enable_if_t<std::is_integral<T>::value, void> Set(int pos, T & value)
+		inline std::enable_if_t<std::is_integral<T>::value, void> Set(size_t pos, T & value, T num)
 		{
-			value |= (static_cast<T>(1) << pos);
+			value |= (num<< pos);
 		}
 		template<typename T>
-		inline std::enable_if_t<std::is_integral<T>::value, void> Get(int pos, const T & value)
+		inline std::enable_if_t<std::is_integral<T>::value, T> Get(size_t pos, const T & value)
 		{
 			return (value >> pos) & static_cast<T>(1);
 		}

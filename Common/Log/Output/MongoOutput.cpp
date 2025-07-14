@@ -28,7 +28,7 @@ namespace custom
 	{
 		std::string time = help::Time::GetDateString();
 
-		bson::Writer::Document document;
+		bson::w::Document document;
 		if(!logInfo.File.empty())
 		{
 			document.Add("file", logInfo.File);

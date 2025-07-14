@@ -4,6 +4,7 @@
 
 #include"HttpWebComponent.h"
 #include"Entity/Actor/App.h"
+#include "Timer/Timer/ElapsedTimer.h"
 #include"Core/System/System.h"
 #include"Http/Client/HttpSession.h"
 #include"Http/Service/HttpService.h"
@@ -388,6 +389,9 @@ namespace acs
 				LOG_ERROR("[{}] {} {}", ip, request->GetUrl().Path(), HttpStatusToString(HttpStatus::NOT_FOUND));
 				break;
 			}
+#ifdef __DEBUG__
+			timer::ElapsedTimer timer;
+#endif
 			int logicCode = httpService->Invoke(config, *request, *response);
 			if (response->GetBody() == nullptr)
 			{
@@ -406,7 +410,7 @@ namespace acs
 				head.Get(http::Header::RealIp, ip);
 				const http::Url& url = request->GetUrl();
 				const std::string& desc = CodeConfig::Inst()->GetDesc(logicCode);
-				LOG_WARN("({})[{}] code:{} => {}", url.Method(), url.ToStr(), logicCode, desc);
+				LOG_WARN("[{}ms] ({})[{}] code:{} => {}", timer.GetMs(), url.Method(), url.ToStr(), logicCode, desc);
 			}
 #endif
 		}
@@ -431,7 +435,6 @@ namespace acs
 
 		std::unique_ptr<json::w::Value> data = document.AddObject("web");
 		{
-			data->Add("memory", byteCount);
 			data->Add("sum", this->mRecordInfo.sum);
 			data->Add("conn", this->mRecordInfo.conn);
 			data->Add("wait", this->mRecordInfo.wait);
@@ -439,6 +442,8 @@ namespace acs
 			data->Add("success", this->mRecordInfo.success);
 			data->Add("failure", this->mRecordInfo.failure);
 			data->Add("timeout", this->mRecordInfo.timeout);
+
+			data->Add("memory", byteCount);
 		}
 	}
 
@@ -467,6 +472,8 @@ namespace acs
 			}
 			this->mHttpClients.erase(iter);
 		}
+		code == XCode::Ok
+		? this->mRecordInfo.success++ : this->mRecordInfo.failure++;
 	}
 
 	bool HttpWebComponent::OnListen(tcp::Socket* socket) noexcept
@@ -492,8 +499,6 @@ namespace acs
 			this->mRecordInfo.failure++;
 			return false;
 		}
-		code == HttpStatus::OK
-		? this->mRecordInfo.success++ : this->mRecordInfo.failure++;
 		return httpClient->StartWriter(code, timeout);
 	}
 
@@ -505,8 +510,6 @@ namespace acs
 			this->mRecordInfo.failure++;
 			return false;
 		}
-		code == HttpStatus::OK
-		? this->mRecordInfo.success++ : this->mRecordInfo.failure++;
 		return httpClient->StartWriter(code, std::move(httpContent), timeout);
 	}
 

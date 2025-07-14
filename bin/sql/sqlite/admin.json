@@ -1,0 +1,52 @@
+{
+	"name" : "admin_list",
+	"fields" : {
+		"name" : {
+			"type" : "VARCHAR(64)",
+			"notnull" : true,
+			"comment" : "用户名"
+		},
+		"user_id" : {
+			"type" : "INT",
+			"unique" : true,
+			"notnull" : true,
+			"comment" : "用户ID"
+		},
+		"account" : {
+			"type" : "VARCHAR(64)",
+			"notnull" : true,
+			"unique" : true,
+			"comment" : "账户",
+			"primary_key": true
+		},
+		"password" : {
+			"type" : "VARCHAR(64)",
+			"notnull" : true,
+			"comment" : "密码"
+		},
+		"login_time" : {
+			"type" : "BIGINT",
+			"notnull" : true,
+			"default" : 0,
+			"comment" : "登录时间"
+		},
+		"permission" : {
+			"type" : "INT",
+			"notnull" : true,
+			"default" : 1,
+			"comment" : "用户权限"
+		},
+		"create_time" : {
+			"type" : "BIGINT",
+			"notnull" : true,
+			"default" : 0,
+			"comment" : "创建时间"
+		},
+		"login_ip" : {
+			"type" : "VARCHAR(64)",
+			"notnull" : true,
+			"default" : "",
+			"comment" : "上次登录IP"
+		}
+	}
+}

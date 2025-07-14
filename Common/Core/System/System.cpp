@@ -87,14 +87,14 @@ namespace os
 		{
 			commandLine.emplace_back(argv[index]);
 		}
-		System::SetEnv("id", "1"); //服务器id
-		System::SetEnv("log", "1"); //日志等级
-		System::SetEnv("name", "server");
-		System::SetEnv("node", "all");
-		System::SetEnv("db", "127.0.0.1"); //db地址
-		System::SetEnv("exe", commandLine[0]);
-		System::SetEnv("config", "./config/run/all.json");
-		std::string work = fmt::format("{0}/", getcwd(nullptr, 0));
+		System::SetAppEnv("id", "1"); //服务器id
+		System::SetAppEnv("node", "all");
+		System::SetAppEnv("name", "server");
+		System::SetAppEnv("db", "127.0.0.1"); //db地址
+		System::SetAppEnv("config", "./config/run/all.json");
+
+		char buffer[256] = { 0 };
+		std::string work = fmt::format("{0}/", getcwd(buffer, sizeof(buffer)));
 		help::Str::ReplaceString(work, "\\", "/");
 		if (work.back() == '/')
 		{
@@ -117,10 +117,10 @@ namespace os
 				CONSOLE_LOG_ERROR("args:{} format error", line);
 				return false;
 			}
-			System::SetEnv(result[0], result[1]);
+			System::SetAppEnv(result[0], result[1]);
 		}
 		std::string path;
-		System::GetEnv("CONFIG", path);
+		System::GetAppEnv("CONFIG", path);
 		CONSOLE_LOG_DEBUG("config path = {}", path);
 #ifdef __OS_WIN__
 		SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
@@ -141,10 +141,15 @@ namespace os
 		System::SetEnv(key, val);
 	}
 
-	bool System::GetEnv(const std::string& k, int& v)
+	void System::LuaSetAppEnv(const char* key, const char* val)
+	{
+		System::SetAppEnv(key, val);
+	}
+
+	bool System::GetAppEnv(const std::string& k, int& v)
 	{
 		std::string value;
-		if (!System::GetEnv(k, value))
+		if (!System::GetAppEnv(k, value))
 		{
 			return false;
 		}
@@ -152,7 +157,7 @@ namespace os
 		return true;
 	}
 
-	bool System::GetEnv(const std::string& k, std::string& v)
+	bool System::GetAppEnv(const std::string& k, std::string& v)
 	{
 		std::string str = fmt::format("APP_{}", k);
 		help::Str::Toupper(str);
@@ -183,7 +188,7 @@ namespace os
 		return false;
 	}
 
-	bool System::Run(const std::string& cmd, std::string& output)
+	bool System::Run(const std::string& cmd, std::list<std::string> & output)
 	{
 #ifdef __OS_WIN__
 		FILE* pipe = _popen(cmd.c_str(), "r");
@@ -195,14 +200,14 @@ namespace os
 			return false;
 		}
 		size_t count = 0;
-		char buffer[512] = { 0 };
+		char buffer[1024] = { 0 };
 		while (!feof(pipe) && count <= 1000)
 		{
 			count++;
 			size_t len = fread(buffer, 1, sizeof(buffer), pipe);
 			if (len > 0)
 			{
-				output.append(buffer, len);
+				output.emplace_back(buffer, len);
 			}
 		}
 #ifdef __OS_WIN__
@@ -214,12 +219,7 @@ namespace os
 
 	}
 
-	bool System::HasEnv(const std::string& k)
-	{
-		return getenv(k.c_str()) != nullptr;
-	}
-
-	void System::SetEnv(const std::string& k, const std::string& v)
+	void System::SetAppEnv(const std::string& k, const std::string& v)
 	{
 		std::string str = fmt::format("APP_{}", k);
 		help::Str::Toupper(str);
@@ -231,9 +231,19 @@ namespace os
 		System::AddValue(k, v);
 	}
 
+	void System::SetEnv(const std::string& k,const std::string& v)
+	{
+#if WIN32
+		_putenv_s(k.c_str(), v.c_str());
+#else
+		setenv(k.c_str(), v.c_str(), 1);
+#endif
+	}
+
 	bool System::ReadFile(const std::string& path, std::string& content)
 	{
-		std::ifstream fs(path);
+		std::ifstream fs;
+		fs.open(path, std::ios::binary | std::ios::in);
 		if (!fs.is_open())
 		{
 			return false;

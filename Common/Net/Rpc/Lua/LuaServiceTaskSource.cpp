@@ -34,7 +34,7 @@ namespace acs
 	void LuaServiceTaskSource::WriteRpcResponse(lua_State* lua) noexcept
 	{
 		this->mRpcData->Body()->clear();
-		this->mRpcData->SetProto(rpc::Proto::None);
+		this->mRpcData->SetProto(rpc::proto::none);
 		this->mCode = (int)luaL_checkinteger(lua, 2);
 		if (this->mCode != XCode::Ok)
 		{
@@ -45,7 +45,7 @@ namespace acs
 			std::string pb;
 			if (this->mRpcData->TempHead().Get("pb", pb))
 			{
-				this->mRpcData->SetProto(rpc::Proto::Protobuf);
+				this->mRpcData->SetProto(rpc::proto::pb);
 				pb::Message* message = App::GetProto()->Temp(pb);
 				if (message == nullptr)
 				{
@@ -58,11 +58,11 @@ namespace acs
 					this->mCode = XCode::ParseMessageError;
 					return;
 				}
-				this->mRpcData->WriteMessage(message);
+				message->SerializePartialToString(this->mRpcData->Body());
 			}
 			else
 			{
-				this->mRpcData->SetProto(rpc::Proto::Json);
+				this->mRpcData->SetProto(rpc::proto::json);
 				lua::yyjson::read(lua, 3, *this->mRpcData->Body());
 			}
 		}
@@ -71,7 +71,7 @@ namespace acs
 			size_t len = 0;
 			const char* str = lua_tolstring(lua, 3, &len);
 			this->mRpcData->Body()->append(str, len);
-			this->mRpcData->SetProto(rpc::Proto::String);
+			this->mRpcData->SetProto(rpc::proto::string);
 		}
 	}
 

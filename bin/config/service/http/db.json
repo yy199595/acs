@@ -1,0 +1,43 @@
+{
+	"/db/redis" : {
+		"type" : "POST",
+		"auth" : false,
+		"async" : true,
+		"desc" : "执行redis命令",
+		"bind" : "DBHttpService.Redis",
+		"content-type": "application/json"
+	},
+	"/db/mysql" : {
+		"type" : "POST",
+		"auth" : false,
+		"async" : true,
+		"desc" : "执行mysql命令",
+		"bind" : "DBHttpService.Mysql",
+		"content-type": "application/json",
+		"request" : {
+			"sql" : ""
+		}
+	},
+	"/db/pgsql" : {
+		"type" : "POST",
+		"auth" : false,
+		"async" : true,
+		"desc" : "执行pgsql命令",
+		"bind" : "DBHttpService.Pgsql",
+		"content-type": "application/json",
+		"request" : {
+			"sql" : ""
+		}
+	},
+	"/db/mongo" : {
+		"type" : "POST",
+		"auth" : false,
+		"async" : true,
+		"desc" : "执行mongodb命令",
+		"bind" : "DBHttpService.Mongo",
+		"content-type": "application/json",
+		"request" : {
+			"sql" : ""
+		}
+	}
+}

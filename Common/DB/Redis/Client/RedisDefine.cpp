@@ -32,7 +32,6 @@ namespace redis
 
 	std::string Request::ToString()
 	{
-		std::string json;
 		json::w::Document document;
 		std::unique_ptr<json::w::Value> list = document.AddArray(this->mCommand.c_str());
 		{
@@ -41,8 +40,7 @@ namespace redis
 				list->Push(str.c_str(), str.size());
 			}
 		}
-		document.Encode(&json);
-		return json;
+		return document.JsonString();
 	}
 
 	std::unique_ptr<Request> Request::MakeLua(const std::string& key, const std::string& func, const std::string & json)
@@ -118,12 +116,12 @@ namespace redis
 			}
 			case redis::type::Array:
 			{
+				int index = 1;
 				lua_createtable(lua, 0, (int)element.list.size());
-				for (size_t index = 0; index < element.list.size(); index++)
+				for(const Element& item : element.list)
 				{
-					const Element& item = element.list.at(index);
 					this->WriteElementLua(item, lua);
-					lua_seti(lua, -2, (int)index + 1);
+					lua_seti(lua, -2, index++);
 				}
 				return 1;
 			}

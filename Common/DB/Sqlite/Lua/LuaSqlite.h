@@ -14,8 +14,9 @@ namespace lua
 		int Del(lua_State * lua);
 		int SetTimeout(lua_State * lua);
 
-		int Exec(lua_State* lua);
-		int Query(lua_State* lua);
+		int Run(lua_State* lua);
+		int Build(lua_State * lua);
+		int Invoke(lua_State * lua);
 	}
 }
 #endif //APP_COMMON_SQLITE_LUA_LUASQLITE_H

@@ -43,11 +43,13 @@ namespace acs
 		return true;
 	}
 
-	void OuterWebSocketComponent::OnMessage(int id, rpc::Message* request, rpc::Message* response) noexcept
+	void OuterWebSocketComponent::OnMessage(rpc::Message* req, rpc::Message* ) noexcept
 	{
 		++this->mSumCount;
+		std::unique_ptr<rpc::Message> request(req);
 		if(this->mOuter->OnMessage(request) != XCode::Ok)
 		{
+			int id = request->SockId();
 			auto iter = this->mSessions.find(id);
 			if(iter != this->mSessions.end())
 			{
@@ -56,12 +58,12 @@ namespace acs
 		}
 	}
 
-	void OuterWebSocketComponent::Broadcast(rpc::Message* message) noexcept
+	void OuterWebSocketComponent::Broadcast(std::unique_ptr<rpc::Message> & message) noexcept
 	{
 
 	}
 
-	int OuterWebSocketComponent::Send(int id, rpc::Message* message) noexcept
+	int OuterWebSocketComponent::Send(int id, std::unique_ptr<rpc::Message> & message) noexcept
 	{
 		auto iter = this->mSessions.find(id);
 		if(iter != this->mSessions.end())

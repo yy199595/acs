@@ -1,0 +1,6 @@
+{
+	"TelnetSystem.Run": {
+		"async": true,
+		"proto" : "json"
+	}
+}

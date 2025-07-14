@@ -1,0 +1,26 @@
+{
+	"name" : "registry_list",
+	"fields" : {
+		"id" : {
+			"type" : "INT",
+			"notnull" : true,
+			"primary_key": true,
+			"comment" : "节点ID"
+		},
+		"name" : {
+			"type" : "VARCHAR(64)",
+			"notnull" : true,
+			"comment" : "节点名称"
+		},
+		"listen" : {
+			"type" : "JSON",
+			"notnull" : true,
+			"comment" : "服务器地址列表"
+		},
+		"last_time" : {
+			"type" : "BIGINT",
+			"notnull" : true,
+			"comment" : "刷新时间"
+		}
+	}
+}

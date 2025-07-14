@@ -31,6 +31,14 @@ namespace mongo
         int opCode;
     };
 
+	struct Info
+	{
+	public:
+		std::string host;
+		std::string memory;
+		std::string version;
+	};
+
 	class Request final : public tcp::IProto
 #ifdef __SHARE_PTR_COUNTER__
 			, public memory::Object<Request>
@@ -44,15 +52,15 @@ namespace mongo
 		int OnSendMessage(std::ostream &os) final;
 		int GetRpcId() const { return this->header.requestID; }
 	public:
+		void Insert(bson::w::Document & document);
+	public:
 		Request & GetCollection(const char * cmd, const std::string & tab);
 	public:
 		Request & Skip(int skip = 1);
 		Request & Limit(int limit = 1);
-		Request & Query(bson::Writer::Document & doc);
-		Request & Filter(bson::Writer::Document & doc);
-	public:
-		void Insert(bson::Writer::Array & documents);
-		void Insert(bson::Writer::Document & document);
+		Request & Query(bson::w::Document & doc);
+		bool Filter(bson::w::Document & doc);
+		bool Filter(json::r::Value & filter);
 	public:
         int flag;
 		Head header;
@@ -61,7 +69,7 @@ namespace mongo
 		int numberToSkip;
 		int numberToReturn;
 		std::string dataBase;
-		bson::Writer::Document document;
+		bson::w::Document document;
 	};
 
 	class Response final
@@ -70,20 +78,18 @@ namespace mongo
 #endif
     {
     public:
-		Response(const std::string & cmd);
-		Response(int id, const std::string & cmd);
+		Response(std::string  cmd);
+		Response(int id, std::string  cmd);
     public:
 		const Head & GetHead() const { return this->mHead;}
 		inline int RpcId() const { return this->mHead.responseTo; }
 		inline void SetRpcId(int id) { this->mHead.responseTo = id; }
 		inline long long GetCursor() const { return this->cursorID; }
-		const bson::Reader::Document & Document() const { return this->mDocument; }
 	public:
 		std::string ToString();
 		bool Encode(std::string * json);
 		int OnRecvMessage(std::istream &os, size_t size);
-		inline bool IsEmpty() const { return this->mResult.empty(); }
-		const std::vector<std::string> & GetResults() const { return this->mResult; }
+		inline bool IsEmpty() const { return this->result.empty(); }
 	private:
 		bool DecodeQuery();
 	private:
@@ -94,9 +100,13 @@ namespace mongo
         int startingFrom;   // where in the cursor this reply is starting
         int numberReturned; // number of documents in the reply
 		const std::string cmd;
-		std::unique_ptr<char[]> mBuffer;
-		bson::Reader::Document mDocument;
-		std::vector<std::string> mResult;
+#ifdef __DEBUG__
+		//std::string mJson;
+#endif
+	public:
+		bson::r::Document document;
+		std::list<std::string> result;
+		std::unique_ptr<char[]> buffer;
     };
 }
 

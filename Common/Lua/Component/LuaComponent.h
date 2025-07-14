@@ -19,7 +19,7 @@ namespace acs
 
 	class LuaComponent final : public Component,
 							   public IStart, public IComplete, public IRefresh,
-							   public IServerRecord, public IAppStop, public ISecondUpdate
+							   public IServerRecord, public IAppStop, public ISecondUpdate, public IDestroy
 	{
 	public:
 		LuaComponent();
@@ -34,6 +34,7 @@ namespace acs
 		void OnAppStop() final;
 		void OnComplete() final;
 		bool OnRefresh() final;
+		void OnDestroy() final;
 		void OnSecondUpdate(int tick) noexcept final;
 		void OnRecord(json::w::Document &document) final;
 	private:

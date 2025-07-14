@@ -22,7 +22,7 @@ namespace rpc
 		~OuterTcpSession() final;
 	 public:
 		void Stop();
-		void Send(rpc::Message * message);
+		void Send(std::unique_ptr<rpc::Message> & message);
 		void StartReceive(tcp::Socket * socket, int second = 0);
 		inline void BindPlayer(long long id) { this->mPlayerId = id; }
 		inline long long GetPlayerId() const { return this->mPlayerId; }
@@ -34,10 +34,9 @@ namespace rpc
 		void SendFirstMessage();
 		void CloseSocket(int code);
 		void OnSendMessage(size_t size) final;
-		void AddToSendQueue(rpc::Message * message);
 		void OnSendMessage(const asio::error_code &code) final;
+ 		void AddToSendQueue(std::unique_ptr<rpc::Message> & message);
 	private:
-		bool mClose;
 		int mRecvCount;
 		int mDecodeState;
 		const int mSockId;
@@ -47,7 +46,7 @@ namespace rpc
 		rpc::ProtoHead mProtoHead;
 		Asio::Context & mMainContext;
 		std::unique_ptr<rpc::Message> mMessage;
-		std::queue<rpc::Message *> mSendMessages;
+		std::queue<std::unique_ptr<rpc::Message>> mSendMessages;
 	};
 }
 

@@ -16,8 +16,10 @@ namespace pgsql
 	public:
 		Client(int id, Component * component, pgsql::Config & config, Asio::Context & main);
 	public:
+		bool InvokeCompileSql();
 		int Start(tcp::Socket * socket);
-		void Send(std::unique_ptr<pgsql::Request> request);
+		void Send(std::unique_ptr<pgsql::Request>& request);
+		inline const pgsql::ServerInfo & GetInfo() const { return this->mServerInfo; }
 	private:
 		int Auth(bool connect);
 #ifdef __ENABLE_OPEN_SSL__
@@ -28,6 +30,7 @@ namespace pgsql
 		void OnConnect(const Asio::Code &code, int count) final;
 		void OnReceiveMessage(std::istream &readStream, size_t size, const asio::error_code &code) final;
 	private:
+		bool OnCompileSql();
 		bool CreateDatabase();
 		bool ReadResponse(pgsql::Result & response);
 		bool ReadResponse(char& type, std::string & response);
@@ -39,6 +42,7 @@ namespace pgsql
 		pgsql::Config mConfig;
 		Component * mComponent;
 		pgsql::Result mResponse;
+		pgsql::ServerInfo mServerInfo;
 		std::unique_ptr<pgsql::Request> mRequest;
 	};
 }

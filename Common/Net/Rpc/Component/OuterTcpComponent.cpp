@@ -21,10 +21,10 @@ namespace acs
 
 	bool OuterTcpComponent::LateAwake()
 	{
-		std::unique_ptr<json::r::Value> jsonObject;
+		json::r::Value jsonObject;
 		if(ServerConfig::Inst()->Get("connect", jsonObject))
 		{
-			jsonObject->Get("outer", this->mMaxConnectCount);
+			jsonObject.Get("outer", this->mMaxConnectCount);
 		}
 		help::PlayerLoginEvent::Add(this, &OuterTcpComponent::OnPlayerLogin);
 		help::PlayerLogoutEvent::Add(this, &OuterTcpComponent::OnPlayerLogout);
@@ -50,8 +50,9 @@ namespace acs
 		}
 	}
 
-	void OuterTcpComponent::OnMessage(rpc::Message * message, rpc::Message *) noexcept
+	void OuterTcpComponent::OnMessage(rpc::Message * req, rpc::Message *) noexcept
 	{
+		std::unique_ptr<rpc::Message> message(req);
 		int code = this->mOuter->OnMessage(message);
 		if(code != XCode::Ok)
 		{
@@ -60,9 +61,9 @@ namespace acs
 		}
 	}
 
-	int OuterTcpComponent::Send(int id, rpc::Message * message) noexcept
+	int OuterTcpComponent::Send(int id, std::unique_ptr<rpc::Message> & message) noexcept
 	{
-		if (message->GetType() == rpc::Type::Response)
+		if (message->GetType() == rpc::type::response)
 		{
 			--this->mWaitCount;
 		}
@@ -104,19 +105,18 @@ namespace acs
 		LOG_DEBUG("remove client({}) count:{}", id, this->mGateClientMap.size());
 	}
 
-	void OuterTcpComponent::OnSendFailure(int id, rpc::Message* message)
+	void OuterTcpComponent::OnSendFailure(int id, rpc::Message* req)
 	{
 		int sockId = 0;
+		std::unique_ptr<rpc::Message> message(req);
 		message->GetHead().Add(rpc::Header::code, XCode::SendMessageFail);
-		if(message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
+		if(message->GetType() == rpc::type::request && message->GetRpcId() > 0)
 		{
 			if(message->GetHead().Get(rpc::Header::sock_id, sockId))
 			{
 				this->Send(sockId, message);
-				return;
 			}
 		}
-		delete message;
 	}
 
 	void OuterTcpComponent::StartClose(int id, int code)
@@ -139,20 +139,19 @@ namespace acs
 		}
     }
 
-	void OuterTcpComponent::Broadcast(rpc::Message * message) noexcept
+	void OuterTcpComponent::Broadcast(std::unique_ptr<rpc::Message>& message) noexcept
 	{
-		message->SetType(rpc::Type::Request);
+		message->SetType(rpc::type::request);
 		for(auto iter = this->mGateClientMap.begin(); iter != this->mGateClientMap.end(); iter++)
 		{
-			if(iter->second->GetPlayerId() == 0)
+			if(iter->second->GetPlayerId() > 0)
 			{
 				continue;
 			}
 			std::unique_ptr<rpc::Message> broadCastMessage = message->Clone();
 			{
-				iter->second->Send(broadCastMessage.release());
+				iter->second->Send(broadCastMessage);
 			}
 		}
-		delete message;
 	}
 }

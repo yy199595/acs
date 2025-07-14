@@ -60,7 +60,7 @@ namespace acs
 		{
 			return false;
 		}
-		std::unique_ptr<json::r::Value> value;
+		json::r::Value value;
 		for(const char * key : keys)
 		{
 			if(!this->Get(key, value))
@@ -70,7 +70,7 @@ namespace acs
 			const std::string name(key);
 			std::unique_ptr<NodeConfig> nodeConfig = std::make_unique<NodeConfig>(name);
 			{
-				nodeConfig->OnLoadConfig(*value);
+				nodeConfig->OnLoadConfig(value);
 				std::vector<std::string> services;
 				nodeConfig->GetRpcServices(services);
 				nodeConfig->GetHttpServices(services);

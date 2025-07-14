@@ -42,13 +42,13 @@ namespace acs
 			help::Time::Date timeData2 = help::Time::CalcHourMinSecond(end * config::TimerPrecision);
 			help::Time::Date timeData1 = help::Time::CalcHourMinSecond(start * config::TimerPrecision);
 
-			LOG_DEBUG("layer:{} min:[{}:{}:{}] max:[{}:{}:{}]", index + 1, timeData1.Hour + timeData1.Day * 24,
-					timeData1.Minute, timeData1.Second, timeData2.Hour + timeData2.Day * 24, timeData2.Minute, timeData2.Second);
+//			LOG_DEBUG("layer:{} min:[{}:{}:{}] max:[{}:{}:{}]", index + 1, timeData1.Hour + timeData1.Day * 24,
+//					timeData1.Minute, timeData1.Second, timeData2.Hour + timeData2.Day * 24, timeData2.Minute, timeData2.Second);
 		}
 		long long nowTime = help::Time::NowSec();
 		this->mNextUpdateTime = help::Time::NowMil();
 		long long diffTime = help::Time::GetNewTime(1) - nowTime;
-		this->DelayCall((int)(diffTime * 1000), &TimerComponent::OnNewDay, this);
+		this->Timeout((int)(diffTime * 1000), &TimerComponent::OnNewDay, this);
 		return true;
 	}
 
@@ -62,7 +62,7 @@ namespace acs
 		}
 		long long nowTime = help::Time::NowSec();
 		long long diffTime = help::Time::GetNewTime(1) - nowTime;
-		this->DelayCall((int)(diffTime * 1000), &TimerComponent::OnNewDay, this);
+		this->Timeout((unsigned int)(diffTime * 1000), &TimerComponent::OnNewDay, this);
 	}
 
 	bool TimerComponent::AddTimer(std::unique_ptr<TimerBase> timer)
@@ -85,7 +85,7 @@ namespace acs
 		std::unique_ptr<TimerBase> timerBase = std::make_unique<DelayTimer>(ms, std::move(func));
 		if (ms == 0)
 		{
-			this->mLastFrameTriggerTimers.push(timerBase->mTimerId);
+			this->mLastFrameTriggerTimers.emplace(timerBase->mTimerId);
 			this->mTimerMap.emplace(timerBase->mTimerId, std::move(timerBase));
 			return 0;
 		}
@@ -96,13 +96,13 @@ namespace acs
 	bool TimerComponent::CancelTimer(long long id)
 	{
 		auto iter = this->mTimerMap.find(id);
-		if (iter != this->mTimerMap.end())
+		if (iter == this->mTimerMap.end())
 		{
-			this->mCancelCount++;
-            this->mTimerMap.erase(iter);
-			return true;
+			return false;
 		}
-		return false;
+		this->mCancelCount++;
+		this->mTimerMap.erase(iter);
+		return true;
 	}
 
 	void TimerComponent::OnSystemUpdate() noexcept
@@ -237,8 +237,8 @@ namespace acs
 	{
 		long long nowTime = help::Time::NowMil();
 		long long useTime = timer->GetTargetTime() - nowTime;
-		help::Time::Date timeDate = help::Time::CalcHourMinSecond(useTime);
-		CONSOLE_LOG_WARN("run in => {}:{}:{}", timeDate.Hour + timeDate.Day * 24, timeDate.Minute, timeDate.Second);
+//		help::Time::Date timeDate = help::Time::CalcHourMinSecond(useTime);
+//		CONSOLE_LOG_WARN("run in => {}:{}:{}", timeDate.Hour + timeDate.Day * 24, timeDate.Minute, timeDate.Second);
 		unsigned int tick = (unsigned int)useTime / config::TimerPrecision;
 		if (tick <= 0)
 		{
@@ -259,7 +259,7 @@ namespace acs
 		return false;
 	}
 
-	long long TimerComponent::DelayCall(int ms, std::function<void()>&& callback)
+	long long TimerComponent::Timeout(unsigned int ms, std::function<void()>&& callback)
 	{
 		return this->CreateTimer(ms, std::make_unique<LambdaMethod>(std::move(callback)));
 	}

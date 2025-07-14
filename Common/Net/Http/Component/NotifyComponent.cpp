@@ -39,11 +39,11 @@ namespace acs
 
 	bool NotifyComponent::Awake()
 	{
-		std::unique_ptr<json::r::Value> jsonObject;
+		json::r::Value jsonObject;
 		LOG_CHECK_RET_FALSE(this->mApp->Config().Get("notify", jsonObject))
 		{
-			LOG_CHECK_RET_FALSE(jsonObject->Get("wx", this->mWxUrl))
-			LOG_CHECK_RET_FALSE(jsonObject->Get("ding", this->mDingUrl))
+			LOG_CHECK_RET_FALSE(jsonObject.Get("wx", this->mWxUrl))
+			LOG_CHECK_RET_FALSE(jsonObject.Get("ding", this->mDingUrl))
 		}
 		LOG_CHECK_RET_FALSE(help::Str::IsHttpAddr(this->mWxUrl))
 		LOG_CHECK_RET_FALSE(help::Str::IsHttpAddr(this->mDingUrl))
@@ -62,7 +62,7 @@ namespace acs
 		document.Add("content", message);
 		std::unique_ptr<http::Request> request = acs::Make(this->mWxUrl, document, "text");
 		{
-			this->mHttp->Send(std::move(request), [](std::unique_ptr<http::Response> response)
+			this->mHttp->Send(request, [](std::unique_ptr<http::Response>& response)
 			{
 				CONSOLE_LOG_INFO("{}", response->GetBody()->ToStr());
 			});
@@ -87,7 +87,7 @@ namespace acs
 		document.Add("content", content);
 		auto request = acs::Make(url, document, "markdown");
 		{
-			this->mHttp->Send(std::move(request), [](std::unique_ptr<http::Response> response)
+			this->mHttp->Send(request, [](std::unique_ptr<http::Response>& response)
 			{
 				CONSOLE_LOG_FATAL("{}", response->GetBody()->ToStr());
 			});
@@ -142,10 +142,10 @@ namespace acs
 		auto request = acs::Make(url, document, "template_card");
 		if (async)
 		{
-			this->mHttp->Do(std::move(request));
+			this->mHttp->Do(request);
 			return;
 		}
-		this->mHttp->Send(std::move(request), [](std::unique_ptr<http::Response> response)
+		this->mHttp->Send(request, [](std::unique_ptr<http::Response>& response)
 		{
 
 		});
@@ -158,7 +158,7 @@ namespace acs
 		document.Add("content", message);
 		std::unique_ptr<http::Request> request = acs::Make(this->mDingUrl, document, "text");
 		{
-			this->mHttp->Send(std::move(request), [](std::unique_ptr<http::Response> response)
+			this->mHttp->Send(request, [](std::unique_ptr<http::Response>& response)
 			{
 				CONSOLE_LOG_INFO("{}", response->GetBody()->ToStr());
 			});

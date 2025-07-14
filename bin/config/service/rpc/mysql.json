@@ -1,47 +1,207 @@
 {
-    "MysqlDB.Insert": {
+    "MysqlReadProxy.Run" : {
         "async": true,
-        "request": "db.sql.insert",
-        "response": "db.sql.response"
+        "proto" : "json",
+        "request" : {
+            "sql" : ""
+        },
+        "response" : {
+            "list" : []
+        }
     },
-    "MysqlDB.Save": {
+    "MysqlReadProxy.Like" : {
         "async": true,
-        "request": "db.sql.save",
-        "response": "db.sql.response"
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "field" : "",
+            "value" : "",
+            "fields" : [],
+            "limit" : 1
+        },
+        "response" : {
+            "list" : []
+        }
     },
-    "MysqlDB.Exec": {
+    "MysqlReadProxy.Find" : {
         "async": true,
-        "request": "db.sql.exec",
-        "response": "db.sql.query.response"
+        "proto" : "json",
+        "request" : {
+            "limit" : 0,
+            "tab" : "",
+            "filter" : { },
+            "fields" : ["xxx"]
+        },
+        "response" : {
+            "list" : []
+        }
     },
-    "MysqlDB.Query": {
+    "MysqlReadProxy.FindOne" : {
         "async": true,
-        "request": "db.sql.query.request",
-        "response": "db.sql.query.response"
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "filter" : { },
+            "fields" : ["xxx"]
+        },
+        "response" : { }
     },
-    "MysqlDB.Update": {
+    "MysqlReadProxy.Execute" : {
         "async": true,
-        "request": "db.sql.update",
-        "response": "db.sql.response"
+        "proto" : "json",
+        "request" : {
+            "stmt" : "",
+            "args" : { }
+        },
+        "response" : {
+            "list" : []
+        }
     },
-    "MysqlDB.Create": {
+    "MysqlReadProxy.Count" : {
         "async": true,
-        "request": "db.sql.create"
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "filter" : { }
+        },
+        "response" : {
+            "count" : 0
+        }
     },
-    "MysqlDB.Delete": {
+    "MysqlReadProxy.Func" : {
         "async": true,
-        "type": "Server",
-        "request": "db.sql.del",
-        "response": "db.sql.response"
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "func" : "",
+            "field" : "",
+            "filter" : { }
+        },
+        "response" : {
+            "data" : { }
+        }
     },
-    "MysqlDB.Index": {
+    "MysqlReadProxy.FindPage" : {
         "async": true,
-        "request": "db.sql.index",
-        "desc" : "创建一个索引"
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "page" : 1,
+            "count" : 10,
+            "filter" : { },
+            "fields" : ["xxx"]
+        },
+        "response" : {
+            "list" : []
+        }
     },
-    "MysqlDB.FindPage": {
+    "MysqlReadProxy.Distinct" : {
         "async": true,
-        "request": "db.sql.query.page",
-        "response": "db.sql.query.response"
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "filter" : { },
+            "fields" : []
+        },
+        "response" : {
+            "list" : []
+        }
+    },
+    "MysqlWriteProxy.Run" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "sql" : ""
+        },
+        "response" : {
+            "list" : []
+        }
+    },
+    "MysqlWriteProxy.Inc" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "field" : "",
+            "value" : 1,
+            "limit" : 1,
+            "filter" : {}
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "MysqlWriteProxy.Commit" : {
+        "async": true,
+        "proto" : "json",
+        "request" : [],
+        "response" : {
+            "count" : 0,
+            "list" : []
+        }
+    },
+    "MysqlWriteProxy.InsertOne" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "document" : { }
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "MysqlWriteProxy.InsertBatch" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "documents" : []
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "MysqlWriteProxy.Replace" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "document" : { }
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "MysqlWriteProxy.Delete" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "limit" : 0,
+            "filter" : { }
+        }
+    },
+    "MysqlWriteProxy.Update" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "limit" : 0,
+            "filter" : { },
+            "document" : { }
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "MysqlWriteProxy.SetIndex" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "field" : "",
+            "unique" : false
+        }
     }
 }

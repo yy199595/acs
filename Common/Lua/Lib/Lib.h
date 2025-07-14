@@ -48,6 +48,8 @@ namespace lua
 		extern int luaopen_ltcp(lua_State * L);
 		extern int luaopen_lzip(lua_State * L);
 		extern int luaopen_loss(lua_State* L);
+
+		extern int luaopen_lcensor(lua_State * L);
 #ifdef __ENABLE_OPEN_SSL__
 		extern int luaopen_lrsa(lua_State * L);
 		extern int luaopen_lraes(lua_State * L);

@@ -36,17 +36,17 @@ namespace acs
 	class HttpCallbackTask final : public IRpcTask<http::Response>
 	{
 	public:
-		explicit HttpCallbackTask(int id, std::function<void(std::unique_ptr<http::Response>)> & cb)
+		explicit HttpCallbackTask(int id, std::function<void(std::unique_ptr<http::Response>&)> & cb)
 			: mCallback(cb), IRpcTask<http::Response>(id) { }
 	private:
 		inline void OnResponse(std::unique_ptr<http::Response> response) noexcept final;
 	private:
-		std::function<void(std::unique_ptr<http::Response>)> mCallback;
+		std::function<void(std::unique_ptr<http::Response>&)> mCallback;
 	};
 
 	inline void HttpCallbackTask::OnResponse(std::unique_ptr<http::Response> response) noexcept
 	{
-		this->mCallback(std::move(response));
+		this->mCallback(response);
 	}
 }
 

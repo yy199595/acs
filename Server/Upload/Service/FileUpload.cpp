@@ -6,7 +6,7 @@
 #include "Entity/Actor/App.h"
 #include "Util/File/FileHelper.h"
 #include "Util/Tools/TimeHelper.h"
-#include "Oss/Component/OssComponent.h"
+#include "AliCloud/Component/AliOssComponent.h"
 namespace acs
 {
 	FileUpload::FileUpload()
@@ -18,12 +18,12 @@ namespace acs
 
 	bool FileUpload::Awake()
 	{
-		std::unique_ptr<json::r::Value> jsonObject;
+		json::r::Value jsonObject;
 		if (!this->mApp->Config().Get("http", jsonObject))
 		{
 			return false;
 		}
-		return jsonObject->Get("domain", this->mDoMain);
+		return jsonObject.Get("domain", this->mDoMain);
 	}
 
 	bool FileUpload::OnInit()
@@ -31,7 +31,7 @@ namespace acs
 		BIND_COMMON_HTTP_METHOD(FileUpload::File);
 #ifdef __ENABLE_OPEN_SSL__
 		BIND_COMMON_HTTP_METHOD(FileUpload::Oss);
-		this->mOss = this->GetComponent<OssComponent>();
+		this->mOss = this->GetComponent<AliOssComponent>();
 #endif
 		return true;
 	}

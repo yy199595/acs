@@ -76,10 +76,6 @@ namespace Lua
 			this->OnCallError(func);
 			return XCode::CallLuaFunctionFail;
 		}
-		if(!lua_toboolean(this->mLua, -1))
-		{
-			return XCode::Ok;
-		}
 		task->Await<void>();
 		return XCode::Ok;
 	}

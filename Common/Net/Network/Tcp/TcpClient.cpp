@@ -231,17 +231,64 @@ namespace tcp
 				self->OnReadError(code);
 			}
 		};
-
+		const std::string delim("\r\n");
 #ifdef __ENABLE_OPEN_SSL__
 		if (this->mSocket->IsOpenSsl())
 		{
 			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
-			asio::async_read_until(sock, this->mRecvBuffer, "\r\n", callback);
+			asio::async_read_until(sock, this->mRecvBuffer, delim, callback);
 			return true;
 		}
 #endif
 		Asio::Socket& sock = this->mSocket->Get();
-		asio::async_read_until(sock, this->mRecvBuffer, "\r\n", callback);
+		asio::async_read_until(sock, this->mRecvBuffer, delim, callback);
+		return true;
+	}
+
+	bool Client::ReadLine(const std::string& delim, int timeout)
+	{
+		if (this->mStatus == tcp::status::read
+			|| this->mStatus == tcp::status::connect)
+		{
+			return false;
+		}
+		this->mStatus = tcp::status::read;
+		this->StartTimer(timeout, tcp::timeout::read);
+		std::shared_ptr<Client> self = this->shared_from_this();
+		auto callback = [self, timeout](const Asio::Code& code, size_t size)
+		{
+			if (timeout > 0)
+			{
+				self->StopTimer();
+			}
+			self->mStatus = tcp::status::none;
+			std::istream ss(&self->mRecvBuffer);
+			if (code.value() == Asio::OK)
+			{
+				self->OnReceiveLine(ss, size);
+				return;
+			}
+			if (self->mRecvBuffer.size() > 0)
+			{
+				size = self->mRecvBuffer.size();
+				self->OnReceiveLine(ss, size);
+				return;
+			}
+			if (code != asio::error::operation_aborted)
+			{
+				self->OnReadError(code);
+			}
+		};
+#ifdef __ENABLE_OPEN_SSL__
+		if (this->mSocket->IsOpenSsl())
+		{
+			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
+			asio::async_read_until(sock, this->mRecvBuffer, delim, callback);
+			return true;
+		}
+#endif
+		Asio::Socket& sock = this->mSocket->Get();
+		asio::async_read_until(sock, this->mRecvBuffer, delim, callback);
 		return true;
 	}
 
@@ -277,12 +324,17 @@ namespace tcp
 				self->OnReceiveMessage(ss, size, code);
 				return;
 			}
-			if (self->mRecvBuffer.size() > 0)
+			if(size > 0)
 			{
-				size = self->mRecvBuffer.size();
 				self->OnReceiveMessage(ss, size, code);
 			}
-			if (code != asio::error::operation_aborted)
+			else if (self->mRecvBuffer.size() > 0)
+			{
+				size_t count = self->mRecvBuffer.size();
+				self->OnReceiveMessage(ss, count, code);
+			}
+			if (code != asio::error::operation_aborted
+				&& code != asio::error::eof)
 			{
 				self->OnReadError(code);
 			}
@@ -345,7 +397,10 @@ namespace tcp
 				self->OnReceiveMessage(ss, size, code);
 				return;
 			}
-			//this->OnReceiveMessage(ss, size);
+			if(size > 0)
+			{
+				self->OnReceiveMessage(ss, size, code);
+			}
 			if (code != asio::error::operation_aborted)
 			{
 				self->OnReadError(code);
@@ -552,6 +607,22 @@ namespace tcp
 #endif
 		Asio::Socket& sock = this->mSocket->Get();
 		size = asio::read_until(sock, this->mRecvBuffer, "\r\n", code);
+		return code.value() == Asio::OK;
+	}
+
+	bool Client::RecvLineSync(size_t& size, const std::string& delim)
+	{
+		Asio::Code code;
+#ifdef __ENABLE_OPEN_SSL__
+		if (this->mSocket->IsOpenSsl())
+		{
+			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
+			size = asio::read_until(sock, this->mRecvBuffer, delim, code);
+			return code.value() == Asio::OK;
+		}
+#endif
+		Asio::Socket& sock = this->mSocket->Get();
+		size = asio::read_until(sock, this->mRecvBuffer, delim, code);
 		return code.value() == Asio::OK;
 	}
 

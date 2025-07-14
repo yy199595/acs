@@ -14,11 +14,15 @@ namespace acs
 	private:
 		bool OnInit() final;
 	private:
+		int ListDatabases(json::w::Document & response);
+		int FindOne(const json::r::Document & request, rpc::Message & response);
 		int Find(const json::r::Document & request, json::w::Document & response);
 		int Count(const json::r::Document & request, json::w::Document & response);
-		int FindOne(const json::r::Document & request, json::w::Document & response);
+		int Sample(const json::r::Document & request, json::w::Document & response);
 		int GetMore(const json::r::Document & request, json::w::Document & response);
 		int FindPage(const json::r::Document & request, json::w::Document & response);
+		int Aggregate(const json::r::Document & request, json::w::Document & response);
+		int ListCollections(const json::r::Document & request, json::w::Document & response);
 	private:
 		class MongoDBComponent * mMongo;
 	};

@@ -42,14 +42,14 @@
 
     /** Constructs an empty string data */
     StringData()
-      : _data(NULL), _size(0) {}
+      : _data(nullptr), _size(0) {}
 
     /**
      * Constructs a StringData, for the case where the length of string is not known. 'c'
      * must be a pointer to a null-terminated string.
      */
     StringData(const char* c)
-      : _data(c), _size((c == NULL) ? 0 : std::string::npos) {}
+      : _data(c), _size((c == nullptr) ? 0 : std::string::npos) {}
 
     /**
      * Constructs a StringData explicitly, for the case where the length of the string is

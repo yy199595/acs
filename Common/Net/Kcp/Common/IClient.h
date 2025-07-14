@@ -30,8 +30,8 @@ namespace kcp
 	public:
 		virtual void StartReceive() { };
 		virtual void Update(long long t) = 0;
-		virtual void Send(tcp::IProto * message) { };
 		virtual void Send(const char * buf, int len) = 0;
+		virtual void Send(std::unique_ptr<rpc::Message> & message) { };
 	};
 
 	inline int OnKcpSend(const char *buf, int len, struct IKCPCB *kcp, void *user)

@@ -4,8 +4,8 @@
 #include "App.h"
 #include "Actor.h"
 #include "XCode/XCode.h"
+#include "Proto/Lua/Bson.h"
 #include "Message/s2s/s2s.pb.h"
-#include "Util/Tools/TimeHelper.h"
 #include "Proto/Include/Message.h"
 #include "Rpc/Config/ServiceConfig.h"
 #include "Yyjson/Lua/ljson.h"
@@ -36,7 +36,7 @@ namespace acs
 			return XCode::MakeTcpRequestFailure;
 		}
 		const int id = message->SockId();
-		return this->mRouter->Send(id, std::move(message));
+		return this->mRouter->Send(id, message);
 	}
 
 	int Actor::Send(const std::string& func, const pb::Message& request) const
@@ -46,18 +46,19 @@ namespace acs
 		{
 			return XCode::MakeTcpRequestFailure;
 		}
-		if(!message->WriteMessage(&request))
+		if(!request.SerializeToString(message->Body()))
 		{
 			return XCode::SerializationFailure;
 		}
 		int id = message->SockId();
-		return this->mRouter->Send(id, std::move(message));
+		message->SetProto(rpc::proto::pb);
+		return this->mRouter->Send(id, message);
 	}
 
-	int Actor::Send(std::unique_ptr<rpc::Message> message) const
+	int Actor::Send(std::unique_ptr<rpc::Message>& message) const
 	{
 		int id = message->SockId();
-		return this->mRouter->Send(id, std::move(message));
+		return this->mRouter->Send(id, message);
 	}
 
 	int Actor::Call(const std::string& func) const
@@ -68,7 +69,7 @@ namespace acs
 			return XCode::MakeTcpRequestFailure;
 		}
 		int id = message->SockId();
-		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, message);
 		return result != nullptr ? result->GetCode() : XCode::NetTimeout;
 	}
 	
@@ -79,12 +80,13 @@ namespace acs
 		{
 			return XCode::MakeTcpRequestFailure;
 		}
-		if(!message->WriteMessage(&request))
+		if(!request.SerializeToString(message->Body()))
 		{
 			return XCode::SerializationFailure;
 		}
 		int id = message->SockId();
-		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
+		message->SetProto(rpc::proto::pb);
+		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, message);
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
 
@@ -96,27 +98,28 @@ namespace acs
 			return XCode::MakeTcpRequestFailure;
 		}
 		int id = message->SockId();
-		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, message);
 		if(result == nullptr)
 		{
 			return XCode::NetTimeout;
 		}
-		int code = XCode::Ok;
-		if(code == XCode::Ok && !result->ParseMessage(response))
+		int code = result->GetCode();
+		const std::string & body = result->GetBody();
+		if(code == XCode::Ok && !response->ParseFromString(body))
 		{
 			return XCode::ParseMessageError;
 		}
 		return code;
 	}
 
-	int Actor::Call(std::unique_ptr<rpc::Message> message)
+	int Actor::Call(std::unique_ptr<rpc::Message>& message)
 	{
 		int id = 0;
 		if(!this->GetAddress(*message, id))
 		{
 			return XCode::NotFoundActorAddress;
 		}
-		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, message);
 		if(result == nullptr)
 		{
 			return XCode::NetTimeout;
@@ -135,20 +138,21 @@ namespace acs
 				code = XCode::MakeTcpRequestFailure;
 				break;
 			}
-			if (!message->WriteMessage(&request))
+			if (!request.SerializePartialToString(message->Body()))
 			{
 				code = XCode::SerializationFailure;
 				break;
 			}
 			int id = message->SockId();
-			std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
+			std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, message);
 			if (result == nullptr)
 			{
 				code = XCode::NetTimeout;
 				break;
 			}
 			code = result->GetCode();
-			if (code == XCode::Ok && !result->ParseMessage(response))
+			const std::string & body = result->GetBody();
+			if (code == XCode::Ok && !response->ParsePartialFromString(body))
 			{
 				code = XCode::ParseMessageError;
 				break;
@@ -168,14 +172,42 @@ namespace acs
 				code = XCode::MakeTcpRequestFailure;
 				break;
 			}
-			if (!message->WriteMessage(&request))
+			if (!request.Serialize(message->Body()))
 			{
 				code = XCode::SerializationFailure;
 				break;
 			}
 			int id = message->SockId();
-			code = this->mRouter->Send(id, std::move(message));
+			code = this->mRouter->Send(id, message);
 		} while (false);
+		return code;
+	}
+
+	int Actor::Call(const std::string& func, std::unique_ptr<json::r::Document> & response)
+	{
+		int code = XCode::Ok;
+		do
+		{
+			std::unique_ptr<rpc::Message> message = this->Make(func);
+			if(message == nullptr)
+			{
+				code = XCode::MakeTcpRequestFailure;
+				break;
+			}
+			int id = message->SockId();
+			std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, message);
+			if (result == nullptr)
+			{
+				code = XCode::NetTimeout;
+				break;
+			}
+			code = result->GetCode();
+			if(code == XCode::Ok && !response->Decode(result->GetBody()))
+			{
+				return XCode::ParseJsonFailure;
+			}
+		}
+		while (false);
 		return code;
 	}
 
@@ -190,13 +222,14 @@ namespace acs
 				code = XCode::MakeTcpRequestFailure;
 				break;
 			}
-			if (!message->WriteMessage(&request))
+			if (!request.Serialize(message->Body()))
 			{
 				code = XCode::SerializationFailure;
 				break;
 			}
 			int id = message->SockId();
-			std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
+			message->SetProto(rpc::proto::json);
+			std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, message);
 			if (result == nullptr)
 			{
 				code = XCode::NetTimeout;
@@ -208,7 +241,7 @@ namespace acs
 		return code;
 	}
 
-	int Actor::Call(const std::string& func, const json::w::Document& request, json::r::Document* response)
+	int Actor::Call(const std::string& func, const std::string& request, std::unique_ptr<json::r::Document>& response)
 	{
 		int code = XCode::Ok;
 		do
@@ -219,29 +252,79 @@ namespace acs
 				code = XCode::MakeTcpRequestFailure;
 				break;
 			}
-			if (!message->WriteMessage(&request))
-			{
-				code = XCode::SerializationFailure;
-				break;
-			}
 			int id = message->SockId();
-			std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
+			message->SetContent(rpc::proto::string, request);
+			std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, message);
 			if (result == nullptr)
 			{
 				code = XCode::NetTimeout;
 				break;
 			}
 			code = result->GetCode();
-			if(code != XCode::Ok)
+			if(code == XCode::Ok && !response->Decode(result->GetBody()))
 			{
-				break;
-			}
-			if(!result->ParseMessage(response))
-			{
-				code = XCode::ParseJsonFailure;
+				return XCode::ParseJsonFailure;
 			}
 		} while (false);
 		return code;
+	}
+
+
+	int Actor::Call(const std::string& func, const json::w::Document& request, std::unique_ptr<json::r::Document> & response)
+	{
+		int code = XCode::Ok;
+		do
+		{
+			std::unique_ptr<rpc::Message> message = this->Make(func);
+			if(message == nullptr)
+			{
+				code = XCode::MakeTcpRequestFailure;
+				break;
+			}
+			if (!request.Serialize(message->Body()))
+			{
+				code = XCode::SerializationFailure;
+				break;
+			}
+			int id = message->SockId();
+			message->SetProto(rpc::proto::json);
+			std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, message);
+			if (result == nullptr)
+			{
+				code = XCode::NetTimeout;
+				break;
+			}
+			code = result->GetCode();
+			if(code == XCode::Ok && !response->Decode(result->GetBody()))
+			{
+				return XCode::ParseJsonFailure;
+			}
+		} while (false);
+		return code;
+	}
+
+	std::unique_ptr<rpc::Message> Actor::CallMethod(const std::string& func, const json::w::Document& request)
+	{
+		int code = XCode::Ok;
+		std::unique_ptr<rpc::Message> message = this->Make(func);
+		do
+		{
+			if (message == nullptr)
+			{
+				return nullptr;
+			}
+			if (!request.Serialize(message->Body()))
+			{
+				code = XCode::SerializationFailure;
+				break;
+			}
+			int id = message->SockId();
+			message->SetProto(rpc::proto::json);
+			return this->mRouter->Call(id, message);
+		}
+		while(false);
+		message->GetHead().Add(rpc::Header::code, code);
+		return message;
 	}
 
 	int Actor::MakeMessage(lua_State* lua, int idx,
@@ -258,7 +341,7 @@ namespace acs
 		{
 			return XCode::MakeTcpRequestFailure;
 		}
-		if(methodConfig->proto == rpc::Proto::Protobuf)
+		if(methodConfig->proto == rpc::proto::pb)
 		{
 			if (!methodConfig->response.empty())
 			{
@@ -269,7 +352,7 @@ namespace acs
 		switch (lua_type(lua, idx))
 		{
 			case LUA_TNIL:
-				message->SetProto(rpc::Proto::None);
+				message->SetProto(rpc::proto::none);
 				return XCode::Ok;
 			case LUA_TSTRING:
 			{
@@ -277,7 +360,7 @@ namespace acs
 				const char* str = lua_tolstring(lua, idx, &count);
 				{
 					message->Body()->append(str, count);
-					message->SetProto(rpc::Proto::String);
+					message->SetProto(rpc::proto::string);
 				}
 				return XCode::Ok;
 			}
@@ -293,11 +376,12 @@ namespace acs
 					double number = luaL_checknumber(lua, idx);
 					message->Body()->append(std::to_string(number));
 				}
+				message->SetProto(rpc::proto::string);
 				break;
 			}
 			case LUA_TTABLE:
 			{
-				if(methodConfig->proto == rpc::Proto::Protobuf)
+				if(methodConfig->proto == rpc::proto::pb)
 				{
 					if (!methodConfig->request.empty())
 					{
@@ -308,24 +392,34 @@ namespace acs
 							LOG_ERROR("call {} fail request : {}", func, name);
 							return XCode::CreateProtoFailure;
 						}
-						message->SetProto(rpc::Proto::Protobuf);
-						if (!message->WriteMessage(request))
+						message->SetProto(rpc::proto::pb);
+						if (!request->SerializePartialToString(message->Body()))
 						{
 							return XCode::SerializationFailure;
 						}
 						return XCode::Ok;
 					}
 				}
-				else if(methodConfig->proto == rpc::Proto::Lua)
+				else if(methodConfig->proto == rpc::proto::lua)
 				{
 					if(lua::lfmt::serialize(lua, idx, *message->Body()) != LUA_OK)
 					{
 						return XCode::Failure;
 					}
-					message->SetProto(rpc::Proto::Lua);
+					message->SetProto(rpc::proto::lua);
 					return XCode::Ok;
 				}
-				message->SetProto(rpc::Proto::Json);
+				else if(methodConfig->proto == rpc::proto::bson)
+				{
+					if(!lua::lbson::read(lua, idx, *message->Body()))
+					{
+						luaL_error(lua, "read bson fail");
+						return XCode::Failure;
+					}
+					message->SetProto(rpc::proto::bson);
+					return XCode::Ok;
+				}
+				message->SetProto(rpc::proto::json);
 				lua::yyjson::read(lua, idx, *message->Body());
 				return XCode::Ok;
 			}
@@ -333,16 +427,16 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int Actor::LuaCall(lua_State* lua, std::unique_ptr<rpc::Message> message) const
+	int Actor::LuaCall(lua_State* lua, std::unique_ptr<rpc::Message>& message) const
 	{
 		int id = message->SockId();
-		return this->mRouter->LuaCall(lua, id, std::move(message));
+		return this->mRouter->LuaCall(lua, id, message);
 	}
 
-	int Actor::LuaSend(lua_State* lua, std::unique_ptr<rpc::Message> message) const
+	int Actor::LuaSend(lua_State* lua, std::unique_ptr<rpc::Message>& message) const
 	{
 		int id = message->SockId();
-		int code = this->mRouter->Send(id, std::move(message));
+		int code = this->mRouter->Send(id, message);
 
 		lua_pushinteger(lua, code);
 		return 1;

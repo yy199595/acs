@@ -23,7 +23,8 @@ namespace http
 		virtual void OnWriteHead(std::ostream & os) = 0;
 		virtual int OnWriteBody(std::ostream & os) = 0;
 		virtual int OnRecvMessage(std::istream & is, size_t size) = 0;
-		virtual int ContentLength() = 0;
+		virtual size_t ContentLength() = 0;
+		virtual void SetContentLength(long long) { }
 	public:
 		template<typename T>
 		T * Cast() { return static_cast<T*>(this); }

@@ -38,12 +38,12 @@ namespace acs
 		return true;
 	}
 
-	int RouterComponent::LuaCall(lua_State* lua, int id, std::unique_ptr<rpc::Message> message)
+	int RouterComponent::LuaCall(lua_State* lua, int id, std::unique_ptr<rpc::Message> & message)
 	{
 		int rpcId = this->mDispatch->BuildRpcId();
 		{
 			message->SetRpcId(rpcId);
-			int code = this->Send(id, std::move(message));
+			int code = this->Send(id, message);
 			if(code != XCode::Ok)
 			{
 				lua_pushinteger(lua, code);
@@ -57,12 +57,11 @@ namespace acs
 	{
 		while (!this->mLocalMessages.empty())
 		{
-			rpc::Message* message = this->mLocalMessages.front();
-			if (this->mDispatch->OnMessage(message) != XCode::Ok)
+			std::unique_ptr<rpc::Message> & message = this->mLocalMessages.front();
 			{
-				delete message;
+				this->mDispatch->OnMessage(message);
+				this->mLocalMessages.pop();
 			}
-			this->mLocalMessages.pop();
 		}
 	}
 
@@ -75,10 +74,10 @@ namespace acs
 		}
 	}
 
-	int RouterComponent::Send(int id, std::unique_ptr<rpc::Message> message)
+	int RouterComponent::Send(int id, std::unique_ptr<rpc::Message> & message)
 	{
 //#ifdef __DEBUG__
-//		if(message->GetType() == rpc::Type::Request)
+//		if(message->GetType() == rpc::type::request)
 //		{
 //			std::string func;
 //			message->GetHead().Get(rpc::Header::func, func);
@@ -86,44 +85,61 @@ namespace acs
 //			message->TempHead().Add("t", help::Time::NowMil());
 //		}
 //#endif
+		int code = XCode::Ok;
 		char net = message->GetNet();
-		if(net == rpc::Net::Client)
+		do
 		{
-			message->SetSource(rpc::Source::Client);
-		}
-		else if(this->mApp->Equal(id))
-		{
-			message->SetSockId(id);
-			this->mLocalMessages.emplace(message.release());
-			return XCode::Ok;
-		}
-		auto iter = this->mSenders.find(net);
-		if(iter == this->mSenders.end())
-		{
-			LOG_ERROR("not find sender:{}", net);
-			return XCode::NotFoundSender;
-		}
+			if(message->GetBody().size() >= rpc::INNER_RPC_BODY_MAX_LENGTH)
+			{
+				code = XCode::NetBigDataShutdown;
+				break;
+			}
 
-		rpc::Message * data = message.release();
-		if(iter->second->Send(id, data) != XCode::Ok)
-		{
-			delete data;
-			return XCode::SendMessageFail;
+			if(net == rpc::net::client)
+			{
+				message->SetSource(rpc::source::client);
+				if(message->GetBody().size() >= rpc::OUTER_RPC_BODY_MAX_LENGTH)
+				{
+					code = XCode::NetBigDataShutdown;
+					break;
+				}
+			}
+			//		else if(this->mApp->Equal(id))
+			//		{
+			//			message->SetSockId(id);
+			//			this->mLocalMessages.emplace(message.release());
+			//			return XCode::Ok;
+			//		}
+
+			auto iter = this->mSenders.find(net);
+			if(iter == this->mSenders.end())
+			{
+				LOG_ERROR("not find sender:{}", (int)net);
+				code = XCode::NotFoundSender;
+				break;
+			}
+			code = iter->second->Send(id, message);
 		}
-		return XCode::Ok;
+		while(false);
+		if(code != XCode::Ok)
+		{
+			int rpcId = message->GetRpcId();
+			std::string msg = message->ToString();
+			LOG_WARN("({}) [send to {}:{}] ({}) => {}", code, id, (int)net, rpcId,  msg);
+		}
+		return code;
 	}
 
-	int RouterComponent::Send(int id, int result, rpc::Message * message)
+	int RouterComponent::Send(int id, int result, std::unique_ptr<rpc::Message> & message)
 	{
 		if (message->GetRpcId() == 0)
 		{
-			delete message;
 			return XCode::Ok;
 		}
-		message->SetType(rpc::Type::Response);
+		message->SetType(rpc::type::response);
 		message->GetHead().Del(rpc::Header::app_id);
 		message->GetHead().Add(rpc::Header::code, result);
-		return this->Send(id, std::unique_ptr<rpc::Message>(message));
+		return this->Send(id, message);
 	}
 
 	rpc::IInnerSender* RouterComponent::GetSender(char net)
@@ -132,12 +148,12 @@ namespace acs
 		return iter != this->mSenders.end() ? iter->second : nullptr;
 	}
 
-	std::unique_ptr<rpc::Message> RouterComponent::Call(int id, std::unique_ptr<rpc::Message> message)
+	std::unique_ptr<rpc::Message> RouterComponent::Call(int id, std::unique_ptr<rpc::Message> & message)
 	{
 		int rpcId = this->mDispatch->BuildRpcId();
 		{
 			message->SetRpcId(rpcId);
-			if (this->Send(id, std::move(message)) != XCode::Ok)
+			if (this->Send(id, message) != XCode::Ok)
 			{
 				LOG_ERROR("send to [{}] fail", id);
 				return nullptr;

@@ -2,6 +2,9 @@
 #include<regex>
 #include<sstream>
 #include <codecvt>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 #include"Random.h"
 
 namespace help
@@ -13,14 +16,16 @@ namespace help
 		return EmptyStr;
 	}
 
-	void Str::Tolower(std::string& str)
+	const std::string & Str::Tolower(std::string& str)
 	{
 		std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+		return str;
 	}
 
-	void Str::Toupper(std::string& str)
+	const std::string & Str::Toupper(std::string& str)
 	{
 		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+		return str;
 	}
 
 	size_t Str::Hash(const std::string& str)
@@ -255,5 +260,41 @@ namespace help
 
 		// 将子字符串转换回 UTF-8 编码
 		return converter.to_bytes(substr);
+	}
+
+	bool utf8::ToString(const std::wstring& wideStr, std::string& result)
+	{
+#ifdef _WIN32
+		// Windows 平台
+		int size_needed = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+		if (size_needed == 0) {
+			return false;
+		}
+		result.assign(size_needed, 0);
+		WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, &result[0], size_needed, nullptr, nullptr);
+#else
+		// POSIX 平台
+    	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    	result = converter.to_bytes(wideStr);
+#endif
+		return true;
+	}
+
+	bool utf8::ToWString(const std::string& utf8Str, std::wstring& result)
+	{
+#ifdef _WIN32
+		// Windows 平台
+		int size_needed = MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), -1, nullptr, 0);
+		if (size_needed == 0) {
+			return false;
+		}
+		result.assign(size_needed, 0);
+		MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), -1, &result[0], size_needed);
+#else
+		// POSIX 平台（需要编译器支持 codecvt）
+    	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    	result = converter.from_bytes(utf8Str);
+#endif
+		return true;
 	}
 }

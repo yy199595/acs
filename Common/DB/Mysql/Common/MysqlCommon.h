@@ -238,13 +238,20 @@ namespace mysql
 		constexpr unsigned char MYSQL_TYPE_LONG = 0x03;    // INT
 		constexpr unsigned char MYSQL_TYPE_FLOAT = 0x04;    // FLOAT
 		constexpr unsigned char MYSQL_TYPE_DOUBLE = 0x05;    // DOUBLE
-		constexpr unsigned char MYSQL_TYPE_NULL = 0x06;    // NULL类型
 		constexpr unsigned char MYSQL_TYPE_LONGLONG = 0x08;    // BIGINT
 		constexpr unsigned char MYSQL_TYPE_INT24 = 0x09;    // MEDIUMINT
+		constexpr unsigned char MYSQL_TYPE_ENUM = 0x0F;    // 集合类型（内部存储为整数)
+
+		constexpr unsigned char MYSQL_TYPE_NULL = 0x06;    // NULL类型
 		constexpr unsigned char MYSQL_TYPE_YEAR = 0x0D;    // YEAR
-		constexpr unsigned char MYSQL_TYPE_VARCHAR = 0x0F;    // VARBINARY
+		constexpr unsigned char MYSQL_TYPE_VARCHAR = 0x15;    // VARBINARY
 		constexpr unsigned char MYSQL_TYPE_NEWDECIMAL = 0xf6;    // 高精度DECIMAL
 		constexpr unsigned char MYSQL_TYPE_JSON = 0xF5;    // JSON (MySQL 5.7+)
+
+		constexpr unsigned char MYSQL_TYPE_DATE = 0x0A;    // 日期类型（YYYY-MM-DD）
+		constexpr unsigned char MYSQL_TYPE_STRING = 0x16;    // 日期类型（YYYY-MM-DD）
+
+
 	}
 }
 
@@ -255,7 +262,7 @@ namespace mysql
 	constexpr unsigned char PACKAGE_ERR = 0xFF;
 	constexpr unsigned char PACKAGE_EOF = 0xFE;
 	constexpr unsigned char PACKAGE_MORE = 0x01;
-
+	constexpr unsigned char PACKAGE_USE_SSL = 0x02;
 }
 
 namespace mysql
@@ -264,12 +271,6 @@ namespace mysql
 	{
 		std::string name;
 		unsigned char type;
-		unsigned char decimals;
-	};
-
-	struct Result
-	{
-		std::vector<std::string> contents;
 	};
 }
 
@@ -278,36 +279,23 @@ namespace mysql
 	struct OKResponse
 	{
 	public:
+		std::string mInfo;
 		unsigned int mAffectedRows = 0;
 		unsigned int mLastInsertId = 0;
 		unsigned int mServerStatus = 0;
 		unsigned int mWarningCount = 0;
 	};
 
-	struct EofResponse
-	{
-		unsigned short warn_count = 0;
-		unsigned short status_flags = 0;
-	};
-}
+//	struct StmtResponse
+//	{
+//	public:
+//		unsigned int stmtId = 0;
+//		unsigned short columnCount = 0;
+//		unsigned short paramCount = 0;
+//		unsigned short warning = 0;
+//		unsigned int nullBitMapLen = 0;
+//	};
 
-namespace mysql
-{
-	class HandshakeResponse
-	{
-	public:
-		bool OnDecode(const std::string &);
-	public:
-		uint8_t filler;
-		uint8_t protocol_version;    // 协议版本
-		std::string server_version;  // 服务器版本
-		uint32_t connection_id;      // 连接 ID
-		std::string salt;            // 盐值 (20 字节)
-		uint32_t capability_flags;   // 服务器能力标志
-		uint8_t character_set;       // 字符集
-		uint16_t status_flags;       // 服务器状态
-		std::string auth_plugin_name; // 认证插件名称
-	};
 }
 
 #endif //APP_MYSQLCOMMON_H

@@ -13,14 +13,14 @@ namespace acs
 {
 	bool ResourceMgr::Awake()
 	{
-		std::unique_ptr<json::r::Value> webObject;
-		std::unique_ptr<json::r::Value> jsonObject;
+		json::r::Value webObject;
+		json::r::Value jsonObject;
 		if (!this->mApp->Config().Get("http", jsonObject))
 		{
 			return false;
 		}
-		jsonObject->Get("domain", this->mDoMain);
-		if(!jsonObject->Get("upload", this->mUpload))
+		jsonObject.Get("domain", this->mDoMain);
+		if(!jsonObject.Get("upload", this->mUpload))
 		{
 			return false;
 		}
@@ -173,7 +173,7 @@ namespace acs
 			customData->Append("</body>");
 			customData->Append("</html>");
 		}
-		response.SetContent(std::move(customData));
+		response.SetContent(customData);
 		return XCode::Ok;
 	}
 

@@ -9,29 +9,16 @@
 namespace http
 {
 	Session::Session(Component* component, Asio::Context& io)
-			: tcp::Client(0), mId(0), mComponent(component), mMainContext(io)
+			: tcp::Client(0), mSockId(0), mComponent(component), mMainContext(io)
 	{
 
 	}
 
 	Session::~Session() noexcept = default;
 
-	void Session::StartReceiveBody(int timeout)
-	{
-#ifdef ONLY_MAIN_THREAD
-		this->ReadSome();
-#else
-		Asio::Context & context = this->mSocket->GetContext();
-		asio::post(context, [this, timeout, self = this->shared_from_this()] {
-			this->StartTimer(timeout, tcp::timeout::read);
-			this->ReadSome();
-		});
-#endif
-	}
-
 	void Session::StartReceiveBody(std::unique_ptr<http::Content> content, int timeout)
 	{
-		this->mRequest.SetBody(std::move(content));
+		this->mRequest->SetBody(std::move(content));
 #ifdef ONLY_MAIN_THREAD
 		this->ReadSome();
 #else
@@ -45,12 +32,10 @@ namespace http
 
 	void Session::StartReceive(int id, tcp::Socket* socket, int timeout)
 	{
-		this->mId = id;
+		this->mSockId = id;
 		this->SetSocket(socket);
-		this->mRequest.SetSockId(id);
 #ifdef __DEBUG__
-		long long nowTime = help::Time::NowMil();
-		this->mRequest.Header().Add("t", nowTime);
+		this->mStartTime = help::Time::NowMil();
 #endif
 #ifdef ONLY_MAIN_THREAD
 		this->ReadLine();
@@ -79,14 +64,14 @@ namespace http
 
 	bool Session::StartWriter(HttpStatus status, int timeout)
 	{
-		this->mResponse.SetCode(status);
+		this->mResponse->SetCode(status);
 		return this->StartWriter(timeout);
 	}
 
 	bool Session::StartWriter(HttpStatus status, std::unique_ptr<Content> data, int timeout)
 	{
-		this->mResponse.SetCode(status);
-		this->mResponse.SetContent(std::move(data));
+		this->mResponse->SetCode(status);
+		this->mResponse->SetContent(data);
 		return this->StartWriter(timeout);
 	}
 
@@ -94,24 +79,24 @@ namespace http
 	{
 		if (this->mSocket == nullptr)
 		{
-			this->mComponent->OnClientError(this->mId, XCode::NetWorkError);
+			this->mComponent->OnClientError(this->mSockId, XCode::NetWorkError);
 			return false;
 		}
 
 #ifdef ONLY_MAIN_THREAD
-		this->Write(this->mResponse);
+		this->Write(*this->mResponse, timeout);
 #else
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(this->mSocket->GetContext(), [this, timeout, self]
 		{
-			bool keep = this->mResponse.IsOk()
-					&& this->mRequest.Header().KeepAlive();
-			this->mResponse.Header().SetKeepAlive(keep, 5);
-			if (this->mResponse.GetBody() == nullptr)
+			bool keep = this->mResponse->IsOk()
+					&& this->mRequest->Header().KeepAlive();
+			this->mResponse->Header().SetKeepAlive(keep, 5);
+			if (this->mResponse->GetBody() == nullptr)
 			{
-				this->mResponse.Header().Add(http::Header::ContentLength, 0);
+				this->mResponse->Header().Add(http::Header::ContentLength, 0);
 			}
-			this->Write(this->mResponse, timeout);
+			this->Write(*this->mResponse, timeout);
 		});
 #endif
 		return true;
@@ -142,21 +127,25 @@ namespace http
 
 	void Session::OnReadPause()
 	{
-		if (this->mRequest.Header().Count() == 0)
+		if (this->mRequest->Header().Count() == 0)
 		{
 			this->OnComplete(HttpStatus::BAD_REQUEST);
 			return;
 		}
 		this->StopTimer();
 		const std::string& ip = this->mSocket->GetIp();
-		this->mRequest.Header().Set(http::Header::RealIp, ip);
+		this->mRequest->Header().Set(http::Header::RealIp, ip);
+		this->mResponse = std::make_unique<http::Response>();
+
+		http::Request * request = this->mRequest.get();
+		http::Response * response = this->mResponse.get();
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnReadHead(&this->mRequest, &this->mResponse);
+		this->mComponent->OnReadHead(request, response);
 #else
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
-		asio::post(this->mMainContext, [this, self, req = &this->mRequest, res = &this->mResponse]
+		asio::post(this->mMainContext, [this, self, request, response]
 		{
-			this->mComponent->OnReadHead(req, res);
+			this->mComponent->OnReadHead(request, response);
 		});
 #endif
 	}
@@ -166,19 +155,26 @@ namespace http
 		this->StopTimer();
 		if (status != HttpStatus::OK)
 		{
-			this->mResponse.SetCode(status);
-			this->mResponse.Header().SetKeepAlive(false, 0);
-			this->Write(this->mResponse, 5);
+			if(this->mResponse == nullptr)
+			{
+				this->mResponse = std::make_unique<http::Response>();
+			}
+			this->mResponse->SetCode(status);
+			this->mResponse->Header().SetKeepAlive(false, 0);
+			this->Write(*this->mResponse, 5);
 		}
 		else
 		{
+			http::Request * request = this->mRequest.get();
+			http::Response * response = this->mResponse.get();
 #ifdef ONLY_MAIN_THREAD
-			this->mComponent->OnMessage(this->mId, &this->mRequest, &this->mResponse);
+			this->mComponent->OnMessage(this->mSockId, request, response);
 #else
+
 			std::shared_ptr<Client> self = this->shared_from_this();
-			asio::post(this->mMainContext, [this, self, req = &this->mRequest, res = &this->mResponse]
+			asio::post(this->mMainContext, [this, self, request, response]
 			{
-				this->mComponent->OnMessage(this->mId, req, res);
+				this->mComponent->OnMessage(this->mSockId, request, response);
 			});
 #endif
 		}
@@ -186,7 +182,15 @@ namespace http
 
 	void Session::OnReceiveMessage(std::istream& is, size_t size, const Asio::Code&)
 	{
-		int flag = this->mRequest.OnRecvMessage(is, size);
+		if(this->mRequest == nullptr)
+		{
+			this->mRequest = std::make_unique<http::Request>();
+			this->mRequest->SetSockId(this->mSockId);
+#ifdef __DEBUG__
+			this->mRequest->Header().Add("t", this->mStartTime);
+#endif
+		}
+		int flag = this->mRequest->OnRecvMessage(is, size);
 		if (flag > 0)
 		{
 			this->ReadLength(flag);
@@ -225,7 +229,7 @@ namespace http
 	void Session::OnSendMessage(size_t size)
 	{
 		this->StopTimer();
-		if (this->mResponse.Header().KeepAlive())
+		if (this->mResponse->Header().KeepAlive())
 		{
 			this->Clear();
 			this->ReadLine(10);
@@ -248,8 +252,8 @@ namespace http
 	{
 		this->StopTimer();
 		this->ClearBuffer();
-		this->mRequest.Clear();
-		this->mResponse.Clear();
+		this->mRequest.reset();
+		this->mResponse.reset();
 	}
 
 	void Session::ClosetClient(int code)
@@ -257,12 +261,12 @@ namespace http
 		this->Clear();
 		this->mSocket->Close();
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnClientError(this->mId, code);
+		this->mComponent->OnClientError(this->mSockId, code);
 #else
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(this->mMainContext, [this, self, code]()
 		{
-			this->mComponent->OnClientError(this->mId, code);
+			this->mComponent->OnClientError(this->mSockId, code);
 		});
 #endif
 	}

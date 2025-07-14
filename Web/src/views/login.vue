@@ -1,7 +1,7 @@
 <template>
     <div class="login-wrap">
         <div class="ms-login">
-            <div class="ms-title">慢生活后台</div>
+            <div class="ms-title">服务器管理后台</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
                     <el-input v-model="param.username" placeholder="username">
@@ -73,8 +73,8 @@ const submitForm = async () => {
     try {
         app.remove_user_info()
         const response = await RequestLogin(login_req)
-        console.log(response)
-        const info = response.data.info
+        console.log(response.data)
+        const info = response.data.data.info
         info.token = response.data.data.token
         if (response.data.code == 0) {
             localStorage.setItem("user_info", JSON.stringify(info))
@@ -83,6 +83,7 @@ const submitForm = async () => {
             ElMessage.error(response.data.error)
         }
     } catch (e) {
+        console.error(e)
         ElMessage.error("登陆失败,请检查网络")
     }
 

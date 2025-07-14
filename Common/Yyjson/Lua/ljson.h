@@ -42,6 +42,8 @@ namespace lua
 
 		static bool read(lua_State* L, int inx, std::string& json);
 
+		static bool read(lua_State* L, int inx, std::unique_ptr<char> & json, size_t & count);
+
 		static bool read(lua_State* L, int inx, JsonValue & jsonValue);
 
 		static int decode(lua_State* L);

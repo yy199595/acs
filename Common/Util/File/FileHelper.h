@@ -12,7 +12,6 @@ namespace help
 		constexpr size_t GB = 1024 * 1024 * 1024;
 		
 		extern bool FileIsExist(const std::string &path);
-		extern bool GetFileSize(std::fstream & fs, size_t & size);
 		extern long long GetLastWriteTime(const std::string & path);
 		extern bool GetFileLine(const std::string & path, size_t & size);
 		extern bool GetFileSize(const std::string & path, size_t & size);
@@ -22,7 +21,7 @@ namespace help
         extern bool ReadTxtFile(const std::string &path, std::string &outFile);
 		extern bool ChangeName(const std::string & path, const std::string & name);
 		extern bool WriterFile(const std::string &path, const std::string &fileContent);
-		extern bool ReadTxtFile(const std::string &path, std::vector<std::string> &outLines);
+		extern bool ReadTxtFile(const std::string &path, std::vector<std::string> &outLines, char delim = ';');
 	}
 
 }// namespace FileHelper

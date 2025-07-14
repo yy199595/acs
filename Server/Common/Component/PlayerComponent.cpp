@@ -55,7 +55,7 @@ namespace acs
 			{
 				rpcMessage->SetSockId(sockId);
 				rpcMessage->GetHead().Set(rpc::Header::id, std::to_string(iter->first));
-				if (player->Send(std::move(rpcMessage)) == XCode::Ok)
+				if (player->Send(rpcMessage) == XCode::Ok)
 				{
 					++count;
 				}

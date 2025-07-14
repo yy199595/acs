@@ -9,34 +9,6 @@
 
 namespace rpc
 {
-#ifdef __MEMORY_POOL_OPERATOR__
-	 std::mutex Message::sAllocLock;
-	 std::vector<void *> Message::sAllocQueue;
-	void* Message::operator new(std::size_t size)
-	{
-		std::lock_guard<std::mutex> lock(sAllocLock);
-		if(!sAllocQueue.empty())
-		{
-			void * ptr = sAllocQueue.back();
-			sAllocQueue.pop_back();
-			return ptr;
-		}
-		return std::malloc(size);
-	}
-
-	void Message::operator delete(void* ptr)
-	{
-		std::lock_guard<std::mutex> lock(sAllocLock);
-		if(sAllocQueue.size() >= 100)
-		{
-			std::free(ptr);
-			return;
-		}
-		sAllocQueue.emplace_back(ptr);
-	}
-
-#endif
-
     const std::string& Head::GetStr(const std::string& key) const
 	{
 		static std::string empty;
@@ -106,8 +78,34 @@ namespace rpc
 		switch(this->mMsg)
 		{
 			case rpc::msg::bin:
+			{
+				//tcp::Data::ReadHead(os, this->mProtoHead, true);
+				int len = this->mHead.OnRecvMessage(os, size);
+				if (len <= 0)
+				{
+					return tcp::read::error;
+				}
+				this->mBody.clear();
+				this->mProtoHead.Len -= len;
+				if (this->mProtoHead.Len == 0)
+				{
+					return tcp::read::done;
+				}
+				this->mBody.resize(this->mProtoHead.Len);
+				char * buffer = const_cast<char*>(this->mBody.c_str());
+				size_t count = os.readsome(buffer, this->mProtoHead.Len);
+				if(count != this->mProtoHead.Len)
+				{
+					return tcp::read::decode_error;
+				}
+				return tcp::read::done;
+			}
 			case rpc::msg::text:
 			{
+				constexpr size_t protoLen = rpc::RPC_PACK_HEAD_LEN - rpc::RPC_PACKET_LEN_BYTES;
+
+				this->mProtoHead.Len = size - protoLen;
+				tcp::Data::ReadHead(os, this->mProtoHead, false);
 				int len = this->mHead.OnRecvMessage(os, size);
 				if (len <= 0)
 				{
@@ -141,19 +139,19 @@ namespace rpc
 				{
 					return tcp::read::decode_error;
 				}
-				document.Get("type", this->mProtoHead.Type);
-				document.Get("proto", this->mProtoHead.Porto);
-				document.Get("rpc_id", this->mProtoHead.RpcId);
-				std::unique_ptr<json::r::Value> jsonValue;
+				json::r::Value jsonValue;
+				document.Get("type", this->mProtoHead.type);
+				document.Get("proto", this->mProtoHead.porto);
+				document.Get("rpc_id", this->mProtoHead.rpcId);
 				if(!document.Get("head", jsonValue))
 				{
 					return tcp::read::decode_error;
 				}
 				std::string value;
-				for(const char * key : jsonValue->GetAllKey())
+				for(const char * key : jsonValue.GetAllKey())
 				{
 					value.clear();
-					if(!jsonValue->Get(key, value))
+					if(!jsonValue.Get(key, value))
 					{
 						return tcp::read::decode_error;
 					}
@@ -161,7 +159,12 @@ namespace rpc
 				}
 				if(document.Get("data", jsonValue))
 				{
-					this->mBody = jsonValue->ToString();
+					size_t count = 0;
+					std::unique_ptr<char> json;
+					if(jsonValue.ToCString(json, count))
+					{
+						this->mBody.assign(json.get(), count);
+					}
 					return 0;
 				}
 				document.Get("data", this->mBody);
@@ -170,6 +173,13 @@ namespace rpc
 		}
 		return 0;
     }
+
+	bool Message::IsOk()
+	{
+		int code = 1;
+		this->mHead.Get(rpc::Header::code, code);
+		return code == 0;
+	}
 
     int Message::GetCode(int code) const
     {
@@ -200,14 +210,15 @@ namespace rpc
 			case rpc::msg::json:
 			{
 				json::w::Document document;
-				document.Add("type", this->mProtoHead.Type);
-				document.Add("proto", this->mProtoHead.Porto);
+				document.Add("type", this->mProtoHead.type);
+				document.Add("proto", this->mProtoHead.porto);
+				document.Add("rpc_id", this->mProtoHead.rpcId);
 				std::unique_ptr<json::w::Value> headObject = document.AddObject("head");
 				for(auto iter = this->mHead.Begin(); iter != this->mHead.End(); iter++)
 				{
 					headObject->Add(iter->first.c_str(), iter->second);
 				}
-				if(this->mProtoHead.Porto == rpc::Proto::Json)
+				if(this->mProtoHead.porto == rpc::proto::json)
 				{
 					document.AddObject("data", this->mBody);
 				}
@@ -215,8 +226,12 @@ namespace rpc
 				{
 					document.Add("data", this->mBody);
 				}
-				std::string message = document.JsonString();
-				os.write(message.c_str(), (int)message.size());
+				size_t count = 0;
+				std::unique_ptr<char> json;
+				if(document.Serialize(json, count))
+				{
+					os.write(json.get(), count);
+				}
 				break;
 			}
 		}
@@ -229,10 +244,29 @@ namespace rpc
         this->mBody = content;
     }
 
+	void Message::SetError(const std::string& content)
+	{
+		this->mBody = content;
+    	this->mProtoHead.porto = rpc::proto::error;
+	}
+
+
+	void Message::SetContent(const json::w::Document& content)
+	{
+		content.Serialize(&this->mBody);
+		this->mProtoHead.porto = rpc::proto::json;
+	}
+
 	void Message::SetContent(char proto, const std::string& content)
 	{
 		this->mBody = content;
-		this->mProtoHead.Porto = proto;
+		this->mProtoHead.porto = proto;
+	}
+
+	void Message::SetContent(char proto, const char* content, size_t count)
+	{
+		this->mProtoHead.porto = proto;
+		this->mBody.assign(content, count);
 	}
 
     std::unique_ptr<Message> Message::Clone() const
@@ -251,70 +285,25 @@ namespace rpc
         return message;
     }
 
-    bool Message::ParseMessage(pb::Message* message)
-	{
-		switch (this->mProtoHead.Porto)
-		{
-			case rpc::Proto::Protobuf:
-				if (message->ParseFromString(this->mBody))
-				{
-					this->mBody.clear();
-					return true;
-				}
-				return false;
-			case rpc::Proto::Json:
-				if(pb_json::JsonStringToMessage(this->mBody, message).ok())
-				{
-					this->mBody.clear();
-					return true;
-				}
-				return false;
-			default:
-			//LOG_ERROR("unknown message proto : {}", this->mProtoHead.Porto);
-				return false;
-		}
-	}
-
-	bool Message::ParseMessage(json::r::Document* message)
-	{
-		if(this->mProtoHead.Porto != rpc::Proto::Json)
-		{
-			return false;
-		}
-		if(!message->Decode(this->mBody))
-		{
-			return false;
-		}
-		this->mBody.clear();
-		return true;
-	}
-
-	bool Message::WriteMessage(const json::w::Document* message)
-	{
-		this->mBody.clear();
-		this->SetProto(rpc::Proto::Json);
-		return message->Encode(&this->mBody);
-	}
-
 	void Message::Clear()
 	{
 		this->mSockId = 0;
 		this->mHead.Clear();
 		this->mBody.clear();
 		this->mTempHead.Clear();
-		this->mNet = rpc::Net::Tcp;
+		this->mNet = rpc::net::tcp;
 		memset(&this->mProtoHead, 0, sizeof(this->mProtoHead));
 	}
 
 	std::string Message::ToString()
 	{
 		json::w::Document jsonWriter;
-		switch(this->mProtoHead.Type)
+		switch(this->mProtoHead.type)
 		{
-			case rpc::Type::Request:
+			case rpc::type::request:
 				jsonWriter.Add("type", "request");
 				break;
-			case rpc::Type::Response:
+			case rpc::type::response:
 				jsonWriter.Add("type", "response");
 				break;
 		}
@@ -324,44 +313,22 @@ namespace rpc
 		{
 			data->Add(iter->first.c_str(), iter->second);
 		}
-		switch(this->mProtoHead.Porto)
+		switch(this->mProtoHead.porto)
 		{
-			case rpc::Proto::String:
+			case rpc::proto::string:
 				jsonWriter.Add("data", this->mBody);
 				break;
-			case rpc::Proto::Json:
+			case rpc::proto::json:
 			{
 				jsonWriter.AddObject("data", this->mBody);
 				break;
 			}
-			case rpc::Proto::Protobuf:
+			case rpc::proto::pb:
 			{
 				break;
 			}
 		}
-		std::string json;
-		jsonWriter.Encode(&json);
-		return json;
-	}
-
-    bool Message::WriteMessage(const pb::Message* message)
-	{
-		if (message == nullptr)
-		{
-			return true;
-		}
-		this->mBody.clear();
-		switch (this->mProtoHead.Porto)
-		{
-			case rpc::Proto::None:
-			case rpc::Proto::Protobuf:
-				this->SetProto(rpc::Proto::Protobuf);
-				return message->SerializeToString(&mBody);
-			case rpc::Proto::Json:
-			case rpc::Proto::String:
-				return pb::util::MessageToJsonString(*message, &mBody).ok();
-		}
-		return message->SerializeToString(&mBody);
+		return jsonWriter.JsonString();
 	}
 
 	Message::Message() noexcept
@@ -369,7 +336,7 @@ namespace rpc
 		this->mSockId = 0;
 		this->mBody.clear();
 		this->mHead.Clear();
-		this->mNet = rpc::Net::Tcp;
+		this->mNet = rpc::net::tcp;
 		this->mMsg = rpc::msg::bin;
 		memset(&this->mProtoHead, 0, sizeof(this->mProtoHead));
 	}

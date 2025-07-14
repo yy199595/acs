@@ -2,8 +2,8 @@
 local log = require("Log")
 local app = require("App")
 local redis = require("RedisComponent")
-local mongo = require("MongoComponent")
 local RpcService = require("RpcService")
+local mongo = require("MongoProxyComponent")
 
 local Chat = RpcService()
 

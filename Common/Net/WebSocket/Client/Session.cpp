@@ -3,6 +3,9 @@
 //
 #include "XCode/XCode.h"
 #include "Session.h"
+
+#include <strstream>
+
 #include "Http/Common/HttpRequest.h"
 #include "Http/Common/HttpResponse.h"
 #include "Util/Tools/String.h"
@@ -52,10 +55,10 @@ namespace ws
 		});
 	}
 
-	void Session::Send(rpc::Message* message)
+	void Session::Send(std::unique_ptr<rpc::Message>& req)
 	{
 		Asio::Context & context = this->mSocket->GetContext();
-		asio::post(context, [this, self = this->shared_from_this(), message] ()
+		asio::post(context, [this, self = this->shared_from_this(), message = req.release()] ()
 		{
 			this->mStream.str("");
 			message->SetMsg(this->mMsg);
@@ -64,17 +67,18 @@ namespace ws
 				message->OnSendMessage(this->mStream);
 				wsMessage->SetBody(ws::OPCODE_BIN, this->mStream.str(), false);
 			}
-			this->AddToSendQueue(std::move(wsMessage));
+			this->AddToSendQueue(wsMessage);
 			delete message;
 		});
 	}
 
-	void Session::Send(ws::Message* message)
+	void Session::Send(std::unique_ptr<ws::Message> & req)
 	{
 		Asio::Context & context = this->mSocket->GetContext();
-		asio::post(context, [this, self = this->shared_from_this(), message] ()
+		asio::post(context, [this, self = this->shared_from_this(), msg = req.release()] ()
 		{
-			this->AddToSendQueue(std::unique_ptr<ws::Message>(message));
+			std::unique_ptr<ws::Message> message(msg);
+			this->AddToSendQueue(message);
 		});
 	}
 
@@ -141,7 +145,7 @@ namespace ws
 
 	void Session::OnReadBody()
 	{
-		switch(this->mMessage->GetHeader().mOpCode)
+		switch(this->mMessage->GetHeader().opcode)
 		{
 			case ws::OPCODE_BIN:
 			case ws::OPCODE_TEXT:
@@ -172,31 +176,32 @@ namespace ws
 		std::unique_ptr<ws::Message> pongMessage = std::make_unique<ws::Message>();
 		{
 			std::string message("pong");
-			pongMessage->SetBody(ws::OPCODE_PONG, message);
-			this->AddToSendQueue(std::move(pongMessage));
+			pongMessage->SetBody(ws::OPCODE_PONG, message, false);
+			this->AddToSendQueue(pongMessage);
 		}
 	}
 
 	bool Session::OnMessage()
 	{
-		std::shared_ptr<Client> self = this->shared_from_this();
 		const std::string & message = this->mMessage->GetMessageBody();
 		std::unique_ptr<rpc::Message> request = std::make_unique<rpc::Message>();
 		{
 			request->SetMsg(this->mMsg);
-			std::stringstream buffer(message);
+			request->SetNet(rpc::net::ws);
+			request->SetSockId(this->mSockId);
+			std::istringstream buffer(message);
 			if(request->OnRecvMessage(buffer, message.size()) != 0)
 			{
 				return false;
 			}
 		}
-		request->SetNet(rpc::Net::Ws);
-		request->SetSockId(this->mSockId);
+
+		std::shared_ptr<Client> self = this->shared_from_this();
 		request->GetHead().Add(rpc::Header::id, this->mPlayerId);
 		request->GetHead().Add(rpc::Header::client_sock_id, this->mSockId);
 		asio::post(this->mMainContext, [self, this, req = request.release()]
 		{
-			this->mComponent->OnMessage(this->mSockId, req, nullptr);
+			this->mComponent->OnMessage(req, nullptr);
 		});
 		this->mMessage->Clear();
 		return true;
@@ -283,7 +288,7 @@ namespace ws
 		}
 	}
 
-	void Session::AddToSendQueue(std::unique_ptr<ws::Message> message)
+	void Session::AddToSendQueue(std::unique_ptr<ws::Message> & message)
 	{
 		this->mWaitSendMessage.emplace(std::move(message));
 		if(this->mWaitSendMessage.size() == 1)

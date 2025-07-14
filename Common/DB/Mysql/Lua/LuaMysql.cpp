@@ -4,11 +4,11 @@
 
 
 
-#include"LuaMysql.h"
-#include"Entity/Actor/App.h"
-#include"Mysql/Lua/LuaMysqlTask.h"
-#include"Mysql/Component/MysqlDBComponent.h"
-#include"Proto/Component/ProtoComponent.h"
+#include "LuaMysql.h"
+#include "Entity/Actor/App.h"
+#include "Mysql/Lua/LuaMysqlTask.h"
+#include "Mysql/Component/MysqlDBComponent.h"
+#include "Proto/Component/ProtoComponent.h"
 using namespace acs;
 namespace lua
 {
@@ -30,7 +30,7 @@ namespace lua
 		const char * sql = luaL_checklstring(L, 1, &size);
 		std::unique_ptr<mysql::Request> request = std::make_unique<mysql::Request>(sql, size);
 		{
-			mysql->Send(std::move(request), rpcId);
+			mysql->Send(request, rpcId);
 		}
 		return mysql->AddTask(new LuaMysqlTask(L, rpcId))->Await();
 	}

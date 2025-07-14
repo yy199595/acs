@@ -69,18 +69,14 @@ namespace help
 			{
 				const std::string path = dir.substr(0, index);
 #ifdef __OS_WIN__
-				std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-				std::wstring newPath = converter.from_bytes(path);
-				_wmkdir(newPath.c_str());
+				_mkdir(path.c_str());
 #else
 				MakeDirectory(path);
 #endif
 			}
 		}
 #ifdef __OS_WIN__
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-		std::wstring newPath = converter.from_bytes(dir);
-		return _wmkdir(newPath.c_str()) != -1;
+		return _mkdir(dir.c_str()) != -1;
 #else
 		return MakeDirectory(dir) != -1;
 #endif
@@ -120,10 +116,7 @@ namespace help
 	bool dir::DirectorIsExist(const std::string& dir)
 	{
 #ifdef __OS_WIN__
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-		std::wstring newDir = converter.from_bytes(dir);
-		//return _access(dir.c_str(), 0) == 0;
-		return  _waccess(newDir.c_str(), 0) == 0;
+		return  _access(dir.c_str(), 0) == 0;
 #else
 		return access(dir.c_str(), F_OK) == 0;
 #endif
@@ -133,10 +126,9 @@ namespace help
 			std::vector<std::string>& directorys, std::vector<std::string>& files)
 	{
 #ifdef __OS_WIN__
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-		std::wstring temPath = converter.from_bytes(path) + L"/*.*";
-		WIN32_FIND_DATAW findFileData;
-		HANDLE fileHandle = FindFirstFileW(temPath.c_str(), &findFileData);
+		std::string temPath = path + "/*.*";
+		WIN32_FIND_DATA findFileData;
+		HANDLE fileHandle = FindFirstFile(temPath.c_str(), &findFileData);
 		if (fileHandle == INVALID_HANDLE_VALUE)
 		{
 			return false;
@@ -145,7 +137,7 @@ namespace help
 		{
 			if (findFileData.cFileName[0] != '.')
 			{
-				std::string name = converter.to_bytes(findFileData.cFileName);
+				std::string name(findFileData.cFileName);
 				if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				{
 					std::string newPath = fmt::format("{}/{}", path, name);
@@ -158,7 +150,7 @@ namespace help
 				}
 			}
 			//如果是当前路径或者父目录的快捷方式，或者是普通目录，则寻找下一个目录或者文件
-			if (!FindNextFileW(fileHandle, &findFileData))
+			if (!FindNextFile(fileHandle, &findFileData))
 			{
 				break;
 			}
@@ -196,12 +188,15 @@ namespace help
 
 	bool dir::GetFilePaths(const std::string& path, std::vector<std::string>& paths, bool r)
 	{
+		if(path.empty())
+		{
+			return false;
+		}
 #ifdef __OS_WIN__
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-		std::wstring temPath = converter.from_bytes(path) + L"/*.*";
+		std::string temPath = path + "/*.*";
 
-		WIN32_FIND_DATAW findFileData;
-		HANDLE fileHandle = FindFirstFileW(temPath.c_str(), &findFileData);
+		WIN32_FIND_DATA findFileData;
+		HANDLE fileHandle = FindFirstFile(temPath.c_str(), &findFileData);
 		if (fileHandle == INVALID_HANDLE_VALUE)
 		{
 			return false;
@@ -211,7 +206,7 @@ namespace help
 		{
 			if (findFileData.cFileName[0] != '.')
 			{
-				std::string name = converter.to_bytes(findFileData.cFileName);
+				std::string name(findFileData.cFileName);
 				if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				{
 					std::string newDir = fmt::format("{}/{}", path, name);
@@ -224,7 +219,7 @@ namespace help
 				}
 			}
 			//如果是当前路径或者父目录的快捷方式，或者是普通目录，则寻找下一个目录或者文件
-			if (!FindNextFileW(fileHandle, &findFileData))
+			if (!FindNextFile(fileHandle, &findFileData))
 			{
 				break;
 			}
@@ -264,13 +259,11 @@ namespace help
 #endif
 	}
 
-	bool dir::GetFilePaths(const std::string& path, std::string format, std::vector<std::string>& paths)
+	bool dir::GetFilePaths(const std::string& path, const std::string & format, std::vector<std::string>& paths)
 	{
 		std::vector<std::string> allPaths;
 		if (GetFilePaths(path, allPaths))
 		{
-			if (format[0] == '*')
-			{ format = format.substr(1); }
 			for (size_t index = 0; index < allPaths.size(); index++)
 			{
 				if (allPaths[index].find(format) != std::string::npos)

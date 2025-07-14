@@ -1,0 +1,127 @@
+{
+	"count" : 0,
+	"name": "order_list",
+	"schema" : "yy",
+	"fields": {
+		"_id": {
+			"type": "VARCHAR(64)",
+			"notnull": true,
+			"unique": true,
+			"comment": "订单ID",
+			"primary_key": true
+		},
+		"city": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"comment": "所在城市"
+		},
+		"club_id": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"comment": "所在部落id"
+		},
+		"target_id": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"comment": "订单结算人"
+		},
+		"commission": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"comment": "订单分销金额"
+		},
+		"inviter_id": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"index": true,
+			"comment": "订单邀请人"
+		},
+		"order_desc": {
+			"type": "VARCHAR(255)",
+			"notnull": true,
+			"default": "",
+			"comment": "订单描述信息"
+		},
+		"type": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"index": true,
+			"comment": "订单类型"
+		},
+		"price": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"index": true,
+			"comment": "订单类型"
+		},
+		"price_type": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"comment": "价格类型"
+		},
+		"amount": {
+			"type": "DECIMAL(10,2)",
+			"notnull": true,
+			"default": 0,
+			"comment": "订单金额"
+		},
+		"status": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"index": true,
+			"comment": "订单状态"
+		},
+		"user_id": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"index": true,
+			"comment": "下单人id"
+		},
+		"open_id": {
+			"type": "VARCHAR(64)",
+			"notnull": true,
+			"default": "",
+			"comment": "下单人openid"
+		},
+		"icon": {
+			"type": "VARCHAR(128)",
+			"notnull": true,
+			"default": "",
+			"comment": "订单图标"
+		},
+		"over_time": {
+			"type": "BIGINT",
+			"notnull": true,
+			"default": 0,
+			"comment": "订单结束时间"
+		},
+		"refund_time": {
+			"type": "BIGINT",
+			"notnull": true,
+			"default": 0,
+			"comment": "退款时间"
+		},
+		"product_id": {
+			"type": "BIGINT",
+			"notnull": true,
+			"default": 0,
+			"index": true,
+			"comment": "产品id"
+		},
+		"custom": {
+			"type": "JSON",
+			"notnull": true,
+			"comment": "产品描述"
+		}
+	}
+}

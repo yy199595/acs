@@ -17,8 +17,8 @@ namespace kcp
 	public:
 		void Start();
 		void RemoveSession(const std::string & address);
-		bool Send(const std::string & addr, tcp::IProto * message);
 		inline asio::ip::udp::socket & Socket() { return this->mSocket; }
+		bool Send(const std::string & addr, std::unique_ptr<rpc::Message> & message);
 	private:
 		void Update();
 		void StartTimer();

@@ -4,52 +4,91 @@
 #include"Mongo/Client/MongoFactory.h"
 #include"Mongo/Component/MongoDBComponent.h"
 
-using namespace acs;
+
 namespace lua
 {
-	int LuaMongo::Run(lua_State * L)
+	int LuaMongo::Run(lua_State* L)
 	{
 		using MongoComponent = acs::MongoDBComponent;
-		static MongoComponent * component = App::Get<MongoComponent>();
-		if(component == nullptr)
+		static MongoComponent* component = acs::App::Get<MongoComponent>();
+		if (component == nullptr)
 		{
 			luaL_error(L, "not find MongoDBComponent");
 			return 0;
 		}
 		lua_pushthread(L);
-		json::r::Document document;
-		const char * tab = luaL_checkstring(L, 1);
-		const char * cmd = luaL_checkstring(L, 2);
-		if(lua_isstring(L, 3))
+		const char* tab = luaL_checkstring(L, 1);
+		const char* cmd = luaL_checkstring(L, 2);
+		std::unique_ptr<mongo::Request> mongoRequest;
+		if (!mongo::MongoFactory::New(tab, cmd, mongoRequest))
 		{
-			size_t len = 0;
-			const char * json = luaL_checklstring(L, 3, &len);
-			if(!document.Decode(json, len))
-			{
-				luaL_error(L, "decode json fail");
-				return 0;
-			}
-		}
-		else if(lua_istable(L, 3))
-		{
-			std::string json;
-			lua::yyjson::read(L, 3, json);
-			if(!document.Decode(json.c_str(), json.size()))
-			{
-				luaL_error(L, "decode json fail");
-				return 0;
-			}
-		}
-
-		std::unique_ptr<mongo::Request> request = mongo::MongoFactory::Command(tab, cmd, document);
-		if(request == nullptr)
-		{
-			luaL_error(L, "create mongo request fail");
+			luaL_error(L, "make mongo request error");
 			return 0;
 		}
+		int top = lua_gettop(L);
+		for (int index = 3; index <= top - 1; index += 2)
+		{
+			int valIndex = index + 1;
+			const char* key = luaL_checkstring(L, index);
+			switch (lua_type(L, valIndex))
+			{
+				case LUA_TNUMBER:
+				{
+					if (lua_isinteger(L, valIndex))
+					{
+						long long value = lua_tointeger(L, valIndex);
+						if (value > std::numeric_limits<int>::max())
+						{
+							mongoRequest->document.Add(key, value);
+						}
+						else
+						{
+							mongoRequest->document.Add(key, (int)value);
+						}
+					}
+					else
+					{
+						mongoRequest->document.Add(key, lua_tonumber(L, valIndex));
+					}
+					break;
+				}
+				case LUA_TSTRING:
+				{
+					size_t count = 0;
+					const char* str = luaL_checklstring(L, valIndex, &count);
+					mongoRequest->document.Add(key, str, count);
+					break;
+				}
+				case LUA_TBOOLEAN:
+				{
+					bool value = lua_toboolean(L, valIndex);
+					mongoRequest->document.Add(key, value);
+					break;
+				}
+				case LUA_TTABLE:
+				{
+					size_t count = 0;
+					std::unique_ptr<char> json;
+					if (lua::yyjson::read(L, valIndex, json, count))
+					{
+						bson::w::Document document;
+						document.FromByJson(json.get(), count);
+						mongoRequest->document.Add(key, document);
+					}
+					break;
+				}
+				case LUA_TNIL:
+				{
+					mongoRequest->document.Add(key);
+					break;
+				}
+				default:
+					luaL_error(L, "unknown lua type");
+					return 0;
+			}
+		}
 		int taskId = 0;
-		component->Send(std::move(request), taskId);
-		return component->AddTask(new LuaMongoTask(L, taskId))->Await();
+		component->Send(mongoRequest, taskId);
+		return component->AddTask(new acs::LuaMongoTask(L, taskId))->Await();
 	}
-
 }

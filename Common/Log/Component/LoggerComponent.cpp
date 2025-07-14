@@ -45,13 +45,13 @@ namespace acs
 	bool LoggerComponent::Awake()
 	{
 		std::string name;
-		os::System::GetEnv("name", name);
+		os::System::GetAppEnv("name", name);
 		std::unique_ptr<json::r::Value> jsonArray;
 		LuaCCModuleRegister::Add([](Lua::CCModule& ccModule)
 		{
 			ccModule.Open("core.log", lua::lib::luaopen_llog);
 		});
-		os::System::GetEnv("console", this->mConsole);
+		os::System::GetAppEnv("console", this->mConsole);
 		this->mThread = this->GetComponent<ThreadComponent>();
 		std::unordered_map<std::string, custom::LogLevel> logLevelMap = {
 				{"all", custom::LogLevel::All, },

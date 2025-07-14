@@ -4,7 +4,6 @@
 
 #ifndef APP_REGISTRYSERVICE_H
 #define APP_REGISTRYSERVICE_H
-#include <queue>
 #include "Rpc/Service/RpcService.h"
 #include "Yyjson/Object/JsonObject.h"
 

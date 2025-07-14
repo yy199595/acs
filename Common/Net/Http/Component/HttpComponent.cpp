@@ -111,13 +111,7 @@ namespace acs
 			return nullptr;
 		}
 		request->SetTimeout(second);
-		std::unique_ptr<http::Response> response = this->Do(std::move(request));
-		if (response != nullptr && response->Code() != HttpStatus::OK
-			&& response->Code() != HttpStatus::FOUND)
-		{
-			LOG_ERROR("[GET] {} error={}", url, HttpStatusToString(response->Code()))
-		}
-		return response;
+		return this->Do(request);
 	}
 
 	void HttpComponent::OnRecord(json::w::Document& document)
@@ -130,7 +124,7 @@ namespace acs
 		}
 	}
 
-	int HttpComponent::Send(std::unique_ptr<http::Request> request, std::function<void(std::unique_ptr<http::Response>)> && cb)
+	int HttpComponent::Send(std::unique_ptr<http::Request>& request, std::function<void(std::unique_ptr<http::Response>&)> && cb)
 	{
 #ifndef __ENABLE_OPEN_SSL__
 		if(request->IsHttps())
@@ -150,11 +144,11 @@ namespace acs
 		}
 		this->mUseClients.emplace(rpcId, httpAsyncClient);
 		this->AddTask(new HttpCallbackTask(rpcId, cb));
-		httpAsyncClient->Do(std::move(request), std::move(response), rpcId);
+		httpAsyncClient->Do(request, response, rpcId);
 		return XCode::Ok;
 	}
 
-	int HttpComponent::Send(std::unique_ptr<http::Request> request, std::unique_ptr<http::Response> response, int& rpcId)
+	int HttpComponent::Send(std::unique_ptr<http::Request>& request, std::unique_ptr<http::Response>& response, int& rpcId)
 	{
 #ifndef __ENABLE_OPEN_SSL__
 		if(request->IsHttps())
@@ -172,16 +166,16 @@ namespace acs
 			return XCode::Failure;
 		}
 		this->mUseClients.emplace(rpcId, httpAsyncClient);
-		httpAsyncClient->Do(std::move(request), std::move(response), rpcId);
+		httpAsyncClient->Do(request, response, rpcId);
 		return XCode::Ok;
 	}
 
-	std::unique_ptr<http::Response> HttpComponent::Do(std::unique_ptr<http::Request> request)
+	std::unique_ptr<http::Response> HttpComponent::Do(std::unique_ptr<http::Request>& request)
 	{
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 		{
 			int taskId = 0;
-			if(this->Send(std::move(request), std::move(response), taskId) != XCode::Ok)
+			if(this->Send(request, response, taskId) != XCode::Ok)
 			{
 				return std::make_unique<http::Response>(HttpStatus::INTERNAL_SERVER_ERROR);
 			}
@@ -189,13 +183,13 @@ namespace acs
 		}
 	}
 
-	std::unique_ptr<http::Response> HttpComponent::Do(std::unique_ptr<http::Request> request, std::unique_ptr<http::Content> body)
+	std::unique_ptr<http::Response> HttpComponent::Do(std::unique_ptr<http::Request>& request, std::unique_ptr<http::Content> body)
 	{
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 		{
 			int taskId = 0;
-			response->SetContent(std::move(body));
-			if(this->Send(std::move(request), std::move(response), taskId) != XCode::Ok)
+			response->SetContent(body);
+			if(this->Send(request, response, taskId) != XCode::Ok)
 			{
 				return std::make_unique<http::Response>(HttpStatus::INTERNAL_SERVER_ERROR);
 			}
@@ -212,7 +206,7 @@ namespace acs
 		}
 		request->SetTimeout(second);
 		request->SetContent(document);
-		std::unique_ptr<http::Response>response = this->Do(std::move(request));
+		std::unique_ptr<http::Response>response = this->Do(request);
 		if (response != nullptr && response->Code() != HttpStatus::OK)
 		{
 			LOG_ERROR("[POST] {} fail:{}", url, HttpStatusToString(response->Code()))
@@ -229,7 +223,7 @@ namespace acs
 		}
 		request->SetTimeout(second);
 		request->SetContent(http::Header::JSON, data);
-		std::unique_ptr<http::Response> response = this->Do(std::move(request));
+		std::unique_ptr<http::Response> response = this->Do(request);
 		if (response != nullptr && response->Code() != HttpStatus::OK)
 		{
 			LOG_ERROR("[POST] {} fail:{}", url, HttpStatusToString(response->Code()))
@@ -237,13 +231,21 @@ namespace acs
 		return response;
 	}
 
-	void HttpComponent::OnMessage(int taskId, http::Request* request, http::Response* response) noexcept
+	void HttpComponent::OnMessage(int taskId, http::Request* req, http::Response* res) noexcept
 	{
+		std::unique_ptr<http::Request> request(req);
+		std::unique_ptr<http::Response> response(res);
 		auto iter = this->mUseClients.find(taskId);
-		if(iter != this->mUseClients.end())
+		if (iter != this->mUseClients.end())
 		{
 			this->mUseClients.erase(iter);
 		}
-		this->OnResponse(taskId, std::unique_ptr<http::Response>(response));
+//#ifdef __DEBUG__
+//		const std::string& error = response->GetError();
+//		const std::string& url = request->GetUrl().ToStr();
+//		const std::string& method = request->GetUrl().Method();
+//		LOG_DEBUG("[{}ms][HTTP:{}] ({}) => {}", request->GetCostTime(), method, url, error);
+//#endif
+		this->OnResponse(taskId, std::move(response));
 	}
 }

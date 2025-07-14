@@ -7,6 +7,7 @@
 #include "Common/Entity/Player.h"
 #include "Util/Tools/TimeHelper.h"
 #include "Rpc/Config/MethodConfig.h"
+#include "Rpc/Config/ServiceConfig.h"
 #include "Node/Component/NodeComponent.h"
 #include "Common/Component/PlayerComponent.h"
 #include "Router/Component/RouterComponent.h"
@@ -33,37 +34,31 @@ namespace acs
 		return true;
 	}
 
-	int GateComponent::Send(int id, rpc::Message* message)
+	int GateComponent::Send(int id, std::unique_ptr<rpc::Message> & message)
 	{
-		if(this->mOuterComponent->Send(id, message) != XCode::Ok)
-		{
-			delete message;
-			return XCode::SendMessageFail;
-		}
-		return XCode::Ok;
+		return this->mOuterComponent->Send(id, message);
 	}
 
-	void GateComponent::Broadcast(rpc::Message* message)
+	void GateComponent::Broadcast(std::unique_ptr<rpc::Message> & message)
 	{
 
 	}
 
-	int GateComponent::OnMessage(rpc::Message* message) noexcept
+	int GateComponent::OnMessage(std::unique_ptr<rpc::Message> & message) noexcept
 	{
 #ifdef __DEBUG__
 		rpc::Head& head = message->GetHead();
 		long long nowTime = help::Time::NowMil();
 #endif
-		int code = XCode::Failure;
 		switch (message->GetType())
 		{
-			case rpc::Type::Request:
+			case rpc::type::request:
 #ifdef __DEBUG__
 				head.Add("t1", nowTime);
 #endif
-				code = this->OnRequest(message);
+				this->OnRequest(message);
 				break;
-			case rpc::Type::Response:
+			case rpc::type::response:
 			{
 #ifdef __DEBUG__
 				std::string func;
@@ -72,28 +67,22 @@ namespace acs
 				head.Get(rpc::Header::func, func);
 				LOG_INFO("call [{}] use time => {}ms", func, nowTime - startTime);
 #endif
-				code = this->OnResponse(message);
+				this->OnResponse(message);
 			}
 				break;
 			default:
-				code = XCode::UnKnowPacket;
 				LOG_ERROR("unknown message {}", message->ToString());
 				break;
-		}
-		if (code != XCode::Ok)
-		{
-			delete message;
-			return code;
 		}
 		return XCode::Ok;
 	}
 
-	int GateComponent::OnRequest(rpc::Message* message)
+	int GateComponent::OnRequest(std::unique_ptr<rpc::Message> & message)
 	{
 		char net = message->GetNet();
-		message->SetNet(rpc::Net::Tcp);
+		message->SetNet(rpc::net::tcp);
 		message->GetHead().Add("n", net);
-		message->SetSource(rpc::Source::Client);
+		message->SetSource(rpc::source::client);
 		assert(message->GetHead().Has(rpc::Header::client_sock_id));
 		const std::string& fullName = message->GetHead().GetStr(rpc::Header::func);
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
@@ -103,7 +92,7 @@ namespace acs
 			return XCode::CallFunctionNotExist;
 		}
 		long long playerId = 0;
-		message->SetNet(rpc::Net::Tcp);
+		message->SetNet(rpc::net::tcp);
 		int serverId = this->mApp->GetNodeId();
 		message->GetHead().Get(rpc::Header::id, playerId);
 		Player* player = this->mPlayerComponent->Get(playerId);
@@ -113,7 +102,7 @@ namespace acs
 			{
 				return XCode::CloseSocket;
 			}
-			this->mRouter->Send(serverId, std::unique_ptr<rpc::Message>(message));
+			this->mRouter->Send(serverId, message);
 			return XCode::Ok;
 		}
 		const std::string& name = methodConfig->server;
@@ -124,13 +113,13 @@ namespace acs
 		}
 		switch (methodConfig->forward)
 		{
-			case rpc::Forward::Fixed: //转发到固定机器
+			case rpc::forward::fixed: //转发到固定机器
 				if (!player->GetServerId(name, serverId))
 				{
 					return XCode::NotFoundServerRpcAddress;
 				}
 				break;
-			case rpc::Forward::Random:
+			case rpc::forward::random:
 			{
 				if(!nodeCluster->Random(serverId))
 				{
@@ -138,7 +127,7 @@ namespace acs
 				}
 				break;
 			}
-			case rpc::Forward::Hash:
+			case rpc::forward::hash:
 			{
 				if(!nodeCluster->Hash(playerId, serverId))
 				{
@@ -146,7 +135,7 @@ namespace acs
 				}
 				break;
 			}
-			case rpc::Forward::Next:
+			case rpc::forward::next:
 			{
 				if(!nodeCluster->Next(serverId))
 				{
@@ -158,23 +147,24 @@ namespace acs
 			LOG_ERROR("unknown forward {}", message->ToString());
 				return XCode::Failure;
 		}
-		this->mRouter->Send(serverId, std::unique_ptr<rpc::Message>(message));
+		this->mRouter->Send(serverId, message);
 		return XCode::Ok;
 	}
 
-	int GateComponent::OnResponse(rpc::Message* message)
+	int GateComponent::OnResponse(std::unique_ptr<rpc::Message> & message)
 	{
 		int socketId, netType = 0;
-		if (!message->GetHead().Del("n", netType))
+		rpc::Head & head = message->GetHead();
+		if (!head.Del("n", netType))
 		{
 			return XCode::UnKnowPacket;
 		}
-		if (!message->GetHead().Del(rpc::Header::client_sock_id, socketId))
+		if (!head.Del(rpc::Header::client_sock_id, socketId))
 		{
 			return XCode::UnKnowPacket;
 		}
 		message->SetNet((char)netType);
-		message->SetSource(rpc::Source::Server);
+		message->SetSource(rpc::source::server);
 
 		this->Send(socketId, message);
 		return XCode::Ok;

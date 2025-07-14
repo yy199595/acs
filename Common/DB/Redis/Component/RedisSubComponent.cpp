@@ -66,7 +66,7 @@ namespace acs
 				int rpcId = 0;
 				const std::string & channel = *iter;
 				std::unique_ptr<redis::Request> request = redis::Request::Make("SUBSCRIBE", channel);
-				this->Send(std::move(request), rpcId);
+				this->Send(request, rpcId);
 			}
 		}
 	}
@@ -76,7 +76,7 @@ namespace acs
 		if(this->mConfig.retry > 0)
 		{
 			int ms = this->mConfig.retry * 1000;
-			this->mTimer->DelayCall(ms, [this]() {
+			this->mTimer->Timeout(ms, [this]() {
 				this->mClient->Start(nullptr);
 			});
 			LOG_ERROR("redis sub try connect");
@@ -88,7 +88,9 @@ namespace acs
 		if(this->mConfig.ping > 0 && tick % this->mConfig.ping == 0)
 		{
 			int rpcId = 0;
-			this->Send(redis::Request::Make("PING"), rpcId);
+			std::unique_ptr<redis::Request> request
+				= redis::Request::Make("PING");
+			this->Send(request, rpcId);
 		}
 	}
 
@@ -97,7 +99,7 @@ namespace acs
 		LOG_ERROR("[{}] => {}", key, message->ToString())
 	}
 
-	void RedisSubComponent::Send(std::unique_ptr<redis::Request> request, int& rpcId)
+	void RedisSubComponent::Send(std::unique_ptr<redis::Request>& request, int& rpcId)
 	{
 		rpcId = this->BuildRpcId();
 		{
@@ -108,7 +110,7 @@ namespace acs
 				return;
 			}
 			this->mIsSend = true;
-			this->mClient->Send(std::move(request));
+			this->mClient->Send(request);
 		}
 	}
 
@@ -118,7 +120,7 @@ namespace acs
 		LOG_CHECK_RET_FALSE(!channel.empty())
 		std::unique_ptr<redis::Request> request = redis::Request::Make("SUBSCRIBE", channel);
 		{
-			this->Send(std::move(request), rpcId);
+			this->Send(request, rpcId);
 			std::unique_ptr<redis::Response> response = this->BuildRpcTask<RedisTask>(rpcId)->Await();
 			return response != nullptr && response->element.type == redis::type::Array;
 		}
@@ -129,7 +131,7 @@ namespace acs
 		int rpcId = 0;
 		std::unique_ptr<redis::Request> request = redis::Request::Make("UNSUBSCRIBE", channel);
 		{
-			this->Send(std::move(request), rpcId);
+			this->Send(request, rpcId);
 			std::unique_ptr<redis::Response> response = this->BuildRpcTask<RedisTask>(rpcId)->Await();
 			return response != nullptr && response->element.type == redis::type::Array;
 		}
@@ -151,11 +153,12 @@ namespace acs
 				}
 				break;
 			}
-			const std::string& option = element.list[0].message;
+			auto iter = element.list.begin();
+			const std::string& option = iter->message;
 			if(option == "subscribe")
 			{
-				const redis::Element & element1 = element.list[1];
-				const redis::Element & element2 = element.list[2];
+				const redis::Element & element1 = *(++iter);
+				const redis::Element & element2 = *(++iter);
 				if(element2.number > 0)
 				{
 					LOG_INFO("sub ({}) ok", element1.message)
@@ -164,8 +167,8 @@ namespace acs
 			}
 			else if(option == "unsubscribe")
 			{
-				const redis::Element & element1 = element.list[1];
-				const redis::Element & element2 = element.list[2];
+				const redis::Element & element1 = *(++iter);
+				const redis::Element & element2 = *(++iter);
 				if(element2.number == 1)
 				{
 					auto iter = this->mChannels.find(element1.message);
@@ -178,16 +181,16 @@ namespace acs
 			}
 			else if(option == "message")
 			{
-				const std::string& channel = element.list[1].message;
-				const std::string& message = element.list[2].message;
+				const std::string& channel = (++iter)->message;
+				const std::string& message = (++iter)->message;
 				//LOG_DEBUG("[{}] ({}) {}", option, channel, message)
 				std::unique_ptr<rpc::Message> rpcMessage = std::make_unique<rpc::Message>();
 				{
-					rpcMessage->SetType(rpc::Type::Request);
-					rpcMessage->SetContent(rpc::Proto::Json, message);
+					rpcMessage->SetType(rpc::type::request);
+					rpcMessage->SetContent(rpc::proto::json, message);
 					rpcMessage->GetHead().Add(rpc::Header::func, channel);
 				}
-				if(this->mDispatch->OnMessage(rpcMessage.get()) == XCode::Ok)
+				if(this->mDispatch->OnMessage(rpcMessage) == XCode::Ok)
 				{
 					rpcMessage.release();
 				}
@@ -202,7 +205,7 @@ namespace acs
 		this->mIsSend = false;
 		if(!this->mMessages.empty())
 		{
-			this->mClient->Send(std::move(this->mMessages.front()));
+			this->mClient->Send(this->mMessages.front());
 			this->mMessages.pop();
 			return;
 		}

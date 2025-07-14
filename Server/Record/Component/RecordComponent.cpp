@@ -8,26 +8,20 @@
 #include "Http/Common/HttpResponse.h"
 #include "Rpc/Config/MethodConfig.h"
 #include "Util/Tools/TimeHelper.h"
-#include "Mongo/Component/MongoComponent.h"
-
-constexpr char * HTTP_RECORD_LIST = "http_record_list";
+#include "Sqlite/Component/SqliteComponent.h"
+constexpr const char * HTTP_RECORD_LIST = "http_record_list";
 
 namespace acs
 {
 	RecordComponent::RecordComponent()
 	{
-		this->mMongo = nullptr;
+		this->mSqlite = nullptr;
 	}
 
 	bool RecordComponent::LateAwake()
 	{
-		this->mMongo = this->GetComponent<MongoComponent>();
-		return this->mMongo != nullptr;
-	}
-
-	void RecordComponent::OnComplete()
-	{
-		this->mMongo->SetIndex(HTTP_RECORD_LIST, "time", -1);
+		this->mSqlite = this->GetComponent<SqliteComponent>();
+		return this->mSqlite != nullptr;
 	}
 
 	void RecordComponent::OnRequestDone(const HttpMethodConfig & config, const http::Request & request, const http::Response & response)
@@ -40,11 +34,11 @@ namespace acs
 		long long id = help::ID::Create();
 		long long nowTime = help::Time::NowSec();
 		{
-			document.Add("url", config.path);
+			document.Add("path", config.path);
 			document.Add("desc", config.desc);
 			document.Add("method", config.type);
-			document.Add("time", nowTime);
 			document.Add("_id", std::to_string(id));
+			document.Add("tcreate_timeime", nowTime);
 		}
 		if(request.GetBody() != nullptr)
 		{
@@ -66,6 +60,6 @@ namespace acs
 		{
 			document.Add("user_id", userId);
 		}
-		this->mMongo->Insert(HTTP_RECORD_LIST, document, false);
+		this->mSqlite->Insert(HTTP_RECORD_LIST, document);
 	}
 }

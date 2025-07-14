@@ -1,17 +1,16 @@
 //
 // Created by zmhy0073 on 2022/8/29.
 //
-#include"Admin.h"
-#include"Util/Tools/Zip.h"
-#include"Core/System/System.h"
-#include"Entity/Actor/App.h"
-#include"Util/File/DirectoryHelper.h"
-#include"Message/com/com.pb.h"
-#include"Util/File/FileHelper.h"
-#include"Util/Tools/TimeHelper.h"
+#include "Admin.h"
+#include "Util/Tools/Zip.h"
+#include "Core/System/System.h"
+#include "Entity/Actor/App.h"
+#include "Message/com/com.pb.h"
+#include "Util/File/FileHelper.h"
+#include "Util/Tools/TimeHelper.h"
+#include "Server/Config/CodeConfig.h"
 #include "Timer/Timer/ElapsedTimer.h"
-#include"Proto/Component/ProtoComponent.h"
-#include"Mongo/Component/MongoComponent.h"
+#include "Proto/Component/ProtoComponent.h"
 namespace acs
 {
 	Admin::Admin()
@@ -72,7 +71,7 @@ namespace acs
 
 		switch(methodConfig->proto)
 		{
-			case rpc::Proto::Protobuf:
+			case rpc::proto::pb:
 			{
 				std::string json;
 				pb::Message * request = this->mProto->Temp(methodConfig->request);
@@ -224,12 +223,13 @@ namespace acs
 
 	int Admin::Info(const http::FromContent& request, json::w::Document& response)
 	{
-		std::unique_ptr<com::type::json> result = std::make_unique<com::type::json>();
-		if (this->mApp->Call("NodeSystem.RunInfo", result.get()) != XCode::Ok)
+		std::unique_ptr<json::r::Document> result =
+				std::make_unique<json::r::Document>();
+		if (this->mApp->Call("NodeSystem.RunInfo", result) != XCode::Ok)
 		{
 			return XCode::Failure;
 		}
-		response.AddObject("data", result->json());
+		response.Add("data", *result);
 		return XCode::Ok;
 	}
 
@@ -246,22 +246,33 @@ namespace acs
 			this->mActor->GetNodes(serverActors);
 			serverActors.emplace_back(this->mApp->GetNodeId());
 		}
-
+		std::string func("NodeSystem.RunInfo");
 		std::unique_ptr<json::w::Value> document = response.AddArray("list");
-		std::unique_ptr<com::type::json> result = std::make_unique<com::type::json>();
+		std::unique_ptr<json::r::Document> result = std::make_unique<json::r::Document>();
 		for(const int serverId : serverActors)
 		{
-			result->Clear();
 			if(Actor * server = this->mActor->Get(serverId))
 			{
 				timer::ElapsedTimer timer1;
-				if (server->Call("NodeSystem.RunInfo", result.get()) == XCode::Ok)
+				int code = server->Call(func, result);
+				if (code == XCode::Ok)
 				{
 					std::unique_ptr<json::w::Value> jsonValue;
-					if(document->PushObject(result->json(), jsonValue))
+					if(document->PushObject(*result, jsonValue))
 					{
-						jsonValue->Add("ping", timer1.GetMs());
+						jsonValue->Add("timeout", fmt::format("{}ms", timer1.GetMs()));
 					}
+				}
+				else
+				{
+					const std::string & desc = CodeConfig::Inst()->GetDesc(code);
+					std::unique_ptr<json::w::Value> jsonObject = document->AddObject();
+					{
+						jsonObject->Add("id", serverId);
+						jsonObject->Add("error", desc);
+						jsonObject->Add("name", server->Name());
+					}
+					LOG_ERROR("call [{}.{}] code:{} => {}" , serverId, func, code, desc)
 				}
 			}
 		}

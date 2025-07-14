@@ -5,11 +5,13 @@
 #ifndef APP_DOCUMENT_H
 #define APP_DOCUMENT_H
 
-#include<string>
-#include<memory>
+#include <list>
+#include <string>
+#include <memory>
+#include <functional>
 #include <unordered_map>
-#include<vector>
-#include"Yyjson/Src/yyjson.h"
+#include <vector>
+#include "Yyjson/Src/yyjson.h"
 
 namespace json
 {
@@ -44,11 +46,14 @@ namespace json
 			Value();
 		public:
 			bool Push(const char *);
-			bool Push(const Value& value);
 			bool Push(const std::string& v);
+			bool Push(r::Value& value);
+			bool Push(const w::Value& value);
 			bool Push(const char* str, size_t size);
 		public:
 			bool PushObject(const std::string& str);
+			bool PushObject(const std::list<std::string>& list);
+			bool PushObject(r::Value & value, std::unique_ptr<w::Value> & result);
 			bool PushObject(const std::string& str, std::unique_ptr<Value> & value);
 
 			template<typename T>
@@ -92,9 +97,7 @@ namespace json
 				{
 					return false;
 				}
-				yyjson_mut_val * val = yyjson_mut_int(this->mDoc, v);
-				yyjson_mut_val * key = yyjson_mut_strcpy(this->mDoc, k);
-				return yyjson_mut_obj_add(this->mValue, key, val);
+				return yyjson_mut_obj_add_int(this->mDoc, this->mValue, k, v);
 			}
 
 			template<typename T>
@@ -104,9 +107,7 @@ namespace json
 				{
 					return false;
 				}
-				yyjson_mut_val * val = yyjson_mut_int(this->mDoc, (int)v);
-				yyjson_mut_val * key = yyjson_mut_strcpy(this->mDoc, k);
-				return yyjson_mut_obj_add(this->mValue, key, val);
+				return yyjson_mut_obj_add_int(this->mDoc, this->mValue, k, (int)v);
 			}
 
 			template<typename T>
@@ -125,9 +126,11 @@ namespace json
 			bool Add(const char* k, const char * v);
 			bool Add(const char* k, yyjson_val* v);
 			bool Add(const char* k, yyjson_mut_val* v);
-			bool Add(const char* k, const Value& value);
+			bool Add(const char* k, r::Value& value);
+			bool Add(const char* k, const w::Value& value);
 			bool Add(const char* k, const std::string& v);
 			bool Add(const char* k, const char* str, size_t size);
+			bool Add(const char* k, const std::list<std::string> & value);
 
 			template<typename T>
 			inline std::enable_if_t<std::is_base_of<IObject, T>::value, bool> Add(const char* k, T & value)
@@ -138,17 +141,22 @@ namespace json
 
 
 			template<typename T>
-			inline bool Add(const char* k, const std::vector<T>& value)
+			inline bool Add(const char* k, const std::vector<T>& value, bool addEmpty = true)
 			{
 				if (!this->IsObject())
 				{
 					return false;
+				}
+				if(!addEmpty && value.empty())
+				{
+					return true;
 				}
 				std::unique_ptr<Value> jsonArray = this->AddArray(k);
 				for (const T& val: value)
 				{
 					jsonArray->Push(val);
 				}
+				return true;
 			}
 		public:
 			bool AddObject(const char* json, size_t size);
@@ -160,6 +168,7 @@ namespace json
 			std::unique_ptr<Value> AddArray(const char* k);
 			std::unique_ptr<Value> AddObject(const char* k);
 		public:
+			inline yyjson_mut_doc * GetDocument() { return this->mDoc; }
 			inline bool IsInt() const { return yyjson_mut_is_int(this->mValue);}
 			inline bool IsArray() const { return yyjson_mut_is_arr(this->mValue); }
 			inline bool IsObject() const { return yyjson_mut_is_obj(this->mValue); }
@@ -178,7 +187,9 @@ namespace json
 			~Document() final { yyjson_mut_doc_free(this->mDoc); }
 		public:
 			std::string JsonString(bool pretty = false) const;
-			bool Encode(std::string* json, bool pretty = false) const noexcept;
+			bool Deserialization(const char * json, size_t size);
+			bool Serialize(std::string * json, bool pretty = false, yyjson_write_flag = 0) const noexcept;
+			bool Serialize(std::unique_ptr<char> & json, size_t & size, bool pretty = false, yyjson_write_flag = 0) const noexcept;
 		private:
 		};
 	}
@@ -188,6 +199,7 @@ namespace json
 		class Value
 		{
 		public:
+			Value() : mValue(nullptr) { }
 			explicit Value(yyjson_val* val) : mValue(val) { }
 
 			virtual ~Value() = default;
@@ -220,23 +232,44 @@ namespace json
 			bool Get(size_t index, int& value) const;
 			bool Get(size_t index, std::string& value) const;
 			int GetInt(const char* k, int defaultVal = 0) const;
-			bool Get(size_t index, std::unique_ptr<Value>& value) const;
-
+			bool GetBool(const char * key, bool defaultVal = false) const;
+			bool GetFirst(std::string & key, json::r::Value& value) const;
+			bool Get(size_t index, r::Value & value) const;
+			bool Foreach(std::function<void(const char * key, r::Value & value)> && callback);
+		public:
+			const char * GetString(size_t & size) const;
+			const char * GetString(size_t index, size_t & size) const;
+			const char * GetString(const char * key, size_t & size) const;
 		public:
 			size_t MemberCount() const;
 			std::string ToString() const;
 			std::vector<const char *> GetAllKey() const;
 			size_t GetKeys(std::vector<const char*>& key) const;
 			inline yyjson_val* GetValue() { return this->mValue; }
+			bool ToCString(std::unique_ptr<char> & json, size_t & size);
 		public:
 			bool Get(const char* k, bool& v) const;
 			bool Get(const char* k, std::string& v) const;
-			bool GetValues(std::vector<std::unique_ptr<Value>> & value) const;
+			bool GetValues(std::vector<r::Value> & value) const;
 		public:
-			bool Get(const char* key, std::unique_ptr<Value>& value) const;
+			bool Get(const char* key, std::vector<r::Value> & value) const;
+		public:
+			bool Get(const char* key, r::Value & value) const;
 			bool Get(const char* key, std::vector<std::string>& value) const;
 			bool Get(const char * key, std::unordered_map<int, std::string> & value) const;
 			bool Get(const char * key, std::unordered_map<std::string, std::string> & value) const;
+			template<typename T>
+			inline bool Get(const char * k1, const char * k2, T & value)
+			{
+				yyjson_val* val = yyjson_obj_get(this->mValue, k1);
+				if(!yyjson_is_obj(val))
+				{
+					return false;
+				}
+				json::r::Value value1(val);
+				return value1.Get(k2, value);
+			}
+
 
 			template<typename T>
 			inline std::enable_if_t<std::is_base_of<IObject, T>::value, bool> Get(const char * key, T & value)
@@ -246,8 +279,8 @@ namespace json
 				{
 					return false;
 				}
-				std::unique_ptr<Value> jsonValue = std::make_unique<r::Value>(val);
-				return value.Decode(*jsonValue);
+				Value jsonValue(val);
+				return value.Decode(jsonValue);
 			}
 
 			template<typename T>
@@ -291,7 +324,10 @@ namespace json
 					{
 						return false;
 					}
-					value.emplace_back((T)yyjson_get_sint(item));
+					else
+					{
+						value.emplace_back((T)yyjson_get_sint(item));
+					}
 				}
 				return true;
 			}
@@ -354,17 +390,18 @@ namespace json
 			yyjson_val* mValue;
 		};
 
-		class Document : public Value
+		class Document : public r::Value
 		{
 		public:
 			explicit Document() : Value(nullptr), mDoc(nullptr) { }
+			explicit Document(w::Value & document);
 			~Document() override  { yyjson_doc_free(this->mDoc); }
 
 		public:
 			void SetDoc(yyjson_doc* doc);
-			bool Decode(const std::string& json) noexcept;
 			bool FromFile(const std::string& path) noexcept;
-			bool Decode(const char* str, size_t size) noexcept;
+			bool Decode(const std::string& json, yyjson_read_flag flag = 0) noexcept;
+			bool Decode(const char* str, size_t size, yyjson_read_flag flag = 0) noexcept;
 			yyjson_doc* GetDoc() { return this->mDoc; }
 			bool DecodeFile(const std::string& path);
 		public:

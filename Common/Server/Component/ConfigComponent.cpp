@@ -20,7 +20,7 @@ namespace acs
 			LOG_CHECK_RET_FALSE(this->LoadTextConfig<CodeConfig>(path));
 		}
 
-		new http::ContentFactory();
+		//new http::ContentFactory();
 		return this->LoadInterfaceConfig();
 	}
 
@@ -32,7 +32,7 @@ namespace acs
 			std::vector<std::string> paths;
 			std::unique_ptr<RpcConfig> config(new RpcConfig());
 
-			help::dir::GetFilePaths(dir, "*.json", paths);
+			help::dir::GetFilePaths(dir, ".json", paths);
 			for (const std::string& path: paths)
 			{
 				if(!config->LoadConfig(path))
@@ -48,7 +48,7 @@ namespace acs
 		{
 			std::vector<std::string> paths;
 			std::unique_ptr<HttpConfig> config(new HttpConfig());
-			help::dir::GetFilePaths(dir, "*.json", paths);
+			help::dir::GetFilePaths(dir, ".json", paths);
 
 			for (const std::string& path: paths)
 			{

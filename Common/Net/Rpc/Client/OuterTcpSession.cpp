@@ -9,7 +9,7 @@
 namespace rpc
 {
 	OuterTcpSession::OuterTcpSession(int id, Component * component, Asio::Context & main)
-		: Client(rpc::OuterBufferMaxSize), mSockId(id), mMainContext(main), mClose(false), mPlayerId(0)
+		: Client(rpc::OUTER_RPC_BODY_MAX_LENGTH), mSockId(id), mMainContext(main), mPlayerId(0)
 	{
 		this->mRecvCount = 0;
 		this->mMessage = nullptr;
@@ -22,7 +22,6 @@ namespace rpc
 	{
 		while(!this->mSendMessages.empty())
 		{
-			delete this->mSendMessages.front();
 			this->mSendMessages.pop();
 		}
 	}
@@ -60,7 +59,7 @@ namespace rpc
 			case tcp::Decode::None:
 			{
 				tcp::Data::ReadHead(readStream, this->mProtoHead, true);
-				if (this->mProtoHead.Len >= rpc::OuterBufferMaxSize)
+				if (this->mProtoHead.Len >= rpc::OUTER_RPC_BODY_MAX_LENGTH)
 				{
 					this->CloseSocket(XCode::NetBigDataShutdown);
 					return;
@@ -107,19 +106,25 @@ namespace rpc
 		}
 		switch(request->GetType())
 		{
-			case rpc::Type::Ping:
+			case rpc::type::ping:
 			{
 				std::unique_ptr<rpc::Message> pongMessage = std::make_unique<rpc::Message>();
 				{
-					pongMessage->SetType(rpc::Type::Pong);
-					this->AddToSendQueue(pongMessage.release());
+					pongMessage->SetType(rpc::type::pong);
+					this->AddToSendQueue(pongMessage);
 				}
 				break;
 			}
-			case rpc::Type::Request:
+			case rpc::type::request:
 			{
+				if (request->GetBody().size() >= rpc::OUTER_RPC_BODY_MAX_LENGTH)
+				{
+					this->CloseSocket(XCode::NetBigDataShutdown);
+					return;
+				}
 #ifdef __DEBUG__
-				request->TempHead().Add(rpc::Header::from_addr, this->mSocket->GetAddress());
+				std::string address = this->GetAddress();
+				request->TempHead().Add(rpc::Header::from_addr, address);
 #endif
 				this->mRecvCount++;
 				std::shared_ptr<Client> self = this->shared_from_this();
@@ -145,17 +150,15 @@ namespace rpc
 
     void OuterTcpSession::CloseSocket()
 	{
-		if(this->mClose) {
-			return;
-		}
-		this->StopTimer();
-		while(!this->mSendMessages.empty())
+		if(this->mSocket->IsActive())
 		{
-			delete this->mSendMessages.front();
-			this->mSendMessages.pop();
+			this->StopTimer();
+			while(!this->mSendMessages.empty())
+			{
+				this->mSendMessages.pop();
+			}
+			this->mSocket->Close();
 		}
-		this->mClose = true;
-		this->mSocket->Close();
 	}
 
 	void OuterTcpSession::SendFirstMessage()
@@ -168,7 +171,7 @@ namespace rpc
 
 	void OuterTcpSession::CloseSocket(int code)
 	{
-		if(!this->mClose)
+		if(this->mSocket->IsActive())
 		{
 			this->CloseSocket();
 			std::shared_ptr<Client> self = this->shared_from_this();
@@ -182,18 +185,19 @@ namespace rpc
 	{
 		if (!this->mSendMessages.empty())
 		{
-			rpc::Message* message = this->mSendMessages.front();
-			if (message->GetType() == rpc::Type::Response)
+			std::unique_ptr<rpc::Message> & message = this->mSendMessages.front();
 			{
-				if(message->GetCode() == XCode::CloseSocket)
+				if (message->GetType() == rpc::type::response)
 				{
-					this->CloseSocket(XCode::CloseSocket);
-					return;
+					if(message->GetCode() == XCode::CloseSocket)
+					{
+						this->CloseSocket(XCode::CloseSocket);
+						return;
+					}
 				}
+				this->mSendMessages.pop();
+				this->SendFirstMessage();
 			}
-			delete message;
-			this->mSendMessages.pop();
-			this->SendFirstMessage();
 		}
 	}
 
@@ -202,21 +206,22 @@ namespace rpc
 		this->CloseSocket(XCode::SendMessageFail);
 	}
 
-	void OuterTcpSession::Send(rpc::Message* message)
+	void OuterTcpSession::Send(std::unique_ptr<rpc::Message>& message)
 	{
 		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(this->mSocket->GetContext(), [this, self, message]
+		asio::post(this->mSocket->GetContext(), [this, self, req = message.release()]
 		{
+			std::unique_ptr<rpc::Message> message(req);
 			this->AddToSendQueue(message);
 		});
 	}
 
-	void OuterTcpSession::AddToSendQueue(rpc::Message* message)
+	void OuterTcpSession::AddToSendQueue(std::unique_ptr<rpc::Message> & message)
 	{
-		this->mSendMessages.emplace(message);
+		this->mSendMessages.emplace(std::move(message));
 		if(this->mSendMessages.size() == 1)
 		{
-			this->Write(*message);
+			this->Write(*this->mSendMessages.front());
 		}
 	}
 }

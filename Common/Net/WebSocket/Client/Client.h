@@ -22,8 +22,8 @@ namespace ws
 		Client(int id, Component * component, Asio::Context & main, char msg);
 	public:
 		void Close();
-		void Send(ws::Message * message);
-		void Send(rpc::Message * message);
+		void Send(std::unique_ptr<ws::Message>& message);
+		void Send(std::unique_ptr<rpc::Message> & message);
 	private:
 		void OnUpdate() final;
 		void OnSendMessage(size_t size) final;
@@ -35,16 +35,17 @@ namespace ws
 	private:
 		void Close(int code);
 		void SendFirstMessage();
-		void AddToSendQueue(std::unique_ptr<ws::Message> message);
+		bool OnMessage(const ws::Message & message);
+		void AddToSendQueue(std::unique_ptr<ws::Message>& message);
 	private:
 		char mMsg;
 		int mSockId;
+		ws::Message mMessage;
 		Component * mComponent;
 		std::stringstream mStream;
 		Asio::Context & mMainContext;
 		http::Request * mHttpRequest;
 		http::Response * mHttpResponse;
-		std::unique_ptr<ws::Message> mMessage;
 		std::queue<std::unique_ptr<ws::Message>> mWaitSendMessage;
 	};
 }

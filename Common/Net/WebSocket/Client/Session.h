@@ -25,9 +25,9 @@ namespace ws
 		~Session() final;
 	public:
 		void Stop();
-		void Send(rpc::Message * message);
-		void Send(ws::Message * message);
 		void StartReceive(tcp::Socket * tcpSocket);
+		void Send(std::unique_ptr<ws::Message>& message);
+		void Send(std::unique_ptr<rpc::Message> & message);
 		inline void BindPlayerID(long long id) { this->mPlayerId = id; }
 	private:
 		void OnSendMessage(size_t size) final;
@@ -38,7 +38,7 @@ namespace ws
 	private:
 		void OnPing();
 		bool OnMessage();
-		void AddToSendQueue(std::unique_ptr<ws::Message> message);
+		void AddToSendQueue(std::unique_ptr<ws::Message> & message);
 	private:
 		void OnReadBody();
 		bool DecodeByHttp();

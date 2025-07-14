@@ -8,18 +8,20 @@
 #include "UdpComponent.h"
 #include "Rpc/Common/Message.h"
 #include "Entity/Actor/App.h"
-#include "Net/Udp/Common/UdpClient.h"
 #include "Server/Config/CodeConfig.h"
 #include "Server/Component/ThreadComponent.h"
 #include "Rpc/Component/DispatchComponent.h"
-#include "Core/Thread/ThreadSync.h"
+#include "Util/Tools/TimeHelper.h"
 
 namespace acs
 {
 	UdpComponent::UdpComponent()
+		: mSendStream(&mSendBuffer), mReadStream(&mReceiveBuffer)
 	{
 		this->mActor = nullptr;
 		this->mDispatch = nullptr;
+		this->mMsg = rpc::msg::bin;
+		this->mAddrName = rpc::Header::from_addr;
 	}
 
 	bool UdpComponent::LateAwake()
@@ -31,47 +33,22 @@ namespace acs
 
 	bool UdpComponent::StopListen()
 	{
-		if (this->mUdpServer == nullptr)
-		{
-			return false;
-		}
-#ifdef ONLY_MAIN_THREAD
 		Asio::Code code;
-		this->mUdpServer->Socket().close(code);
-		if(code.value() != Asio::OK)
-		{
-			return false;
-		}
-#else
-		custom::ThreadSync<bool> threadSync;
-		Asio::Context& context = this->mUdpServer->GetContext();
-		asio::post(context, [this, &threadSync]()
-		{
-			Asio::Code code;
-			this->mUdpServer->Socket().close(code);
-			threadSync.SetResult(code.value() == Asio::OK);
-		});
-		if (!threadSync.Wait())
-		{
-			return false;
-		}
-#endif
-		this->mUdpServer.reset(nullptr);
-		return true;
+		code = this->mSocket->close(code);
+		return code.value() == Asio::OK;
 	}
 
 	bool UdpComponent::StartListen(const acs::ListenConfig& listen)
 	{
 		try
 		{
-			Asio::Context& context = this->GetComponent<ThreadComponent>()->GetContext();
+			Asio::Context& context = this->mApp->GetContext();
 			{
 				unsigned short port = listen.port;
-				Asio::Context & main = this->mApp->GetContext();
-				this->mUdpServer = std::make_unique<udp::Server>(context, this, port, main);
+				udp::EndPoint endpoint(asio::ip::udp::v4(), port);
+				this->mSocket = std::make_unique<udp::Socket>(context, endpoint);
 			}
-
-			asio::post(context, [this]() { this->mUdpServer->StartReceive(); });
+			asio::post(context, [this]() { this->StartReceive(); });
 			return true;
 		}
 		catch (std::exception& e)
@@ -80,50 +57,119 @@ namespace acs
 		}
 	}
 
-	int UdpComponent::Send(int id, rpc::Message* message) noexcept
+	void UdpComponent::StartReceive()
 	{
-		if (message->GetType() == rpc::Type::Response)
+		auto callback = [this](const asio::error_code& code, size_t size)
 		{
-			std::string address;
-			if (!message->TempHead().Del("udp", address))
+			if (code.value() == Asio::OK)
 			{
-				return XCode::SendMessageFail;
+				this->OnReceiveMessage(size);
 			}
-			if(!this->mUdpServer->Send(address, message))
+			if (code != asio::error::operation_aborted)
 			{
-				return XCode::SendMessageFail;
+				this->StartReceive();
 			}
-			return XCode::Ok;
-		}
+		};
+		auto buffer = this->mReceiveBuffer.prepare(udp::BUFFER_COUNT);
+		this->mSocket->async_receive_from(buffer, this->mRemotePoint, callback);
+	}
 
-		udp::IClient* udpClient = this->GetClient(id);
-		if (udpClient == nullptr)
+	void UdpComponent::OnReceiveMessage(size_t size)
+	{
+		this->mReceiveBuffer.commit(size);
+		std::unique_ptr<rpc::Message> rpcPacket = std::make_unique<rpc::Message>();
+		{
+			rpc::ProtoHead & protoHead = rpcPacket->GetProtoHead();
+			{
+				rpcPacket->SetMsg(this->mMsg);
+				tcp::Data::ReadHead(this->mReadStream, protoHead, true);
+			}
+			rpcPacket->Init(protoHead);
+			size_t count = size - rpc::RPC_PACK_HEAD_LEN;
+			if (rpcPacket->OnRecvMessage(this->mReadStream, count) != tcp::read::done)
+			{
+				return;
+			}
+			unsigned short port = this->mRemotePoint.port();
+			std::string ip = this->mRemotePoint.address().to_string();
+			const std::string address = fmt::format("{}:{}", ip, port);
+#ifdef __DEBUG__
+			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
+#endif
+			rpcPacket->SetNet(rpc::net::udp);
+			Asio::Context& context = this->mApp->GetContext();
+			rpcPacket->TempHead().Add(this->mAddrName, address);
+			asio::post(context, [this, req = rpcPacket.release()]{ this->OnMessage(req, nullptr); });
+		}
+		this->mReceiveBuffer.consume(size);
+	}
+
+	int UdpComponent::Send(int id, std::unique_ptr<rpc::Message>& message) noexcept
+	{
+		std::string address;
+		switch(message->GetType())
+		{
+			case rpc::type::request:
+			{
+				if(!this->mActor->GetListen(id, "udp", address))
+				{
+					return XCode::NotFoundActor;
+				}
+				break;
+			}
+			case rpc::type::response:
+			{
+				const rpc::Head & head = message->TempHead();
+				if(!head.Get(this->mAddrName, address))
+				{
+					LOG_ERROR("not find udp address => {}", message->ToString())
+					return XCode::SendMessageFail;
+				}
+				break;
+			}
+		}
+		return this->Send(address, message);
+	}
+
+	int UdpComponent::Send(const std::string& address, std::unique_ptr<rpc::Message>& message)
+	{
+		std::string ip;
+		unsigned short port = 0;
+		if(!help::Str::SplitAddr(address, ip, port))
 		{
 			return XCode::SendMessageFail;
 		}
-		udpClient->Send(message);
+		Asio::Code sendCode;
+		message->SetMsg(this->mMsg);
+		asio::socket_base::message_flags flags = 0;
+		int length = message->OnSendMessage(this->mSendStream);
+		asio::ip::udp::endpoint endpoint(asio::ip::make_address(ip), port);
+		size_t count = this->mSocket->send_to(this->mSendBuffer.data(), endpoint, flags, sendCode);
+		if(sendCode.value() != XCode::Ok)
+		{
+			return XCode::SendMessageFail;
+		}
+		this->mSendBuffer.consume(count);
 		return XCode::Ok;
 	}
 
-	void UdpComponent::OnMessage(rpc::Message* request, rpc::Message* response) noexcept
+	void UdpComponent::OnMessage(rpc::Message* request, rpc::Message* ) noexcept
 	{
-		int code = XCode::Ok;
+		std::unique_ptr<rpc::Message> message(request);
 		switch(request->GetType())
 		{
-			case rpc::Type::Request:
-				code = this->OnRequest(request);
+			case rpc::type::request:
+				this->OnRequest(message);
 				break;
-			case rpc::Type::Response:
-				code = this->mDispatch->OnMessage(request);
+			case rpc::type::response:
+				this->mDispatch->OnMessage(message);
 				break;
 			default:
-				code = XCode::Failure;
 				break;
 		}
-		if(code != XCode::Ok) { delete request; }
 	}
 
-	int UdpComponent::OnRequest(rpc::Message* message) noexcept
+	int UdpComponent::OnRequest(std::unique_ptr<rpc::Message>& message) noexcept
 	{
 		int code = this->mDispatch->OnMessage(message);
 		if (code != XCode::Ok)
@@ -136,47 +182,10 @@ namespace acs
 				return XCode::Failure;
 			}
 			message->Body()->clear();
-			message->SetType(rpc::Type::Response);
+			message->SetType(rpc::type::response);
 			message->GetHead().Add(rpc::Header::code, code);
 			return this->Send(message->SockId(), message);
 		}
 		return XCode::Ok;
-	}
-
-	udp::Client* UdpComponent::GetClient(int id)
-	{
-		auto iter = this->mClients.find(id);
-		if(iter != this->mClients.end())
-		{
-			return iter->second.get();
-		}
-		std::string address;
-		if(!this->mActor->GetListen(id, "udp", address))
-		{
-			return nullptr;
-		}
-		std::string ip;
-		unsigned short port = 0;
-		if(!help::Str::SplitAddr(address, ip, port))
-		{
-			return nullptr;
-		}
-		try
-		{
-			Asio::Context & main = this->mApp->GetContext();
-			asio_udp::endpoint remote(asio::ip::make_address(ip), port);
-			Asio::Context & ctx = this->GetComponent<ThreadComponent>()->GetContext();
-			std::shared_ptr<udp::Client> client = std::make_shared<udp::Client>(ctx, this, remote, main);
-			{
-				this->mClients.emplace(id, client);
-				asio::post(ctx, [client]() { client->StartReceive(); });
-			}
-			return client.get();
-		}
-		catch (std::exception & e)
-		{
-			LOG_ERROR("create udp client:{} =>", address, e.what());
-			return nullptr;
-		}
 	}
 }

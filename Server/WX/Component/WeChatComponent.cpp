@@ -28,7 +28,7 @@ const std::string WE_CHAT_HOST = "https://api.mch.weixin.qq.com";
 
 namespace wx
 {
-	std::string RandomStr(int length)
+	inline std::string RandomStr(int length)
 	{
 		std::string randomString;
 		randomString.resize(length);
@@ -42,7 +42,7 @@ namespace wx
 		return randomString;
 	}
 
-	bool SignWithRSA(const std::string& data, const std::string& keyData, std::string& result)
+	inline bool SignWithRSA(const std::string& data, const std::string& keyData, std::string& result)
 	{
 		BIO* bio = BIO_new_mem_buf(keyData.c_str(), (int)keyData.size());
 		if (bio == nullptr)
@@ -62,14 +62,16 @@ namespace wx
 
 		unsigned int signatureLen = 0;
 		size_t size = EVP_PKEY_size(privateKey);
-		std::unique_ptr<unsigned char> signature(new unsigned char[size]);
-		EVP_SignFinal(ctx, signature.get(), &signatureLen, privateKey);
-		EVP_MD_CTX_free(ctx);
-		result.assign((char*)signature.get(), signatureLen);
+		std::unique_ptr<unsigned char[]> signature = std::make_unique<unsigned char[]>(size);
+		{
+			EVP_SignFinal(ctx, signature.get(), &signatureLen, privateKey);
+			EVP_MD_CTX_free(ctx);
+			result.assign((char*)signature.get(), signatureLen);
+		}
 		return true;
 	}
 
-	std::string GetOrderOverTime(long long timestamp)
+	inline std::string GetOrderOverTime(long long timestamp)
 	{
 		char str[100];
 		time_t t = (time_t)timestamp;
@@ -78,7 +80,7 @@ namespace wx
 		return { str, size };
 	}
 
-	bool RsaPublicEncode(const std::string& cert_file, const std::string& plaintext, std::string& output)
+	inline bool RsaPublicEncode(const std::string& cert_file, const std::string& plaintext, std::string& output)
 	{
 		FILE* cert_fp = fopen(cert_file.c_str(), "r");
 		if (cert_fp == nullptr)
@@ -136,25 +138,23 @@ namespace wx
 			return false;
 		}
 
-		unsigned char* buffer = new unsigned char[outlen];
-		if (EVP_PKEY_encrypt(ctx, buffer, &outlen, (const unsigned char*)plaintext.c_str(), plaintext.length()) <= 0)
+		std::unique_ptr<unsigned char[]> buffer = std::make_unique<unsigned char[]>(outlen);
+		if (EVP_PKEY_encrypt(ctx, buffer.get(), &outlen, (const unsigned char*)plaintext.c_str(), plaintext.length()) <= 0)
 		{
 			ERR_print_errors_fp(stderr);
 			EVP_PKEY_free(pubkey);
 			EVP_PKEY_CTX_free(ctx);
 			X509_free(cert);
-			delete[] buffer;
 			return false;
 		}
 
 		// 将加密结果转换为字符串
-		output = _bson::base64::encode((char*)buffer, outlen);
+		output = _bson::base64::encode((char*)buffer.get(), outlen);
 
 		// 释放资源
 		EVP_PKEY_free(pubkey);
 		EVP_PKEY_CTX_free(ctx);
 		X509_free(cert);
-		delete[] buffer;
 
 		return true;
 	}
@@ -171,23 +171,23 @@ namespace acs
 
 	bool WeChatComponent::Awake()
 	{
-		std::unique_ptr<json::r::Value> jsonValue;
+		json::r::Value jsonValue;
 		if (!this->mApp->Config().Get("wx", jsonValue))
 		{
 			return false;
 		}
 		std::string keyPath, certPath;
-		jsonValue->Get("app_id", this->mConfig.login.appId);
-		jsonValue->Get("app_secret", this->mConfig.login.secret);
+		jsonValue.Get("app_id", this->mConfig.login.appId);
+		jsonValue.Get("app_secret", this->mConfig.login.secret);
 
-		jsonValue->Get("mch_id", this->mConfig.pay.mchId);
-		jsonValue->Get("mch_num", this->mConfig.pay.mchNumber);
-		jsonValue->Get("api_v3_key", this->mConfig.pay.apiV3key);
-		jsonValue->Get("notify_url", this->mConfig.pay.notifyUrl);
-		jsonValue->Get("complaint_url", this->mConfig.pay.complaintUrl);
-		jsonValue->Get("api_key", this->mConfig.pay.apiKeyPath);
-		jsonValue->Get("api_cert", this->mConfig.pay.apiCertPath);
-		jsonValue->Get("public_key", this->mConfig.pay.publicKeyPath);
+		jsonValue.Get("mch_id", this->mConfig.pay.mchId);
+		jsonValue.Get("mch_num", this->mConfig.pay.mchNumber);
+		jsonValue.Get("api_v3_key", this->mConfig.pay.apiV3key);
+		jsonValue.Get("notify_url", this->mConfig.pay.notifyUrl);
+		jsonValue.Get("complaint_url", this->mConfig.pay.complaintUrl);
+		jsonValue.Get("api_key", this->mConfig.pay.apiKeyPath);
+		jsonValue.Get("api_cert", this->mConfig.pay.apiCertPath);
+		jsonValue.Get("public_key", this->mConfig.pay.publicKeyPath);
 		help::fs::ReadTxtFile(this->mConfig.pay.apiCertPath, this->mConfig.pay.apiCert);
 		return help::fs::ReadTxtFile(this->mConfig.pay.apiKeyPath, this->mConfig.pay.apiKey);
 	}
@@ -212,7 +212,7 @@ namespace acs
 		}
 		std::string contentType;
 		std::unique_ptr<http::Content> res = std::make_unique<http::TextContent>();
-		return this->mHttp->Do(std::move(request), std::move(res));
+		return this->mHttp->Do(request, std::move(res));
 	}
 
 	void WeChatComponent::OnStart()
@@ -232,39 +232,39 @@ namespace acs
 	bool WeChatComponent::DownCertificates()
 	{
 		std::unique_ptr<http::Request> request1 = this->NewRequest("GET", "/v3/certificates");
-		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
+		std::unique_ptr<http::Response> response = this->mHttp->Do(request1, std::make_unique<http::JsonContent>());
 		if (response == nullptr)
 		{
 			return false;
 		}
+		json::r::Value jsonArray;
 		const http::JsonContent* jsonData = response->GetBody()->To<const http::JsonContent>();
-		std::unique_ptr<json::r::Value> jsonArray;
 		if (!jsonData->Get("data", jsonArray))
 		{
 			return false;
 		}
 
 		size_t index = 0;
+		json::r::Value jsonObject;
 		std::string serial_no, associated_data;
-		std::unique_ptr<json::r::Value> jsonObject;
-		if (!jsonArray->Get(index, jsonObject))
+		if (!jsonArray.Get(index, jsonObject))
 		{
 			return false;
 		}
-		if (!jsonObject->Get("serial_no", serial_no))
+		if (!jsonObject.Get("serial_no", serial_no))
 		{
 			return false;
 		}
 
-		std::unique_ptr<json::r::Value> jsonObject2;
-		if (!jsonObject->Get("encrypt_certificate", jsonObject2))
+		json::r::Value jsonObject2;
+		if (!jsonObject.Get("encrypt_certificate", jsonObject2))
 		{
 			return false;
 		}
 		std::string ciphertext, nonce;
-		jsonObject2->Get("nonce", nonce);
-		jsonObject2->Get("ciphertext", ciphertext);
-		jsonObject2->Get("associated_data", associated_data);
+		jsonObject2.Get("nonce", nonce);
+		jsonObject2.Get("ciphertext", ciphertext);
+		jsonObject2.Get("associated_data", associated_data);
 
 		const std::string& sessionKey = this->mConfig.pay.apiV3key;
 		const std::string text = _bson::base64::decode(ciphertext);
@@ -301,17 +301,17 @@ namespace acs
 		}
 		std::unique_ptr<wx::UploadOrderResponse> uploadOrderResponse = std::make_unique<wx::UploadOrderResponse>();
 		{
+			json::r::Value jsonObject;
 			jsonData->Get("errmsg", uploadOrderResponse->errmsg);
 			jsonData->Get("errcode", uploadOrderResponse->errcode);
-			std::unique_ptr<json::r::Value> jsonObject;
 			if (jsonData->Get("order", jsonObject))
 			{
-				jsonObject->Get("order_state", uploadOrderResponse->order.order_state);
-				jsonObject->Get("paid_amount", uploadOrderResponse->order.paid_amount);
-				jsonObject->Get("description", uploadOrderResponse->order.description);
-				jsonObject->Get("in_complaint", uploadOrderResponse->order.in_complaint);
-				jsonObject->Get("transaction_id", uploadOrderResponse->order.transaction_id);
-				jsonObject->Get("merchant_trade_no", uploadOrderResponse->order.merchant_trade_no);
+				jsonObject.Get("order_state", uploadOrderResponse->order.order_state);
+				jsonObject.Get("paid_amount", uploadOrderResponse->order.paid_amount);
+				jsonObject.Get("description", uploadOrderResponse->order.description);
+				jsonObject.Get("in_complaint", uploadOrderResponse->order.in_complaint);
+				jsonObject.Get("transaction_id", uploadOrderResponse->order.transaction_id);
+				jsonObject.Get("merchant_trade_no", uploadOrderResponse->order.merchant_trade_no);
 			}
 		}
 		return uploadOrderResponse;
@@ -328,7 +328,7 @@ namespace acs
 		{
 			return nullptr;
 		}
-		std::unique_ptr<http::Response> response2 = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
+		std::unique_ptr<http::Response> response2 = this->mHttp->Do(request1, std::make_unique<http::JsonContent>());
 		if (response2 == nullptr || response2->Code() != HttpStatus::OK)
 		{
 			return nullptr;
@@ -347,20 +347,20 @@ namespace acs
 			jsonObject->Get("trade_state_desc", response1->trade_state_desc);
 			jsonObject->Get("transaction_id", response1->transaction_id);
 
-			std::unique_ptr<json::r::Value> amountObject;
+			json::r::Value amountObject;
 			if (!jsonObject->Get("amount", amountObject))
 			{
 				return nullptr;
 			}
-			amountObject->Get("total", response1->amount.total);
-			amountObject->Get("currency", response1->amount.currency);
-			amountObject->Get("payer_total", response1->amount.payer_total);
-			amountObject->Get("payer_currency", response1->amount.payer_currency);
+			amountObject.Get("total", response1->amount.total);
+			amountObject.Get("currency", response1->amount.currency);
+			amountObject.Get("payer_total", response1->amount.payer_total);
+			amountObject.Get("payer_currency", response1->amount.payer_currency);
 
-			std::unique_ptr<json::r::Value> payerObject;
+			json::r::Value payerObject;
 			if (jsonObject->Get("payer", payerObject))
 			{
-				payerObject->Get("openid", response1->openid);
+				payerObject.Get("openid", response1->openid);
 			}
 		}
 		return response1;
@@ -397,7 +397,7 @@ namespace acs
 	{
 		std::string body;
 		std::string output;
-		document.Encode(&body);
+		document.Serialize(&body);
 		std::string randStr = wx::RandomStr(32);
 		long long nowTime = help::Time::NowSec();
 		std::string str = fmt::format("POST\n{}\n{}\n{}\n{}\n", url, nowTime, randStr, body);
@@ -519,7 +519,7 @@ namespace acs
 		std::string host("/v3/merchant-service/complaint-notifications");
 		std::unique_ptr<http::Request> request1 = this->NewRequest("GET", host);
 		{
-			std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1));
+			std::unique_ptr<http::Response> response = this->mHttp->Do(request1);
 			const http::JsonContent* jsonData = response->To<http::JsonContent>();
 			if (jsonData != nullptr)
 			{
@@ -535,7 +535,7 @@ namespace acs
 		}
 		std::unique_ptr<http::Request> request2 = this->NewRequest("DELETE", host);
 		{
-			this->mHttp->Do(std::move(request2));
+			this->mHttp->Do(request2);
 		}
 		std::string notifyUrl(url);
 		if (notifyUrl.empty())
@@ -547,7 +547,7 @@ namespace acs
 		//message.Add("mchid", this->mConfig.pay.mchId);
 		std::unique_ptr<http::Request> request3 = this->NewRequest(host, message);
 		std::unique_ptr<http::JsonContent> response2 = std::make_unique<http::JsonContent>();
-		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request3), std::move(response2));
+		std::unique_ptr<http::Response> response = this->mHttp->Do(request3, std::move(response2));
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			return false;
@@ -599,7 +599,7 @@ namespace acs
 			return false;
 		}
 		std::unique_ptr<http::JsonContent> response2 = std::make_unique<http::JsonContent>();
-		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1), std::move(response2));
+		std::unique_ptr<http::Response> response = this->mHttp->Do(request1, std::move(response2));
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			return false;
@@ -645,7 +645,7 @@ namespace acs
 		{
 			return false;
 		}
-		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1));
+		std::unique_ptr<http::Response> response = this->mHttp->Do(request1);
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			return false;
@@ -676,7 +676,7 @@ namespace acs
 		{
 			return nullptr;
 		}
-		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
+		std::unique_ptr<http::Response> response = this->mHttp->Do(request1, std::make_unique<http::JsonContent>());
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			if(response != nullptr)
@@ -702,14 +702,14 @@ namespace acs
 			jsonObject->Get("user_received_account", response1->user_received_account);
 			jsonObject->Get("status", response1->status);
 
-			std::unique_ptr<json::r::Value> amountObject;
+			json::r::Value amountObject;
 			if (!jsonObject->Get("amount", amountObject))
 			{
 				LOG_ERROR("{}", jsonObject->JsonObject().ToString());
 				return nullptr;
 			}
-			amountObject->Get("total", response1->amount.total);
-			amountObject->Get("refund", response1->amount.refund);
+			amountObject.Get("total", response1->amount.total);
+			amountObject.Get("refund", response1->amount.refund);
 		}
 		return response1;
 	}
@@ -729,7 +729,7 @@ namespace acs
 			json::w::Document message;
 			message.Add("code", code);
 			request1->SetContent(message);
-			std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1), std::move(responseBody));
+			std::unique_ptr<http::Response> response = this->mHttp->Do(request1, std::move(responseBody));
 			if (response == nullptr || response->Code() != HttpStatus::OK)
 			{
 				return nullptr;
@@ -741,9 +741,9 @@ namespace acs
 			}
 			int errcode = 0;
 			std::string errmsg;
+			json::r::Value jsonObject;
 			jsonData->Get("errmsg", errmsg);
 			jsonData->Get("errcode", errcode);
-			std::unique_ptr<json::r::Value> jsonObject;
 			if (!jsonData->Get("phone_info", jsonObject))
 			{
 				LOG_ERROR("request phone {}", errmsg);
@@ -751,9 +751,9 @@ namespace acs
 			}
 			std::unique_ptr<wx::PhoneInfo> phoneInfo = std::make_unique<wx::PhoneInfo>();
 			{
-				jsonObject->Get("countryCode", phoneInfo->countryCode);
-				jsonObject->Get("phoneNumber", phoneInfo->phoneNumber);
-				jsonObject->Get("purePhoneNumber", phoneInfo->purePhoneNumber);
+				jsonObject.Get("countryCode", phoneInfo->countryCode);
+				jsonObject.Get("phoneNumber", phoneInfo->phoneNumber);
+				jsonObject.Get("purePhoneNumber", phoneInfo->purePhoneNumber);
 			}
 			return phoneInfo;
 		}
@@ -770,7 +770,7 @@ namespace acs
 			fromData.Add("secret", this->mConfig.login.secret);
 			request1->SetUrl("https://api.weixin.qq.com/sns/jscode2session", fromData);
 		}
-		std::unique_ptr<http::Response> response1 = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
+		std::unique_ptr<http::Response> response1 = this->mHttp->Do(request1, std::make_unique<http::JsonContent>());
 		const http::JsonContent* jsonData = response1->GetBody()->To<const http::JsonContent>();
 		if (jsonData == nullptr)
 		{
@@ -828,7 +828,7 @@ namespace acs
 			request->SetVerifyFile(this->mConfig.pay.publicKeyPath);
 			request->Header().Add("Wechatpay-Serial", this->mConfig.pay.certNumber);
 		}
-		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request), std::make_unique<http::JsonContent>());
+		std::unique_ptr<http::Response> response = this->mHttp->Do(request, std::make_unique<http::JsonContent>());
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			return nullptr;
@@ -849,7 +849,7 @@ namespace acs
 		return transferResponse;
 	}
 
-	std::unique_ptr<wx::LinkInfo> WeChatComponent::GetLink(const std::string& path, const std::string& query)
+	std::unique_ptr<wx::LinkInfo> WeChatComponent::GetLinkUrl(const std::string& path, const std::string& query)
 	{
 		if (!this->GetAccessToken())
 		{
@@ -864,7 +864,7 @@ namespace acs
 		{
 			request0->SetUrl(url1);
 			request0->SetContent(document);
-			std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request0));
+			std::unique_ptr<http::Response> response = this->mHttp->Do(request0);
 			if (response == nullptr || response->Code() != HttpStatus::OK)
 			{
 				return nullptr;
@@ -883,6 +883,40 @@ namespace acs
 		}
 	}
 
+	std::unique_ptr<wx::LinkInfo> WeChatComponent::GetSchemeUrl(const std::string& path, const std::string& query)
+	{
+		if (!this->GetAccessToken())
+		{
+			return nullptr;
+		}
+		json::w::Document document;
+		document.Add("path", path);
+		document.Add("query", query);
+		std::string host1("https://api.weixin.qq.com/wxa/generatescheme");
+		std::string url1 = fmt::format("{}?access_token={}", host1, this->mAccessToken.token);
+		std::unique_ptr<http::Request> request0 = std::make_unique<http::Request>("POST");
+		{
+			request0->SetUrl(url1);
+			request0->SetContent(document);
+			std::unique_ptr<http::Response> response = this->mHttp->Do(request0);
+			if (response == nullptr || response->Code() != HttpStatus::OK)
+			{
+				return nullptr;
+			}
+			const http::JsonContent* jsonData = response->To<http::JsonContent>();
+			if (jsonData == nullptr)
+			{
+				return nullptr;
+			}
+			std::unique_ptr<wx::LinkInfo> linkInfo = std::make_unique<wx::LinkInfo>();
+			{
+				jsonData->Get("errmsg", linkInfo->errmsg);
+				jsonData->Get("openlink", linkInfo->url_link);
+			}
+			return linkInfo;
+		}
+	}
+
 	std::unique_ptr<wx::ComplainInfo> WeChatComponent::DecodeComplain(const wx::ComplainRequest& message)
 	{
 		const wx::ComplainResource& resource = message.resource;
@@ -894,7 +928,7 @@ namespace acs
 			return nullptr;
 		}
 		json::r::Document document;
-		if (!document.Decode(result))
+		if (!document.Decode(result, YYJSON_READ_INSITU))
 		{
 			return nullptr;
 		}
@@ -916,7 +950,7 @@ namespace acs
 			return nullptr;
 		}
 		json::r::Document document;
-		if (!document.Decode(result))
+		if (!document.Decode(result, YYJSON_READ_INSITU))
 		{
 			return nullptr;
 		}
@@ -929,17 +963,17 @@ namespace acs
 			document.Get("trade_state", payResponse->trade_state);
 			document.Get("bank_type", payResponse->bank_type);
 			document.Get("attach", payResponse->attach);
-			std::unique_ptr<json::r::Value> jsonObject;
+			json::r::Value jsonObject;
 			if (document.Get("payer", jsonObject))
 			{
-				jsonObject->Get("openid", payResponse->open_id);
+				jsonObject.Get("openid", payResponse->open_id);
 			}
 			if (document.Get("amount", jsonObject))
 			{
-				jsonObject->Get("total", payResponse->amount.total);
-				jsonObject->Get("payer_total", payResponse->amount.payer_total);
-				jsonObject->Get("currency", payResponse->amount.currency);
-				jsonObject->Get("payer_currency", payResponse->amount.payer_currency);
+				jsonObject.Get("total", payResponse->amount.total);
+				jsonObject.Get("payer_total", payResponse->amount.payer_total);
+				jsonObject.Get("currency", payResponse->amount.currency);
+				jsonObject.Get("payer_currency", payResponse->amount.payer_currency);
 			}
 		}
 		return payResponse;
@@ -1037,7 +1071,7 @@ namespace acs
 		std::unique_ptr<http::Request> request = std::make_unique<http::Request>("GET");
 		{
 			request->SetUrl(url, fromData);
-			std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request));
+			std::unique_ptr<http::Response> response = this->mHttp->Do(request);
 			if (response == nullptr || response->Code() != HttpStatus::OK)
 			{
 				return nullptr;

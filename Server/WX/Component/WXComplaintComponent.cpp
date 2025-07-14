@@ -60,10 +60,10 @@ namespace acs
 			return XCode::Ok;
 		}
 
-		std::unique_ptr<json::r::Value> jsonValue;
+		json::r::Value jsonValue;
 		if(document.Get("history", jsonValue))
 		{
-			jsonValue->Get("content", orderComplaint.reason);
+			jsonValue.Get("content", orderComplaint.reason);
 		}
 		return XCode::Ok;
 	}

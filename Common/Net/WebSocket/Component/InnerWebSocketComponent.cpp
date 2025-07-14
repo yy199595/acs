@@ -44,17 +44,17 @@ namespace acs
 		return true;
 	}
 
-	void InnerWebSocketComponent::OnMessage(int id, rpc::Message* request, rpc::Message* response) noexcept
+	void InnerWebSocketComponent::OnMessage(rpc::Message* req, rpc::Message* response) noexcept
 	{
-		if (this->mDispatch->OnMessage(request) == XCode::Ok)
+		std::unique_ptr<rpc::Message> message(req);
+		if (this->mDispatch->OnMessage(message) == XCode::Ok)
 		{
 			return;
 		}
-		LOG_DEBUG("[{}] message = {}", id, request->ToString())
-		delete request;
+		LOG_DEBUG("[{}] message = {}", message->SockId(), message->ToString())
 	}
 
-	int InnerWebSocketComponent::Send(int id, rpc::Message* message) noexcept
+	int InnerWebSocketComponent::Send(int id, std::unique_ptr<rpc::Message> & message) noexcept
 	{
 		auto iter = this->mSessions.find(id);
 		if(iter != this->mSessions.end())
@@ -74,18 +74,17 @@ namespace acs
 			return XCode::NotFoundActorAddress;
 		}
 		Asio::Context & context = this->mApp->GetContext();
-		tcp::Socket * tcpSocket = this->mThread->CreateSocket();
+		tcp::Socket * tcpSocket = this->mThread->CreateSocket(address);
 		std::shared_ptr<ws::Client> requestClient = std::make_shared<ws::Client>(id, this, context, msg_format);
 		{
-			tcpSocket->Init(address);
 			requestClient->SetSocket(tcpSocket);
 			this->mClients.emplace(id, requestClient);
 		}
 		requestClient->Send(message);
-		return XCode::SendMessageFail;
+		return XCode::Ok;
 	}
 
-	int InnerWebSocketComponent::Send(int id, ws::Message* message) noexcept
+	int InnerWebSocketComponent::Send(int id, std::unique_ptr<ws::Message>& message) noexcept
 	{
 		auto iter = this->mSessions.find(id);
 		if(iter != this->mSessions.end())
@@ -107,10 +106,9 @@ namespace acs
 	{
 		int id = this->mClientPool.BuildNumber();
 		Asio::Context & context = this->mApp->GetContext();
-		tcp::Socket * tcpSocket = this->mThread->CreateSocket();
+		tcp::Socket * tcpSocket = this->mThread->CreateSocket(address);
 		std::shared_ptr<ws::Client> requestClient = std::make_shared<ws::Client>(id, this, context, msg_format);
 		{
-			tcpSocket->Init(address);
 			requestClient->SetSocket(tcpSocket);
 			this->mClients.emplace(id, requestClient);
 		}

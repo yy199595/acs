@@ -26,14 +26,14 @@ namespace acs
 			return false;
 		}
 		std::string directory;
+		json::r::Value jsonArray;
 		const std::string & path = this->Path();
 		help::dir::GetDirByPath(path, directory);
-		std::unique_ptr<json::r::Value> jsonArray;
-		if(mainDocument.Get("include", jsonArray) && jsonArray->IsArray())
+		if(mainDocument.Get("include", jsonArray) && jsonArray.IsArray())
 		{
 			size_t index = 0;
 			std::string file;
-			while (jsonArray->Get(index, file))
+			while (jsonArray.Get(index, file))
 			{
 				std::string content;
 				json::r::Document document1;
@@ -42,7 +42,7 @@ namespace acs
 				{
 					return false;
 				}
-				if (!document1.Decode(content))
+				if (!document1.Decode(content, YYJSON_READ_INSITU))
 				{
 					return false;
 				}
@@ -52,7 +52,7 @@ namespace acs
 		}
 		std::string json;
 		json::Merge(jsonDocument, mainDocument);
-		if(jsonDocument.Encode(&json, true) && this->Decode(json))
+		if(jsonDocument.Serialize(&json, true) && this->Decode(json))
 		{
 			//printf("%s\n", json.c_str());
 			return this->OnLoadJson();
@@ -67,13 +67,13 @@ namespace acs
 
 	bool ServerConfig::OnLoadJson()
 	{
-		std::unique_ptr<json::r::Value> jsonObject;
+		json::r::Value jsonObject;
 		if(!this->Get("core", jsonObject))
 		{
 			return false;
 		}
 		std::string secret;
-		if(jsonObject->Get("secret", secret))
+		if(jsonObject.Get("secret", secret))
 		{
 			if(help::fs::FileIsExist(secret))
 			{
@@ -84,36 +84,36 @@ namespace acs
 				this->mSecret = secret;
 			}
 		}
-		os::System::GetEnv("name", this->mName);
-		if(this->Get("path", jsonObject) && jsonObject->IsObject())
+		os::System::GetAppEnv("name", this->mName);
+		if(this->Get("path", jsonObject) && jsonObject.IsObject())
 		{
 			std::vector<const char *> keys;
-			if(jsonObject->GetKeys(keys) > 0)
+			if(jsonObject.GetKeys(keys) > 0)
 			{
 				std::unique_ptr<json::r::Value> value;
 				for (const char* k: keys)
 				{
 					std::string path;
-					if (jsonObject->Get(k, path))
+					if (jsonObject.Get(k, path))
 					{
 						this->mPaths.emplace(k, path);
 					}
 				}
 			}
 		}
-		os::System::SetEnv("name", this->mName);
+		os::System::SetAppEnv("name", this->mName);
 		return true;
 	}
 
 	bool ServerConfig::GetPath(const std::string& name, std::string& path) const
 	{
 		auto iter = this->mPaths.find(name);
-		if (iter != this->mPaths.end())
+		if (iter == this->mPaths.end())
 		{
-			path = iter->second;
-			return true;
+			return false;
 		}
-		return false;
+		path = iter->second;
+		return true;
 	}
 
 	std::unique_ptr<json::r::Document> ServerConfig::Read(const std::string& name) const

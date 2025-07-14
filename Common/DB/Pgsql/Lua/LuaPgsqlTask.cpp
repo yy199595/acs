@@ -63,21 +63,21 @@ namespace acs
 
 		lua_newtable(this->mLua);
 
-		if (response->mError.empty())
+		if (response->error.empty())
 		{
 			lua_push_value(this->mLua, "ok", true);
-			if (!response->mCmd.empty())
+			if (!response->cmd.empty())
 			{
-				lua_pushstring(this->mLua, response->mCmd.c_str());
+				lua_pushstring(this->mLua, response->cmd.c_str());
 				lua_pushinteger(this->mLua, response->count);
 				lua_rawset(this->mLua, -3);
 			}
-			if (!response->mResults.empty())
+			if (!response->results.empty())
 			{
 				int index = 1;
 				lua_pushstring(this->mLua, "result");
-				lua_createtable(this->mLua, 0, response->mResults.size());
-				for (const std::string& json: response->mResults)
+				lua_createtable(this->mLua, 0, response->results.size());
+				for (const std::string& json: response->results)
 				{
 					lua::yyjson::write(this->mLua, json.c_str(), json.size());
 					lua_seti(this->mLua, -2, index++);
@@ -87,8 +87,17 @@ namespace acs
 		}
 		else
 		{
+			int index = 1;
 			lua_push_value(this->mLua, "ok", false);
-			lua_push_value(this->mLua, "error", response->mError);
+
+			lua_pushstring(this->mLua, "error");
+			lua_createtable(this->mLua, 0, response->error.size());
+			for (const std::string& json: response->error)
+			{
+				lua_pushlstring(this->mLua, json.c_str(), json.size());
+				lua_seti(this->mLua, -2, index++);
+			}
+			lua_rawset(this->mLua, -3);
 		}
 		Lua::Coroutine::Resume(coroutine, 1);
 	}

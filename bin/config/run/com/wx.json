@@ -1,0 +1,14 @@
+{
+  "wx": {
+    "app_id": "",
+    "app_secret": "",
+    "mch_id": "",
+    "mch_num": "",
+    "api_key": "",
+    "api_cert": "",
+    "api_v3_key": "",
+    "notify_url": "",
+    "complaint_url": "",
+    "public_key": ""
+  }
+}

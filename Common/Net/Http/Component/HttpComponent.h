@@ -3,9 +3,6 @@
 #ifdef __ENABLE_OPEN_SSL__
 #include"asio/ssl.hpp"
 #endif
-#include "Core/Map/HashMap.h"
-#include "Core/Pool/ArrayPool.h"
-
 #include "Rpc/Component/RpcComponent.h"
 namespace http
 {
@@ -37,11 +34,11 @@ namespace acs
 		std::unique_ptr<http::Response> Post(const std::string& url, const std::string& data, int second = 15);
 		std::unique_ptr<http::Response> Post(const std::string& url, const json::w::Document & json, int second = 15);
 	public:
-		std::unique_ptr<http::Response> Do(std::unique_ptr<http::Request> request);
-		std::unique_ptr<http::Response> Do(std::unique_ptr<http::Request> request, std::unique_ptr<http::Content> body);
+		std::unique_ptr<http::Response> Do(std::unique_ptr<http::Request> & request);
+		std::unique_ptr<http::Response> Do(std::unique_ptr<http::Request> & request, std::unique_ptr<http::Content> content);
 	public:
-		int Send(std::unique_ptr<http::Request> request, std::function<void(std::unique_ptr<http::Response>)> && cb);
-		int Send(std::unique_ptr<http::Request> request, std::unique_ptr<http::Response> response, int & taskId); // 异步发送
+		int Send(std::unique_ptr<http::Request>& request, std::function<void(std::unique_ptr<http::Response>&)> && cb);
+		int Send(std::unique_ptr<http::Request>& request, std::unique_ptr<http::Response>& response, int & taskId); // 异步发送
 	private:
 		bool Awake() final;
 		bool LateAwake() final;

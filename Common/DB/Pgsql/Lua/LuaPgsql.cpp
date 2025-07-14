@@ -4,10 +4,10 @@
 
 
 
-#include"LuaPgsql.h"
-#include"Entity/Actor/App.h"
-#include"Pgsql/Lua/LuaPgsqlTask.h"
-#include"Pgsql/Component/PgsqlDBComponent.h"
+#include "LuaPgsql.h"
+#include "Entity/Actor/App.h"
+#include "Pgsql/Lua/LuaPgsqlTask.h"
+#include "Pgsql/Component/PgsqlDBComponent.h"
 using namespace acs;
 namespace lua
 {
@@ -27,9 +27,9 @@ namespace lua
 		size_t size = 0;
 		lua_pushthread(L);
 		const char * sql = luaL_checklstring(L, 1, &size);
-		std::unique_ptr<pgsql::Request> request = std::make_unique<pgsql::Request>(std::string(sql, size));
+		std::unique_ptr<pgsql::Request> request = std::make_unique<pgsql::Request>(sql, size);
 		{
-			pgsql->Send(std::move(request), rpcId);
+			pgsql->Send(request, rpcId);
 		}
 		return pgsql->AddTask(new LuaPgsqlTask(L, rpcId))->Await();
 	}

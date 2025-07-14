@@ -14,13 +14,13 @@ namespace acs
 		GateComponent();
 		~GateComponent() override = default;
 	public:
-		int Send(int id, rpc::Message * message);
-		void Broadcast(rpc::Message * message);
-		int OnMessage(rpc::Message * request) noexcept final;
+		int Send(int id, std::unique_ptr<rpc::Message> & message);
+		void Broadcast(std::unique_ptr<rpc::Message> & message);
+		int OnMessage(std::unique_ptr<rpc::Message> & request) noexcept final;
 	private:
 		bool LateAwake() final;
-		int OnRequest(rpc::Message * message);
-		int OnResponse(rpc::Message * message);
+		int OnRequest(std::unique_ptr<rpc::Message> & message);
+		int OnResponse(std::unique_ptr<rpc::Message> & message);
 	private:
 		class NodeComponent * mNode;
 		math::NumberPool<int> mNumPool;

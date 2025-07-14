@@ -159,9 +159,8 @@ namespace tcp
 		}
 
 		template<typename T>
-		inline std::enable_if_t<std::is_integral<T>::value, void> Write(char * buffer, const T&value, bool endian = true)
+		inline std::enable_if_t<std::is_integral<T>::value, void> Write(char * buffer, const T&value, size_t size = sizeof(T), bool endian = true)
 		{
-			size_t size = sizeof(T); // 获取类型 T 的字节大小
 			if(endian)
 			{
 				for (size_t i = 0; i < size; ++i) {

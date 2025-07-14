@@ -21,16 +21,17 @@ namespace mongo
 	public:
         void Stop();
 		bool Start(tcp::Socket * socket);
-		void Send(std::unique_ptr<Request> request);
+		void Send(std::unique_ptr<Request>& request);
+		const std::string & GetVersion() const { return this->mInfo.version; }
 		bool SyncSend(const std::unique_ptr<Request>& request, mongo::Response & response);
-		std::unique_ptr<mongo::Response> SyncMongoCommand(std::unique_ptr<Request> request);
+		std::unique_ptr<mongo::Response> SyncMongoCommand(std::unique_ptr<Request>& request);
 	private:
 		bool Auth(bool connect);
 		void OnResponse(int code);
 		std::unique_ptr<Response> ReadResponse(const std::string & cmd);
 		void OnReceiveMessage(std::istream & is, size_t, const Asio::Code &) final;
 		std::unique_ptr<Response> SyncSendMongoCommand(const std::unique_ptr<Request>& request);
-		void OnResponse(int code, std::unique_ptr<Request> request, std::unique_ptr<Response> response);
+		void OnResponse(int code, std::unique_ptr<Request>& request, std::unique_ptr<Response>& response);
 	private:
 		bool AuthBySha1(const std::string & user, const std::string & db, const std::string & pwd);
 #ifdef __ENABLE_OPEN_SSL__
@@ -43,6 +44,7 @@ namespace mongo
 		void OnSendMessage(const asio::error_code &code) final;
 	private:
 		int mClientId;
+		mongo::Info mInfo;
 		Component * mComponent;
 		const mongo::Config mConfig;
 		asio::streambuf streamBuffer;

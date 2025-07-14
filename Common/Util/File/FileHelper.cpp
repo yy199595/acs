@@ -3,7 +3,6 @@
 #include <fstream>
 #ifdef __OS_WIN__
 #include <io.h>
-#include <codecvt>
 #define stat _stat
 #else
 #include <unistd.h>
@@ -21,7 +20,7 @@ namespace help
 	bool fs::GetFileLine(const std::string& path, size_t& size)
 	{
 		std::ifstream fs;
-		fs.open(path, std::ios::in | std::ios::binary);
+		fs.open(path, std::ios::in);
 		if (!fs.is_open())
 		{
 			return false;
@@ -37,15 +36,12 @@ namespace help
 
 	bool fs::GetFileSize(const std::string& path, size_t& size)
 	{
-		std::ifstream fs;
-		fs.open(path, std::ios::in | std::ios::binary);
-		if (!fs.is_open())
+		struct stat result{};
+		if (stat(path.c_str(), &result) != 0)
 		{
 			return false;
 		}
-		fs.seekg(0, std::ios::end);
-		size = fs.tellg();
-		fs.close();
+		size = result.st_size;
 		return true;
 	}
 
@@ -80,28 +76,10 @@ namespace help
 		return true;
 	}
 
-	bool fs::GetFileSize(std::fstream& fs, size_t& size)
-	{
-		if (!fs.is_open())
-		{
-			return false;
-		}
-		fs.seekg(0, std::ios::end);
-		size = fs.tellg();
-		fs.seekg(0, std::ios::beg);
-		return true;
-	}
-
 	bool fs::FileIsExist(const std::string& path)
 	{
 #ifdef _WIN32
-		if(_access(path.c_str(), 0) == 0)
-		{
-			return true;
-		}
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-		std::wstring newPath = converter.from_bytes(path);
-		return  _waccess(newPath.c_str(), 0) == 0;
+		return _access(path.c_str(), 0) == 0;
 #else
 		return access(path.c_str(), F_OK) == 0;
 #endif
@@ -145,13 +123,11 @@ namespace help
 	bool fs::ReadTxtFile(const std::string& path, std::string& outFile)
 	{
 		std::ifstream fs;
-		fs.open(path, std::ios::in);
+		fs.open(path, std::ios::in | std::ios::binary);
 		if(!fs.is_open())
 		{
 #ifdef __OS_WIN__
-			std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-			std::wstring newPath = converter.from_bytes(path);
-			fs.open(newPath, std::ios::in);
+			fs.open(path, std::ios::in);
 			if (!fs.is_open())
 			{
 				return false;
@@ -176,14 +152,14 @@ namespace help
 		return true;
 	}
 
-	bool fs::ReadTxtFile(const std::string& path, std::vector<std::string>& outLines)
+	bool fs::ReadTxtFile(const std::string& path, std::vector<std::string>& outLines, char delim)
 	{
 		std::fstream fs;
-		fs.open(path, std::ios::in);
+		fs.open(path, std::ios::in | std::ios::binary);
 		if (fs.is_open())
 		{
 			std::string tempString;
-			while (std::getline(fs, tempString))
+			while (std::getline(fs, tempString, delim))
 			{
 				outLines.push_back(tempString);
 				tempString = "";

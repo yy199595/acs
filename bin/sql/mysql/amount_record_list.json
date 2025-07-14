@@ -1,0 +1,36 @@
+{
+	"name" : "amount_record_list",
+	"fields" : {
+		"user_id" : {
+			"type" : "INT",
+			"index" : true,
+			"notnull" : true,
+			"comment" : "用户ID"
+		},
+		"amount" : {
+			"type" : "INT",
+			"notnull" : true,
+			"comment" : "变化的金额"
+		},
+		"create_at" : {
+			"type" : "VARCHAR(64)",
+			"notnull" : true,
+			"comment" : "当前时间"
+		},
+		"reason" : {
+			"type" : "VARCHAR(64)",
+			"notnull" : true,
+			"comment" : "转账备注"
+		},
+		"last_amount" : {
+			"type" : "INT",
+			"notnull" : true,
+			"comment" : "变化前金额"
+		},
+		"next_amount" : {
+			"type" : "INT",
+			"notnull" : true,
+			"comment" : "变化后金额"
+		}
+	}
+}

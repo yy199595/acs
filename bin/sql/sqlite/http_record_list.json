@@ -1,0 +1,55 @@
+{
+	"name" : "http_record_list",
+	"fields" : {
+		"uuid" : {
+			"type" : "BIGINT",
+			"notnull" : true,
+			"primary_key": true,
+			"comment" : "请求唯一ID"
+		},
+		"user_id" : {
+			"type" : "INT",
+			"notnull" : true,
+			"default" : 0,
+			"comment" : "请求用户的id"
+		},
+		"ip" : {
+			"type" : "VARCHAR(32)",
+			"notnull" : true,
+			"comment" : "请求用户的ip"
+		},
+		"method" : {
+			"type" : "VARCHAR(8)",
+			"notnull" : true,
+			"comment" : "请求的方法"
+		},
+		"path" : {
+			"type" : "VARCHAR(64)",
+			"notnull" : true,
+			"comment" : "请求的路径"
+		},
+		"request" : {
+			"type" : "TEXT",
+			"notnull" : true,
+			"default" : "",
+			"comment" : "请求数据"
+		},
+		"response" : {
+			"type" : "TEXT",
+			"notnull" : true,
+			"default" : "",
+			"comment" : "返回数据"
+		},
+		"desc" : {
+			"type" : "VARCHAR(256)",
+			"notnull" : true,
+			"comment" : "请求的描述"
+		},
+		"create_time" : {
+			"type" : "BIGINT",
+			"notnull" : true,
+			"index" : true,
+			"comment" : "创建时间"
+		}
+	}
+}

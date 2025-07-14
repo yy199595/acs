@@ -42,7 +42,7 @@ namespace acs
         bool mHasWarning;
     };
 
-	class ProtoComponent final : public Component, public IRefresh
+	class ProtoComponent final : public Component, public IRefresh, public IDestroy
     {
     public:
         ProtoComponent();
@@ -64,6 +64,7 @@ namespace acs
 	 private:
 		bool Awake() final;
 		bool OnRefresh() final;
+		void OnDestroy() final;
         const pb::Message * FindMessage(const std::string & name);
 		void LoopMessage(const pb::Descriptor * descriptor, std::vector<std::string> & protos);
 	private:

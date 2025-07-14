@@ -5,9 +5,10 @@
 #include "WsClientComponent.h"
 #include "Yyjson/Lua/ljson.h"
 #include "Util/Tools/String.h"
+#include "Rpc/Config/ServiceConfig.h"
 #include "Lua/Component/LuaComponent.h"
 #include "Client/Lua/LuaClient.h"
-#include"Lua/Engine/ModuleClass.h"
+#include "Lua/Engine/ModuleClass.h"
 #include "Proto/Component/ProtoComponent.h"
 #include "Rpc/Component/DispatchComponent.h"
 
@@ -58,7 +59,7 @@ namespace acs
 		return id;
 	}
 
-	int WsClientComponent::Send(int id, rpc::Message * message) noexcept
+	int WsClientComponent::Send(int id, std::unique_ptr<rpc::Message> & message) noexcept
 	{
 		auto iter = this->mClientMap.find(id);
 		if(iter == this->mClientMap.end())
@@ -71,9 +72,9 @@ namespace acs
 
 	void WsClientComponent::OnSendFailure(int id, rpc::Message* message)
 	{
-		if(message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
+		if(message->GetType() == rpc::type::request && message->GetRpcId() > 0)
 		{
-			message->SetType(rpc::Type::Response);
+			message->SetType(rpc::type::response);
 			message->GetHead().Add(rpc::Header::code, XCode::SendMessageFail);
 			this->OnMessage(message, nullptr);
 			return;
@@ -81,21 +82,17 @@ namespace acs
 		delete message;
 	}
 
-	void WsClientComponent::OnMessage(rpc::Message* message, rpc::Message* response) noexcept
+	void WsClientComponent::OnMessage(rpc::Message* req, rpc::Message*) noexcept
 	{
-		int code = XCode::Failure;
+		std::unique_ptr<rpc::Message> message(req);
 		switch(message->GetType())
 		{
-			case rpc::Type::Request:
+			case rpc::type::request:
 				this->OnRequest(message);
 				break;
-			case rpc::Type::Response:
-				code = this->mDisComponent->OnMessage(message);
+			case rpc::type::response:
+				this->mDisComponent->OnMessage(message);
 				break;
-		}
-		if(code != XCode::Ok)
-		{
-			delete message;
 		}
 	}
 
@@ -120,7 +117,7 @@ namespace acs
 		this->mClientMap.erase(iter);
 	}
 
-	int WsClientComponent::OnRequest(rpc::Message* message)
+	int WsClientComponent::OnRequest(std::unique_ptr<rpc::Message> & message)
 	{
 		const std::string & func = message->GetHead().GetStr(rpc::Header::func);
 		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
@@ -141,21 +138,20 @@ namespace acs
 		int count = 1;
 		switch(message->GetProto())
 		{
-			case rpc::Proto::String:
+			case rpc::proto::string:
 				count++;
 				lua_pushlstring(lua, body.c_str(), body.size());
 				break;
-			case rpc::Proto::Json:
+			case rpc::proto::json:
 				count++;
 				lua::yyjson::write(lua, body.c_str(), body.size());
 				break;
-			case rpc::Proto::Protobuf:
+			case rpc::proto::pb:
 			{
 				pb::Message * request = this->mProto->Temp(methodConfig->request);
-				if(request != nullptr)
+				if(request != nullptr && request->ParsePartialFromString(message->GetBody()))
 				{
 					count++;
-					message->ParseMessage(request);
 					this->mProto->Write(lua, *request);
 				}
 				break;

@@ -1,4 +1,5 @@
 #include "IProto.h"
+#include <algorithm>
 #include "Util/Tools/Math.h"
 #include "Util/Tools/TimeHelper.h"
 #include "Yyjson/Document/Document.h"
@@ -94,6 +95,7 @@ namespace tcp
 
 	void IHeader::Add(const std::string& k, long long v)
 	{
+
 		this->mHeader.emplace_back(k, std::to_string(v));
 	}
 
@@ -131,9 +133,13 @@ namespace tcp
 		{
 			document.Add(iter->first.c_str(), iter->second);
 		}
-		std::string json;
-		document.Encode(&json, true);
-		lua_pushlstring(L, json.c_str(), json.size());
+		size_t count = 0;
+		std::unique_ptr<char> json;
+		if(!document.Serialize(json, count))
+		{
+			return 0;
+		}
+		lua_pushlstring(L, json.get(), count);
 		return 1;
 	}
 

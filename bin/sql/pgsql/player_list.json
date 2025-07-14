@@ -1,0 +1,38 @@
+{
+	"name" : "player_list",
+	"schema" : "yy",
+	"fields" : {
+		"player_id": {
+			"type" : "BIGINT",
+			"default" : 0,
+			"unique" : true,
+			"primary_key": true,
+			"comment" : "用户ID"
+		},
+		"level" : {
+			"type" : "INT",
+			"default" : 1,
+			"comment" : "等级"
+		},
+		"new_player" : {
+			"type" : "BOOL",
+			"default" : false,
+			"comment" : "新用户"
+		},
+		"nick" : {
+			"type" : "VARCHAR(64)",
+			"default" : null,
+			"comment" : "用户名"
+		},
+		"attr" : {
+			"type" : "JSONB",
+			"default" : null,
+			"comment" : "属性"
+		},
+		"item" : {
+			"type" : "JSONB",
+			"default" : null,
+			"comment" : "物品信息"
+		}
+	}
+}

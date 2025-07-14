@@ -1,0 +1,49 @@
+{
+	"name" : "player_list",
+	"fields" : {
+		"player_id": {
+			"type" : "BIGINT",
+			"unique" : true,
+			"auto_inc" : true,
+			"primary_key": true,
+			"comment" : "用户ID"
+		},
+		"level" : {
+			"type" : "INT",
+			"default" : 1,
+			"comment" : "等级"
+		},
+		"new_player" : {
+			"type" : "BOOL",
+			"default" : false,
+			"comment" : "新用户"
+		},
+		"nick" : {
+			"type" : "VARCHAR(64)",
+			"default" : null,
+			"comment" : "用户名"
+		},
+		"attr" : {
+			"type" : "JSON",
+			"default" : null,
+			"comment" : "属性"
+		},
+		"create_time" : {
+			"type" : "BIGINT",
+			"notnull" : true,
+			"comment" : "创建时间"
+		},
+		"icon" : {
+			"type" : "VARCHAR(128)",
+			"notnull" : true,
+			"default" : "",
+			"comment" : "玩家头像"
+		},
+		"sex" : {
+			"type" : "INT",
+			"notnull" : true,
+			"default" : 0,
+			"comment" : "性别"
+		}
+	}
+}

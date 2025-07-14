@@ -27,10 +27,10 @@ namespace acs
 		kcp::IClient * GetClient(int id);
 		void OnMessage(rpc::Message *request, rpc::Message *response) noexcept final;
 	public:
-		int Send(int id, rpc::Message *message) noexcept final;
-		char GetNet() const noexcept final { return rpc::Net::Kcp; }
+		char GetNet() const noexcept final { return rpc::net::kcp; }
+		int Send(int id, std::unique_ptr<rpc::Message> & message) noexcept final;
 	private:
-		int OnRequest(rpc::Message * message);
+		int OnRequest(std::unique_ptr<rpc::Message> & message);
 	private:
 		ListenConfig mConfig;
 		class NodeComponent * mActor;

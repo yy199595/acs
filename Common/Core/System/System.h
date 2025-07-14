@@ -6,6 +6,8 @@
 #define APP_SYSTEM_H
 
 #endif //APP_SYSTEM_H
+
+#include <list>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -35,16 +37,17 @@ namespace os
 		static std::string FormatPath(const std::string & path);
         static const std::string & WorkPath() { return System::mWorkPath; }
 	public:
-		static bool Run(const std::string & cmd, std::string & output);
+		static bool Run(const std::string & cmd, std::list<std::string> & output);
 	public:
-        static bool HasEnv(const std::string& k);
-		static bool GetEnv(const std::string & k, int & v);
-		static bool GetEnv(const std::string & k, std::string & v);
+		static bool GetAppEnv(const std::string & k, int & v);
+		static bool GetAppEnv(const std::string & k, std::string & v);
 		static void SetEnv(const std::string & k, const std::string & v);
+		static void SetAppEnv(const std::string & k, const std::string & v);
 		static bool ReadFile(const std::string & path, std::string & content);
 		static bool AddValue(const std::string& key, const std::string& value);
 	public:
 		static void LuaSetEnv(const char * key, const char * val);
+		static void LuaSetAppEnv(const char * key, const char * val);
 	private:
         static bool SubValue(std::string& value);
 #ifdef __OS_LINUX__

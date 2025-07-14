@@ -37,9 +37,9 @@ namespace Lua
 			return 0;
 		}
 		lua_pushthread(lua);
-		int ms = (int)luaL_checkinteger(lua, 1);
+		unsigned int ms = (unsigned int)luaL_checkinteger(lua, 1);
 		LuaWaitTaskSource* luaRpcTaskSource = new LuaWaitTaskSource(lua);
-		timerComponent->DelayCall(ms, [luaRpcTaskSource]()
+		timerComponent->Timeout(ms, [luaRpcTaskSource]()
 		{
 			luaRpcTaskSource->SetResult();
 			delete luaRpcTaskSource;

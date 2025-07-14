@@ -3,6 +3,8 @@
 //
 #include "fmt.h"
 #include"MongoProto.h"
+
+#include <utility>
 #include"Proto/Bson/bsonobj.h"
 
 namespace mongo
@@ -76,17 +78,14 @@ namespace mongo
 
 namespace mongo
 {
-	void Request::Insert(bson::Writer::Array& documents)
+	void Request::Insert(bson::w::Document& document)
 	{
-//		bson::Writer::Array documents;
-//		documents.Add(doc);
-		this->document.Add("documents", documents);
-	}
-
-	void Request::Insert(bson::Writer::Document& document)
-	{
-		bson::Writer::Array documents;
-		documents.Add(document);
+		if(document.IsArray())
+		{
+			this->document.Add("documents", document);
+			return;
+		}
+		bson::w::Document documents(document);
 		this->document.Add("documents", documents);
 	}
 }
@@ -106,73 +105,135 @@ namespace mongo
 		return *this;
 	}
 
-	Request& Request::Query(bson::Writer::Document& doc)
+	Request& Request::Query(bson::w::Document& doc)
 	{
 		this->document.Add("query", doc);
 		return *this;
 	}
 
-	Request& Request::Filter(bson::Writer::Document& filter)
+	bool Request::Filter(bson::w::Document& filter)
 	{
 //		bson::Writer::Document mode;
 //		mode.Add("mode", "secondaryPreferred");
 //		this->document.Add("$readPreference", mode);
 		this->document.Add("filter", filter);
-		return *this;
+		return true;
+	}
+
+	bool Request::Filter(json::r::Value& filter)
+	{
+		bson::w::Document bsonFilter;
+		do
+		{
+			size_t size = filter.MemberCount();
+			if (size == 1)
+			{
+				std::string field;
+				json::r::Value listValue;
+				if (!filter.GetFirst(field, listValue) || !listValue.IsArray())
+				{
+					break;
+				}
+				bson::w::Document inArray(false);
+				size_t count = listValue.MemberCount();
+				for (size_t index = 0; index < count; index++)
+				{
+					json::r::Value listItem;
+					listValue.Get(index, listItem);
+					if (listItem.GetType() == YYJSON_TYPE_NUM)
+					{
+						long long number = 0;
+						listItem.Get(number);
+						if (number >= std::numeric_limits<int>::max())
+						{
+							inArray.Push(number);
+						}
+						else
+						{
+							inArray.Push((int)number);
+						}
+					}
+					else if (listItem.GetType() == YYJSON_TYPE_STR)
+					{
+						size_t len = 0;
+						const char* str = listItem.GetString(len);
+						if (str != nullptr && len > 0)
+						{
+							inArray.Push(std::string(str, len));
+						}
+					}
+				}
+				bson::w::Document inObject;
+				inObject.Add("$in", inArray);
+				bsonFilter.Add(field.c_str(), inObject);
+				{
+					this->Filter(bsonFilter);
+					//this->Limit(static_cast<int>(count));
+				}
+				return true;
+			}
+			if(!bsonFilter.FromByJson(filter))
+			{
+				return false;
+			}
+		}
+		while(false);
+		return this->Filter(bsonFilter);
 	}
 }
 
 
 namespace mongo
 {
-	Response::Response(const std::string & cmd)
-			: cmd(cmd)
+	Response::Response(std::string cmd)
+			: cmd(std::move(cmd))
 	{
 		this->mDecodeState = tcp::Decode::None;
 	}
 
-	Response::Response(int id, const std::string& cmd)
-		: cmd(cmd)
+	Response::Response(int id, std::string cmd)
+		: cmd(std::move(cmd))
 	{
 		this->mHead.responseTo = id;
 	}
 
 	std::string Response::ToString()
 	{
-		return this->mDocument.ToString();
+		return this->document.ToString();
 	}
 
 	bool Response::Encode(std::string* json)
 	{
-		return this->mDocument.WriterToJson(json);
+		return this->document.WriterToJson(json);
 	}
 
 	bool Response::DecodeQuery()
 	{
-		std::unique_ptr<bson::Reader::Document> document1;
-		if(!this->mDocument.Get("cursor", document1))
+		bson::r::Document document1;
+		if(!this->document.Get("cursor", document1))
 		{
-			std::string str = this->mDocument.ToString();
+			std::string str = this->document.ToString();
 			return false;
 		}
 
-		std::vector<std::unique_ptr<bson::Reader::Document>> results;
-		if(!document1->Get("firstBatch", results))
+		std::list<bson::r::Document> results;
+		if(!document1.Get("firstBatch", results))
 		{
-			if(!document1->Get("nextBatch", results))
+			if(!document1.Get("nextBatch", results))
 			{
 				return false;
 			}
 		}
-		std::string json;
-		document1->Get("id", this->cursorID);
-		this->mResult.reserve(results.size());
-		for(std::unique_ptr<bson::Reader::Document> & document : results)
+		document1.Get("id", this->cursorID);
+		for(bson::r::Document & bsonDocument : results)
 		{
-			json.clear();
-			if(document->WriterToJson(&json))
+			size_t count = 0;
+			std::unique_ptr<char> json;
+			json::w::Document jsonWriter;
+			bsonDocument.WriterToJson(jsonWriter);
+			if(jsonWriter.Serialize(json, count))
 			{
-				this->mResult.emplace_back(json);
+				this->result.emplace_back(json.get(), count);
 			}
 		}
 		return true;
@@ -202,10 +263,12 @@ namespace mongo
 			offset += sizeof(this->numberReturned);
 		}
 		size_t len = size - offset;
-		this->mBuffer = std::make_unique<char[]>(len);
+		this->buffer = std::make_unique<char[]>(len);
 		{
-			os.readsome(this->mBuffer.get(), len);
-			this->mDocument.Init(this->mBuffer.get());
+			os.readsome(this->buffer.get(), len);
+			this->document.Init(this->buffer.get());
+//			this->mJson = this->mDocument.ToString();
+//			this->mDocument.WriterToJson(&this->mJson);
 			if(this->cmd == "find" || this->cmd == "aggregate" || this->cmd == "getMore")
 			{
 				this->DecodeQuery();

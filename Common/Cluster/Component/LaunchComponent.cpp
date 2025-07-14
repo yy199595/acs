@@ -35,7 +35,7 @@ namespace acs
 		{
 			LOG_CHECK_RET_FALSE(this->AddComponent(components));
 		}
-		std::unique_ptr<json::r::Value> luaObject;
+		json::r::Value luaObject;
 		if (this->mApp->Config().Get("lua", luaObject))
 		{
 			this->mApp->AddComponent<LuaComponent>();
@@ -130,7 +130,7 @@ namespace acs
 
 	bool LaunchComponent::LoadListenConfig()
 	{
-		std::unique_ptr<json::r::Value> jsonObj;
+		json::r::Value jsonObj;
 		ServerConfig & config = this->mApp->GetConfig();
 		{
 			LOG_CHECK_RET_FALSE(config.Get("core", jsonObj));
@@ -144,11 +144,11 @@ namespace acs
 				{ "https", proto_type::tcp },
 				{ "ipc", proto_type::local }
 		};
-		for (const char* key: jsonObj->GetAllKey())
+		for (const char* key: jsonObj.GetAllKey())
 		{
 			std::string value;
-			std::unique_ptr<json::r::Value> jsonData;
-			if (!jsonObj->Get(key, jsonData))
+			json::r::Value jsonData;
+			if (!jsonObj.Get(key, jsonData))
 			{
 				return false;
 			}
@@ -157,17 +157,17 @@ namespace acs
 				listenConfig.port = 0;
 				listenConfig.name = key;
 			}
-			if (jsonData->Get("address", listenConfig.address))
+			if (jsonData.Get("address", listenConfig.address))
 			{
 				listenConfig.port = 0;
 				help::Str::SplitAddr(listenConfig.address, listenConfig.proto_name, listenConfig.ip, listenConfig.port);
 			}
 
-			jsonData->Get("max_conn", listenConfig.max_conn);
-			jsonData->Get("component", listenConfig.component);
+			jsonData.Get("max_conn", listenConfig.max_conn);
+			jsonData.Get("component", listenConfig.component);
 #ifdef __ENABLE_OPEN_SSL__
-			jsonData->Get("key", listenConfig.key);
-			jsonData->Get("cert", listenConfig.cert);
+			jsonData.Get("key", listenConfig.key);
+			jsonData.Get("cert", listenConfig.cert);
 #endif
 			if (listenConfig.port > 0 && !listenConfig.component.empty())
 			{

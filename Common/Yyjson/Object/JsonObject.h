@@ -11,6 +11,8 @@ namespace json
 	class ValueBase
 	{
 	public:
+		ValueBase() = default;
+		virtual ~ValueBase() = default;
 		virtual bool Set(json::w::Value & document, const std::string & key, void * obj) = 0;
 		virtual bool Get(const json::r::Value & document, const std::string & key, void * obj) const = 0;
 	public:
@@ -135,6 +137,8 @@ namespace json
 			valueProxy->Set(value, this);
 			return true;
 		}
+	protected:
+		virtual bool OnDecodeOk() { return true; }
 	public:
 		static std::unique_ptr<T> Create(const std::string & json)
 		{
@@ -221,7 +225,7 @@ namespace json
 		}
 
 	private:
-		static std::map<std::string, std::unique_ptr<ValueBase>> values;
+		static std::unordered_map<std::string, std::unique_ptr<ValueBase>> values;
 	};
 
 	template<typename T>
@@ -254,8 +258,7 @@ namespace json
 	template<typename T>
 	inline bool Object<T>::Decode(const json::r::Value& document)
 	{
-		auto iter = values.begin();
-		for(; iter != values.end(); iter++)
+		for(auto iter = values.begin(); iter != values.end(); iter++)
 		{
 			const std::string & key = iter->first;
 			if(!iter->second->Get(document, key, this))
@@ -263,7 +266,7 @@ namespace json
 				return false;
 			}
 		}
-		return true;
+		return this->OnDecodeOk();
 	}
 
 	template<typename T>
@@ -292,7 +295,7 @@ namespace json
 	inline bool ObjectValueProxy<T, V>::Get(const json::r::Value& document, const std::string& key, void* obj) const
 	{
 		T * inst = (T*)obj;
-		std::unique_ptr<json::r::Value> jsonValue;
+		json::r::Value jsonValue;
 		if(!document.Get(key.c_str(), jsonValue))
 		{
 			if(!this->mMust)
@@ -301,7 +304,7 @@ namespace json
 			}
 			return false;
 		}
-		return (inst->*field).Decode(*jsonValue);
+		return (inst->*field).Decode(jsonValue);
 	}
 
 	template<typename T, typename V>
@@ -327,8 +330,8 @@ namespace json
 			void* obj) const
 	{
 		T * inst = (T*)obj;
-		std::unique_ptr<json::r::Value> jsonArray;
-		if(!document.Get(key.c_str(), jsonArray) || !jsonArray->IsArray())
+		json::r::Value jsonArray;
+		if(!document.Get(key.c_str(), jsonArray) || !jsonArray.IsArray())
 		{
 			if(!this->mMust)
 			{
@@ -337,12 +340,12 @@ namespace json
 			return false;
 		}
 		size_t index = 0;
-		std::unique_ptr<json::r::Value> jsonObject;
-		while (jsonArray->Get(index, jsonObject))
+		json::r::Value jsonObject;
+		while (jsonArray.Get(index, jsonObject))
 		{
 			index++;
 			V value;
-			if(!value.Decode(*jsonObject))
+			if(!value.Decode(jsonObject))
 			{
 				return false;
 			}
@@ -374,8 +377,8 @@ namespace json
 	inline bool ObjectMapValueProxy<T, V>::Get(const json::r::Value& document, const std::string& key, void* obj) const
 	{
 		T * inst = (T*)obj;
-		std::unique_ptr<json::r::Value> jsonObject;
-		if(!document.Get(key.c_str(), jsonObject) || !jsonObject->IsObject())
+		json::r::Value jsonObject;
+		if(!document.Get(key.c_str(), jsonObject) || !jsonObject.IsObject())
 		{
 			if(!this->mMust)
 			{
@@ -383,15 +386,14 @@ namespace json
 			}
 			return false;
 		}
-		std::vector<const char *> keys;
-		jsonObject->GetKeys(keys);
+		std::vector<const char *> keys = jsonObject.GetAllKey();
 		for(const char * fieldKey : keys)
 		{
-			std::unique_ptr<json::r::Value> jsonField;
-			if(jsonObject->Get(fieldKey, jsonField))
+			json::r::Value jsonField;
+			if(jsonObject.Get(fieldKey, jsonField))
 			{
 				V value;
-				if(!value.Decode(*jsonField))
+				if(!value.Decode(jsonField))
 				{
 					return false;
 				}
@@ -406,8 +408,8 @@ namespace json
 			void* obj) const
 	{
 		T * inst = (T*)obj;
-		std::unique_ptr<json::r::Value> jsonObject;
-		if(!document.Get(key.c_str(), jsonObject) || !jsonObject->IsObject())
+		json::r::Value jsonObject;
+		if(!document.Get(key.c_str(), jsonObject) || !jsonObject.IsObject())
 		{
 			if(!this->mMust)
 			{
@@ -415,12 +417,11 @@ namespace json
 			}
 			return false;
 		}
-		std::vector<const char *> keys;
-		jsonObject->GetKeys(keys);
+		std::vector<const char *> keys = jsonObject.GetAllKey();
 		for(const char * fieldKey : keys)
 		{
 			V value;
-			if(jsonObject->Get(fieldKey, value))
+			if(jsonObject.Get(fieldKey, value))
 			{
 				(inst->*field).emplace(fieldKey, value);
 			}
@@ -445,7 +446,7 @@ namespace json
 
 
 	template<typename T>
-	std::map<std::string, std::unique_ptr<ValueBase>> Object<T>::values;
+	std::unordered_map<std::string, std::unique_ptr<ValueBase>> Object<T>::values;
 
 }
 

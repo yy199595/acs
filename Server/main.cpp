@@ -1,5 +1,6 @@
 ﻿
 //#include "vld.h"
+#include "Log/Common/Rang.h"
 #include "Entity/Actor/App.h"
 #include "Timer/Component/TimerComponent.h"
 #include "Async/Component/CoroutineComponent.h"
@@ -24,9 +25,7 @@
 #include "Common/Service/LoginSystem.h"
 #include "Gate/Component/GateComponent.h"
 
-#include "Mongo/Service/MongoDB.h"
 #include "Mongo/Component/MongoDBComponent.h"
-#include "Mongo/Component/MongoComponent.h"
 
 #include "Redis/Component/RedisSubComponent.h"
 
@@ -39,7 +38,7 @@
 #include "Record/Component/RecordComponent.h"
 #include "Quick/Component/QuickComponent.h"
 
-#include "Redis/Component/DelayQueueComponent.h"
+#include "Redis/Component/DelayMQComponent.h"
 #include "WX/Service/WeChat.h"
 #include "Http/Component/NotifyComponent.h"
 
@@ -54,10 +53,7 @@
 #include "WebSocket/Component/InnerWebSocketComponent.h"
 #include "WebSocket/Component/OuterWebSocketComponent.h"
 
-#include "Mysql/Service/MysqlDB.h"
 #include "Mysql/Component/MysqlDBComponent.h"
-#include "Mysql/Component/MysqlComponent.h"
-
 
 #include "Core/System/System.h"
 #include "Redis/Component/RedisComponent.h"
@@ -71,7 +67,7 @@
 
 #include "Upload/Service/FileUpload.h"
 
-#include "Oss/Component/OssComponent.h"
+#include "AliCloud/Component/AliOssComponent.h"
 #include "WX/Component/WXNoticeComponent.h"
 
 #include "Quick/Service/QuickSDK.h"
@@ -82,18 +78,21 @@
 #include "Client/Component/WsClientComponent.h"
 #include "Web/Service/Admin.h"
 #include "Pgsql/Component/PgsqlDBComponent.h"
-#include "Pgsql/Service/PgsqlDB.h"
 
 #include "Mongo/Service/MongoBackup.h"
 #include "Telnet/Component/TelnetComponent.h"
 #include "Common/Component/PlayerComponent.h"
 
 #include "Registry/Service/RegistryService.h"
-
-#include "Local/Component/LocalNetComponent.h"
-
 #include "Mongo/Service/MongoReadProxy.h"
 #include "Mongo/Service/MongoWriteProxy.h"
+#include "Mysql/Service/MysqlReadProxy.h"
+#include "Mysql/Service/MysqlWriteProxy.h"
+#include "Pgsql/Service/PgsqlReadProxy.h"
+#include "Pgsql/Service/PgsqlWriteProxy.h"
+#include "Mysql/Service/MysqlBackup.h"
+
+#include "MeiliSearch/Component/MeiliSearchComponent.h"
 using namespace acs;
 
 
@@ -118,11 +117,9 @@ void RegisterComponent()
 	REGISTER_COMPONENT(RedisSubComponent);
 	REGISTER_COMPONENT(RedisComponent);
 	REGISTER_COMPONENT(SqliteComponent);
-	REGISTER_COMPONENT(MongoComponent);
 	REGISTER_COMPONENT(MongoDBComponent);
 
 	REGISTER_COMPONENT(MysqlDBComponent);
-	REGISTER_COMPONENT(MysqlComponent);
 
 	REGISTER_COMPONENT(LuaComponent);
 	REGISTER_COMPONENT(HttpComponent);
@@ -149,7 +146,7 @@ void RegisterComponent()
 	REGISTER_COMPONENT(WeChatComponent);
 	REGISTER_COMPONENT(WXComplaintComponent);
 #endif
-	REGISTER_COMPONENT(OssComponent);
+	REGISTER_COMPONENT(AliOssComponent);
 
 	REGISTER_COMPONENT(PgsqlDBComponent);
 
@@ -158,7 +155,7 @@ void RegisterComponent()
 	REGISTER_COMPONENT(PlayerComponent);
 
 	REGISTER_COMPONENT(PubSubComponent);
-	REGISTER_COMPONENT(LocalNetComponent);
+	REGISTER_COMPONENT(MeiliSearchComponent);
 }
 
 void RegisterAll()
@@ -170,11 +167,6 @@ void RegisterAll()
 	REGISTER_COMPONENT(GateSystem);
 	REGISTER_COMPONENT(NodeSystem);
 	REGISTER_COMPONENT(LoginSystem);
-
-	REGISTER_COMPONENT(MongoDB);
-	REGISTER_COMPONENT(MysqlDB);
-	REGISTER_COMPONENT(PgsqlDB);
-
 	REGISTER_COMPONENT(MongoBackup);
 
 #ifdef __ENABLE_OPEN_SSL__
@@ -196,21 +188,34 @@ void RegisterAll()
 	REGISTER_COMPONENT(MongoReadProxy);
 	REGISTER_COMPONENT(MongoWriteProxy);
 
-}
+	REGISTER_COMPONENT(MysqlBackup);
+	REGISTER_COMPONENT(MysqlReadProxy);
+	REGISTER_COMPONENT(MysqlWriteProxy);
 
+	REGISTER_COMPONENT(PgsqlReadProxy);
+	REGISTER_COMPONENT(PgsqlWriteProxy);
+}
+#include "Core/Bloom/BloomFilter.h"
 int main(int argc, char** argv)
 {
-#ifdef __OS_WIN__
-	system("chcp 65001");
-#endif
+	bloom::Filter<> bloom_component;
+	bool result1 = bloom_component.Has("192.168.1.2");
+	bloom_component.Set("192.168.1.2");
+	bool result2 = bloom_component.Has("192.168.1.2");
+	bloom_component.Del("192.168.1.2");
+	bool result3 = bloom_component.Has("192.168.1.2");
 
+#ifdef __OS_WIN__
+	SetConsoleOutputCP(CP_UTF8);
+	setWinTermMode(rang::winTerm::Auto);
+#endif
 	int id = 0;
 	RegisterAll();
 	std::string cmd, name;
 	os::System::Init(argc, argv);
-	os::System::GetEnv("id", id);
-	os::System::GetEnv("name", name);
-	if(!os::System::GetEnv("cmd", cmd))
+	os::System::GetAppEnv("id", id);
+	os::System::GetAppEnv("name", name);
+	if(!os::System::GetAppEnv("cmd", cmd))
 	{
 		return (new App(id, name))->Run();
 	}

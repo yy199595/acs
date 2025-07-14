@@ -36,36 +36,9 @@ namespace tcp
 		this->mPort = endPoint.port();
 		this->mIp = endPoint.address().to_string();
 		this->SetOption(tcp::OptionType::CloseLinger, true);
-		this->mAddress = fmt::format("{0}:{1}", this->mIp, this->mPort);
+		this->SetOption(tcp::OptionType::ReuseAddress, true);
 		return true;
     }
-
-#ifdef __MEMORY_POOL_OPERATOR__
-	std::mutex Socket::sMutex;
-	std::vector<void *> Socket::sAllocArray;
-	void* Socket::operator new(size_t size)
-	{
-		std::lock_guard<std::mutex> lock(sMutex);
-		if(!sAllocArray.empty())
-		{
-			void * ptr = sAllocArray.back();
-			sAllocArray.pop_back();
-			return ptr;
-		}
-		return std::malloc(size);
-	}
-
-	void Socket::operator delete(void* ptr)
-	{
-		std::lock_guard<std::mutex> lock(sMutex);
-		if(sAllocArray.size() >= 100)
-		{
-			std::free(ptr);
-			return;
-		}
-		sAllocArray.emplace_back(ptr);
-	}
-#endif
 
 	bool Socket::CanRecvCount(size_t& count)
 	{
@@ -85,6 +58,7 @@ namespace tcp
 			this->SetOption(tcp::OptionType::NoDelay, true);
 			this->SetOption(tcp::OptionType::KeepAlive, true);
 		}
+		this->mIsActive = true;
 	}
 
 	bool Socket::Init(const std::string& address)
@@ -107,7 +81,6 @@ namespace tcp
 		this->mIp = ip;
 		this->mPort = port;
 		this->mIsClient = true;
-		this->mAddress = fmt::format("{0}:{1}", ip, port);
 		return true;
 	}
 
@@ -117,16 +90,16 @@ namespace tcp
 		switch (type)
 		{
 			case tcp::OptionType::NoDelay:
-				this->mSocket->set_option(asio::ip::tcp::no_delay(val), code);
+				code = this->mSocket->set_option(asio::ip::tcp::no_delay(val), code);
 				break;
 			case tcp::OptionType::KeepAlive:
-				this->mSocket->set_option(asio::ip::tcp::socket::keep_alive(val), code); //保持连接
+				code = this->mSocket->set_option(asio::ip::tcp::socket::keep_alive(val), code); //保持连接
 				break;
 			case tcp::OptionType::CloseLinger:
-				this->mSocket->set_option(asio::socket_base::linger(val, 0), code); //立即关闭
+				code = this->mSocket->set_option(asio::socket_base::linger(val, 2), code); //立即关闭
 				break;
 			case tcp::OptionType::ReuseAddress:
-				this->mSocket->set_option(asio::ip::tcp::socket::reuse_address(val), code); //重用地址
+				code = this->mSocket->set_option(asio::ip::tcp::socket::reuse_address(val), code); //重用地址
 				break;
 		}
 		return code.value() == Asio::OK;
@@ -136,14 +109,14 @@ namespace tcp
 	void Socket::Close()
 	{
 		Asio::Code code;
-		this->mSocket->cancel(code);
-		this->mSocket->shutdown(asio::socket_base::shutdown_both, code);
-		this->mSocket->close(code);
-
+		this->mIsActive = false;
+		code = this->mSocket->cancel(code);
+		code = this->mSocket->shutdown(asio::socket_base::shutdown_both, code);
+		code = this->mSocket->close(code);
 #ifdef __ENABLE_OPEN_SSL__
 		if (this->mSslSocket != nullptr)
 		{
-			this->mSslSocket->shutdown(code);
+			code = this->mSslSocket->shutdown(code);
 		}
 #endif
 	}

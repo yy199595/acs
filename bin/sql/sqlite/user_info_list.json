@@ -1,0 +1,108 @@
+{
+	"count": 0,
+	"name": "user_info_list",
+	"fields": {
+		"_id": {
+			"type": "VARCHAR(64)",
+			"notnull": true,
+			"unique": true,
+			"primary_key": true,
+			"comment": "微信登录返回的openid"
+		},
+		"nick": {
+			"type": "VARCHAR(64)",
+			"notnull": true,
+			"default": "",
+			"comment": "用户昵称"
+		},
+		"user_desc": {
+			"type": "VARCHAR(256)",
+			"notnull": true,
+			"default": "",
+			"comment": "用户描述"
+		},
+		"sex": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"comment": "用户性别"
+		},
+		"icon": {
+			"type": "VARCHAR(256)",
+			"notnull": true,
+			"default": "",
+			"comment": "用户头像"
+		},
+		"user_id": {
+			"type": "BIGINT",
+			"notnull": true,
+			"unique": true,
+			"comment": "用户ID"
+		},
+		"public_id": {
+			"type": "VARCHAR(64)",
+			"notnull": true,
+			"default": "",
+			"comment": "公众号通知ID"
+		},
+		"city": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"index": true,
+			"comment": "城市ID"
+		},
+		"amount": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"comment": "钱包余额"
+		},
+		"club_id": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"comment": "部落ID"
+		},
+		"card_id": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"comment": "会员卡类型"
+		},
+		"unionid": {
+			"type": "VARCHAR(64)",
+			"notnull": true,
+			"default": "",
+			"comment": "微信多平台ID"
+		},
+		"city_name": {
+			"type": "VARCHAR(64)",
+			"notnull": true,
+			"default": "",
+			"comment": "城市名字"
+		},
+		"permission": {
+			"type": "INT",
+			"notnull": true,
+			"default": 0,
+			"comment": "用户权限"
+		},
+		"vip_time": {
+			"type": "BIGINT",
+			"notnull": true,
+			"default": 0,
+			"comment": "会员卡到期时间"
+		},
+		"create_time": {
+			"type": "BIGINT",
+			"notnull": true,
+			"default": 0,
+			"comment": "创建时间"
+		},
+		"activity_list": {
+			"type": "JSON",
+			"comment": "参与过的活动列表"
+		}
+	}
+}

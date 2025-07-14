@@ -14,7 +14,7 @@ namespace kcp
 		~Session() { ikcp_release(this->mKcp);}
 	public:
 		void Update(long long ms) final;
-		void Send(tcp::IProto *message) final;
+		void Send(std::unique_ptr<rpc::Message>& message) final;
 		void Send(const char *buf, int len) final;
 		inline long long GetLastTime() const { return this->mLastTime; }
 		int Decode(const char * message, int len, char * buffer);

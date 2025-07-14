@@ -3,9 +3,6 @@
     },
     "server": {
         "rpc": [
-            "MongoDB",
-            "MysqlDB",
-            "PgsqlDB",
             "NodeSystem",
             "GateSystem",
             "PubSubSystem",
@@ -16,7 +13,12 @@
             "TelnetSystem",
             "RegistryService",
             "MongoReadProxy",
-            "MongoWriteProxy"
+            "MongoWriteProxy",
+            "MysqlReadProxy",
+            "MysqlWriteProxy",
+            "PgsqlReadProxy",
+            "PgsqlWriteProxy"
+
         ],
         "http" : [
             "Admin",
@@ -28,10 +30,10 @@
             "ResourceMgr",
             "Collection",
             "Demo",
+            "MysqlBackup",
             "DBHttpService"
         ],
         "component": [
-            "GateComponent",
             "LoggerComponent",
             "ConfigComponent",
             "NodeComponent",
@@ -43,14 +45,15 @@
             "UdpComponent",
             "WsClientComponent",
             "RedisComponent",
-            "MongoComponent",
             "MysqlDBComponent",
-            "OssComponent",
+            "MongoDBComponent",
+            "AliOssComponent",
             "SqliteComponent",
             "PgsqlDBComponent",
             "TelnetComponent",
             "RedisSubComponent",
-            "PlayerComponent"
+            "PlayerComponent",
+            "MeiliSearchComponent"
         ]
     }
 }

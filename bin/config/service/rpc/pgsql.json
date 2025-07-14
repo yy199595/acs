@@ -1,0 +1,216 @@
+{
+    "PgsqlReadProxy.Run" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "sql" : ""
+        },
+        "response" : {
+            "list" : []
+        }
+    },
+    "PgsqlReadProxy.Inc" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "sql" : ""
+        },
+        "response" : {
+            "tab" : "",
+            "field" : "",
+            "value" : 1,
+            "filter" : { }
+        }
+    },
+    "PgsqlReadProxy.Find" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "limit" : 0,
+            "tab" : "",
+            "opt" : "AND",
+            "filter" : { },
+            "fields" : ["xxx"]
+        },
+        "response" : {
+            "list" : []
+        }
+    },
+    "PgsqlReadProxy.Count" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "filter" : { }
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "PgsqlReadProxy.Func" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "func" : "",
+            "field" : "",
+            "filter" : { }
+        },
+        "response" : {
+            "data" : { }
+        }
+    },
+    "PgsqlReadProxy.FindPage" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "page" : 1,
+            "count" : 10,
+            "filter" : { },
+            "fields" : ["xxx"]
+        },
+        "response" : {
+            "list" : []
+        }
+    },
+    "PgsqlReadProxy.Distinct" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "filter" : { },
+            "fields" : []
+        },
+        "response" : {
+            "list" : []
+        }
+    },
+    "PgsqlWriteProxy.Run" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "sql" : ""
+        },
+        "response" : {
+            "list" : []
+        }
+    },
+    "PgsqlWriteProxy.Inc" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "field" : "",
+            "value" : 1,
+            "limit" : 1,
+            "filter" : {}
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "PgsqlWriteProxy.Insert" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "document" : { }
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "PgsqlWriteProxy.Replace" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "document" : { }
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "PgsqlWriteProxy.Delete" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "limit" : 0,
+            "filter" : { }
+        }
+    },
+    "PgsqlWriteProxy.Update" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "limit" : 0,
+            "filter" : { },
+            "document" : { }
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "PgsqlWriteProxy.SetIndex" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "field" : "",
+            "unique" : false
+        }
+    },
+    "PgsqlReadProxy.Execute" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "stmt" : "",
+            "args" : []
+        }
+    },
+    "PgsqlWriteProxy.Execute" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "stmt" : "",
+            "args" : []
+        }
+    },
+    "PgsqlWriteProxy.Commit" : {
+        "async": true,
+        "proto" : "json",
+        "request" : [],
+        "response" : {
+            "count" : 0,
+            "list" : []
+        }
+    },
+    "PgsqlWriteProxy.InsertBatch" : {
+        "async": true,
+        "proto" : "json",
+        "request" : {
+            "tab" : "",
+            "documents" : []
+        },
+        "response" : {
+            "count" : 0
+        }
+    },
+    "PgsqlWriteProxy.UpdateBatch" : {
+        "async": true,
+        "proto" : "json",
+        "request" : [
+            {
+                "tab" : "",
+                "filter" : { },
+                "document" : { }
+            }
+        ],
+        "response" : {
+            "count" : 0
+        }
+    }
+}

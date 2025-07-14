@@ -69,18 +69,16 @@ namespace acs
 			{
 				case mysql::PACKAGE_OK:
 				{
-					const mysql::OKResponse & result = response->GetOKResponse();
+
+					lua_pushstring(this->mLua, "result");
+					lua_createtable(this->mLua, 0, 4);
 					{
-						lua_pushstring(this->mLua, "result");
-						lua_createtable(this->mLua, 0, 4);
-						{
-							lua_push_value(this->mLua, "warn_count", result.mWarningCount);
-							lua_push_value(this->mLua, "server_status", result.mServerStatus);
-							lua_push_value(this->mLua, "affected_rows", result.mAffectedRows);
-							lua_push_value(this->mLua, "last_insert_id", result.mLastInsertId);
-						}
-						lua_rawset(this->mLua, -3);
+						lua_push_value(this->mLua, "warn_count", response->ok.mWarningCount);
+						lua_push_value(this->mLua, "server_status", response->ok.mServerStatus);
+						lua_push_value(this->mLua, "affected_rows", response->ok.mAffectedRows);
+						lua_push_value(this->mLua, "last_insert_id", response->ok.mLastInsertId);
 					}
+					lua_rawset(this->mLua, -3);
 					break;
 				}
 				case mysql::PACKAGE_ERR:
@@ -96,18 +94,17 @@ namespace acs
 				}
 				default:
 				{
-					const mysql::Result & result = response->GetResult();
+
+					int index = 1;
+					lua_pushstring(this->mLua, "result");
+					lua_createtable(this->mLua, 0, response->contents.size());
+					for (const std::string& json: response->contents)
 					{
-						int index = 1;
-						lua_pushstring(this->mLua, "result");
-						lua_createtable(this->mLua, 0, result.contents.size());
-						for(const std::string & json : result.contents)
-						{
-							lua::yyjson::write(this->mLua, json.c_str(), json.size());
-							lua_seti(this->mLua, -2, index++);
-						}
-						lua_rawset(this->mLua, -3);
+						lua::yyjson::write(this->mLua, json.c_str(), json.size());
+						lua_seti(this->mLua, -2, index++);
 					}
+					lua_rawset(this->mLua, -3);
+
 					break;
 				}
 			}

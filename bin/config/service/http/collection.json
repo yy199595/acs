@@ -13,6 +13,32 @@
             "filter" : { }
         }
     },
+    "/table_mgr/find_all": {
+        "type": "POST",
+        "async": true,
+        "auth": true,
+        "permission": 100,
+        "desc": "获取所有文档",
+        "bind": "Collection.FindAll",
+        "content-type": "application/json",
+        "request": {
+            "tab": "xxx",
+            "filter" : { }
+        }
+    },
+    "/table_mgr/count": {
+        "type": "POST",
+        "async": true,
+        "auth": true,
+        "permission": 100,
+        "desc": "获取符合条件的文档数量",
+        "bind": "Collection.Count",
+        "content-type": "application/json",
+        "request": {
+            "tab": "xxx",
+            "filter" : { }
+        }
+    },
     "/table_mgr/delete": {
         "type": "GET",
         "async": true,

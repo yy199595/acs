@@ -42,7 +42,8 @@ namespace http
         void OnWriteHead(std::ostream &os) final;
         int OnWriteBody(std::ostream &os) final { return 0; }
         int OnRecvMessage(std::istream & ss, size_t size) final;
-		int ContentLength() final { return (int)this->mContent.size();}
+		size_t ContentLength() final { return this->mContent.size();}
+		inline void SetContentLength(long long len) final { this->mContent.reserve(len); }
     private:
         std::string mContent;
         std::unordered_map<std::string, std::string> mParameters;
@@ -60,9 +61,9 @@ namespace http
 		~JsonContent() override = default;
     public:
 		void Write(const json::w::Document & document);
-		const std::string & JsonStr() const { return this->mJson;}
+		inline const std::string & JsonStr() const { return this->mJson;}
 		inline const json::r::Document & JsonObject() const { return this->mDocument; }
-		http::ContentType GetContentType() const final { return http::ContentType::JSON; }
+		inline http::ContentType GetContentType() const final { return http::ContentType::JSON; }
 
 		template<typename T>
 		inline bool Get(const char * key, T & value) const
@@ -75,8 +76,9 @@ namespace http
         int OnWriteBody(std::ostream &os) final;
         int OnRecvMessage(std::istream & is, size_t size) final;
 		inline std::string ToStr() const final { return this->mJson; }
-		inline int ContentLength() final { return (int)this->mJson.size(); }
-		inline bool OnDecode() final { return this->mDocument.Decode(this->mJson); }
+		inline size_t ContentLength() final { return this->mJson.size(); }
+		inline void SetContentLength(long long len) final { this->mJson.reserve(len); }
+		inline bool OnDecode() final { return this->mDocument.Decode(this->mJson, YYJSON_READ_INSITU); }
 	private:
         std::string mJson;
 		json::r::Document mDocument;
@@ -101,7 +103,8 @@ namespace http
 		int OnRecvMessage(std::istream& is, size_t size) final;
 		bool OnDecode() final { return this->Decode(this->mXml); }
 		std::string ToStr() const final { return this->mXml; }
-		int ContentLength() final { return (int)this->mXml.size(); }
+		inline size_t ContentLength() final { return this->mXml.size(); }
+		inline void SetContentLength(long long len) final { this->mXml.reserve(len); }
 	private:
 		std::string mXml;
 	};
@@ -112,8 +115,8 @@ namespace http
 	class TextContent final : public Content
 	{
 	public:
-		explicit TextContent() : mMaxSize(1024 * 500) { }
-		explicit TextContent(std::string t) : mMaxSize(10240), mConType(std::move(t)) {}
+		explicit TextContent() : mMaxSize(0) { }
+		explicit TextContent(std::string t) : mMaxSize(0), mConType(std::move(t)) {}
 	private:
 		void WriteToLua(lua_State *l) override;
 		bool OnDecode() final { return true; }
@@ -121,7 +124,7 @@ namespace http
 		void OnWriteHead(std::ostream &os) final;
 		int OnRecvMessage(std::istream & is, size_t size) final;
 		std::string ToStr() const final { return this->mContent; }
-		int ContentLength() final { return (int)this->mContent.size();}
+		inline size_t ContentLength() final { return this->mContent.size();}
 	public:
 		void Append(const std::string & content);
 		std::string * Data() { return &this->mContent;}
@@ -131,6 +134,7 @@ namespace http
 		inline void SetContentType(const std::string & t) { this->mConType = t; }
 		void SetContent(const std::string & type, const char * content, size_t size);
 		http::ContentType GetContentType() const final { return http::ContentType::TEXT; }
+		inline void SetContentLength(long long len) final { this->mContent.reserve(len); }
 	private:
 		size_t mMaxSize;
 		std::string mUrl;
@@ -152,17 +156,17 @@ namespace http
 		bool MakeFile(const std::string & path);
 		inline void SetMaxSize(size_t size) { this->mMaxSize = size; }
 		bool OpenFile(const std::string & path, const std::string & type);
-		http::ContentType GetContentType() const final { return http::ContentType::FILE; }
+		inline http::ContentType GetContentType() const final { return http::ContentType::FILE; }
 	private:
 		bool OnDecode() final;
 		void WriteToLua(lua_State *l) final;
 		int OnWriteBody(std::ostream &os) final;
 		void OnWriteHead(std::ostream &os) final;
-		std::string ToStr() const final { return this->mPath; }
-		int ContentLength() final { return (int)this->mFileSize;}
 		int OnRecvMessage(std::istream & is, size_t) final;
+		inline std::string ToStr() const final { return this->mPath; }
+		inline size_t ContentLength() final { return this->mFileSize;}
 	public:
-		const std::string & Path() const { return this->mPath; }
+		inline const std::string & Path() const { return this->mPath; }
 	private:
 		size_t mMaxSize;
 		size_t mFileSize;
@@ -189,7 +193,7 @@ namespace http
 		void OnWriteHead(std::ostream &os) final;
 		int OnRecvMessage(std::istream & is, size_t size) final;
 		std::string ToStr() const final { return this->mPath; }
-		int ContentLength() final { return 0; }
+		inline size_t ContentLength() final { return 0; }
 		http::ContentType GetContentType() const final { return http::ContentType::CHUNKED; }
 	private:
 		size_t mContSize;
@@ -223,8 +227,8 @@ namespace http
 		std::string ToStr() const final;
 		int OnWriteBody(std::ostream& os) final;
 		void OnWriteHead(std::ostream& os) final;
-		int ContentLength() final { return (int)this->mReadCount;}
-		http::ContentType GetContentType() const final { return http::ContentType::MULTIPAR; }
+		inline size_t ContentLength() final { return this->mReadCount;}
+		inline http::ContentType GetContentType() const final { return http::ContentType::MULTIPAR; }
 	private:
 		bool mDone;
 		size_t mLength;
@@ -255,7 +259,8 @@ namespace http
 		int OnWriteBody(std::ostream &os) final;
 		void OnWriteHead(std::ostream &os) final;
 		int OnRecvMessage(std::istream &is, size_t size) final;
-		int ContentLength() final { return (int)this->mBody.size();}
+		inline size_t ContentLength() final { return this->mBody.size();}
+		inline void SetContentLength(long long len) final { this->mBody.reserve(len); }
 		http::ContentType GetContentType() const final { return http::ContentType::PB; }
 	public:
 		const std::string & GetContent() const { return this->mBody; }

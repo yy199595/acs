@@ -43,73 +43,163 @@ local info = {
     login_time = 8
 }
 
-local count = 0
+local time_ms = time.ms
 local host = "http://127.0.0.1:8088"
 --local host = "http://43.143.239.75:8080"
 
+local redis_time = 0
+local redis_count = 0
+
 local start_redis = function()
+
+    redis_time = time_ms()
     local url = str_format("%s/db/redis", host)
     while true do
-        count = count + 1
         http:Post(url, { "SET", "now_time", os.time() })
         http:Post(url, { "GET", "now_time" })
         http:Post(url, { "INFO"})
+        redis_count = redis_count + 3
+        if time_ms() - redis_time >= 5000 then
+            print("[redis count] =>", redis_count)
+            redis_time = time_ms()
+        end
     end
 end
+
+local ping_time = 0
+local ping_count = 0
 
 local start_ping = function()
+
+    ping_time = time_ms()
     while true do
-        count = count + 1
+        ping_count = ping_count + 1
         http:Get(str_format("%s/admin/ping", host))
+        if time_ms() - ping_time >= 5000 then
+            print("[ping count] =>", ping_count)
+            ping_time = time_ms()
+        end
     end
 end
+
+local hello_time = 0
+local hello_count = 0
 
 local start_hello = function()
+    hello_time = time_ms()
     while true do
-        count = count + 1
+        hello_count = hello_count + 1
         http:Get(str_format("%s/hello", host))
+        if time_ms() - hello_time >= 5000 then
+            print("[hello count] =>", hello_count)
+            hello_time = time_ms()
+        end
     end
 end
+
+local mysql_time = 0
+local mysql_count = 0
 
 local start_mysql = function()
-    local tab = "demo"
-    local sqlHelper = require("SqlHelper")
+    mysql_time = time_ms()
+    local tab = "yy.user_info_list"
     local url = str_format("%s/db/mysql", host)
     while true do
-        count = count + 1
 
-        local res2 = http:Post(url, sqlHelper.CreateSql(tab, info))
-        local res3 = http:Post(url, sqlHelper.InsertSql(tab, info))
-        local res4 = http:Post(url, sqlHelper.QuerySql(tab, { user_id = info.user_id }))
-        local res5 = http:Post(url, sqlHelper.DeleteSql(tab, { user_id = info.user_id }))
+        local filter1 = { user_id = 10000 }
+        local filter2 = { user_id = 10004 }
+        local filter3 = { user_id = 10005 }
 
+        http:Post(url, { func = "Update", args = { tab, filter1, { amount = 1000}}})
+        http:Post(url, { func = "Update", args = { tab, filter2, { amount = 1000}}})
+        http:Post(url, { func = "Update", args = { tab, filter3, { amount = 1000}}})
+
+        http:Post(url, { func = "FindOne", args = { tab, filter1 }})
+        http:Post(url, { func = "FindOne", args = { tab, filter2 }})
+        http:Post(url, { func = "FindOne", args = { tab, filter3 }})
+
+
+        mysql_count = mysql_count + 6
+        if time_ms() - mysql_time >= 5000 then
+            print("[mysql count] =>", mysql_count)
+            mysql_time = time_ms()
+        end
     end
 end
+
+local pgsql_time = 0
+local pgsql_count = 0
+
+local start_pgsql = function()
+    local tab = "yy.user_info_list"
+    local count = 0
+    pgsql_time = time_ms()
+    local url = str_format("%s/db/pgsql", host)
+    while true do
+
+        local filter1 = { user_id = 10000 }
+        local filter2 = { user_id = 10004 }
+        local filter3 = { user_id = 10005 }
+
+        http:Post(url, { func = "Update", args = { tab, filter1, { amount = 1000}}})
+        http:Post(url, { func = "Update", args = { tab, filter2, { amount = 1000}}})
+        http:Post(url, { func = "Update", args = { tab, filter3, { amount = 1000}}})
+
+        http:Post(url, { func = "FindOne", args = { tab, filter1 }})
+        http:Post(url, { func = "FindOne", args = { tab, filter2 }})
+        http:Post(url, { func = "FindOne", args = { tab, filter3 }})
+
+
+        pgsql_count = pgsql_count + 6
+        if time_ms() - pgsql_time >= 5000 then
+            print("[pgsql count] =>", pgsql_count)
+            pgsql_time = time_ms()
+        end
+    end
+end
+
+local mongo_time = 0
+local mongo_count = 0
 
 local start_mongo = function()
-    local tab = "demo"
+
+    local tab = "yjz.user_info_list"
+    mongo_time = time_ms()
     local url = str_format("%s/db/mongo", host)
     while true do
-        count = count + 1
 
-        http:Post(url, { cmd = "InsertOnce", documents = { tab, info } })
-        http:Post(url, { cmd = "FindOne", documents = { tab, { user_id = info.user_id } } })
-        http:Post(url, { cmd = "Delete", documents = { tab, { user_id = info.user_id }, 1 } })
+        local filter1 = { user_id = 10000 }
+        local filter2 = { user_id = 10004 }
+        local filter3 = { user_id = 10005 }
 
+        http:Post(url, { func = "UpdateOne", args = { tab, filter1, { amount = 1000}}})
+        http:Post(url, { func = "UpdateOne", args = { tab, filter2, { amount = 1000}}})
+        http:Post(url, { func = "UpdateOne", args = { tab, filter3, { amount = 1000}}})
+
+        http:Post(url, { func = "FindOne", args = { tab, filter1 }})
+        http:Post(url, { func = "FindOne", args = { tab, filter2 }})
+        http:Post(url, { func = "FindOne", args = { tab, filter3 }})
+
+        mongo_count = mongo_count + 3
+        if time_ms() - mongo_time >= 5000 then
+            print("[mongo count] =>", mongo_count)
+            mongo_time = time_ms()
+        end
     end
 end
 
-local start = 0
+local info_time = 0
+local info_count = 0
 
 local start_run_info = function()
+
     local url = str_format("%s/admin/info", host)
     while true do
-        count = count + 1
+        info_count = info_count + 1
         local response = http:Get(url).data
-        local value = response.const_memory_b - start
-        if value ~= 0 then
-            print("value = ", value)
-            start = response.const_memory_b
+        if time_ms() - info_time >= 5000 then
+            print("[run info count] => ", info_count)
+            info_time = time_ms()
         end
     end
 end
@@ -122,14 +212,10 @@ function Main:OnComplete()
         coroutine.start(start_redis)
         coroutine.start(start_mysql)
         coroutine.start(start_mongo)
+        coroutine.start(start_pgsql)
         coroutine.start(start_run_info)
     end
-end
-
-function Main:OnUpdate(tick)
-    if tick % 5 == 0 then
-        log.Debug("count = {}", count)
-    end
+    coroutine.sleep(100)
 end
 
 return Main

@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <string>
+#include <utility>
 #include <vector>
 #include "Lua/Engine/Define.h"
 #include "Rpc/Async/RpcTaskSource.h"
@@ -19,6 +20,13 @@ namespace redis
 		constexpr char Array = '*';
 		constexpr char BinString = '$';
 	}
+
+	struct Parameter
+	{
+	public:
+		char type;
+		std::string value;
+	};
 }
 
 namespace redis
@@ -30,6 +38,7 @@ namespace redis
 	{
 	public:
 		Request() : mTaskId(0){ }
+		explicit Request(std::string cmd) : mTaskId(0), mCommand(std::move(cmd)) { }
 	public:
 		void Clear() final;
 		std::string ToString() final;
@@ -49,18 +58,27 @@ namespace redis
 		inline const std::string& GetCommand() const{ return this->mCommand; }
 		inline void SetCommand(const std::string& cmd) { this->mCommand = cmd;}
 		inline void AddParameter(const std::string& value) { this->mParameters.emplace_back(value); }
-		inline void AddString(const char* str, size_t size) { this->mParameters.emplace_back(str, size); }
+		inline void AddParameter(const char* str, size_t size) { this->mParameters.emplace_back(str, size); }
+		inline void AddParameter(const json::w::Document & document) {
+			size_t count = 0;
+			std::unique_ptr<char> json;
+			if(document.Serialize(json, count))
+			{
+				this->mParameters.emplace_back(json.get(), count);
+			}
+		}
 
 		template<typename T>
-		inline std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value, void> AddParameter(T value) { this->mParameters.emplace_back(std::to_string(value)); }
+		inline std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value, void> AddParameter(T value) {
+			this->mParameters.emplace_back(std::to_string(value));
+		}
 
 		template<typename T>
 		inline std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value, void> AddParameter(const std::vector<T> & value)
 		{
-			std::transform(value.begin(), value.end(), std::back_inserter(this->mParameters), [](const T & value)
-			{
-				return std::to_string(value);
-			});
+			for(const T & item : value) {
+				this->mParameters.emplace_back(std::to_string(item));
+			}
 		}
 		inline void AddParameter(const std::vector<std::string > & value) {
 			this->mParameters.insert(this->mParameters.end(), value.begin(), value.end());
@@ -103,7 +121,7 @@ namespace redis
 		char type = 0;
 		std::string message;
 		long long number = 0;
-		std::vector<Element> list;
+		std::list<Element> list;
 	public:
 		inline bool IsString() const { return this->type == redis::type::String || this->type == redis::type::BinString; }
 	};

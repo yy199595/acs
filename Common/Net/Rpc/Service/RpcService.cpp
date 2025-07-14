@@ -6,7 +6,7 @@
 #include "Proto/Lua/Message.h"
 #include "Lua/Lib/Lib.h"
 #include "Core/System/System.h"
-
+#include "Rpc/Config/ServiceConfig.h"
 namespace acs
 {
 	extern std::string GET_FUNC_NAME(const std::string& fullName)
@@ -55,7 +55,7 @@ namespace acs
 		return true;
 	}
 
-	int RpcService::Invoke(const RpcMethodConfig* methodConfig, rpc::Message* message) noexcept
+	int RpcService::Invoke(const RpcMethodConfig* methodConfig, std::unique_ptr<rpc::Message> & message) noexcept
 	{
 		const std::string& method = methodConfig->method;
 		if (this->mLuaModule != nullptr && this->mLuaModule->HasFunction(method))
@@ -91,9 +91,9 @@ namespace acs
 
 			switch (message.GetProto())
 			{
-				case rpc::Proto::None:
+				case rpc::proto::none:
 					return XCode::Ok;
-				case rpc::Proto::Json:
+				case rpc::proto::json:
 				{
 					const std::string& data = message.GetBody();
 					if (!data.empty() && !lua::yyjson::write(lua, data.c_str(), data.size()))
@@ -102,7 +102,7 @@ namespace acs
 					}
 					break;
 				}
-				case rpc::Proto::Lua:
+				case rpc::proto::lua:
 				{
 					const std::string& str = message.GetBody();
 					if(lua::lfmt::deserialize(lua, str) != LUA_OK)
@@ -111,13 +111,13 @@ namespace acs
 					}
 					break;
 				}
-				case rpc::Proto::String:
+				case rpc::proto::string:
 				{
 					const std::string& str = message.GetBody();
 					lua_pushlstring(lua, str.c_str(), str.size());
 					break;
 				}
-				case rpc::Proto::Protobuf:
+				case rpc::proto::pb:
 				{
 					if (!config->request.empty())
 					{
@@ -127,7 +127,7 @@ namespace acs
 							{
 								return XCode::CreateProtoFailure;
 							}
-							if (!message.ParseMessage(request))
+							if (!request->ParsePartialFromString(message.GetBody()))
 							{
 								return XCode::ParseMessageError;
 							}
@@ -162,7 +162,7 @@ namespace acs
 			LOG_ERROR("{} {}", config->fullname, err);
 			return XCode::CallLuaFunctionFail;
 		}
-		message.SetProto(rpc::Proto::None);
+		message.SetProto(rpc::proto::none);
 		if (!lua_isinteger(lua, -2))
 		{
 			LOG_ERROR("invoke ({}) return code unknown", config->fullname);
@@ -176,7 +176,7 @@ namespace acs
 				if (message.TempHead().Del("pb", pb))
 				{
 					MessageEncoder messageEncoder(lua);
-					message.SetProto(rpc::Proto::Protobuf);
+					message.SetProto(rpc::proto::pb);
 					pb::Message* data = this->mProto->Temp(pb);
 					if (data == nullptr)
 					{
@@ -186,11 +186,14 @@ namespace acs
 					{
 						return XCode::ParseMessageError;
 					}
-					message.WriteMessage(data);
+					if(!data->ParsePartialFromString(message.GetBody()))
+					{
+						return XCode::ParseMessageError;
+					}
 				}
 				else
 				{
-					message.SetProto(rpc::Proto::Json);
+					message.SetProto(rpc::proto::json);
 					lua::yyjson::read(lua, -1, *message.Body());
 				}
 				break;
@@ -201,7 +204,7 @@ namespace acs
 				message.Body()->clear();
 				const char* str = lua_tolstring(lua, -1, &len);
 				message.Body()->append(str, len);
-				message.SetProto(rpc::Proto::String);
+				message.SetProto(rpc::proto::string);
 				break;
 			}
 		}

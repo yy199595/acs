@@ -4,93 +4,236 @@
 
 #include "MysqlDBComponent.h"
 #include "Entity/Actor/App.h"
-#include "Util/File/FileHelper.h"
+#include "Util/File/DirectoryHelper.h"
 #include "Log/Component/LoggerComponent.h"
 #include "Server/Config/ServerConfig.h"
 #include "Server/Component/ThreadComponent.h"
 #include "Timer/Timer/ElapsedTimer.h"
-#include "Message/s2s/registry.pb.h"
 #include "Lua/Lib/Lib.h"
 #include "XCode/XCode.h"
 #include "Server/Config/CodeConfig.h"
-#include "Util/Tools/Math.h"
+#include "DB/Common/SqlFactory.h"
+#include "Util/Tools/String.h"
+#include "Util/File/FileHelper.h"
+
 namespace acs
 {
 	MysqlDBComponent::MysqlDBComponent()
 	{
 		this->mCount = 0;
 		this->mRetryCount = 0;
-		REGISTER_JSON_CLASS_FIELD(db::Explain, open);
-		REGISTER_JSON_CLASS_FIELD(db::Explain, command);
-
-		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, ping);
-		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, count);
-		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, retry);
-		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, script);
-		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, debug);
-		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, explain);
-		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, binlog);
-		REGISTER_JSON_CLASS_FIELD(mysql::Cluster, conn_count);
-		REGISTER_JSON_CLASS_MUST_FIELD(mysql::Cluster, address);
-
-		REGISTER_JSON_CLASS_FIELD(mysql::Explain, id);
-		REGISTER_JSON_CLASS_FIELD(mysql::Explain, ref);
-		REGISTER_JSON_CLASS_FIELD(mysql::Explain, table);
-		REGISTER_JSON_CLASS_FIELD(mysql::Explain, key);
-		REGISTER_JSON_CLASS_FIELD(mysql::Explain, select_type);
-		REGISTER_JSON_CLASS_FIELD(mysql::Explain, Extra);
-		REGISTER_JSON_CLASS_FIELD(mysql::Explain, type);
-		REGISTER_JSON_CLASS_FIELD(mysql::Explain, rows);
-		REGISTER_JSON_CLASS_FIELD(mysql::Explain, filtered);
-		REGISTER_JSON_CLASS_FIELD(mysql::Explain, key_len);
-		REGISTER_JSON_CLASS_FIELD(mysql::Explain, possible_keys);
-
+		sql::RegisterObject();
+		db::Explain::RegisterFields();
+		mysql::Cluster::RegisterFields();
+		mysql::Explain::RegisterFields();
 	}
 
 	bool MysqlDBComponent::Awake()
 	{
 		this->mConfig.count = 1;
 		this->mConfig.debug = false;
-		LuaCCModuleRegister::Add([](Lua::CCModule & ccModule) {
+		LuaCCModuleRegister::Add([](Lua::CCModule& ccModule)
+		{
 			ccModule.Open("db.mysql", lua::lib::luaopen_lmysqldb);
 		});
-		if(!ServerConfig::Inst()->Get("mysql", this->mConfig))
-		{
-			return false;
-		}
-		if(!this->mConfig.script.empty())
-		{
-			std::string path = this->mConfig.script;
-			return help::fs::ReadTxtFile(path, this->mConfig.script);
-		}
-		return true;
+		return ServerConfig::Inst()->Get("mysql", this->mConfig);
 	}
 
 	void MysqlDBComponent::OnStart()
 	{
-		if(!this->mConfig.script.empty())
+		this->InitDataBaseAndSession();
+	}
+
+	bool MysqlDBComponent::InitDataBaseAndSession()
+	{
+		std::vector<std::string> filePaths;
+		const std::string& dir = this->mConfig.table;
+		if (help::dir::GetFilePaths(dir, ".json", filePaths) > 0)
 		{
-			this->Run(this->mConfig.script);
+			for (const std::string& path: filePaths)
+			{
+				if(!this->mFileFactory.IsChange(path))
+				{
+					continue;
+				}
+				sql::Table mysqlTable;
+				json::r::Document document;
+				if (!this->mFileFactory.Read(path, document, mysqlTable))
+				{
+					LOG_ERROR("decode json fail => {}", path);
+					return false;
+				}
+				std::vector<std::string> tables;
+				tables.emplace_back(mysqlTable.name);
+				if(mysqlTable.count > 0)
+				{
+					tables.clear();
+					for (int index = 0; index < mysqlTable.count; index++)
+					{
+						int idx = index + 1;
+						tables.emplace_back(fmt::format("{}{}", mysqlTable.name, idx));
+					}
+				}
+				for (const std::string& tab: tables)
+				{
+					timer::ElapsedTimer timer1;
+					if (this->InitTable(tab, mysqlTable))
+					{
+						LOG_DEBUG("[{}ms] init mysql table [{}] ok", timer1.GetMs(), tab);
+					}
+				}
+			}
 		}
+		assert(this->mFreeClients.Size() == this->mClients.size());
+		for(auto iter = this->mClients.begin(); iter != this->mClients.end(); iter++)
+		{
+			if(!iter->second->InvokeCompileSql())
+			{
+				return false;
+			}
+			LOG_DEBUG("mysql client ({}) compile sql ok", iter->first)
+		}
+		return true;
+	}
+
+	bool MysqlDBComponent::InitTable(const std::string& name, const sql::Table& tableInfo)
+	{
+		std::string sql1 = fmt::format("DESCRIBE {}", name);
+		std::unique_ptr<mysql::Response> response = this->Run(sql1);
+		if (response == nullptr || !response->IsOk() || response->contents.empty())
+		{
+			if(!this->CreateTable(name, tableInfo))
+			{
+				return false;
+			}
+			LOG_INFO("create mysql table [{}] ok", name);
+			return true;
+		}
+		sql::Factory sqlFactory;
+		std::unordered_map<std::string, std::string> fields;
+		for(const std::string & json : response->contents)
+		{
+			json::r::Document document1;
+			if(document1.Decode(json))
+			{
+				std::string field, type;
+				document1.Get("Type", type);
+				document1.Get("Field", field);
+				fields.emplace(field, help::Str::Toupper(type));
+			}
+		}
+
+		for(auto iter = tableInfo.fields.begin(); iter != tableInfo.fields.end(); iter++)
+		{
+			const std::string & field = iter->first;
+			if(fields.find(field) == fields.end())
+			{
+				sqlFactory.GetTable(name);
+				const sql::Field & fieldInfo = iter->second;
+				sqlFactory.AlterColumn(field.c_str(), fieldInfo.type);
+				if(fieldInfo.notnull)
+				{
+					sqlFactory.NotNull();
+				}
+				sqlFactory.Default(fieldInfo.default_val);
+				const std::string & sql = sqlFactory.ToString();
+				std::unique_ptr<mysql::Response> mysqlResponse = this->Run(sql);
+				if(mysqlResponse != nullptr && mysqlResponse->IsOk())
+				{
+					LOG_INFO("[{}] add column ({}) ok", name, field);
+				}
+				if(fieldInfo.index)
+				{
+					sqlFactory.GetTable(name).SetIndex(field, false);
+					const std::string & sql2 = sqlFactory.ToString();
+					std::unique_ptr<mysql::Response> mysqlResponse1 = this->Run(sql2);
+					if(mysqlResponse1 != nullptr && mysqlResponse1->IsOk())
+					{
+						LOG_DEBUG("[{}] set index ({}) ok", name, field);
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	bool MysqlDBComponent::CreateTable(const std::string& name, const sql::Table& tableInfo)
+	{
+		json::r::Value jsonFields;
+		std::string engine("InnoDB");
+		std::string character("utf8mb4");
+		std::string collate("utf8mb4_unicode_ci");
+
+		size_t count = 0;
+		sql::Factory sqlFactory;
+		std::vector<std::string> indexes;
+		std::vector<std::string> primary;
+		sqlFactory.GetTable(name).Begin();
+		for (auto iter = tableInfo.fields.begin(); iter != tableInfo.fields.end(); iter++)
+		{
+			count++;
+			const sql::Field& fieldInfo = iter->second;
+			sqlFactory.AppendColumn(fieldInfo.name.c_str(), fieldInfo.type.c_str());
+			if (fieldInfo.notnull)
+			{
+				sqlFactory.NotNull();
+			}
+			sqlFactory.Default(fieldInfo.default_val);
+			if (fieldInfo.unique)
+			{
+				sqlFactory.Unique();
+			}
+			if(fieldInfo.auto_inc)
+			{
+				sqlFactory.AutoInc();
+			}
+			if(!fieldInfo.comment.empty())
+			{
+				sqlFactory.Comment(fieldInfo.comment);
+			}
+			if (fieldInfo.index)
+			{
+				indexes.emplace_back(fieldInfo.name);
+			}
+			if (fieldInfo.primary_key)
+			{
+				primary.emplace_back(fieldInfo.name);
+			}
+			if(count < tableInfo.fields.size())
+			{
+				sqlFactory.Next();
+			}
+		}
+		if(!primary.empty())
+		{
+			sqlFactory.Next().PrimaryKey(primary);
+		}
+		if(!indexes.empty())
+		{
+			sqlFactory.Next().Index(indexes);
+		}
+		sqlFactory.End().Engine(engine.c_str()).Character(character.c_str()).Collate(collate.c_str());
+		std::unique_ptr<mysql::Response> response = this->Run(sqlFactory.ToString());
+		return response != nullptr && response->IsOk();
 	}
 
 	bool MysqlDBComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(!this->mConfig.address.empty())
-		for(int x = 0; x < this->mConfig.address.size(); x++)
+		for (int x = 0; x < this->mConfig.address.size(); x++)
 		{
-			const std::string & address = this->mConfig.address.at(x);
+			const std::string& address = this->mConfig.address.at(x);
 			for (int index = 0; index < this->mConfig.count; index++)
 			{
 				mysql::Config config;
 				timer::ElapsedTimer timer1;
-				if(!MysqlDBComponent::DecodeUrl(address, config))
+				if (!MysqlDBComponent::DecodeUrl(address, config))
 				{
 					return false;
 				}
 				this->mRetryCount++;
 				int id = (x + 1) * 100 + index + 1;
-				config.script = this->mConfig.script;
+				config.script = this->mConfig.table;
 				config.conn_count = this->mConfig.conn_count;
 				Asio::Context& main = this->mApp->GetContext();
 				tcp::Socket* tcpSocket = this->GetComponent<ThreadComponent>()->CreateSocket(config.address);
@@ -102,8 +245,10 @@ namespace acs
 						LOG_ERROR("connect {} {} ", address, CodeConfig::Inst()->GetDesc(code));
 						return false;
 					}
+					this->mFreeClients.Push(id);
 					this->mClients.emplace(id, mysqlClient);
-					LOG_INFO("[{}ms] connect {} ok ", timer1.GetMs(), address);
+					const mysql::HandshakeResponse & handShake = mysqlClient->GetHandshake();
+					LOG_INFO("[{}ms] ({}) connect {} ok ", timer1.GetMs(), handShake.server_version, address);
 				}
 			}
 		}
@@ -112,7 +257,7 @@ namespace acs
 
 	bool MysqlDBComponent::DecodeUrl(const std::string& address, mysql::Config& config)
 	{
-		if(!config.Decode(address))
+		if (!config.Decode(address))
 		{
 			return false;
 		}
@@ -127,19 +272,19 @@ namespace acs
 	void MysqlDBComponent::OnRecord(json::w::Document& document)
 	{
 		timer::ElapsedTimer timer1;
-		this->Run(std::make_unique<mysql::Request>(mysql::cmd::PING));
+		std::unique_ptr<mysql::Request> pingRequest
+				= std::make_unique<mysql::Request>(mysql::cmd::PING);
+
+		this->Run(pingRequest);
 		std::unique_ptr<json::w::Value> jsonObject = document.AddObject("mysql");
 		{
 			size_t sendByteCount = 0;
 			size_t recvByteCount = 0;
-			for(auto iter = this->mClients.begin(); iter != this->mClients.end(); iter++)
+			for (auto iter = this->mClients.begin(); iter != this->mClients.end(); iter++)
 			{
 				sendByteCount += iter->second->SendBufferBytes();
 				recvByteCount += iter->second->RecvBufferBytes();
 			}
-
-			jsonObject->Add("send_memory", sendByteCount);
-			jsonObject->Add("recv_memory", recvByteCount);
 
 			jsonObject->Add("sum", this->mCount);
 			jsonObject->Add("retry", this->mRetryCount);
@@ -147,13 +292,17 @@ namespace acs
 			jsonObject->Add("free", this->mFreeClients.Size());
 			jsonObject->Add("wait", this->mMessages.size());
 			jsonObject->Add("ping", fmt::format("{}ms", timer1.GetMs()));
+
+			jsonObject->Add("send_memory", sendByteCount);
+			jsonObject->Add("recv_memory", recvByteCount);
+
 		}
 	}
 
 	void MysqlDBComponent::OnConnectOK(int id)
 	{
 		this->mRetryCount--;
-		if(this->mClients.find(id) != this->mClients.end())
+		if (this->mClients.find(id) != this->mClients.end())
 		{
 			this->AddFreeClient(id);
 			LOG_DEBUG("mysql client:{} login ok", id);
@@ -162,48 +311,47 @@ namespace acs
 
 	void MysqlDBComponent::OnDestroy()
 	{
-		while(!this->mMessages.empty())
+		while (!this->mMessages.empty())
 		{
 			this->mApp->Sleep();
 			LOG_DEBUG("wait mysql request invoke => {}", this->mMessages.size());
 		}
 	}
 
-	void MysqlDBComponent::OnMessage(int id, mysql::Request* request, mysql::Response* response) noexcept
+	void MysqlDBComponent::OnMessage(int id, mysql::Request* req, mysql::Response* res) noexcept
 	{
 		this->mCount++;
 		this->AddFreeClient(id);
-		std::unique_ptr<mysql::Response> resp(response);
-		if(response->HasError())
+		std::unique_ptr<mysql::Request> request(req);
+		std::unique_ptr<mysql::Response> response(res);
+		if (response->HasError())
 		{
 			LOG_WARN("{}", request->ToString());
 			LOG_WARN("{}", response->ToString());
 		}
 		else
 		{
-			if (this->mConfig.explain.open)
+			if (this->mConfig.explain.open && request->Count() == 1)
 			{
 				std::string cmd;
 				if (request->GetCommand(cmd) && cmd != "EXPLAIN" && this->mConfig.explain.HasCommand(cmd))
 				{
 					std::string sql = request->ToString();
 					long long ms = request->GetCostTime();
-					this->mApp->StartCoroutine([sql, this, ms]
-					{
-						this->OnExplain(sql, ms);
-					});
+					CoroutineComponent * coroutine = acs::App::Coroutine();
+					coroutine->Start(&MysqlDBComponent::OnExplain, this, sql, ms);
 				}
 			}
-			if(this->mConfig.debug)
+			if (this->mConfig.debug)
 			{
 				CONSOLE_LOG_DEBUG("request=>{}", request->ToString());
 				CONSOLE_LOG_DEBUG("[{}ms] response=>{}", request->GetCostTime(), response->ToString());
 			}
 		}
 		int rpcId = request->GetRpcId();
-		if(rpcId > 0)
+		if (rpcId > 0)
 		{
-			this->OnResponse(rpcId, std::move(resp));
+			this->OnResponse(rpcId, std::move(response));
 		}
 	}
 
@@ -211,17 +359,16 @@ namespace acs
 	{
 		const std::string newSql = fmt::format("EXPLAIN {}", sql);
 		std::unique_ptr<mysql::Response> response1 = this->Run(newSql);
-		LoggerComponent * logger = this->GetComponent<LoggerComponent>();
+		LoggerComponent* logger = this->GetComponent<LoggerComponent>();
 		{
-			std::string result;
-			if(response1->GetFirstResult(result))
+			if(!response1->contents.empty())
 			{
 				std::unique_ptr<custom::LogInfo> sqlLog = std::make_unique<custom::LogInfo>();
 				{
 					sqlLog->Level = custom::LogLevel::None;
 					sqlLog->Content = fmt::format("[{}ms] {}\n", ms, sql);
 					{
-						sqlLog->Content.append(result);
+						sqlLog->Content = response1->contents.front();
 						logger->PushLog("mysql", std::move(sqlLog));
 					}
 				}
@@ -232,14 +379,15 @@ namespace acs
 	void MysqlDBComponent::OnSendFailure(int id, mysql::Request* message)
 	{
 		// 重新找一个mysql client执行
-		this->Send(std::unique_ptr<mysql::Request>(message));
-		LOG_WARN("redis client:{} resend => {}", id, message->ToString())
+		std::unique_ptr<mysql::Request> request(message);
+		LOG_WARN("redis client:{} resend => {}", id, request->ToString())
+		this->Send(request);
 	}
 
 	void MysqlDBComponent::OnClientError(int id, int code)
 	{
 		auto iter = this->mClients.find(id);
-		if(iter == this->mClients.end())
+		if (iter == this->mClients.end())
 		{
 			return;
 		}
@@ -251,21 +399,22 @@ namespace acs
 
 	void MysqlDBComponent::OnSecondUpdate(int tick) noexcept
 	{
-		if(this->mConfig.ping > 0 && tick % this->mConfig.ping == 0)
+		if (this->mConfig.ping > 0 && tick % this->mConfig.ping == 0)
 		{
 			int id = 0;
-			while(this->mFreeClients.Pop(id))
+			while (this->mFreeClients.Pop(id))
 			{
-				//CONSOLE_LOG_WARN("mysql client:{} ping", id)
-				this->Send(id, std::make_unique<mysql::Request>(mysql::cmd::PING));
+				std::unique_ptr<mysql::Request> request =
+					std::make_unique<mysql::Request>(mysql::cmd::PING);
+				this->Send(id, request);
 			}
 		}
-		if(this->mConfig.retry > 0 && tick % this->mConfig.retry == 0)
+		if (this->mConfig.retry > 0 && tick % this->mConfig.retry == 0)
 		{
-			for(const int id : this->mRetryClients)
+			for (const int id: this->mRetryClients)
 			{
 				auto iter = this->mClients.find(id);
-				if(iter != this->mClients.end())
+				if (iter != this->mClients.end())
 				{
 					iter->second->Start(nullptr);
 				}
@@ -275,58 +424,78 @@ namespace acs
 	}
 
 
-	void MysqlDBComponent::Send(std::unique_ptr<mysql::Request> request, int& rpcId)
+	void MysqlDBComponent::Send(std::unique_ptr<mysql::Request>& request, int& rpcId)
 	{
 		rpcId = this->BuildRpcId();
 		{
 			request->SetRpcId(rpcId);
-			this->Send(std::move(request));
+			this->Send(request);
 		}
 	}
 
 	void MysqlDBComponent::AddFreeClient(int id)
 	{
-		if(!this->mMessages.empty())
+		if (!this->mMessages.empty())
 		{
-			this->Send(id, std::move(this->mMessages.front()));
+			this->Send(id, this->mMessages.front());
 			this->mMessages.pop();
 			return;
 		}
 		this->mFreeClients.Push(id);
 	}
 
-	void MysqlDBComponent::Send(int id, std::unique_ptr<mysql::Request> request)
+	void MysqlDBComponent::Send(int id, std::unique_ptr<mysql::Request>& request)
 	{
 		auto iter = this->mClients.find(id);
-		if(iter == this->mClients.end())
+		if (iter == this->mClients.end())
 		{
 			return;
 		}
 		iter->second->Send(std::move(request));
 	}
 
-	void MysqlDBComponent::Send(std::unique_ptr<mysql::Request> request)
+	void MysqlDBComponent::Send(std::unique_ptr<mysql::Request>& request)
 	{
 		int id = 0;
-		if(!this->mFreeClients.Pop(id))
+		if (!this->mFreeClients.Pop(id))
 		{
 			this->mMessages.emplace(std::move(request));
 			return;
 		}
-		this->Send(id, std::move(request));
+		this->Send(id, request);
 	}
 
 	std::unique_ptr<mysql::Response> MysqlDBComponent::Run(const std::string& sql)
 	{
-		return this->Run(std::make_unique<mysql::Request>(sql));
+		std::unique_ptr<mysql::Request> request =
+				std::make_unique<mysql::Request>(sql);
+		return this->Run(request);
 	}
 
-	std::unique_ptr<mysql::Response> MysqlDBComponent::Run(std::unique_ptr<mysql::Request> request)
+	std::unique_ptr<json::r::Document> MysqlDBComponent::Invoke(const std::string& sql)
+	{
+		std::unique_ptr<mysql::Response> response = this->Run(sql);
+		if (response == nullptr || !response->IsOk() || response->contents.empty())
+		{
+			return nullptr;
+		}
+		const std::string & result = response->contents.front();
+		std::unique_ptr<json::r::Document> document = std::make_unique<json::r::Document>();
+		{
+			if (!document->Decode(result.c_str(), result.size()))
+			{
+				return nullptr;
+			}
+		}
+		return document;
+	}
+
+	std::unique_ptr<mysql::Response> MysqlDBComponent::Run(std::unique_ptr<mysql::Request>& request)
 	{
 		int rpcId = this->BuildRpcId();
 		{
 			request->SetRpcId(rpcId);
-			this->Send(std::move(request));
+			this->Send(request);
 			return this->BuildRpcTask<MysqlTask>(rpcId)->Await();
 		}
 	}

@@ -248,10 +248,6 @@ namespace http
 
 	void JsonContent::OnWriteHead(std::ostream& os)
 	{
-		if (this->mJson.empty())
-		{
-			this->mDocument.Decode(this->mJson);
-		}
 		os << http::Header::ContentType << ": " << http::Header::JSON << "\r\n";
 		os << http::Header::ContentLength << ": " << this->mJson.size() << "\r\n";
 	}
@@ -259,7 +255,7 @@ namespace http
 	void JsonContent::Write(const json::w::Document& document)
 	{
 		this->mJson.clear();
-		document.Encode(&this->mJson);
+		document.Serialize(&this->mJson);
 	}
 
 	void JsonContent::WriteToLua(lua_State* lua)
@@ -349,7 +345,7 @@ namespace http
 		while (count > 0)
 		{
 			this->mContent.append(buffer, count);
-			if (this->mContent.size() >= this->mMaxSize)
+			if (this->mMaxSize > 0 && this->mContent.size() >= this->mMaxSize)
 			{
 				return tcp::read::big_long;
 			}
@@ -461,7 +457,7 @@ namespace http
 			return false;
 		}
 		this->mPath = path;
-		help::fs::GetFileSize(this->mFile, this->mFileSize);
+		help::fs::GetFileSize(this->mPath, this->mFileSize);
 		return true;
 	}
 

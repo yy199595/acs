@@ -55,10 +55,8 @@ namespace acs
 		{
 			try
 			{
-				const std::string& key = config.key;
-				const std::string& cert = config.cert;
-				this->mSslCtx.use_certificate_chain_file(cert);
-				this->mSslCtx.use_private_key_file(key, asio::ssl::context::pem);
+				this->mSslCtx.use_certificate_chain_file(config.cert);
+				this->mSslCtx.use_private_key_file(config.key, asio::ssl::context::pem);
 				this->mSslCtx.set_options(asio::ssl::context::default_workarounds |
 						asio::ssl::context::no_sslv2 | asio::ssl::context::no_sslv3 |
 						asio::ssl::context::no_tlsv1 | asio::ssl::context::no_tlsv1_1 |
@@ -156,13 +154,11 @@ namespace acs
 		{
 			do
 			{
-				this->Accept();
-				if (code.value() != Asio::OK)
+				if (code.value() != Asio::OK || !sock->Init())
 				{
 					sock->Destroy();
 					break;
 				}
-				sock->Init();
 				//CONSOLE_LOG_INFO("{} listen => {}", this->GetName(), sock->GetAddress())
 #ifdef __ENABLE_OPEN_SSL__
 				if (sock->IsOpenSsl())
@@ -186,6 +182,7 @@ namespace acs
 				asio::post(io, [this, sock] { this->OnAcceptSocket(sock); });
 			}
 			while (false);
+			this->Accept();
 		};
 #ifdef __ENABLE_OPEN_SSL__
 		if(sock->IsOpenSsl())
@@ -210,7 +207,7 @@ namespace acs
 	{
 #ifdef ONLY_MAIN_THREAD
 		Asio::Code code;
-		this->mAcceptor->close(code);
+		code = this->mAcceptor->close(code);
 		LOG_WARN("stop listen [{}]", this->mConfig.address);
 		return code.value() == Asio::OK;
 #else
@@ -218,7 +215,7 @@ namespace acs
 		asio::post(this->mExecutor, [&threadSync, this] ()
 		{
 			Asio::Code code;
-			this->mAcceptor->close(code);
+			code = this->mAcceptor->close(code);
 			threadSync.SetResult(code.value() == Asio::OK);
 		});
 		return threadSync.Wait();

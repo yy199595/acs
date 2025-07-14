@@ -9,6 +9,7 @@
 #include "Util/Tools/TimeHelper.h"
 #include "Yyjson/Document/Document.h"
 #include "Core/Event/IEvent.h"
+#include "Timer/Timer/ElapsedTimer.h"
 #include "Lua/Component/LuaComponent.h"
 #include "Server/Component/ConfigComponent.h"
 #ifdef __OS_LINUX__
@@ -60,16 +61,11 @@ namespace acs
         return XCode::Ok;
     }
 
-    int NodeSystem::Add(const rpc::Message& request)
+    int NodeSystem::Add(const json::r::Document & document)
 	{
-		json::r::Document document;
-		if(!document.Decode(request.GetBody()))
-		{
-			return XCode::ParseJsonFailure;
-		}
 		int id = 0;
 		std::string name;
-		std::unique_ptr<json::r::Value> listenObject;
+		json::r::Value listenObject;
 		LOG_ERROR_CHECK_ARGS(document.Get("id", id))
 		LOG_ERROR_CHECK_ARGS(document.Get("name", name))
 		LOG_ERROR_CHECK_ARGS(document.Get("listen", listenObject))
@@ -87,14 +83,14 @@ namespace acs
 				return XCode::Failure;
 			}
 		}
-		for(const char * key : listenObject->GetAllKey())
+		for(const char * key : listenObject.GetAllKey())
 		{
 			std::string address;
-			LOG_CHECK_RET_FALSE(listenObject->Get(key, address))
+			LOG_CHECK_RET_FALSE(listenObject.Get(key, address))
 			node->AddListen(key, address);
 		}
 		help::AddNodeEvent::Trigger(name, id);
-		LOG_INFO("[add node] {}", request.GetBody())
+		LOG_INFO("[add node] {}", document.ToString())
 		return XCode::Ok;
 	}
 
@@ -126,13 +122,12 @@ namespace acs
         return XCode::Ok;
     }
 
-	int NodeSystem::RunInfo(com::type::json& response)
+	int NodeSystem::RunInfo(json::w::Document & document)
 	{
 		os::SystemInfo systemInfo;
 		os::System::GetSystemInfo(systemInfo);
 		long long startMemory = this->mApp->GetStartUseMemory();
-		json::w::Document document;
-        {
+		{
 			document.Add("name", this->mApp->Name());
 			document.Add("id", this->mApp->GetNodeId());
 			document.Add("fps", this->mApp->GetFps());
@@ -140,7 +135,7 @@ namespace acs
 			document.Add("start_time", help::Time::GetDateString(start));
 
 			std::unique_ptr<json::w::Value> jsonObject = document.AddObject("listen");
-			for(const std::pair<std::string, std::string> & item : this->mApp->GetListens())
+			for (const std::pair<std::string, std::string>& item: this->mApp->GetListens())
 			{
 				jsonObject->Add(item.first.c_str(), item.second);
 			}
@@ -219,14 +214,15 @@ namespace acs
 
 			}
 #endif
-			std::vector<IServerRecord *> records;
+			std::vector<IServerRecord*> records;
 			this->mApp->GetComponents(records);
-			for(IServerRecord * record : records)
-			{				
+			for (IServerRecord* record: records)
+			{
+				timer::ElapsedTimer timer1;
 				record->OnRecord(document);
+				//LOG_INFO("[{}] {}ms", (dynamic_cast<Component*>(record))->GetName(), timer1.GetMs());
 			}
 		}
-		document.Encode(response.mutable_json());
 		return XCode::Ok;
 	}
 

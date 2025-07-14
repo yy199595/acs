@@ -1,0 +1,14 @@
+{
+	"RegistryService.Add" : {
+		"async" : false,
+		"proto" : "json"
+	},
+	"RegistryService.Del" : {
+		"async" : false,
+		"proto" : "string"
+	},
+	"RegistryService.Ping" : {
+		"async" : false,
+		"proto" : "string"
+	}
+}

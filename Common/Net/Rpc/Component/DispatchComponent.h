@@ -17,16 +17,16 @@ namespace acs
 	 public:
 		DispatchComponent();
     public:
-		int OnMessage(rpc::Message * message) noexcept;
+		int OnMessage(std::unique_ptr<rpc::Message> & message) noexcept;
 	private:
 		bool LateAwake() final;
 		void OnAppStop() final;
 		void OnRecord(json::w::Document &document) final;
-		void Invoke(const RpcMethodConfig * config, rpc::Message * message) noexcept;
+		void Invoke(const RpcMethodConfig * config, std::unique_ptr<rpc::Message> & message) noexcept;
 	private:
-		int OnClient(rpc::Message * message);
-		int OnRequest(rpc::Message * message) noexcept;
-		int OnBroadcast(rpc::Message * message);
+		int OnClient(std::unique_ptr<rpc::Message> & message);
+		int OnRequest(std::unique_ptr<rpc::Message> & message) noexcept;
+		int OnBroadcast(std::unique_ptr<rpc::Message> & message);
     private:
 		unsigned int mSumCount;
 		unsigned int mWaitCount;

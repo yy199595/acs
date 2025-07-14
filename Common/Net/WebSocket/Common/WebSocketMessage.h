@@ -10,21 +10,11 @@ namespace ws
 {
 	struct Header
 	{
-		bool mFin;
-		bool mMask;
-		unsigned char mRsv;
-		unsigned char mOpCode;
-		unsigned int mLength;
-	};
-
-	class Content
-	{
-	public:
-		explicit Content(unsigned char opcode) : mOpCode(opcode) { }
-	public:
-		virtual size_t Length() = 0;
-	private:
-		unsigned char mOpCode;
+		bool fin;
+		bool mask;
+		unsigned char rsv;
+		unsigned int length;
+		unsigned char opcode;
 	};
 
 	class Message final : public tcp::IProto

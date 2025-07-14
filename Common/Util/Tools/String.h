@@ -18,10 +18,10 @@ namespace help
 		extern bool IsRegex(const std::string & pattern);
 
         //转大写
-        extern void Toupper(std::string & str);
+        extern const std::string & Toupper(std::string & str);
 
         //转小写
-        extern void Tolower(std::string & str);
+        extern const std::string & Tolower(std::string & str);
 
         extern void ClearBlank(std::string &input);
 
@@ -55,5 +55,8 @@ namespace help
 	{
 		extern size_t Length(const std::string & str);
 		extern std::string Sub(const std::string & str, int start, int count);
+
+		extern bool ToString(const std::wstring & str, std::string & result);
+		extern bool ToWString(const std::string & str, std::wstring & result);
 	}
 }

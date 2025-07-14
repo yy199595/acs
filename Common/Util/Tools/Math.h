@@ -2,8 +2,6 @@
 
 
 #include<string>
-#include<algorithm>
-
 
 namespace help
 {
@@ -47,9 +45,9 @@ namespace help
 													: t2;
 		}
 
-		inline bool ToNumber(const std::string& str, int& value)
+		inline bool IsInt(const char * str, size_t size)
 		{
-			if (str.empty())
+			if(str == nullptr || size == 0)
 			{
 				return false;
 			}
@@ -58,20 +56,19 @@ namespace help
 			{
 				start = 1;
 			}
-			for (size_t index = start; index < str.length(); index++)
+			for (size_t index = start; index < size; index++)
 			{
 				if (!std::isdigit(str[index]))
 				{
 					return false;
 				}
 			}
-			value = std::stoi(str);
 			return true;
 		}
 
-		inline bool ToNumber(const std::string& str, long long& value)
+		inline bool IsFloat(const char * str, size_t size)
 		{
-			if (str.empty())
+			if(str == nullptr || size == 0)
 			{
 				return false;
 			}
@@ -80,14 +77,42 @@ namespace help
 			{
 				start = 1;
 			}
-			for (size_t index = start; index < str.length(); index++)
+			for (size_t index = start; index < size; index++)
 			{
-				if (!std::isdigit(str[index]))
+				if(str[index] == '.')
+				{
+					if(index == 0)
+					{
+						return false;
+					}
+				}
+				else if (!std::isdigit(str[index]))
 				{
 					return false;
 				}
 			}
-			value = std::stoll(str);
+			return true;
+		}
+
+		template<typename T>
+		inline std::enable_if_t<std::is_integral<T>::value, bool> ToNumber(const std::string& str, T& value)
+		{
+			if(!IsInt(str.c_str(), str.size()))
+			{
+				return false;
+			}
+			value = (T)std::stoll(str);
+			return true;
+		}
+
+		template<typename T>
+		inline std::enable_if_t<std::is_floating_point<T>::value, bool> ToNumber(const std::string& str, T& value)
+		{
+			if(!IsFloat(str.c_str(), str.size()))
+			{
+				return false;
+			}
+			value = (T)std::stod(str);
 			return true;
 		}
 	}

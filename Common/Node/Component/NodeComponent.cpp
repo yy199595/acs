@@ -1,10 +1,10 @@
-#include"NodeComponent.h"
-#include"Lua/Engine/ModuleClass.h"
-#include"Server/Config/ServerConfig.h"
-#include"Lua/Component/LuaComponent.h"
+#include "NodeComponent.h"
+#include "Lua/Engine/ModuleClass.h"
+#include "Server/Config/ServerConfig.h"
+#include "Lua/Component/LuaComponent.h"
 #include "Core/Event/IEvent.h"
 #include "Util/Tools/Random.h"
-
+#include "Rpc/Config/ServiceConfig.h"
 namespace acs
 {
 	void NodeCluster::AddItem(int id)
@@ -94,23 +94,23 @@ namespace acs
 		auto jsonDocument = ServerConfig::Inst()->Read("machine");
 		if (jsonDocument != nullptr && jsonDocument->IsArray())
 		{
+			json::r::Value jsonObject;
 			for (size_t index = 0; index < jsonDocument->MemberCount(); index++)
 			{
-				std::unique_ptr<json::r::Value> jsonObject;
 				if (jsonDocument->Get(index, jsonObject))
 				{
 					int id = 0;
 					std::string name;
-					std::unique_ptr<json::r::Value> listenObject;
-					LOG_CHECK_RET_FALSE(jsonObject->Get("id", id))
-					LOG_CHECK_RET_FALSE(jsonObject->Get("name", name))
-					LOG_CHECK_RET_FALSE(jsonObject->Get("listen", listenObject))
+					json::r::Value listenObject;
+					LOG_CHECK_RET_FALSE(jsonObject.Get("id", id))
+					LOG_CHECK_RET_FALSE(jsonObject.Get("name", name))
+					LOG_CHECK_RET_FALSE(jsonObject.Get("listen", listenObject))
 					std::unique_ptr<Node> server1= std::make_unique<Node>(id, name);
 
-					for(const char * key : listenObject->GetAllKey())
+					for(const char * key : listenObject.GetAllKey())
 					{
 						std::string address;
-						LOG_CHECK_RET_FALSE(listenObject->Get(key, address))
+						LOG_CHECK_RET_FALSE(listenObject.Get(key, address))
 						LOG_CHECK_RET_FALSE(server1->AddListen(key, address))
 					}
 					this->Add(std::move(server1));

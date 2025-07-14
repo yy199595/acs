@@ -17,21 +17,25 @@ namespace acs
 		bool LateAwake() final;
 		int Send(const std::string& func) const;
 		const std::string & Name() const { return this->mName; }
-		int Send(std::unique_ptr<rpc::Message> message) const;
+		int Send(std::unique_ptr<rpc::Message>& message) const;
 		int Send(const std::string& func, const pb::Message& request) const;
 	 public:
 		int Call(const std::string & func) const;
-		int Call(std::unique_ptr<rpc::Message> request);
+		int Call(std::unique_ptr<rpc::Message>& request);
 		int Call(const std::string & func, pb::Message * response) const;
 		int Call(const std::string & func, const pb::Message & request) const;
 		int Call(const std::string & func, const pb::Message & request, pb::Message * response);
 	public:
 		int Send(const std::string & func, const json::w::Document & request);
 		int Call(const std::string & func, const json::w::Document & request);
-		int Call(const std::string & func, const json::w::Document & request, json::r::Document * response);
+		int Call(const std::string & func, std::unique_ptr<json::r::Document> & response);
+		int Call(const std::string & func, const std::string & request, std::unique_ptr<json::r::Document> & response);
+		int Call(const std::string & func, const json::w::Document & request, std::unique_ptr<json::r::Document> & response);
 	public:
-		int LuaSend(lua_State * lua, std::unique_ptr<rpc::Message>) const;
-		int LuaCall(lua_State * lua, std::unique_ptr<rpc::Message>) const;
+		std::unique_ptr<rpc::Message> CallMethod(const std::string & func, const json::w::Document & request);
+	public:
+		int LuaSend(lua_State * lua, std::unique_ptr<rpc::Message> &) const;
+		int LuaCall(lua_State * lua, std::unique_ptr<rpc::Message> &) const;
 		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::unique_ptr<rpc::Message> &) const;
 	 public:
 		virtual bool OnInit() = 0;

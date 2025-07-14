@@ -5,6 +5,7 @@
 #include"MethodRegister.h"
 #include"Entity/Actor/App.h"
 #include"Rpc/Service/RpcService.h"
+#include"Rpc/Config/ServiceConfig.h"
 #include"Proto/Component/ProtoComponent.h"
 namespace acs
 {
@@ -29,7 +30,7 @@ namespace acs
                 LOG_ERROR("not find rpc config : {}", fullName);
                 return false;
             }
-			if(config->proto == rpc::Proto::Protobuf)
+			if(config->proto == rpc::proto::pb)
 			{
 				const std::string& request = config->request;
 				const std::string& response = config->response;
@@ -49,7 +50,7 @@ namespace acs
 		return true;
 	}
 
-	ServiceMethod * ServiceMethodRegister::GetMethod(const string& name)
+	ServiceMethod * ServiceMethodRegister::GetMethod(const std::string& name)
 	{
 		auto iter1 = std::find_if(this->mMethodMap.begin(), this->mMethodMap.end(),
 				[&name](std::unique_ptr<ServiceMethod> & method) {
@@ -67,7 +68,7 @@ namespace acs
 
 namespace acs
 {
-	HttpServiceMethod * HttpServiceRegister::GetMethod(const string& name)
+	HttpServiceMethod * HttpServiceRegister::GetMethod(const std::string& name)
 	{
 		auto iter = std::find_if(this->mHttpMethods.begin(), this->mHttpMethods.end(),
 				[&name](const std::unique_ptr<HttpServiceMethod> & method) {

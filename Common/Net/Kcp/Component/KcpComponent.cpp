@@ -89,9 +89,9 @@ namespace acs
 		}
 	}
 
-	int KcpComponent::Send(int id, rpc::Message* message) noexcept
+	int KcpComponent::Send(int id, std::unique_ptr<rpc::Message> & message) noexcept
 	{
-		if (message->GetType() == rpc::Type::Response)
+		if (message->GetType() == rpc::type::response)
 		{
 			std::string address;
 			if (!message->TempHead().Del(rpc::Header::from_addr, address))
@@ -114,35 +114,32 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	void KcpComponent::OnMessage(rpc::Message* request, rpc::Message* response) noexcept
+	void KcpComponent::OnMessage(rpc::Message* req, rpc::Message* response) noexcept
 	{
-		int code = XCode::Ok;
+		std::unique_ptr<rpc::Message> request(req);
 		switch(request->GetType())
 		{
-			case rpc::Type::Logout:
+			case rpc::type::logout:
 			{
 				std::string address;
-				code = XCode::Failure;
 				if(request->GetHead().Get(rpc::Header::from_addr, address))
 				{
 					this->mKcpServer->RemoveSession(address);
 				}
 				break;
 			}
-			case rpc::Type::Request:
-				code = this->OnRequest(request);
+			case rpc::type::request:
+				this->OnRequest(request);
 				break;
-			case rpc::Type::Response:
-				code = this->mDispatch->OnMessage(request);
+			case rpc::type::response:
+				this->mDispatch->OnMessage(request);
 				break;
 			default:
-				code = XCode::Failure;
 				break;
 		}
-		if(code != XCode::Ok) { delete request; }
 	}
 
-	int KcpComponent::OnRequest(rpc::Message* message)
+	int KcpComponent::OnRequest(std::unique_ptr<rpc::Message> & message)
 	{
 		int code = this->mDispatch->OnMessage(message);
 		if (code != XCode::Ok)
@@ -155,7 +152,7 @@ namespace acs
 				return XCode::Failure;
 			}
 			message->Body()->clear();
-			message->SetType(rpc::Type::Response);
+			message->SetType(rpc::type::response);
 			message->GetHead().Add(rpc::Header::code, code);
 			return this->Send(message->SockId(), message);
 		}

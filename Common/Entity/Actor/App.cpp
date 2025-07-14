@@ -1,5 +1,5 @@
 ﻿#include"App.h"
-
+#include "XCode/XCode.h"
 #ifndef __OS_WIN__
 #include<csignal>
 #endif
@@ -39,7 +39,7 @@ namespace acs
 {
 	App::App(int id, const std::string & name) :
 			Node(id, name), mSignal(mContext),
-			mContext(1), mStartTime(help::HighTime::NowMil())
+			mContext(1), mStartTime(help::Time::NowMil())
 	{
 		this->mLogicFps = 0;
 		this->mTickCount = 0;
@@ -51,6 +51,10 @@ namespace acs
 		this->mStartMemory = 0;
 		this->mCoroutine = nullptr;
 		this->mStatus = ServerStatus::Init;
+#ifdef __DEBUG__
+		this->mMainId = std::this_thread::get_id();
+#endif
+
 #ifdef __OS_WIN__
 		//Debug::Init();
 #endif
@@ -166,21 +170,17 @@ namespace acs
 	{
 		std::string path;
 		srand(help::HighTime::NowMil());
-		if(!os::System::GetEnv("CONFIG", path))
+		if(!os::System::GetAppEnv("CONFIG", path))
 		{
-			return XServerCode::ConfError;
+			return XCode::ConfigError;
 		}
 		if (!this->mConfig.LoadConfig(path) || !this->LoadLang())
 		{
-			return XServerCode::ConfError;
+			return XCode::ConfigError;
 		}
 		if (!this->LoadComponent())
 		{
-#ifdef __OS_WIN__
-			return getchar();
-#else
-			return XServerCode::InitError;
-#endif
+			return XCode::Failure;
 		}
 
 		long long logicStartTime = 0;
@@ -201,11 +201,11 @@ namespace acs
 		Asio::Code code;
 		int eventCount = 100;
 		long long logicRunCount = 0;
-		std::unique_ptr<json::r::Value> jsonObject;
+		json::r::Value jsonObject;
 		if (this->mConfig.Get("core", jsonObject))
 		{
-			jsonObject->Get("fps", fps);
-			jsonObject->Get("event", eventCount);
+			jsonObject.Get("fps", fps);
+			jsonObject.Get("event", eventCount);
 		}
 		std::chrono::milliseconds sleepTime(1);
 		long long logicUpdateInterval = 1000 / fps;
@@ -270,7 +270,7 @@ namespace acs
 			std::this_thread::sleep_for(sleepTime);
 		}
 		printf("========== close server ==========\n");
-		return XServerCode::Ok;
+		return XCode::Ok;
 	}
 
 	long long App::MakeGuid()
@@ -303,7 +303,7 @@ namespace acs
 	std::string App::Sign(json::w::Document& document)
 	{
 		std::string data;
-		document.Encode(&data);
+		document.Serialize(&data);
 		const std::string& key = this->mConfig.GetSecretKey();
 #ifdef __ENABLE_OPEN_SSL__
 		return jwt::Create(data, key);
@@ -384,7 +384,7 @@ namespace acs
 		{
 			timer::ElapsedTimer timer;
 			const std::string& name = dynamic_cast<Component*>(component)->GetName();
-			const long long timeId = timerComponent->DelayCall(10 * 1000, [name]()
+			const long long timeId = timerComponent->Timeout(10 * 1000, [name]()
 			{
 				LOG_FATAL("{} start time out", name);
 			});
@@ -392,7 +392,7 @@ namespace acs
 			timerComponent->CancelTimer(timeId);
 			if (timer.GetMs() > 100)
 			{
-				LOG_DEBUG("[{}ms] => {}.Start", timer.GetMs(), name);
+				LOG_DEBUG("[{}ms] => {}.Start Done", timer.GetMs(), name);
 			}
 		}
 		startComponents.clear();
@@ -404,7 +404,7 @@ namespace acs
 			timer::ElapsedTimer timer;
 			Component* component = dynamic_cast<Component*>(complete);
 			const std::string& name = dynamic_cast<Component*>(component)->GetName();
-			const long long timerId = timerComponent->DelayCall(1000 * 10, [component]()
+			const long long timerId = timerComponent->Timeout(1000 * 10, [component]()
 			{
 				LOG_ERROR("{0}.Complete call timeout", component->GetName());
 			});
@@ -421,7 +421,7 @@ namespace acs
 		completeComponents.clear();
 		this->mStatus = ServerStatus::Ready;
 		this->mStartMemory = systemInfo.use_memory;
-		long long t = help::HighTime::NowMil() - this->mStartTime;
+		long long t = help::Time::NowMil() - this->mStartTime;
 		LOG_INFO("  ===== start {} ok [{:.3f}s] =======", this->Name(), t / 1000.0f);
 
 		//VLDEnable();
@@ -429,6 +429,6 @@ namespace acs
 
 	int App::Run(const std::string& cmd)
 	{
-		return XServerCode::Ok;
+		return XCode::Ok;
 	}
 }

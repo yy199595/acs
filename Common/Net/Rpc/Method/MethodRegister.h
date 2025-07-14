@@ -5,10 +5,12 @@
 #ifndef APP_METHODREGISTER_H
 #define APP_METHODREGISTER_H
 
-#include"ServiceMethod.h"
-#include"Lua/Engine/Define.h"
-#include"Http/Method/HttpServiceMethod.h"
-#include"Entity/Component/Component.h"
+#include "ServiceMethod.h"
+#include "Lua/Engine/Define.h"
+#include "Proto/Include/Message.h"
+#include "Http/Method/HttpServiceMethod.h"
+#include "Entity/Component/Component.h"
+
 namespace acs
 {
 	class ServiceMethodRegister
@@ -31,7 +33,7 @@ namespace acs
 		}
 
 		template<typename T, typename T1>
-		inline std::enable_if_t<std::is_base_of<Message, T1>::value, bool>
+		inline std::enable_if_t<std::is_base_of<pb::Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType2<T, T1> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
@@ -39,7 +41,7 @@ namespace acs
 		}
 
 		template<typename T, typename T1>
-		inline std::enable_if_t<std::is_base_of<Message, T1>::value, bool>
+		inline std::enable_if_t<std::is_base_of<pb::Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType22<T, T1> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
@@ -47,8 +49,8 @@ namespace acs
 		}
 
 		template<typename T, typename T1, typename T2>
-		inline std::enable_if_t<std::is_base_of<Message, T1>::value
-		                      && std::is_base_of<Message, T1>::value, bool>
+		inline std::enable_if_t<std::is_base_of<pb::Message, T1>::value
+		                      && std::is_base_of<pb::Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType3<T, T1, T2> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
@@ -56,8 +58,8 @@ namespace acs
 		}
 
 		template<typename T, typename T1, typename T2>
-		inline std::enable_if_t<std::is_base_of<Message, T1>::value
-		                      && std::is_base_of<Message, T1>::value, bool>
+		inline std::enable_if_t<std::is_base_of<pb::Message, T1>::value
+		                      && std::is_base_of<pb::Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType33<T, T1, T2> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
@@ -65,7 +67,7 @@ namespace acs
 		}
 
 		template<typename T, typename T1>
-		inline std::enable_if_t<std::is_base_of<Message, T1>::value, bool>
+		inline std::enable_if_t<std::is_base_of<pb::Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType4<T, T1> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
@@ -73,7 +75,7 @@ namespace acs
 		}
 
 		template<typename T, typename T1>
-		inline std::enable_if_t<std::is_base_of<Message, T1>::value, bool>
+		inline std::enable_if_t<std::is_base_of<pb::Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType44<T, T1> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
@@ -81,45 +83,80 @@ namespace acs
 		}
 
 		template<typename T>
-		bool Bind(std::string name, ServiceMethodType6<T> func, const std::string key)
+		inline bool Bind(std::string name, ServiceMethodType6<T> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
 			return this->AddMethod(std::make_unique<ServiceMethod6<T>>(name, component, func, key));
 		}
 
 		template<typename T>
-		bool Bind(std::string name, ServiceMethodType7<T> func, const std::string key)
+		inline bool Bind(std::string name, ServiceMethodType7<T> func, const std::string key)
 		{
 			T* component = this->mComponent->Cast<T>();
 			return this->AddMethod(std::make_unique<ServiceMethod7<T>>(name, component, func, key));
 		}
 
 		template<typename T>
-		bool Bind(std::string name, ServiceMethodType8<T> func, const std::string key)
+		inline bool Bind(std::string name, ServiceMethodType8<T> func, const std::string key)
 		{
 			T* component = this->mComponent->Cast<T>();
 			return this->AddMethod(std::make_unique<ServiceMethod8<T>>(name, component, func, key));
 		}
 
 		template<typename T>
-		bool Bind(std::string name, ServiceMethodType9<T> func, const std::string key)
+		inline bool Bind(std::string name, ServiceMethodType88<T> func, const std::string key)
+		{
+			T* component = this->mComponent->Cast<T>();
+			return this->AddMethod(std::make_unique<ServiceMethod88<T>>(name, component, func, key));
+		}
+
+		template<typename T>
+		inline bool Bind(std::string name, ServiceMethodType9<T> func, const std::string key)
 		{
 			T* component = this->mComponent->Cast<T>();
 			return this->AddMethod(std::make_unique<ServiceMethod9<T>>(name, component, func, key));
 		}
 
 		template<typename T>
-		bool Bind(std::string name, ServiceMethodType10<T> func, const std::string key)
+		inline bool Bind(std::string name, ServiceMethodType99<T> func, const std::string key)
+		{
+			T* component = this->mComponent->Cast<T>();
+			return this->AddMethod(std::make_unique<ServiceMethod99<T>>(name, component, func, key));
+		}
+
+		template<typename T>
+		inline bool Bind(std::string name, ServiceMethodType10<T> func, const std::string key)
 		{
 			T* component = this->mComponent->Cast<T>();
 			return this->AddMethod(std::make_unique<ServiceMethod10<T>>(name, component, func, key));
 		}
 
+		template<typename T>
+		inline bool Bind(std::string name, ServiceMethodType12<T> func, const std::string key)
+		{
+			T* component = this->mComponent->Cast<T>();
+			return this->AddMethod(std::make_unique<ServiceMethod12<T>>(name, component, func, key));
+		}
+
 		template<typename T, typename T1>
-		bool Bind(std::string name, ServiceMethodType34<T, T1> func, const std::string key)
+		inline bool Bind(std::string name, ServiceMethodType34<T, T1> func, const std::string key)
 		{
 			T* component = this->mComponent->Cast<T>();
 			return this->AddMethod(std::make_unique<ServiceMethod34<T, T1>>(name, component, func, key));
+		}
+
+		template<typename T, typename T1>
+		inline bool Bind(std::string name, ServiceMethodType101<T> func, const std::string key)
+		{
+			T* component = this->mComponent->Cast<T>();
+			return this->AddMethod(std::make_unique<ServiceMethod101<T>>(name, component, func, key));
+		}
+
+		template<typename T>
+		inline bool Bind(std::string name, ServiceMethodType102<T> func, const std::string key)
+		{
+			T* component = this->mComponent->Cast<T>();
+			return this->AddMethod(std::make_unique<ServiceMethod102<T>>(name, component, func, key));
 		}
 
 		inline bool Has(const std::string & name)

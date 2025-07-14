@@ -5,10 +5,10 @@
 #include "MysqlClient.h"
 
 #include "Util/Tools/String.h"
-#include "Util/Crypt/sha1.h"
 #include "Util/File/FileHelper.h"
 #include "Core/Thread/ThreadSync.h"
 #include "XCode/XCode.h"
+#include "Util/File/DirectoryHelper.h"
 
 namespace mysql
 {
@@ -47,14 +47,6 @@ namespace mysql
 		asio::post(context, [this, &threadSync, self]
 		{
 			int code = this->Auth(true);
-			if(code == XCode::Ok && !this->mConfig.script.empty())
-			{
-				std::string sql;
-				if(help::fs::ReadTxtFile(this->mConfig.script, sql))
-				{
-					this->SyncRun(sql, this->mResponse);
-				}
-			}
 			threadSync.SetResult(code);
 		});
 		return threadSync.Wait();
@@ -71,6 +63,25 @@ namespace mysql
 		});
 	}
 
+	bool Client::InvokeCompileSql()
+	{
+		if(this->mMessage != nullptr)
+		{
+			return false;
+		}
+#ifdef ONLY_MAIN_THREAD
+		return this->OnCompileSql();
+#else
+		custom::ThreadSync<bool> threadSync;
+		Asio::Context& context = this->mSocket->GetContext();
+		asio::post(context, [&threadSync, self = this->shared_from_this(), this]
+		{
+			threadSync.SetResult(this->OnCompileSql());
+		});
+		return threadSync.Wait();
+#endif
+
+	}
 
 	void Client::Send(std::unique_ptr<Request> request)
 	{
@@ -85,32 +96,49 @@ namespace mysql
 			}
 			req->SetIndex(0);
 			this->mMessage.reset(req);
-			this->Write(*this->mMessage);
+			this->Send(*this->mMessage);
 		});
 	}
 
-	bool Client::SyncReadResponse(std::string& response)
+	bool Client::OnCompileSql()
 	{
-		size_t size = 0;
-		if (!this->RecvSync(4, size))
+		std::vector<std::string> filePaths;
+		const std::string& dir = this->mConfig.script;
+		if (help::dir::GetFilePaths(dir, ".sql", filePaths) > 0)
 		{
-			return false;
+			for (const std::string& path: filePaths)
+			{
+				std::vector<std::string> compileSql;
+				if (!help::fs::ReadTxtFile(path, compileSql))
+				{
+					return false;
+				}
+				for (const std::string& sql: compileSql)
+				{
+					this->SyncRun(sql, this->mResponse);
+					if (this->mResponse.HasError())
+					{
+						LOG_ERROR("{}", sql);
+						LOG_ERROR("{}", this->mResponse.GetBuffer());
+						return false;
+					}
+				}
+			}
 		}
-		char buffer[4] = { 0 };
-		std::istream stream(&this->mRecvBuffer);
-		stream.readsome(buffer, sizeof(buffer));
-		this->mIndex = (unsigned char)buffer[3];
-		int length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16);
-		if (!this->RecvSync(length, size))
-		{
-			return false;
-		}
-		response.resize(length);
-		stream.readsome((char*)response.data(), length);
 		return true;
 	}
 
-	bool Client::SyncReadResponse(mysql::Response& response)
+	void Client::Send(mysql::Request& request)
+	{
+		//const std::string & sql = request.Get();
+		// if(!sql.empty())
+		// {
+		// 	this->SyncRun(sql, this->mResponse);
+		// }
+		this->Write(request);
+	}
+
+	bool Client::SyncReadOnePacket(mysql::Response& response)
 	{
 		size_t size = 0;
 		response.Clear();
@@ -140,16 +168,20 @@ namespace mysql
 			Asio::Code error;
 			if (!this->ConnectSync(error))
 			{
-				return XCode::ConnectDatabaseFail;
+				return XCode::NetConnectFailure;
 			}
 		}
 
-		std::string response1;
-		if (!this->SyncReadResponse(response1))
+		if (!this->SyncReadOnePacket(this->mResponse))
 		{
 			return XCode::NetReadFailure;
 		}
-		if (!this->mHandshake.OnDecode(response1))
+		if(this->mResponse.GetPackageCode() == mysql::PACKAGE_OK)
+		{
+			CONSOLE_LOG_ERROR("{}", this->mResponse.GetBuffer());
+			return XCode::Failure;
+		}
+		if (!this->mHandshake.OnDecode(this->mResponse))
 		{
 			return XCode::PasswordAuthFail;
 		}
@@ -172,47 +204,120 @@ namespace mysql
 		}
 		if (!this->InitDataBase())
 		{
-			return XCode::CreateDatabaseFail;
-		}
-		if (this->mMessage == nullptr)
-		{
-			std::shared_ptr<tcp::Client> self = this->shared_from_this();
-			asio::post(this->mMain, [self, this, id = this->mClientID]()
-			{
-				this->mComponent->OnConnectOK(id);
-			});
+			return XCode::DataBaseCreateFailure;
 		}
 		return XCode::Ok;
 	}
+
+	bool Client::SendPacket(unsigned char* message, size_t size, unsigned char sequence_id)
+	{
+		std::vector<uint8_t> final_packet;
+		std::array<uint8_t, 3> len_packet = mysql::encode(size);
+		{
+			final_packet.emplace_back(len_packet[0]);
+			final_packet.emplace_back(len_packet[1]);
+			final_packet.emplace_back(len_packet[2]);
+			final_packet.emplace_back(sequence_id);
+		}
+		for(size_t index = 0; index < size; index++)
+		{
+			final_packet.emplace_back(message[index]);
+		}
+		return this->SendSync((char*)final_packet.data(), final_packet.size());
+	}
+
+//	int Client::OnMoreAuth(unsigned char status)
+//	{
+//		const std::string & password = this->mConfig.password;
+//		switch(status)
+//		{
+//			case 0x03: //发送明文密码
+//			{
+//				std::string plain = password + '\0';
+//				unsigned char id = this->mResponse.GetIndex() + 1;
+//				if(!this->SendPacket((unsigned char*)plain.data(), plain.size(), id))
+//				{
+//					return XCode::SendMessageFail;
+//				}
+//				break;
+//			}
+//			case 0x04: //rsa加密
+//			{
+//				std::vector<uint8_t> requestPubkey { 0x02 };
+//				unsigned char id = this->mResponse.GetIndex() + 1;
+//				if(!this->SendPacket(requestPubkey.data(), requestPubkey.size(), id))
+//				{
+//					return XCode::SendMessageFail;
+//				}
+//				if (!this->SyncReadOnePacket(this->mResponse))
+//				{
+//					return XCode::NetReadFailure;
+//				}
+//				std::string pubkey_data = this->mResponse.GetBuffer();
+//				const std::string scramble = this->mHandshake.salt;
+//				BIO* bio = BIO_new_mem_buf(pubkey_data.data(), pubkey_data.size());
+//				RSA* rsa = PEM_read_bio_RSA_PUBKEY(bio, nullptr, nullptr, nullptr);
+//				BIO_free(bio);
+//
+//				if (!rsa) {
+//					return XCode::PasswordAuthFail;
+//				}
+//
+//				std::string plain = password + '\0';
+//				for (size_t i = 0; i < plain.size(); ++i) {
+//					plain[i] ^= scramble[i % scramble.size()];
+//				}
+//
+//				unsigned char encrypted[256]; // 2048位公钥
+//				int len = RSA_public_encrypt(
+//						plain.size(), (const unsigned char*)plain.data(),
+//						encrypted, rsa, RSA_PKCS1_OAEP_PADDING);
+//				if (len <= 0) {
+//					return XCode::PasswordAuthFail;
+//				}
+//				RSA_free(rsa);
+//				id = this->mResponse.GetIndex() + 1;
+//				if(!this->SendPacket(encrypted, len, id))
+//				{
+//					return XCode::SendMessageFail;
+//				}
+//				break;
+//			}
+//			default:
+//				return XCode::Failure;
+//		}
+//		return XCode::Ok;
+//	}
 
 	int Client::Login(const mysql::LoginRequest& request)
 	{
 		std::vector<uint8_t> packet;
 		if (request.Encode(packet) != XCode::Ok)
 		{
+			CONSOLE_LOG_ERROR("{}", request.authPlugin);
 			return XCode::AuthPluginNonsupport;
 		}
 		uint8_t sequence_id = 1; // 登录包的 sequence_id 必须是 1
-		uint32_t length = packet.size();
-
-		std::vector<uint8_t> final_packet = mysql::encode(length);
-		final_packet.emplace_back(sequence_id);
-		//final_packet.emplace_back(mysql::cmd::CONNECT);
-
-		final_packet.insert(final_packet.end(), packet.begin(), packet.end());
-
-		if (!this->SendSync((char*)final_packet.data(), final_packet.size()))
+		if(!this->SendPacket(packet.data(), packet.size(), sequence_id))
 		{
-			return XCode::NetSendFailure;
+			return XCode::SendMessageFail;
 		}
+		unsigned char code = mysql::PACKAGE_OK;
 		do
 		{
-			if (!this->SyncReadResponse(this->mResponse))
+			if (!this->SyncReadOnePacket(this->mResponse))
 			{
 				return XCode::NetReadFailure;
 			}
-		} while (this->mResponse.GetPackageCode() == mysql::PACKAGE_MORE);
-		return this->mResponse.GetPackageCode() == mysql::PACKAGE_OK ? XCode::Ok : XCode::Failure;
+			code = this->mResponse.GetPackageCode();
+			if(code == mysql::PACKAGE_ERR)
+			{
+				CONSOLE_LOG_ERROR("{}", this->mResponse.GetBuffer())
+				return XCode::PasswordAuthFail;
+			}
+
+		} while (code == mysql::PACKAGE_MORE);
+		return code == mysql::PACKAGE_OK ? XCode::Ok : XCode::Failure;
 	}
 
 	bool Client::SyncRun(const std::string& sql, mysql::Response& response)
@@ -222,7 +327,7 @@ namespace mysql
 		{
 			return false;
 		}
-		if (!this->SyncReadResponse(response))
+		if (!this->SyncReadOnePacket(response))
 		{
 			return false;
 		}
@@ -265,9 +370,18 @@ namespace mysql
 		}
 		else if (this->Auth(false) == XCode::Ok)
 		{
-			if (this->mMessage != nullptr)
+			this->OnCompileSql();
+			if (this->mMessage == nullptr)
 			{
-				this->Write(*this->mMessage);
+				std::shared_ptr<tcp::Client> self = this->shared_from_this();
+				asio::post(this->mMain, [self, this, id = this->mClientID]()
+				{
+					this->mComponent->OnConnectOK(id);
+				});
+			}
+			else
+			{
+				this->Send(*this->mMessage);
 			}
 			return;
 		}
@@ -311,131 +425,167 @@ namespace mysql
 		this->OnReceiveMessage(readStream, size, code);
 	}
 
-	std::unique_ptr<mysql::Response> Client::ReadResponse()
+	std::unique_ptr<mysql::Response> Client::ReadAllPacket()
 	{
+		this->mBuffer.clear();
 		std::unique_ptr<mysql::Response> response = std::make_unique<mysql::Response>();
 		{
-			this->SyncReadResponse(*response);
-			int code = response->GetPackageCode();
-			if (code == mysql::PACKAGE_ERR || code == mysql::PACKAGE_OK)
+			this->SyncReadOnePacket(*response);
+			unsigned char code = response->GetPackageCode();
+			if (code == mysql::PACKAGE_ERR || code == mysql::PACKAGE_EOF || code == mysql::PACKAGE_OK)
 			{
 				return response;
 			}
-
-			this->mFields.clear();
 			unsigned int pos = 0;
-			unsigned int count = response->DecodeColumnCount(pos);
-			mysql::Result& mysqlResult = response->GetResult();
-			for (int index = 0; index < count; index++)
+			this->mFields.clear();
+			unsigned int columnCount = response->DecodeColumnCount(pos);
+			for (unsigned int index = 0; index < columnCount; index++)
 			{
 				pos = 0;
-				this->SyncReadResponse(this->mResponse);
+				this->SyncReadOnePacket(this->mResponse);
 				{
 					mysql::FieldInfo fieldInfo;
-					std::string catalog = this->mResponse.ReadString(pos);
-					std::string schema = this->mResponse.ReadString(pos);
-					std::string table = this->mResponse.ReadString(pos);
-					std::string org_table = this->mResponse.ReadString(pos);
-					fieldInfo.name = this->mResponse.ReadString(pos);
-					std::string org_name = this->mResponse.ReadString(pos);
-					pos += 7;
-					fieldInfo.type = this->mResponse.ReadChar(pos);
-					unsigned short flags = this->mResponse.ReadShort(pos);
-					fieldInfo.decimals = this->mResponse.ReadChar(pos);
+					this->mResponse.ReadField(pos, fieldInfo);
 					this->mFields.emplace_back(fieldInfo);
 				}
 			}
-
-			std::string json;
-			this->SyncReadResponse(this->mResponse);
-			if (this->mResponse.GetPackageCode() == mysql::PACKAGE_EOF)
+			while (columnCount > 0 && this->SyncReadOnePacket(this->mResponse))
 			{
-				return response;
-			}
-			while (this->mResponse.GetPackageCode() != mysql::PACKAGE_EOF)
-			{
-				pos = 0;
-				if(this->mResponse.GetPackageCode() != mysql::PACKAGE_OK)
+				code = this->mResponse.GetPackageCode();
+				const std::string & buffer = this->mResponse.GetBuffer();
+				if ((code == mysql::PACKAGE_OK && buffer.empty()) || code == mysql::PACKAGE_EOF)
 				{
-					json::w::Document document;
-					for (const mysql::FieldInfo& fieldInfo: this->mFields)
-					{
-						std::string value = this->mResponse.ReadString(pos);
-						switch (fieldInfo.type)
-						{
-							case mysql::field::MYSQL_TYPE_TINY:
-							case mysql::field::MYSQL_TYPE_SHORT:
-							case mysql::field::MYSQL_TYPE_INT24:
-							case mysql::field::MYSQL_TYPE_YEAR:
-							case mysql::field::MYSQL_TYPE_LONG:
-							case mysql::field::MYSQL_TYPE_LONGLONG:
-							case mysql::field::MYSQL_TYPE_NEWDECIMAL:
-							{
-								long long number = 0;
-								if (!value.empty())
-								{
-									number = std::stoll(value);
-								}
-								document.Add(fieldInfo.name.c_str(), number);
-								break;
-							}
-							case mysql::field::MYSQL_TYPE_FLOAT:
-							case mysql::field::MYSQL_TYPE_DOUBLE:
-							{
-								double number = 0;
-								if (!value.empty())
-								{
-									number = std::stod(value);
-								}
-								document.Add(fieldInfo.name.c_str(), number);
-								break;
-							}
-							case mysql::field::MYSQL_TYPE_JSON:
-							{
-								document.AddObject(fieldInfo.name.c_str(), value);
-								break;
-							}
-							case mysql::field::MYSQL_TYPE_NULL:
-							{
-								document.AddNull(fieldInfo.name.c_str());
-								break;
-							}
-							default:
-								document.Add(fieldInfo.name.c_str(), value);
-								break;
-						}
-					}
-					document.Encode(&json);
-					mysqlResult.contents.emplace_back(json);
+					break;
 				}
-				this->SyncReadResponse(this->mResponse);
+				json::w::Document document;
+				this->OnTextMessage(document);
+
+				size_t count = 0;
+				std::unique_ptr<char> json;
+				if(document.Serialize(json, count))
+				{
+					response->contents.emplace_back(json.get(), count);
+				}
 			}
 		}
 		return response;
 	}
 
+	void Client::OnTextMessage(json::w::Document& document)
+	{
+		unsigned int pos = 0;
+		for (const mysql::FieldInfo& fieldInfo: this->mFields)
+		{
+			std::string value = this->mResponse.ReadString(pos);
+			switch (fieldInfo.type)
+			{
+				case mysql::field::MYSQL_TYPE_TINY:
+				{
+					int number = 0;
+					if (!value.empty())
+					{
+						number = std::stoi(value);
+					}
+					document.Add(fieldInfo.name.c_str(), number == 1);
+					break;
+				}
+				case mysql::field::MYSQL_TYPE_SHORT:
+				case mysql::field::MYSQL_TYPE_INT24:
+				case mysql::field::MYSQL_TYPE_YEAR:
+				case mysql::field::MYSQL_TYPE_LONG:
+				case mysql::field::MYSQL_TYPE_LONGLONG:
+				case mysql::field::MYSQL_TYPE_NEWDECIMAL:
+				{
+					long long number = 0;
+					if (!value.empty())
+					{
+						number = std::stoll(value);
+					}
+					document.Add(fieldInfo.name.c_str(), number);
+					break;
+				}
+				case mysql::field::MYSQL_TYPE_FLOAT:
+				case mysql::field::MYSQL_TYPE_DOUBLE:
+				{
+					double number = 0;
+					if (!value.empty())
+					{
+						number = std::stod(value);
+					}
+					document.Add(fieldInfo.name.c_str(), number);
+					break;
+				}
+				case mysql::field::MYSQL_TYPE_JSON:
+				{
+					document.AddObject(fieldInfo.name.c_str(), value);
+					break;
+				}
+				case mysql::field::MYSQL_TYPE_NULL:
+				{
+					document.AddNull(fieldInfo.name.c_str());
+					break;
+				}
+				default:
+					document.Add(fieldInfo.name.c_str(), value);
+					break;
+			}
+		}
+	}
+
 	void Client::OnReceiveMessage(std::istream& readStream, size_t size, const asio::error_code&)
 	{
-		std::unique_ptr<mysql::Response> response = this->ReadResponse();
+		unsigned int affectedCount = 0;
+		std::unique_ptr<mysql::Response> response = this->ReadAllPacket();
+		if (this->mMessage != nullptr && this->mMessage->Count() > 1)
 		{
-			
-#ifdef ONLY_MAIN_THREAD
-			std::unique_ptr<mysql::Request> request = std::move(this->mMessage);
-			this->mComponent->OnMessage(this->mClientID, request.get(), response.release());
-#else
-			mysql::Request* req = nullptr;
-			if (this->mMessage != nullptr)
+			for (size_t index = 0; index < this->mMessage->Count() - 1; index++)
 			{
-				req = this->mMessage.release();
-			}
-			std::shared_ptr<tcp::Client> self = this->shared_from_this();
-			asio::post(this->mMain, [this, self, req, resp = response.release()]
+				std::unique_ptr<mysql::Response> response1 = this->ReadAllPacket();
+				if(response1->GetPackageCode() == mysql::PACKAGE_ERR)
 				{
-					this->mComponent->OnMessage(this->mClientID, req, resp);
-					delete req;
-				});
-#endif
-			
+					LOG_ERROR("{}", response1->GetBuffer())
+					response->error.emplace_back(response1->GetBuffer());
+				}
+				else
+				{
+					if (response1->ok.mAffectedRows > 0)
+					{
+						affectedCount += response1->ok.mAffectedRows;
+					}
+					if(!response1->contents.empty())
+					{
+						response->contents.insert(response->contents.begin(),
+								response1->contents.begin(), response1->contents.end());
+					}
+				}
+			}
 		}
+		if(response->GetPackageCode() == mysql::PACKAGE_ERR)
+		{
+			response->error.emplace_back(response->GetBuffer());
+		}
+		if(this->mMessage->IsEnableCommit())
+		{
+			std::string sql = response->error.empty()
+						? "COMMIT" : "ROLLBACK";
+			this->SyncRun(sql, this->mResponse); //有错误就回滚事务
+		}
+		response->ok.mAffectedRows += affectedCount;
+		mysql::Request* req = nullptr;
+		if (this->mMessage != nullptr)
+		{
+			req = this->mMessage.release();
+		}
+#ifdef ONLY_MAIN_THREAD
+		this->mComponent->OnMessage(this->mClientID, req, response.release());
+#else
+
+		std::shared_ptr<tcp::Client> self = this->shared_from_this();
+		asio::post(this->mMain, [this, self, req, resp = response.release()]
+		{
+			this->mComponent->OnMessage(this->mClientID, req, resp);
+		});
+#endif
+
 	}
 }

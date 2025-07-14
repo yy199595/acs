@@ -79,7 +79,7 @@ namespace acs
 		{
 			return LuaActor::LuaPushCode(lua, code);
 		}
-		return targetActor->LuaSend(lua, std::move(message));
+		return targetActor->LuaSend(lua, message);
 	}
 
 	int LuaActor::Call(lua_State* lua)
@@ -94,7 +94,7 @@ namespace acs
 		}
 
 		Actor* targetActor = nullptr;
-		const std::string func = luaL_checkstring(lua, 3);
+		const std::string func(luaL_checkstring(lua, 3));
 		if (lua_isnil(lua, 2))
 		{
 			targetActor = App::Inst();
@@ -120,7 +120,7 @@ namespace acs
 		{
 			return LuaActor::LuaPushCode(lua, code);
 		}
-		return targetActor->LuaCall(lua, std::move(message));
+		return targetActor->LuaCall(lua, message);
 	}
 
 	int LuaApp::GetConfig(lua_State* lua)

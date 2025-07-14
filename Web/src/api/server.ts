@@ -3,7 +3,7 @@ import request from '../utils/request';
 export const RequestAllList = () => {
     return request({
         method: "get",
-        url: "./admin/all_info",
+        url: "./admin/all",
     });
 }
 

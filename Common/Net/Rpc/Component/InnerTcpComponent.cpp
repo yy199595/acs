@@ -27,27 +27,26 @@ namespace acs
 		return true;
 	}
 
-    void InnerTcpComponent::OnMessage(rpc::Message * message, rpc::Message *) noexcept
+    void InnerTcpComponent::OnMessage(rpc::Message * request, rpc::Message *) noexcept
 	{
-		int code = XCode::Ok;
-		message->SetNet(rpc::Net::Tcp);
+    	std::unique_ptr<rpc::Message> message(request);
+		message->SetNet(rpc::net::tcp);
 		switch (message->GetType())
 		{
-			case rpc::Type::Logout:
-				code = XCode::Failure;
+			case rpc::type::logout:
 				this->StartClose(message->SockId());
 				break;
-			case rpc::Type::Request:
+			case rpc::type::request:
 				if(message->GetRpcId() > 0)
 				{
 					this->mWaitCount++;
 				}
-				code = this->OnRequest(message);
+				this->OnRequest(message);
 				break;
-			case rpc::Type::Forward:
-				code = this->OnForward(message);
+			case rpc::type::forward:
+				this->OnForward(message);
 				break;
-			case rpc::Type::Response:
+			case rpc::type::response:
 			{
 
 //#ifdef __DEBUG__
@@ -70,25 +69,20 @@ namespace acs
 				{
 					this->mWaitCount++;
 				}
-				code = this->mDispatch->OnMessage(message);
+				this->mDispatch->OnMessage(message);
 				break;
 			}
-			case rpc::Type::Client:
-			case rpc::Type::Broadcast:
-				code = this->mDispatch->OnMessage(message);
+			case rpc::type::client:
+			case rpc::type::broadcast:
+				this->mDispatch->OnMessage(message);
 				break;
 			default:
-				code = XCode::UnKnowPacket;
 			LOG_FATAL("unknown message type : {} data:{}", message->GetType(), message->ToString());
 				break;
 		}
-		if(code != XCode::Ok)
-		{
-			delete message;
-		}
 	}
 
-	int InnerTcpComponent::OnForward(rpc::Message* message) noexcept
+	int InnerTcpComponent::OnForward(std::unique_ptr<rpc::Message> & message) noexcept
 	{
 		int target = 0;
 		int code = XCode::Ok;
@@ -99,7 +93,7 @@ namespace acs
 				code = XCode::CallArgsError;
 				break;
 			}
-			message->SetType(rpc::Type::Request);
+			message->SetType(rpc::type::request);
 			message->GetHead().Add("#", message->SockId());
 			if(this->Send(target, message) != XCode::Ok)
 			{
@@ -110,24 +104,22 @@ namespace acs
 		while(false);
 		if(code != XCode::Ok)
 		{
-			message->SetType(rpc::Type::Response);
+			message->SetType(rpc::type::response);
 			return this->Send(message->SockId(), message);
 		}
 		return XCode::Ok;
 	}
 
-    void InnerTcpComponent::OnSendFailure(int, rpc::Message * message)
+    void InnerTcpComponent::OnSendFailure(int, rpc::Message * req)
     {
-        if (message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
+    	std::unique_ptr<rpc::Message> message(req);
+		//LOG_DEBUG("send fail => {}", message->ToString())
+        if (message->GetType() == rpc::type::request && message->GetRpcId() > 0)
 		{
-			message->SetType(rpc::Type::Response);
+			message->SetType(rpc::type::response);
 			message->GetHead().Add(rpc::Header::code, XCode::NetWorkError);
-			if (this->mDispatch->OnMessage(message) == XCode::Ok)
-			{
-				return;
-			}
+			this->mDispatch->OnMessage(message);
 		}
-		delete message;
     }
 
 	bool InnerTcpComponent::OnListen(tcp::Socket * socket) noexcept
@@ -190,9 +182,8 @@ namespace acs
 		return tcpClient.get();
 	}
 
-    int InnerTcpComponent::Send(int id, rpc::Message * message) noexcept
+    int InnerTcpComponent::Send(int id, std::unique_ptr<rpc::Message> & message) noexcept
     {
-
         rpc::InnerTcpClient * clientSession = this->GetClient(id);
 		if(clientSession == nullptr)
 		{
@@ -211,7 +202,7 @@ namespace acs
 		}
     }
 
-	int InnerTcpComponent::OnRequest(rpc::Message * message) noexcept
+	int InnerTcpComponent::OnRequest(std::unique_ptr<rpc::Message>& message) noexcept
 	{
 		int code = this->mDispatch->OnMessage(message);
 		if (code != XCode::Ok)
@@ -224,7 +215,7 @@ namespace acs
 				return XCode::DeleteData;
 			}
 			message->Body()->clear();
-			message->SetType(rpc::Type::Response);
+			message->SetType(rpc::type::response);
 			message->GetHead().Add(rpc::Header::code, code);
 			return this->Send(message->SockId(), message);
 		}

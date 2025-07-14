@@ -25,62 +25,61 @@ namespace mongo
 		MongoFactory::New(tab, "count", mongoRequest);
 		if(json.IsObject() && json.MemberCount() > 0)
 		{
-			bson::Writer::Document filter;
+			bson::w::Document filter;
 			if (!filter.FromByJson(json))
 			{
 				return nullptr;
 			}
-			bson::Writer::Document mode;
+			bson::w::Document mode;
 			mode.Add("mode", "secondaryPreferred");
 			mongoRequest->document.Add("$readPreference", mode);
 			mongoRequest->document.Add("filter", filter);
 		}
 		return mongoRequest;
 	}
-	std::unique_ptr<Request> MongoFactory::Insert(const std::string& table, bson::Writer::Document& document)
+	std::unique_ptr<Request> MongoFactory::Insert(const std::string& table, bson::w::Document& document)
 	{
 		std::unique_ptr<Request> mongoRequest;
 		MongoFactory::New(table, "insert", mongoRequest);
 		{
-			bson::Writer::Array documents(document);
-			mongoRequest->document.Add("documents", documents);
+			mongoRequest->Insert(document);
 		}
 		return mongoRequest;
 	}
 
-	std::unique_ptr<Request> MongoFactory::Delete(const std::string& table, bson::Writer::Document& document, int limit)
+	std::unique_ptr<Request> MongoFactory::Delete(const std::string& table, bson::w::Document& document, int limit)
 	{
 		std::unique_ptr<Request> mongoRequest;
 		MongoFactory::New(table, "delete", mongoRequest);
 		{
-			bson::Writer::Document delDocument;
+			bson::w::Document delDocument;
 			{
 				delDocument.Add("limit", limit);
 				delDocument.Add("q", document);
 			}
-			bson::Writer::Array documents(delDocument);
+			bson::w::Document documents(delDocument);
 			mongoRequest->document.Add("deletes", documents);
 		}
 		return mongoRequest;
 	}
 
 	std::unique_ptr<Request> MongoFactory::Update(const std::string& table,
-			bson::Writer::Document& select, bson::Writer::Document& update,const char* tag, bool upsert, bool multi)
+			bson::w::Document& select, bson::w::Document& update,const char* tag, bool upsert, bool multi)
 	{
 		std::unique_ptr<Request> mongoRequest;
 		MongoFactory::New(table, "update", mongoRequest);
 		{
-			bson::Writer::Document updateDocument;
+			bson::w::Document updateDocument;
 			{
 				updateDocument.Add(tag, update);
 			}
-			bson::Writer::Document updateInfo;
+			bson::w::Document updateInfo;
 			updateInfo.Add("multi", multi); //默认更新一个文档
 			updateInfo.Add("upsert", upsert); //true不存在插入
 			updateInfo.Add("u", updateDocument);
 			updateInfo.Add("q", select);
 
-			bson::Writer::Array updates(updateInfo);
+			bson::w::Document updates(updateInfo);
 			mongoRequest->document.Add("updates", updates);
 		}
 		return mongoRequest;
@@ -88,7 +87,7 @@ namespace mongo
 
 	std::unique_ptr<Request> MongoFactory::Query(const std::string& tab, const json::r::Document & json, int limit, int skip)
 	{
-		bson::Writer::Document filter;
+		bson::w::Document filter;
 		std::unique_ptr<Request> mongoRequest;
 		MongoFactory::New(tab, "find", mongoRequest);
 		if(json.IsObject() && json.MemberCount() > 0)
@@ -98,7 +97,7 @@ namespace mongo
 				return nullptr;
 			}
 		}
-		bson::Writer::Document mode;
+		bson::w::Document mode;
 		mode.Add("mode", "secondaryPreferred");
 
 		mongoRequest->document.Add("$readPreference", mode);
@@ -138,18 +137,16 @@ namespace mongo
 	{
 		std::unique_ptr<Request> mongoRequest;
 		MongoFactory::New(table, "createIndexes", mongoRequest);
-		bson::Writer::Array documentArray1;
 
-		bson::Writer::Document key;
-		bson::Writer::Document document;
+		bson::w::Document key;
+		bson::w::Document document;
 		key.Add(name.c_str(), sort); //1升序  -1降序
 
 		document.Add("key", key);
 		document.Add("unique", unique); //是否为唯一索引
 		document.Add("name", name.c_str());
 
-		documentArray1.Add(document);
-
+		bson::w::Document documentArray1(document);
 		mongoRequest->document.Add("indexes", documentArray1);
 		return mongoRequest;
 	}

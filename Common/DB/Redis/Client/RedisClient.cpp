@@ -13,8 +13,7 @@ namespace redis
 	Client::Client(int id, Config  config, Component* com, Asio::Context& io)
 			: tcp::Client(1024 * 1024), mClientId(id), mConfig(std::move(config)), mComponent(com), mMainContext(io)
 	{
-		this->mRequest = nullptr;
-		this->mResponse = nullptr;
+
 	}
 
 	void Client::StartReceive()
@@ -37,7 +36,16 @@ namespace redis
 			return true;
 		}
 		this->SetSocket(socket);
-		return this->Auth(true);
+		if(this->Auth(true))
+		{
+			json::r::Document jsonDocument;
+			if(this->Info(jsonDocument))
+			{
+				jsonDocument.Get("Server", "redis_version", this->mVersion);
+			}
+			return true;
+		}
+		return false;
 #else
 		std::shared_ptr<tcp::Client> self = this->shared_from_this();
 		if(socket == nullptr)
@@ -55,15 +63,61 @@ namespace redis
 		Asio::Context & context = this->mSocket->GetContext();
 		asio::post(context, [&threadSync, self, this, &sock]
 		{
-			if (this->Auth(true))
+			bool result = this->Auth(true);
+			if(result)
 			{
-				threadSync.SetResult(true);
-				return;
+				json::r::Document jsonDocument;
+				if(this->Info(jsonDocument))
+				{
+					jsonDocument.Get("Server", "redis_version", this->mVersion);
+				}
 			}
-			threadSync.SetResult(false);
+			threadSync.SetResult(result);
 		});
 		return threadSync.Wait();
 #endif
+	}
+
+	bool Client::Info(json::r::Document & readDocument)
+	{
+		std::unique_ptr<redis::Request> request = std::make_unique<redis::Request>("INFO");
+
+		std::unique_ptr<redis::Response> response = this->ReadResponse(request);
+		if (response->HasError() || !response->element.IsString())
+		{
+			return false;
+		}
+		std::string line;
+		json::w::Document document;
+		std::stringstream buffer(response->element.message);
+		while (std::getline(buffer, line))
+		{
+			if (line.back() == '\r')
+			{
+				line.pop_back();
+			}
+			if (line.front() == '#')
+			{
+				std::string key = line.substr(2);
+				std::unique_ptr<json::w::Value> jsonObject = document.AddObject(key.c_str());
+				while (std::getline(buffer, line))
+				{
+					if (line.back() == '\r')
+					{
+						line.pop_back();
+					}
+					if (line.empty())
+					{
+						break;
+					}
+					size_t pos = line.find(':');
+					std::string k = line.substr(0, pos);
+					std::string v = line.substr(pos + 1);
+					jsonObject->Add(k.c_str(), v);
+				}
+			}
+		}
+		return readDocument.Decode(document.JsonString());
 	}
 
 	void Client::OnConnect(const Asio::Code& code, int count)
@@ -148,7 +202,7 @@ namespace redis
 		return true;
 	}
 
-	void Client::Send(std::unique_ptr<Request> command)
+	void Client::Send(std::unique_ptr<Request>& command)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->mRequest = std::move(command);
@@ -269,11 +323,11 @@ namespace redis
 
 	void Client::OnReceiveLine(std::istream& buffer, size_t size)
 	{
-		this->mResponse = std::make_unique<redis::Response>();
-		if(!this->OnMessage(buffer, size, this->mResponse->element))
+		std::unique_ptr<redis::Response> response = std::make_unique<redis::Response>();
+		if(!this->OnMessage(buffer, size, response->element))
 		{
-			this->mResponse->element.message = "decode error";
-			this->mResponse->element.type = redis::type::Error;
+			response->element.message = "decode error";
+			response->element.type = redis::type::Error;
 		}
 		size_t count = this->mRecvBuffer.size();
 		if(count > 0)
@@ -283,21 +337,19 @@ namespace redis
 			std::istream is(&this->mRecvBuffer);
 			is.readsome((char*)str.data(), count);
 		}
-#ifdef ONLY_MAIN_THREAD
-		std::unique_ptr<redis::Request> request = std::move(this->mRequest);
-		this->mComponent->OnMessage(this->mClientId, request.get(), this->mResponse.release());
-#else
+		redis::Response* resp = response.release();
 		redis::Request* req = this->mRequest.release();
-		redis::Response* resp = this->mResponse.release();
+#ifdef ONLY_MAIN_THREAD
+		this->mComponent->OnMessage(this->mClientId, req, resp);
+#else
 		asio::post(this->mMainContext, [this, req, resp, id = this->mClientId]
 		{
 			this->mComponent->OnMessage(id, req, resp);
-			delete req;
 		});
 #endif
 	}
 
-	std::unique_ptr<redis::Response> Client::Sync(std::unique_ptr<redis::Request> request)
+	std::unique_ptr<redis::Response> Client::Sync(std::unique_ptr<redis::Request>& request)
 	{
 #ifdef ONLY_MAIN_THREAD
 		return this->ReadResponse(request);

@@ -22,12 +22,12 @@ namespace acs
 
 	bool WXNoticeComponent::Awake()
 	{
-		std::unique_ptr<json::r::Value> jsonValue;
+		json::r::Value jsonValue;
 		if (!this->mApp->Config().Get("wx", jsonValue))
 		{
 			return false;
 		}
-		LOG_CHECK_RET_FALSE(jsonValue->Get("app_id", this->mAppId))
+		LOG_CHECK_RET_FALSE(jsonValue.Get("app_id", this->mAppId))
 		{
 			ServerConfig * config = ServerConfig::Inst();
 			LOG_CHECK_RET_FALSE(config->Get("whcbqhn", this->mConfig))

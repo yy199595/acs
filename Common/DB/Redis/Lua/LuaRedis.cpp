@@ -2,12 +2,12 @@
 // Created by yjz on 2022/6/15.
 //
 
-#include"LuaRedis.h"
-#include"Entity/Actor/App.h"
-#include"Yyjson/Lua/ljson.h"
-#include"Redis/Client/RedisDefine.h"
-#include"Proto/Component/ProtoComponent.h"
-#include"Redis/Component/RedisComponent.h"
+#include "LuaRedis.h"
+#include "Entity/Actor/App.h"
+#include "Yyjson/Lua/ljson.h"
+#include "Redis/Client/RedisDefine.h"
+#include "Proto/Component/ProtoComponent.h"
+#include "Redis/Component/RedisComponent.h"
 #include "Redis/Component/RedisSubComponent.h"
 using namespace acs;
 namespace lua
@@ -20,7 +20,7 @@ namespace lua
 			{
 				size_t size = 0;
 				const char* str = lua_tolstring(lua, index, &size);
-				request->AddString(str, size);
+				request->AddParameter(str, size);
 				break;
 			}
 			case LUA_TNUMBER:
@@ -37,10 +37,11 @@ namespace lua
 			}
 			case LUA_TTABLE:
 			{
-				std::string json;
-				if(lua::yyjson::read(lua, index, json))
+				size_t count = 0;
+				std::unique_ptr<char> json;
+				if(lua::yyjson::read(lua, index, json, count))
 				{
-					request->AddParameter(json);
+					request->AddParameter(json.get(), count);
 				}
 				break;
 			}
@@ -83,7 +84,7 @@ namespace lua
 			}
 		}
 		int id = 0;
-		redisComponent->Send(std::move(request), id);
+		redisComponent->Send(request, id);
         return redisComponent->AddTask(new LuaRedisTask(lua, id))->Await();
     }
 
@@ -149,7 +150,7 @@ namespace lua
 			}
 		}
 		lua_pushboolean(lua, true);
-		redisComponent->Send(std::move(request));
+		redisComponent->Send(request);
         return 1;
     }
 
@@ -180,7 +181,7 @@ namespace lua
 			}
 		}
 		int id = 0;
-		redisComponent->Send(std::move(request), id);
+		redisComponent->Send(request, id);
 		return redisComponent->AddTask(new LuaRedisTask(L, id))->Await();
 	}
 

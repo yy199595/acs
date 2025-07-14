@@ -72,17 +72,17 @@ namespace acs
 		int count = 0;
 		std::string channel;
 		std::string message;
-		char proto = rpc::Proto::String;
+		char proto = rpc::proto::string;
 		LOG_ERROR_CHECK_ARGS(document.Get("channel", channel));
 		if(!document.Get("message", message))
 		{
-			std::unique_ptr<json::r::Value> jsonValue;
+			json::r::Value jsonValue;
 			if(!document.Get("message", jsonValue))
 			{
 				return XCode::CallArgsError;
 			}
-			proto = rpc::Proto::Json;
-			message = jsonValue->ToString();
+			proto = rpc::proto::json;
+			message = jsonValue.ToString();
 		}
 		for(auto iter = this->mSubInfos.begin(); iter != this->mSubInfos.end(); iter++)
 		{
@@ -97,7 +97,7 @@ namespace acs
 						rpcMessage->SetContent(proto, message);
 						rpcMessage->SetSockId(subClient.sockId);
 						//subClient.messages.emplace(std::move(rpcMessage));
-						if(this->mRouter->Send(subClient.sockId, std::move(rpcMessage)) == XCode::Ok)
+						if(this->mRouter->Send(subClient.sockId, rpcMessage) == XCode::Ok)
 						{
 							count++;
 						}

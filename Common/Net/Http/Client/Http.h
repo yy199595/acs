@@ -121,7 +121,7 @@ namespace http
 
 	namespace Header
 	{
-		constexpr const char * RealIp = "X-Real-IP";
+		constexpr const char * RealIp = "x-real-ip";
 //		constexpr const char * Permission = "X-Permission";
 //		constexpr const char * OpenId = "X-Open-ID";
 		constexpr const char* Auth = "Authorization";

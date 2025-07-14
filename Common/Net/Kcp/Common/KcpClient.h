@@ -14,8 +14,8 @@ namespace kcp
 		explicit Client(asio::io_context & io, Component * component, asio_udp::endpoint & remote, Asio::Context & main);
 		~Client(){ ikcp_release(this->mKcp); }
 	public:
-		void Send(tcp::IProto * message) final;
 		void Send(const char *buf, int len) final;
+		void Send(std::unique_ptr<rpc::Message> & message) final;
 		inline asio_udp::socket & Socket() { return this->mSocket; }
 	public:
 		void StartReceive() final;

@@ -15,6 +15,7 @@
 #include"Router/Component/RouterComponent.h"
 
 #include"Core/System/System.h"
+#include "Server/Config/CodeConfig.h"
 
 namespace acs
 {
@@ -51,7 +52,7 @@ namespace acs
 		}
 	}
 
-	int DispatchComponent::OnRequest(rpc::Message* message) noexcept
+	int DispatchComponent::OnRequest(std::unique_ptr<rpc::Message> & message) noexcept
 	{
 		++this->mSumCount;
 		int code = XCode::Ok;
@@ -82,19 +83,19 @@ namespace acs
 				this->Invoke(methodConfig, message);
 				break;
 			}
-			this->mCoroutine->Start(&DispatchComponent::Invoke, this, methodConfig, message);
+			this->mCoroutine->Start(&DispatchComponent::Invoke, this, methodConfig, std::move(message));
+			return XCode::Ok;
 		}
 		while (false);
 		if(code != XCode::Ok)
 		{
 			int id = message->SockId();
 			this->mRouter->Send(id, code, message);
-			return XCode::Ok;
 		}
 		return code;
 	}
 
-	void DispatchComponent::Invoke(const RpcMethodConfig* config, rpc::Message* message) noexcept
+	void DispatchComponent::Invoke(const RpcMethodConfig* config, std::unique_ptr<rpc::Message> & message) noexcept
 	{
 		++this->mWaitCount;
 		int code = XCode::Ok;
@@ -115,11 +116,11 @@ namespace acs
 		} while (false);
 #ifdef __DEBUG__
 		long long t = help::Time::NowMil() - start;
-//		if (code != XCode::Ok)
-//		{
-//			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-//			LOG_WARN("({}ms) invoke [{}] code:{} = {}", t, config->FullName, code, desc);
-//		}
+		if (code != XCode::Ok)
+		{
+			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+			LOG_WARN("({}ms) invoke [{}] code:{} = {}", t, config->fullname, code, desc);
+		}
 		if (config->timeout > 0 && t >= config->timeout)
 		{
 			LOG_WARN("({}ms) invoke [{}] too long time", t, config->fullname);
@@ -139,15 +140,16 @@ namespace acs
 		}
 	}
 
-	int DispatchComponent::OnMessage(rpc::Message* message) noexcept
+	int DispatchComponent::OnMessage(std::unique_ptr<rpc::Message> & message) noexcept
 	{
+		assert(this->mApp->IsMainThread());
 		switch (message->GetType())
 		{
-			case rpc::Type::Request:
+			case rpc::type::request:
 				return this->OnRequest(message);
-			case rpc::Type::Response:
+			case rpc::type::response:
 			{
-				if(message->GetSource() == rpc::Source::Client)
+				if(message->GetSource() == rpc::source::client)
 				{
 					if (this->mGateSender != nullptr)
 					{
@@ -158,19 +160,19 @@ namespace acs
 					}
 				}
 				int rpcId = message->GetRpcId();
-				this->OnResponse(rpcId, std::unique_ptr<rpc::Message>(message));
+				this->OnResponse(rpcId, std::move(message));
 				return XCode::Ok;
 			}
-			case rpc::Type::Client:
+			case rpc::type::client:
 				return this->OnClient(message);
-			case rpc::Type::Broadcast:
+			case rpc::type::broadcast:
 				return this->OnBroadcast(message);
 		}
 		LOG_ERROR("unknown message type : {}", message->GetType());
 		return XCode::UnKnowPacket;
 	}
 
-	int DispatchComponent::OnClient(rpc::Message* message)
+	int DispatchComponent::OnClient(std::unique_ptr<rpc::Message> & message)
 	{
 		if (this->mGateSender == nullptr)
 		{
@@ -182,19 +184,19 @@ namespace acs
 			LOG_ERROR("not find userid forward to client fail");
 			return XCode::CallArgsError;
 		}
-		message->SetType(rpc::Type::Request);
+		message->SetType(rpc::type::request);
 		message->GetHead().Del(rpc::Header::client_sock_id);
 		this->mGateSender->Send(sockId, message);
 		return XCode::Ok;
 	}
 
-	int DispatchComponent::OnBroadcast(rpc::Message* message)
+	int DispatchComponent::OnBroadcast(std::unique_ptr<rpc::Message> & message)
 	{
 		if (this->mGateSender == nullptr)
 		{
 			return XCode::Failure;
 		}
-		message->SetType(rpc::Type::Request);
+		message->SetType(rpc::type::request);
 		this->mGateSender->Broadcast(message);
 		return XCode::Ok;
 	}

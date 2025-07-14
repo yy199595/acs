@@ -55,7 +55,7 @@ namespace ws
 		std::unique_ptr<ws::Message> pingMessage = std::make_unique<ws::Message>();
 		{
 			std::string message("ping");
-			pingMessage->SetBody(ws::OPCODE_PING, message);
+			pingMessage->SetBody(ws::OPCODE_PING, message, false);
 			this->mWaitSendMessage.emplace(std::move(pingMessage));
 			if(this->mWaitSendMessage.size() == 1)
 			{
@@ -128,18 +128,18 @@ namespace ws
 		this->mSockId = 0;
 	}
 
-	void Client::Send(ws::Message* message)
+	void Client::Send(std::unique_ptr<ws::Message>& message)
 	{
 		Asio::Context & context = this->mSocket->GetContext();
-		asio::post(context, [this, self = this->shared_from_this(), message] ()
+		asio::post(context, [this, self = this->shared_from_this(), req = message.release()] ()
 		{
-			std::unique_ptr<ws::Message> wsMessage(message);
-			this->AddToSendQueue(std::move(wsMessage));
+			std::unique_ptr<ws::Message> wsMessage(req);
+			this->AddToSendQueue(wsMessage);
 		});
 
 	}
 
-	void Client::AddToSendQueue(std::unique_ptr<ws::Message> wsMessage)
+	void Client::AddToSendQueue(std::unique_ptr<ws::Message>& wsMessage)
 	{
 		this->mWaitSendMessage.emplace(std::move(wsMessage));
 		if(this->mWaitSendMessage.size() == 1)
@@ -148,20 +148,20 @@ namespace ws
 		}
 	}
 
-	void Client::Send(rpc::Message* message)
+	void Client::Send(std::unique_ptr<rpc::Message>& req)
 	{
 		Asio::Context & context = this->mSocket->GetContext();
-		asio::post(context, [this, self = this->shared_from_this(), message] ()
+		asio::post(context, [this, self = this->shared_from_this(), message = req.release()] ()
 		{
 			this->mStream.str("");
 			std::unique_ptr<ws::Message> wsMessage = std::make_unique<ws::Message>();
 			{
 				message->SetMsg(this->mMsg);
 				message->OnSendMessage(this->mStream);
-				wsMessage->SetBody(ws::OPCODE_BIN, this->mStream.str(), true);
+				wsMessage->SetBody(ws::OPCODE_BIN, this->mStream.str(), false);
 			}
 			delete message;
-			this->AddToSendQueue(std::move(wsMessage));
+			this->AddToSendQueue(wsMessage);
 		});
 	}
 
@@ -179,6 +179,48 @@ namespace ws
 	{
 		asio::error_code code;
 		this->OnReceiveMessage(readStream, size, code);
+	}
+
+	bool Client::OnMessage(const ws::Message& message)
+	{
+		const ws::Header & header = message.GetHeader();
+		switch(header.opcode)
+		{
+			case ws::OPCODE_BIN:
+			case ws::OPCODE_TEXT:
+			{
+				auto self = this->shared_from_this();
+				const std::string & body = this->mMessage.GetMessageBody();
+				std::unique_ptr<rpc::Message> request = std::make_unique<rpc::Message>();
+				{
+					request->SetMsg(this->mMsg);
+					std::stringstream buffer(body);
+					if(request->OnRecvMessage(buffer, body.size()) != 0)
+					{
+						return false;
+					}
+				}
+				request->SetNet(rpc::net::ws);
+				request->SetSockId(this->mSockId);
+				asio::post(this->mMainContext, [self, this, req = request.release()]
+				{
+					this->mComponent->OnMessage(req, nullptr);
+				});
+				return true;
+			}
+			case ws::OPCODE_PING:
+			{
+				std::unique_ptr<ws::Message> pingMessage = std::make_unique<ws::Message>();
+				{
+					pingMessage->SetBody(ws::OPCODE_PONG, "ping", false);
+				}
+				this->AddToSendQueue(pingMessage);
+				break;
+			}
+			case ws::OPCODE_CLOSE:
+				return false;
+		}
+		return true;
 	}
 
 	void Client::OnReceiveMessage(std::istream& readStream, size_t size, const asio::error_code& code)
@@ -206,11 +248,7 @@ namespace ws
 		}
 		else
 		{
-			if(this->mMessage == nullptr)
-			{
-				this->mMessage = std::make_unique<ws::Message>();
-			}
-			flag = this->mMessage->OnRecvMessage(readStream, size);
+			flag = this->mMessage.OnRecvMessage(readStream, size);
 		}
 		switch(flag)
 		{
@@ -228,26 +266,12 @@ namespace ws
 				break;
 			case tcp::read::done:
 			{
-				auto self = this->shared_from_this();
-				const std::string & message = this->mMessage->GetMessageBody();
-				std::unique_ptr<rpc::Message> request = std::make_unique<rpc::Message>();
+				if(!this->OnMessage(this->mMessage))
 				{
-					request->SetMsg(this->mMsg);
-					std::stringstream buffer(message);
-					if(request->OnRecvMessage(buffer, message.size()) != 0)
-					{
-						this->Close(XCode::UnKnowPacket);
-						return;
-					}
+					this->Close(XCode::UnKnowPacket);
+					return;
 				}
-
-				request->SetNet(rpc::Net::Ws);
-				request->SetSockId(this->mSockId);
-				asio::post(this->mMainContext, [self, this, req = request.release()]
-				{
-					this->mComponent->OnMessage(req, nullptr);
-				});
-				this->mMessage->Clear();
+				this->mMessage.Clear();
 				this->ReadSome();
 				break;
 			}

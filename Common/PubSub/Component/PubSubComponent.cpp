@@ -8,7 +8,7 @@
 #include "PubSub/Service/PubSubSystem.h"
 #include "Node/Component/NodeComponent.h"
 #include "Cluster/Config/ClusterConfig.h"
-
+#include "Rpc/Config/ServiceConfig.h"
 namespace acs
 {
 	PubSubComponent::PubSubComponent()
@@ -44,15 +44,15 @@ namespace acs
 		{
 			return XCode::MakeTcpRequestFailure;
 		}
-		request->SetContent(rpc::Proto::Json, message);
+		request->SetContent(rpc::proto::json, message);
 		request->GetHead().Add(rpc::Header::channel, channel);
-		return node->Call(std::move(request));
+		return node->Call(request);
 	}
 
 	int PubSubComponent::Publish(const std::string& channel, const json::w::Document& document)
 	{
 		std::string message;
-		if(!document.Encode(&message))
+		if(!document.Serialize(&message))
 		{
 			return XCode::ParseJsonFailure;
 		}
@@ -76,7 +76,7 @@ namespace acs
 			return XCode::MakeTcpRequestFailure;
 		}
 		request->GetHead().Add(rpc::Header::channel, channel);
-		return node->Call(std::move(request));
+		return node->Call(request);
 	}
 
 	int PubSubComponent::UnSubscribe(const std::string& channel)
@@ -96,6 +96,6 @@ namespace acs
 			return XCode::MakeTcpRequestFailure;
 		}
 		request->GetHead().Add(rpc::Header::channel, channel);
-		return node->Call(std::move(request));
+		return node->Call(request);
 	}
 }
